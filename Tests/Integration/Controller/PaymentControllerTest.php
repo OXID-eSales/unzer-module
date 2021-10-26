@@ -15,15 +15,22 @@
  * Created: 2021-10-26, ja
  */
 
-namespace OxidSolutionCatalysts\Unzer\Controller;
+namespace OxidSolutionCatalysts\Unzer\Tests\Controller;
 
-class PaymentController extends PaymentController_parent
+class PaymentControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
-    /**
-     * @return bool
-     */
-    public function doSomething()
+    protected $SubjectUnderTest = null;
+
+    public function setUp(): void
     {
-        return (bool) true;
+        $this->SubjectUnderTest = oxNew(\OxidEsales\Eshop\Application\Controller\PaymentController::class);
+    }
+
+    public function testSomething()
+    {
+        self::assertEquals(
+            true,
+            $this->SubjectUnderTest->doSomething()
+        );
     }
 }

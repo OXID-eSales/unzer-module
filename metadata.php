@@ -28,10 +28,10 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class
+            => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class
     ],
     'controllers' => [
-        \OxidEshop\Application\Controller\PaymentController::class
-            => \OxidSolutionCatalists\Unzer\Controller\PaymentController::class
     ],
     'templates' => [
     ],

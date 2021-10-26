@@ -18,7 +18,8 @@
     },
     "autoload": {
         "psr-4": {
-            "OxidSolutionCatalists\\Unzer\\": "src"
+            "OxidSolutionCatalysts\\Unzer\\": "src",
+            "OxidSolutionCatalysts\\Unzer\\Tests\\": "Tests"
         }
     }
 }
