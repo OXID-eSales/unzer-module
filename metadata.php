@@ -14,7 +14,10 @@ $sMetadataVersion = '2.1';
  */
 $aModule = [
     'id' => 'osc-unzer',
-    'title' => 'Unzer Payment Modul für OXID',
+    'title' => [
+        'de' => 'Unzer Payment-Modul für OXID',
+        'en' => 'Unzer Payment Module for OXID',
+    ],
     'description' => [
         'de' => '',
         'en' => '',

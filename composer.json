@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "OxidSolutionCatalists\\Unzer\\": "../../../source/modules/osc/unzer"
+            "OxidSolutionCatalists\\Unzer\\": "src"
         }
     }
 }
