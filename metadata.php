@@ -30,6 +30,8 @@ $aModule = [
     'extend' => [
     ],
     'controllers' => [
+        \OxidEshop\Application\Controller\PaymentController::class
+            => \OxidSolutionCatalists\Unzer\Controller\PaymentController::class
     ],
     'templates' => [
     ],
