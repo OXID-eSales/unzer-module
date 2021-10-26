@@ -138,7 +138,7 @@ jobs:
         working-directory: /build/oxid
 
       - name: console
-        run: vendor/bin/oe-console oe:module:activate oxpspasswordpolicy
+        run: vendor/bin/oe-console oe:module:activate osc-unzer
         working-directory: /build/oxid
 
       - name: check mod config
@@ -154,5 +154,5 @@ jobs:
         working-directory: /build/oxid
 
       - name: run unit tests
-        run: php vendor/bin/phpunit --bootstrap vendor/oxid-esales/testing-library/bootstrap.php -c /build/oxid/source/modules/oxps/passwordpolicy/tests/phpunit.xml
+        run: php vendor/bin/phpunit --bootstrap vendor/oxid-esales/testing-library/bootstrap.php -c /build/oxid/source/modules/osc/unzer/tests/phpunit.xml
         working-directory: /build/oxid
