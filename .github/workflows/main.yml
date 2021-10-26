@@ -1,0 +1,158 @@
+name: oxid module tests
+
+on: [push]
+
+jobs:
+  codestyle_checks:
+    strategy:
+      matrix:
+        php: [ 7.4 ]
+        oxid: [ 6.3 ]
+    runs-on: ubuntu-latest
+    container:
+      image: oxidprojects/oxid-apache-php:oxid${{ matrix.oxid }}-php${{ matrix.php }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Validate composer.json
+        run: composer validate
+      - name: validate php syntax
+        run: find . -not -path "./vendor/*" -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
+      - name: install php-cs-fixer
+        run: phive install php-cs-fixer:2.18.5 --trust-gpg-keys E82B2FB314E9906E
+      - name: run code checks
+        run: tools/php-cs-fixer fix --dry-run --diff-format=udiff .
+  install:
+    strategy:
+      matrix:
+        php: [ 7.4 ] 
+        oxid: [ 6.3 ]
+    runs-on: ubuntu-latest
+    container:
+      image: oxidprojects/oxid-apache-php:oxid${{ matrix.oxid }}-php${{ matrix.php }}
+      options: --tmpfs=/build:noatime
+    env:
+      MODULE_NAME: oxid-solution-catalysts/unzer
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: install
+        run: composer create-project oxid-professional-services/test-oxid /build/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/keywan-ghadami-oxid/test-oxid.git\", \"type\":\"vcs\"}" --remove-vcs
+
+      - name: move artifacts to projects folder
+        run: |
+          mkdir -p /build/oxid/project-modules/module-under-test && cp -r * /build/oxid/project-modules/module-under-test
+      - name: add project module folder
+        run:
+          composer config repositories.build path /build/oxid/project-modules/\*
+        working-directory: /build/oxid
+
+      - name: require module
+        run: composer require --no-interaction $MODULE_NAME
+        working-directory: /build/oxid
+
+      - name: move config to source folder
+        run: cp config.inc.php-dist source/config.inc.php
+        working-directory: /build/oxid
+
+      - name: zip temp artifact
+        run: tar czf /build/oxid.tar.gz --directory /build oxid
+
+      - name: Upload oxid-with-deps
+        uses: actions/upload-artifact@v2
+        with:
+          name: oxid${{ matrix.oxid }}-php${{ matrix.php }}-with-deps
+          path: /build/oxid.tar.gz
+
+  static_code_checks:
+    strategy:
+      matrix:
+        php: [ 7.4 ]
+        oxid: [ 6.3 ]
+    runs-on: ubuntu-latest
+    needs: install
+    container:
+      image: oxidprojects/oxid-apache-php:oxid${{ matrix.oxid }}-php${{ matrix.php }}
+      options: --tmpfs=/build:exec,noatime
+    steps:
+      - name: Download oxid installation
+        uses: actions/download-artifact@v2
+        with:
+          name: oxid${{ matrix.oxid }}-php${{ matrix.php }}-with-deps
+          path: /build
+      - name: extract oxid installation
+        run: |
+          tar xzf oxid.tar.gz
+        working-directory: /build/
+
+      - name: prepare autoload
+        run: bin/createModuleAutoload.sh
+        working-directory: /build/oxid
+
+      - name: run psalm
+        run: php tools/psalm --no-progress --no-cache
+        working-directory: /build/oxid
+
+
+  oxid_unit_tests:
+    strategy:
+      matrix:
+        php: [ 7.4 ]
+        oxid: [ 6.3 ]
+    runs-on: ubuntu-latest
+    needs: install
+    env:
+      MYSQL_DATABASE: oxid
+      MYSQL_HOST: db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      SHOP_URL: http://localhost/
+    services:
+      db:
+        image: mariadb:10.5
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: oxid
+        ports:
+          - 3306
+        options: --tmpfs=/tmp:noatime --tmpfs=/var/lib/mysql:noatime --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    container:
+      image: oxidprojects/oxid-apache-php:oxid${{ matrix.oxid }}-php${{ matrix.php }}
+      options: --tmpfs=/build:exec,noatime
+    steps:
+      - name: Download a single artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: oxid${{ matrix.oxid }}-php${{ matrix.php }}-with-deps
+          path: /build
+      - name: extract temp artifact
+        run: |
+          tar xzf oxid.tar.gz
+        working-directory: /build/
+
+      - name: mysql shema
+        run: mysql -u $MYSQL_USER -h db -p$MYSQL_PASSWORD $MYSQL_DATABASE < "vendor/oxid-esales/oxideshop-ce/source/Setup/Sql/database_schema.sql"
+        working-directory: /build/oxid
+
+      - name: mysql data
+        run: mysql -u $MYSQL_USER -h db -p$MYSQL_PASSWORD $MYSQL_DATABASE < "vendor/oxid-esales/oxideshop-ce/source/Setup/Sql/initial_data.sql"
+        working-directory: /build/oxid
+
+      - name: console
+        run: vendor/bin/oe-console oe:module:activate oxpspasswordpolicy
+        working-directory: /build/oxid
+
+      - name: check mod config
+        run: cat var/configuration/shops/1.yaml
+        working-directory: /build/oxid
+
+      - name: composer validate
+        run: composer validate
+        working-directory: /build/oxid
+
+      - name: oxid config
+        run: cat source/config.inc.php
+        working-directory: /build/oxid
+
+      - name: run unit tests
+        run: php vendor/bin/phpunit --bootstrap vendor/oxid-esales/testing-library/bootstrap.php -c /build/oxid/source/modules/oxps/passwordpolicy/tests/phpunit.xml
+        working-directory: /build/oxid

@@ -1,0 +1,24 @@
+{
+    "name": "oxid-solution-catalysts/unzer",
+    "description": "OXID eSales unzer payment module for OXID",
+    "type": "oxideshop-module",
+    "keywords": ["oxid", "modules", "eShop", "unzer", "payment"],
+    "homepage": "https://www.oxid-esales.com",
+    "license": ["GPL-3.0"],
+    "extra": {
+        "oxideshop": {
+            "target-directory": "osc/unzer"
+        }
+    },
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "OxidSolutionCatalists\\Unzer\\": "../../../source/modules/osc/unzer"
+        }
+    }
+}
