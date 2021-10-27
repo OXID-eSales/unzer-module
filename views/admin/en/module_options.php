@@ -9,7 +9,7 @@ $sLangName = "English";
 
 $aLang = [
     "charset"                                  => "UTF-8",
-    'SHOP_MODULE_GROUP_merchant'               => 'ccess Data',
+    'SHOP_MODULE_GROUP_merchant'               => 'Access Data',
     'SHOP_MODULE_GROUP_environment'            => 'Environment',
     'SHOP_MODULE_UnzerPublicKey'               => 'Public-Key',
     'SHOP_MODULE_UnzerPrivateKey'              => 'Private-Key',
