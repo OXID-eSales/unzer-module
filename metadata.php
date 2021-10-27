@@ -38,6 +38,35 @@ $aModule = [
     'blocks' => [
     ],
     'settings' => [
+        [
+            'group' => 'merchant',
+            'name' => 'UnzerPublicKey',
+            'type' => 'str'
+        ],
+        [
+            'group' => 'merchant',
+            'name' => 'UnzerPrivateKey',
+            'type' => 'str'
+        ],
+        [
+            'group' => 'merchant',
+            'name' => 'UnzerApiKey',
+            'type' => 'str'
+        ],
+        [
+            'group' => 'environment',
+            'name' => 'UnzerSystemMode',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1'
+        ],
+        [
+            'group' => 'environment',
+            'name' => 'UnzerLogLevel',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1|2'
+        ],
     ],
     'events' => [
     ],
