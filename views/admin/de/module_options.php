@@ -22,7 +22,8 @@ $aLang = [
     'SHOP_MODULE_UnzerLogLevel_0'              => 'Debug',
     'SHOP_MODULE_UnzerLogLevel_1'              => 'Warn',
     'SHOP_MODULE_UnzerLogLevel_2'              => 'Error',
-    'HELP_SHOP_MODULE_UnzerLogLevel'           => 'Das Log Level bestimmt, welche Ereignisse in der Logdatei protokolliert werden. Mögliche Werte sind Debug (alles), Warning (Warnungen und Fehler), oder Error (nur Fehler).',
+    'HELP_SHOP_MODULE_UnzerLogLevel'           => 'Das Log Level bestimmt, welche Ereignisse in der Logdatei protokolliert werden. Mögliche Werte
+     sind Debug (alles), Warning (Warnungen und Fehler), oder Error (nur Fehler).',
 
 
 ];
