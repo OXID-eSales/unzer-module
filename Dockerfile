@@ -13,3 +13,7 @@ RUN composer config repositories.build path /var/www/oxideshop/project-modules/\
 RUN composer require --no-interaction $MODULE_NAME
 # move config to source folder
 RUN cp config.inc.php-dist source/config.inc.php
+
+COPY ./docker-php-entrypoint /usr/local/bin/
+RUN chmod 777 /usr/local/bin/docker-php-entrypoint \
+    && ln -s /usr/local/bin/docker-php-entrypoint
