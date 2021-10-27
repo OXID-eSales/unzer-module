@@ -6,7 +6,7 @@ services:
       - '80:80'
     environment:
       - MYSQL_HOST=db
-      - MYSQL_DATBASE=oxid
+      - MYSQL_DATABASE=oxid
       - MYSQL_USER=oxid
       - MYSQL_PASSWORD=oxid
       - SHOP_URL=http://localhost
