@@ -9,6 +9,7 @@ services:
       - MYSQL_DATABASE=oxid
       - MYSQL_USER=oxid
       - MYSQL_PASSWORD=oxid
+      - OXID_EDITION=ce
       - SHOP_URL=http://localhost
   db:
     image: mariadb

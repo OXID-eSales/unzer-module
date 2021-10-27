@@ -1,11 +1,14 @@
-ARG MODULE_NAME="oxid-solution-catalysts/unzer"
 ARG OXID="6.3"
 ARG PHP="7.4"
-
 FROM oxidprojects/oxid-apache-php:oxid${OXID}-php${PHP}
+ARG OXID="6.3"
+ARG PHP="7.4"
+ARG MODULE_NAME="oxid-solution-catalysts/unzer"
 RUN rm -rfv /var/www/oxideshop
-RUN composer create-project oxid-professional-services/test-oxid /var/www/oxideshop --no-interaction -s dev --repository="{\"url\":\"https://github.com/keywan-ghadami-oxid/test-oxid.git\", \"type\":\"vcs\"}" --remove-vcs
+RUN composer create-project oxid-professional-services/test-oxid=dev-oxid$OXID /var/www/oxideshop --no-interaction -s dev --repository="{\"url\":\"https://github.com/keywan-ghadami-oxid/test-oxid.git\", \"type\":\"vcs\"}" --remove-vcs
 RUN mkdir -p /var/www/oxideshop/project-modules/module-under-test
+#RUN composer require oxid-esales/oxideshop-demodata-ce:
+
 COPY . /var/www/oxideshop/project-modules/module-under-test
 
 WORKDIR /var/www/oxideshop
