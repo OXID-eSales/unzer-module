@@ -154,5 +154,5 @@ jobs:
         working-directory: /build/oxid
 
       - name: run unit tests
-        run: php vendor/bin/phpunit --bootstrap vendor/oxid-esales/testing-library/bootstrap.php -c /build/oxid/source/modules/osc/unzer/tests/phpunit.xml
+        run: php vendor/bin/phpunit --bootstrap vendor/oxid-esales/testing-library/bootstrap.php -c /build/oxid/source/modules/osc/unzer/Tests/phpunit.xml
         working-directory: /build/oxid
