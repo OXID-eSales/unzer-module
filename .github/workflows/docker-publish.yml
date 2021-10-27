@@ -69,7 +69,6 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REGISTRY }}/oxidprojects/unzer-oxid:oxid63php74
-            oxidprojects/unzer-oxid:oxid63php74
           secrets: |
             "github_token=${{ secrets.GITHUB_TOKEN }}"
     
