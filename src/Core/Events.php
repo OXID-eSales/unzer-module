@@ -35,130 +35,130 @@ use Psr\Container\ContainerInterface;
 class Events
 {
     private static array $_aPayments = [
-            //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
+        //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
-            //Credit cards and debit cards are the most common payment method in e-commerce.
-            'oscunzer_card' =>              ['insert' => 1,
-                                            'de_desc' => "Kreditkarte",
-                                            'en_desc' => "Credit Card",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Credit cards and debit cards are the most common payment method in e-commerce.
+        'oscunzer_card' => ['insert' => 1,
+            'de_desc' => "Kreditkarte",
+            'en_desc' => "Credit Card",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Unzer Direct Debit lets you accept payments in euro.
-            'oscunzer_sepa' =>              ['insert' => 1,
-                                            'de_desc' => "SEPA Lastschrift",
-                                            'en_desc' => "SEPA Direct Debit",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Unzer Direct Debit lets you accept payments in euro.
+        'oscunzer_sepa' => ['insert' => 1,
+            'de_desc' => "SEPA Lastschrift",
+            'en_desc' => "SEPA Direct Debit",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
-            'oscunzer_sepa-secured' =>      ['insert' => 1,
-                                            'de_desc' => "SEPA Lastschrift Secured",
-                                            'en_desc' => "SEPA Direct Debit Secured",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
+        'oscunzer_sepa-secured' => ['insert' => 1,
+            'de_desc' => "SEPA Lastschrift Secured",
+            'en_desc' => "SEPA Direct Debit Secured",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Sofort is an online payment method used in select European countries.
-            'oscunzer_sofort' =>            ['insert' => 1,
-                                            'de_desc' => "Sofort",
-                                            'en_desc' => "Sofort",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Sofort is an online payment method used in select European countries.
+        'oscunzer_sofort' => ['insert' => 1,
+            'de_desc' => "Sofort",
+            'en_desc' => "Sofort",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Unzer Invoice lets you issue an invoice and then collect the payment.
-            'oscunzer_invoice' =>           ['insert' => 1,
-                                            'de_desc' => "Rechnung",
-                                            'en_desc' => "Invoice",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Unzer Invoice lets you issue an invoice and then collect the payment.
+        'oscunzer_invoice' => ['insert' => 1,
+            'de_desc' => "Rechnung",
+            'en_desc' => "Invoice",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Unzer Invoice Secured lets you issue an invoice and then collect the payment, your payment is secured.
-            'oscunzer_invoice-secured' =>   ['insert' => 1,
-                                            'de_desc' => "Rechnung Secured",
-                                            'en_desc' => "Invoice Secured",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Unzer Invoice Secured lets you issue an invoice and then collect the payment, your payment is secured.
+        'oscunzer_invoice-secured' => ['insert' => 1,
+            'de_desc' => "Rechnung Secured",
+            'en_desc' => "Invoice Secured",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Giropay is an online payment method used in Germany.
-            'oscunzer_giropay' =>           ['insert' => 1,
-                                            'de_desc' => "Giropay",
-                                            'en_desc' => "Giropay",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Giropay is an online payment method used in Germany.
+        'oscunzer_giropay' => ['insert' => 1,
+            'de_desc' => "Giropay",
+            'en_desc' => "Giropay",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //iDEAL is the most popular method for online payments in the Netherlands.
-            'oscunzer_ideal' =>             ['insert' => 1,
-                                            'de_desc' => "iDEAL",
-                                            'en_desc' => "iDEAL",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //iDEAL is the most popular method for online payments in the Netherlands.
+        'oscunzer_ideal' => ['insert' => 1,
+            'de_desc' => "iDEAL",
+            'en_desc' => "iDEAL",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
-            'oscunzer_prepayment' =>        ['insert' => 1,
-                                            'de_desc' => "Vorkasse",
-                                            'en_desc' => "Prepayment",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
+        'oscunzer_prepayment' => ['insert' => 1,
+            'de_desc' => "Vorkasse",
+            'en_desc' => "Prepayment",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Unzer Bank Transfer lets your customers pay directly from their bank account.
-            'oscunzer_banktransfer' =>      ['insert' => 1,
-                                            'de_desc' => "Banktransfer",
-                                            'en_desc' => "Bank Transfer",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Unzer Bank Transfer lets your customers pay directly from their bank account.
+        'oscunzer_banktransfer' => ['insert' => 1,
+            'de_desc' => "Banktransfer",
+            'en_desc' => "Bank Transfer",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Electronic Payment Standard (EPS) is an online payment system used in Austria.
-            'oscunzer_eps' =>               ['insert' => 1,
-                                            'de_desc' => "EPS",
-                                            'en_desc' => "EPS",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Electronic Payment Standard (EPS) is an online payment system used in Austria.
+        'oscunzer_eps' => ['insert' => 1,
+            'de_desc' => "EPS",
+            'en_desc' => "EPS",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //PostFinance e-finance is an online direct payment method used in Switzerland.
-            'oscunzer_post-finance' =>      ['insert' => 1,
-                                            'de_desc' => "PostFinance e-finance",
-                                            'en_desc' => "PostFinance e-finance",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
-            //Apple Pay is a popular mobile payment and digital wallet service provided by Apple.
-            'oscunzer_applepay' =>          ['insert' => 0,
-                                            'de_desc' => "Apple Pay",
-                                            'en_desc' => "Apple Pay",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
-            //Unzer Instalment lets your customers pay in monthly payments.
-            'oscunzer_instalment' =>        ['insert' => 1,
-                                            'de_desc' => "Ratenzahlung",
-                                            'en_desc' => "Instalment",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
-            //PayPal is one of the world’s most popular online payment systems.
-            'oscunzer_paypal' =>            ['insert' => 1,
-                                            'de_desc' => "PayPal",
-                                            'en_desc' => "PayPal",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //PostFinance e-finance is an online direct payment method used in Switzerland.
+        'oscunzer_post-finance' => ['insert' => 1,
+            'de_desc' => "PostFinance e-finance",
+            'en_desc' => "PostFinance e-finance",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
+        //Apple Pay is a popular mobile payment and digital wallet service provided by Apple.
+        'oscunzer_applepay' => ['insert' => 0,
+            'de_desc' => "Apple Pay",
+            'en_desc' => "Apple Pay",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
+        //Unzer Instalment lets your customers pay in monthly payments.
+        'oscunzer_instalment' => ['insert' => 1,
+            'de_desc' => "Ratenzahlung",
+            'en_desc' => "Instalment",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
+        //PayPal is one of the world’s most popular online payment systems.
+        'oscunzer_paypal' => ['insert' => 1,
+            'de_desc' => "PayPal",
+            'en_desc' => "PayPal",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Przelewy24 is an online payment method used in Poland.
-            'oscunzer_przelewy24' =>        ['insert' => 0,
-                                            'de_desc' => "Przelewy24",
-                                            'en_desc' => "Przelewy24",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Przelewy24 is an online payment method used in Poland.
+        'oscunzer_przelewy24' => ['insert' => 0,
+            'de_desc' => "Przelewy24",
+            'en_desc' => "Przelewy24",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
-            'oscunzer_wechatpay' =>         ['insert' => 0,
-                                            'de_desc' => "WeChat Pay",
-                                            'en_desc' => "WeChat Pay",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
+        'oscunzer_wechatpay' => ['insert' => 0,
+            'de_desc' => "WeChat Pay",
+            'en_desc' => "WeChat Pay",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
 
-            //Alipay is China’s leading third-party mobile and online payment solution.
-            'oscunzer_alipay' =>            ['insert' => 0,
-                                            'de_desc' => "Alipay",
-                                            'en_desc' => "Alipay",
-                                            'de_longdesc' => "de text",
-                                            'en_longdesc' => "en text"],
+        //Alipay is China’s leading third-party mobile and online payment solution.
+        'oscunzer_alipay' => ['insert' => 0,
+            'de_desc' => "Alipay",
+            'en_desc' => "Alipay",
+            'de_longdesc' => "de text",
+            'en_longdesc' => "en text"],
     ];
 
     /**
@@ -166,9 +166,9 @@ class Events
      */
     public static function addUnzerPaymentMethods()
     {
-        foreach(self::$_aPayments as $paymentid => $aPayment){
+        foreach (self::$_aPayments as $paymentid => $aPayment) {
             $payment = oxNew(Payment::class);
-            if($aPayment['insert']){
+            if ($aPayment['insert']) {
                 if (!$payment->load($paymentid)) {
                     $payment->setId($paymentid);
                     $payment->oxpayments__oxactive = new Field(0);
@@ -200,7 +200,7 @@ class Events
      *
      * @return bool
      */
-    public static function isUnzerActiveOnSubShops() : bool
+    public static function isUnzerActiveOnSubShops(): bool
     {
         $config = Registry::getConfig();
         $shops = $config->getShopIds();
@@ -209,7 +209,9 @@ class Events
 
         foreach ($shops as $shopId) {
             if ($shopId != $activeShopId) {
-                if($moduleActivationBridge->isActive("osc-unzer", $shopId)) return true;
+                if ($moduleActivationBridge->isActive("osc-unzer", $shopId)) {
+                    return true;
+                }
             }
         }
 
@@ -222,7 +224,7 @@ class Events
     public static function disableUnzerPaymentMethods()
     {
         $payment = oxNew(Payment::class);
-        foreach(self::$_aPayments as $paymentid => $aPayment){
+        foreach (self::$_aPayments as $paymentid => $aPayment) {
             if ($payment->load($paymentid)) {
                 $payment->oxpayments__oxactive = new Field(0);
                 $payment->save();
@@ -253,11 +255,11 @@ class Events
     }
 
     /**
+     * @return ContainerInterface
      * @internal
      *
-     * @return ContainerInterface
      */
-    protected static function getContainer() : ContainerInterface
+    protected static function getContainer(): ContainerInterface
     {
         return ContainerFactory::getInstance()->getContainer();
     }
