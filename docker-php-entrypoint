@@ -28,6 +28,12 @@ then
 
 fi
 
+if [ "${HTA_USER}" != test ] && [ "${HTA_PW}" != test ]
+then
+echo 'AuthType Basic\nAuthName "Passwortgesch�tzter Bereich"\nAuthUserFile /var/www/oxideshop/.htpasswd\nRequire valid-user' >> /var/www/oxideshop/source/.htaccess
+htpasswd -bc /var/www/oxideshop/.htpasswd ${HTA_USER} ${HTA_PW}
+fi
+
 rm -rf /var/www/oxideshop/source/Setup/
 chmod 444 /var/www/oxideshop/source/config.inc.php
 chmod 444 /var/www/oxideshop/source/.htaccess

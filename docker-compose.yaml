@@ -11,6 +11,8 @@ services:
       - MYSQL_PASSWORD=oxid
       - OXID_EDITION=ce
       - SHOP_URL=http://localhost
+      - HTA_USER=user
+      - HTA_PW=password
   db:
     image: mariadb
     ports:

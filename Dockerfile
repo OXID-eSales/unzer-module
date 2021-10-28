@@ -4,6 +4,8 @@ FROM oxidprojects/oxid-apache-php:oxid${OXID}-php${PHP}
 ARG OXID="6.3"
 ARG PHP="7.4"
 ARG MODULE_NAME="oxid-solution-catalysts/unzer"
+ENV HTA_PW="test"
+ENV HTA_USER="test"
 RUN rm -rfv /var/www/oxideshop
 RUN composer create-project oxid-professional-services/test-oxid=dev-oxid6.3 /var/www/oxideshop --no-interaction -s dev --repository="{\"url\":\"https://github.com/keywan-ghadami-oxid/test-oxid.git\", \"type\":\"git\"}" --remove-vcs
 RUN mkdir -p /var/www/oxideshop/project-modules/module-under-test
