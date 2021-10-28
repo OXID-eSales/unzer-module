@@ -14,18 +14,18 @@ use Doctrine\Migrations\AbstractMigration;
 final class Version20211028091954 extends AbstractMigration
 {
 
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return '';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
-
+        //tbd
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
-
+        //tbd
     }
 }
