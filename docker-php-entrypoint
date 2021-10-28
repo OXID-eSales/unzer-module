@@ -31,8 +31,9 @@ fi
 rm -rf /var/www/oxideshop/source/Setup/
 chmod 444 /var/www/oxideshop/source/config.inc.php
 chmod 444 /var/www/oxideshop/source/.htaccess
+chown -R www-data:www-data /var/www/oxideshop/
 
 echo "Setup done."
-#/var/www/oxideshop/vendor/bin/oe-console oe:module:activate ddoewysiwyg;
+/var/www/oxideshop/vendor/bin/oe-console oe:module:activate osc-unzer;
 
 exec "$@"
