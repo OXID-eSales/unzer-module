@@ -7,12 +7,9 @@
  * is a violation of the license agreement and will be prosecuted by
  * civil and criminal law.
  *
- * @author        OXID Solution Catalyst
- * @link          https://www.oxid-esales.com
- * @copyright (C) OXID eSales AG 2003-2021
- *
- * @package unzer-devbox
- * Created: 2021-10-26, ja
+ * @copyright 2003-2021 OXID eSales AG
+ * @author    OXID Solution Catalysts
+ * @link      https://www.oxid-esales.com
  */
 
 namespace OxidSolutionCatalysts\Unzer\Controller;

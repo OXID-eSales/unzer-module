@@ -69,5 +69,7 @@ $aModule = [
         ],
     ],
     'events' => [
+        'onActivate'    => '\OxidSolutionCatalysts\Unzer\Core\Events::onActivate',
+        'onDeactivate'  => '\OxidSolutionCatalysts\Unzer\Core\Events::onDeActivate',
     ],
 ];

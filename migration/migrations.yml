@@ -1,0 +1,4 @@
+name: Unzer module migration
+migrations_namespace: OxidSolutionCatalysts\Unzer\Migrations
+table_name: oxmigrations_unzer
+migrations_directory: data
