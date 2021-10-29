@@ -126,10 +126,10 @@ class Events
             'en_desc' => "Apple Pay",
             'de_longdesc' => "de text",
             'en_longdesc' => "en text"],
-        //Unzer Instalment lets your customers pay in monthly payments.
-        'oscunzer_instalment' => ['insert' => 1,
+        //Unzer Installment lets your customers pay in monthly payments.
+        'oscunzer_installment' => ['insert' => 1,
             'de_desc' => "Ratenzahlung",
-            'en_desc' => "Instalment",
+            'en_desc' => "Installment",
             'de_longdesc' => "de text",
             'en_longdesc' => "en text"],
         //PayPal is one of the world’s most popular online payment systems.
