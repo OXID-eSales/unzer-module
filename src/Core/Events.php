@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with OXID eSales Unzer module.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * @copyright 2003-2021 OXID eSales AG
  * @link      http://www.oxid-esales.com
- * @copyright (C) OXID eSales AG 2003-2021
+ * @author    OXID Solution Catalysts
  */
 
 namespace OxidSolutionCatalysts\Unzer\Core;
@@ -270,6 +271,8 @@ class Events
 
     /**
      * Add Unzer payment methods set EN and DE (long) descriptions
+     *
+     * @return void
      */
     public static function addUnzerPaymentMethods()
     {
@@ -313,8 +316,7 @@ class Events
         $moduleActivationBridge = self::getContainer()->get(ModuleActivationBridgeInterface::class);
 
         foreach ($shops as $shopId) {
-            if (($shopId != $activeShopId) && ($moduleActivationBridge->isActive("osc-unzer", $shopId)))
-            {
+            if (($shopId != $activeShopId) && ($moduleActivationBridge->isActive("osc-unzer", $shopId))) {
                 return true;
             }
         }
@@ -324,6 +326,8 @@ class Events
 
     /**
      * Disables Unzer payment methods
+     *
+     * @return void
      */
     public static function disableUnzerPaymentMethods()
     {
@@ -338,6 +342,8 @@ class Events
 
     /**
      * Execute action on activate event
+     *
+     * @return void
      */
     public static function onActivate()
     {
@@ -348,6 +354,8 @@ class Events
 
     /**
      * Execute action on deactivate event
+     *
+     * @return void
      */
     public static function onDeactivate()
     {
@@ -359,9 +367,10 @@ class Events
     }
 
     /**
-     * @return ContainerInterface
-     * @internal
+     * ContainerFactory, ContainerInterface
      *
+     * @return   ContainerInterface
+     * @internal
      */
     protected static function getContainer(): ContainerInterface
     {
