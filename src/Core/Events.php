@@ -162,7 +162,7 @@ class Events
     ];
 
     /**
-     * Add PayPal payment method set EN and DE long descriptions
+     * Add Unzer payment methods set EN and DE (long) descriptions
      */
     public static function addUnzerPaymentMethods()
     {
