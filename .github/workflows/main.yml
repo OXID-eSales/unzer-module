@@ -138,6 +138,22 @@ jobs:
         working-directory: /build/oxid
 
       - name: console
+        run: vendor/bin/oe-console oe:module:install-configuration source/modules/osc/unzer/
+        working-directory: /build/oxid
+
+      - name: console
+        run: vendor/bin/oe-console oe:module:apply-configuration
+        working-directory: /build/oxid
+
+      - name: console
+        run: vendor/bin/oe-eshop-db_migrate migrations:migrate
+        working-directory: /build/oxid
+
+      - name: console
+        run: vendor/bin/oe-eshop-db_views_generate
+        working-directory: /build/oxid
+
+      - name: console
         run: vendor/bin/oe-console oe:module:activate osc-unzer
         working-directory: /build/oxid
 
