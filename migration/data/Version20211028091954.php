@@ -19,7 +19,8 @@ final class Version20211028091954 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        //tbd
+        // UNZER-12 Skipping this migration until we have some setup routine here
+        exit();
     }
 
     public function down(Schema $schema): void
