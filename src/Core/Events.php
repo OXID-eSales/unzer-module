@@ -269,6 +269,69 @@ class Events
         ],
     ];
 
+    private static array $_aRDFinserts = [
+        'oscunzer_card_mastercard' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'MasterCard',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_visa' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'VISA',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_americanexpress' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'AmericanExpress',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_dinersclub' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'DinersClub',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_jcb' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'JCB',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_prepayment' => [
+            'oxpaymentid' => 'oscunzer_prepayment',
+            'oxobjectid' => 'ByBankTransferInAdvance',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_banktransfer' => [
+            'oxpaymentid' => 'oscunzer_banktransfer',
+            'oxobjectid' => 'ByBankTransferInAdvance',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_invoice' => [
+            'oxpaymentid' => 'oscunzer_invoice',
+            'oxobjectid' => 'ByInvoice',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_invoice-secured' => [
+            'oxpaymentid' => 'oscunzer_invoice-secured',
+            'oxobjectid' => 'ByInvoice',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_sepa' => [
+            'oxpaymentid' => 'oscunzer_sepa',
+            'oxobjectid' => 'DirectDebit',
+            'oxtype' => 'rdfapayment',
+        ],
+        'ooscunzer_sepa-secured' => [
+            'oxpaymentid' => 'oscunzer_sepa-secured',
+            'oxobjectid' => 'DirectDebit',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_paypal' => [
+            'oxpaymentid' => 'oscunzer_paypal',
+            'oxobjectid' => 'PayPal',
+            'oxtype' => 'rdfapayment',
+        ],
+    ];
+
     /**
      * Add Unzer payment methods set EN and DE (long) descriptions
      *
@@ -349,6 +412,9 @@ class Events
     {
         // adding record to oxPayment table
         self::addUnzerPaymentMethods();
+
+        // enable Unzer payment RDF
+        self::enableUnzerRDFA();
     }
 
 
@@ -364,6 +430,7 @@ class Events
             return;
         }
         self::disableUnzerPaymentMethods();
+        self::disableUnzerRDFA();
     }
 
     /**
@@ -375,5 +442,35 @@ class Events
     protected static function getContainer(): ContainerInterface
     {
         return ContainerFactory::getInstance()->getContainer();
+    }
+
+    /**
+     * Disable Unzer RDF
+     *
+     * @return void
+     */
+    public static function disableUnzerRDFA()
+    {
+        foreach (self::$_aRDFinserts as $oxid => $aRDF) {
+            $query = "DELETE FROM `oxobject2payment` WHERE `OXID` = ?";
+            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid]);
+        }
+    }
+
+    /**
+     * Enables Unzer RDF
+     *
+     * @return void
+     */
+    public static function enableUnzerRDFA()
+    {
+        // If Unzer activated on other sub shops do not change global RDF setting.
+        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
+            return;
+        }
+        foreach (self::$_aRDFinserts as $oxid => $aRDF) {
+            $query = "INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) VALUES(?, ?, ?, ?)";
+            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid, $aRDF['oxpaymentid'], $aRDF['oxobjectid'], $aRDF['oxtype']]);
+        }
     }
 }
