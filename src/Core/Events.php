@@ -22,7 +22,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
@@ -413,8 +415,18 @@ class Events
         // adding record to oxPayment table
         self::addUnzerPaymentMethods();
 
+        // execute module migrations
+        self::executeModuleMigrations();
+
         // enable Unzer payment RDF
         self::enableUnzerRDFA();
+
+        // clear tmp
+        self::clearTmp();
+
+        // update views
+        $oDbMeta = oxNew(DbMetaDataHandler::class);
+        $oDbMeta->updateViews();
     }
 
 
@@ -436,7 +448,7 @@ class Events
     /**
      * ContainerFactory, ContainerInterface
      *
-     * @return   ContainerInterface
+     * @return ContainerInterface
      * @internal
      */
     protected static function getContainer(): ContainerInterface
@@ -472,5 +484,42 @@ class Events
             $query = "INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) VALUES(?, ?, ?, ?)";
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid, $aRDF['oxpaymentid'], $aRDF['oxobjectid'], $aRDF['oxtype']]);
         }
+    }
+
+    /**
+     * Execute necessary module migrations on activate event
+     *
+     * @return void
+     */
+    private static function executeModuleMigrations(): void
+    {
+        $migrations = (new MigrationsBuilder())->build();
+        $migrations->execute('migrations:migrate', 'osc-unzer');
+    }
+
+    /**
+     * clearTmp
+     *
+     * Clears the tmp folder
+     *
+     * @return true
+     */
+    private static function clearTmp()
+    {
+        $oConf = Registry::getConfig();
+        $sTmpDir = realpath($oConf->getShopConfVar('sCompileDir'));
+
+        $aFiles = glob($sTmpDir . '/*{.php,.txt,.inc}', GLOB_BRACE);
+        $aFiles = array_merge($aFiles, glob($sTmpDir . '/smarty/*{.inc,.php}', GLOB_BRACE));
+
+        if (count($aFiles) > 0) {
+            foreach ($aFiles as $file) {
+                if (is_file($file)) {
+                    @unlink($file);
+                }
+            }
+        }
+
+        return true;
     }
 }
