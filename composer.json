@@ -13,7 +13,7 @@
     "require": {
         "php": "^7.1",
         "unzerdev/php-sdk": "v1.1",
-        "oxid-esales/oxideshop-ce": "^v6.2.2"
+        "oxid-esales/oxideshop-ce": "^v6.6.0"
     },
     "require-dev": {
 
