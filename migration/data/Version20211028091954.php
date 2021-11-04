@@ -7,14 +7,13 @@ namespace OxidSolutionCatalysts\Unzer\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Version\Version;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
 final class Version20211028091954 extends AbstractMigration
 {
-    public function __construct(Version $version)
+    public function __construct($version)
     {
         parent::__construct($version);
 
