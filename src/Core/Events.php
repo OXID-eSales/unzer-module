@@ -507,7 +507,7 @@ class Events
     private static function clearTmp()
     {
         $oConf = Registry::getConfig();
-        $sTmpDir = realpath($oConf->getShopConfVar('sCompileDir'));
+        $sTmpDir = realpath($oConf->getConfigParam('sCompileDir'));
 
         $aFiles = glob($sTmpDir . '/*{.php,.txt,.inc}', GLOB_BRACE);
         $aFiles = array_merge($aFiles, glob($sTmpDir . '/smarty/*{.inc,.php}', GLOB_BRACE));
