@@ -81,21 +81,19 @@ final class Version20211105112337 extends AbstractMigration
           ;");
 
         foreach (self::$_aPayments as $paymentid) {
-            $oxid = md5($paymentid."oxidstandard.oxdelset");
+            $oxid = md5($paymentid . "oxidstandard.oxdelset");
             $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
-                            select '".$oxid."', '".$paymentid."', 'oxidstandard', 'oxdelset' from oxdeliveryset where oxid = 'oxidstandard' ");
+                            select '" . $oxid . "', '" . $paymentid . "', 'oxidstandard', 'oxdelset' from oxdeliveryset where oxid = 'oxidstandard' ");
         }
 
         foreach (self::$_aRDFinserts as $oxid => $aRDF) {
             $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
                             VALUES(?, ?, ?, ?)", [$oxid, $aRDF['oxpaymentid'], $aRDF['oxobjectid'], 'rdfapayment']);
         }
-
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-
     }
 }
