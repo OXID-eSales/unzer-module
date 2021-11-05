@@ -10,7 +10,6 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Active order object
      *
-     * @var oxorder
      */
     protected $_oEditObject = null;
 
@@ -70,7 +69,7 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Returns editable order object
      *
-     * @return \OxidEsales\Eshop\Application\Model\Order
+     * @return object
      */
     public function getEditObject()
     {
