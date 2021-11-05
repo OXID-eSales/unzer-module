@@ -8,6 +8,13 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
 {
     /**
+     * Editable object id
+     *
+     * @var string
+     */
+    protected $_sEditObjectId = null;
+
+    /**
      * Executes parent method parent::render()
      * name of template file "oscunzer_order.tpl".
      *
