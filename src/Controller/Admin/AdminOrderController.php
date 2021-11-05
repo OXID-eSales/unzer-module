@@ -8,11 +8,11 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
 {
     /**
-     * Editable object id
+     * Active order object
      *
-     * @var string
+     * @var oxorder
      */
-    protected $_sEditObjectId = null;
+    protected $_oEditObject = null;
 
     /**
      * Executes parent method parent::render()
