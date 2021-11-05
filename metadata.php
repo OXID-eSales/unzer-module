@@ -40,7 +40,7 @@ $aModule = [
         [
             'template' => 'payment_main.tpl',
             'block'    => 'admin_payment_main_form',
-            'file'     => 'src/views/admin/blocks/admin_payment_main_form.tpl',
+            'file'     => 'views/admin/blocks/admin_payment_main_form.tpl',
         ]
     ],
     'settings' => [
