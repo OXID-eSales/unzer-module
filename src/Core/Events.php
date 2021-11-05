@@ -418,9 +418,6 @@ class Events
         // execute module migrations
         self::executeModuleMigrations();
 
-        // enable Unzer payment RDF
-        self::enableUnzerRDFA();
-
         // clear tmp
         self::clearTmp();
 
@@ -466,23 +463,6 @@ class Events
         foreach (self::$_aRDFinserts as $oxid => $aRDF) {
             $query = "DELETE FROM `oxobject2payment` WHERE `OXID` = ?";
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid]);
-        }
-    }
-
-    /**
-     * Enables Unzer RDF
-     *
-     * @return void
-     */
-    public static function enableUnzerRDFA()
-    {
-        // If Unzer activated on other sub shops do not change global RDF setting.
-        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
-            return;
-        }
-        foreach (self::$_aRDFinserts as $oxid => $aRDF) {
-            $query = "INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) VALUES(?, ?, ?, ?)";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid, $aRDF['oxpaymentid'], $aRDF['oxobjectid'], $aRDF['oxtype']]);
         }
     }
 
