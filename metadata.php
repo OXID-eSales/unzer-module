@@ -32,12 +32,12 @@ $aModule = [
             => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class
     ],
     'controllers' => [
-        'unzer_admin_order'              => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class
+        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class
     ],
     'templates' => [
-        //admin
+        // admin
         'oscunzer_order.tpl' => 'osc/unzer/views/admin/tpl/oscunzer_order.tpl',
-    'templates' => [
+        // frontend
         'modules/osc/unzer/unzer_alipay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_alipay.tpl',
         'modules/osc/unzer/unzer_bankcontact.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_bankcontact.tpl',
         'modules/osc/unzer/unzer_banktransfer.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_banktransfer.tpl',
