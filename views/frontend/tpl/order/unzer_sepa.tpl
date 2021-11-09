@@ -1,3 +1,9 @@
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://static.unzer.com/v1/unzer.css" />
+<script type="text/javascript" src="https://static.unzer.com/v1/unzer.js"></script>
+
 <form id="payment-form">
     <div id="sepa-secured-IBAN" class="field">
         <!-- The IBAN field UI Element will be inserted here -->
@@ -14,7 +20,7 @@
     <script type="text/javascript">
         [{capture name="javaScript"}]
         // Create an Unzer instance with your public key
-        let unzerInstance = new unzer([{$unzerPublicKey}]);
+        let unzerInstance = new unzer('[{$unzerpub}]');
 
         // Create a SEPA Direct Debit Secured instance and render the form
         let SepaDirectDebitSecured = unzerInstance.SepaDirectDebitSecured();
@@ -51,16 +57,16 @@
                     form.appendChild(hiddenInputCustomerId);
 
                     form.setAttribute('method', 'POST');
-                    form.setAttribute('action', [{$sClUrl}]);
+                    form.setAttribute('action', 'https://unzer.local');
 
                     // Submitting the form
                     form.submit();
                 })
                 .catch(function(error) {
-                    $('#error-holder').html(error.message)
+                    $('#error-holder').html(error.message);
                 })
         });
         [{/capture}]
     </script>
     [{/capture}]
-[{oxscript add=$unzerSepaDirectJS}]
+[{oxscript add=$smarty.capture.javaScript}]
