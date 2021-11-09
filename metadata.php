@@ -29,7 +29,9 @@ $aModule = [
     'email' => 'info@oxid-esales.com',
     'extend' => [
         \OxidEsales\Eshop\Application\Controller\PaymentController::class
-            => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class
+        => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class
+        => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class
     ],
     'controllers' => [
         'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class
