@@ -28,11 +28,13 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class
-            => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class                              => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
+
     ],
     'controllers' => [
-        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class
+        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,
+        'unzer_dispatcher'  =>   \OxidSolutionCatalysts\Unzer\Controller\DispatcherController::class,
     ],
     'templates' => [
         // admin
