@@ -8,11 +8,7 @@
     <div id="sepa-secured-IBAN" class="field">
         <!-- The IBAN field UI Element will be inserted here -->
     </div>
-    <div id="customer" class="field">
-        <!-- The customer form UI element will be inserted here -->
-    </div>
     <div class="field" id="error-holder" style="color: #9f3a38"></div>
-    <button class="unzerUI primary button fluid" id="submit-button" type="submit">[{oxmultilang ident="PAY"}]</button>
 </form>
 
 
@@ -23,8 +19,8 @@
         let unzerInstance = new unzer('[{$unzerpub}]');
 
         // Create a SEPA Direct Debit Secured instance and render the form
-        let SepaDirectDebitSecured = unzerInstance.SepaDirectDebitSecured();
-        SepaDirectDebitSecured.create('sepa-direct-debit-secured', {
+        let SepaDirectDebitSecured = unzerInstance.SepaDirectDebit();
+        SepaDirectDebitSecured.create('sepa-direct-debit', {
             containerId: 'sepa-secured-IBAN'
         });
 
