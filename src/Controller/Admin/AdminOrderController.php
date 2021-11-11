@@ -85,4 +85,3 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
         return $this->editObject;
     }
 }
-

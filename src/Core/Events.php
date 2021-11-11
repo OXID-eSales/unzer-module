@@ -503,4 +503,3 @@ class Events
         return true;
     }
 }
-
