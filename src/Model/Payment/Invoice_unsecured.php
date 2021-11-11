@@ -105,8 +105,8 @@ class Invoice_unsecured extends Payment
                     $transaction->getDescriptor()
                 );
 
-            $unzerHelper->redirect($unzerHelper->redirectUrl(self::RETURN_CONTROLLER_URL));
-
+            //TODO SUCCESS CHECK Dummy Redirect
+            \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
         } catch (UnzerApiException $e) {
             $merchantMessage = $e->getMerchantMessage();
             $clientMessage = $e->getClientMessage();
