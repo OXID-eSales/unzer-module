@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Extend;
 
-
 class Payment extends Payment_parent
 {
     /**

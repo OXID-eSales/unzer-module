@@ -64,6 +64,9 @@ class Invoice_unsecured extends Payment
         return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
+    /**
+     * @return mixed|void
+     */
     public function validate()
     {
         $unzerHelper = $this->getUnzerHelper();
@@ -108,7 +111,6 @@ class Invoice_unsecured extends Payment
 
             //TODO SUCCESS CHECK Dummy Redirect
             \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
-
         } catch (UnzerApiException $e) {
             $merchantMessage = $e->getMerchantMessage();
             $clientMessage = $e->getClientMessage();
@@ -117,6 +119,5 @@ class Invoice_unsecured extends Payment
         }
         //TODO ERROR Dummy Redirect
         \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
-
     }
 }

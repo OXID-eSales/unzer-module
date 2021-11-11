@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping;
 
-
 use OxidSolutionCatalysts\Unzer\Model\Payments\Invoice_unsecured;
 
 /**
