@@ -28,17 +28,19 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class                              => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class       => \OxidSolutionCatalysts\Unzer\Controller\Extend\PaymentController::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class                                => \OxidSolutionCatalysts\Unzer\Core\Extend\ViewConfig::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class                      => \OxidSolutionCatalysts\Unzer\Model\Extend\Payment::class,
 
     ],
     'controllers' => [
-        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,
+        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\Extend\AdminOrderController::class,
         'unzer_dispatcher'  =>   \OxidSolutionCatalysts\Unzer\Controller\DispatcherController::class,
     ],
     'templates' => [
         // admin
         'oscunzer_order.tpl' => 'osc/unzer/views/admin/tpl/oscunzer_order.tpl',
+
         // frontend
         'modules/osc/unzer/unzer_alipay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_alipay.tpl',
         'modules/osc/unzer/unzer_bankcontact.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_bankcontact.tpl',
@@ -48,14 +50,13 @@ $aModule = [
         'modules/osc/unzer/unzer_eps_charge.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_eps_charge.tpl',
         'modules/osc/unzer/unzer_giro.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_giro.tpl',
         'modules/osc/unzer/unzer_installment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment.tpl',
-        'modules/osc/unzer/unzer_invoice.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice.tpl',
         'modules/osc/unzer/unzer_invoice_securred.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_securred.tpl',
         'modules/osc/unzer/unzer_paypal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal.tpl',
         'modules/osc/unzer/unzer_paypal_recurring.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal_recurring.tpl',
         'modules/osc/unzer/unzer_prepayment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_prepayment.tpl',
         'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
         'modules/osc/unzer/unzer_sofort.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sofort.tpl',
-        'modules/osc/unzer/unzer_wechat.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_wechat.tpl'
+        'modules/osc/unzer/unzer_wechat.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_wechat.tpl',
     ],
     'blocks' => [
         //admin
@@ -69,6 +70,11 @@ $aModule = [
             'template' => 'page/checkout/order.tpl',
             'block' => 'shippingAndPayment',
             'file' => 'views/frontend/blocks/unzer_select_payment.tpl'
+        ],
+        [
+            'template' => 'page/checkout/order.tpl',
+            'block' => 'checkout_order_btn_confirm_bottom',
+            'file' => 'views/frontend/blocks/unzer_checkout_order_btn_confirm_bottom.tpl'
         ]
     ],
     'settings' => [

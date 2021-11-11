@@ -20,7 +20,9 @@
  * @author    OXID Solution Catalysts
  */
 
-namespace OxidSolutionCatalysts\Unzer\Core;
+namespace OxidSolutionCatalysts\Unzer\Core\Extend;
+
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class ViewConfig extends ViewConfig_parent
 {

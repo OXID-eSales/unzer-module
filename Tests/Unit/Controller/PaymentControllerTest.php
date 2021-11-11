@@ -15,9 +15,9 @@
  * Created: 2021-10-26, ja
  */
 
-namespace OxidSolutionCatalysts\Unzer\Tests\Controller;
+namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Controller;
 
-use \OxidSolutionCatalysts\Unzer\Controller\PaymentController;
+use \OxidSolutionCatalysts\Unzer\Controller\Extend\PaymentController;
 
 class PaymentControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {

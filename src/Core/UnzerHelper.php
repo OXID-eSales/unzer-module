@@ -119,21 +119,4 @@ class UnzerHelper
             return "sandbox";
         }
     }
-
-    /**
-     * @param string $url
-     */
-    public function redirect(string $url)
-    {
-        Registry::getUtils()->redirect($url, true, 302);
-    }
-
-    /**
-     * @param string
-     * @return string
-     */
-    public function redirectUrl($cl): string
-    {
-        return Registry::getConfig()->getShopHomeUrl() . 'cl=' . $cl;
-    }
 }

@@ -12,7 +12,7 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Controller;
+namespace OxidSolutionCatalysts\Unzer\Controller\Extend;
 
 class PaymentController extends PaymentController_parent
 {

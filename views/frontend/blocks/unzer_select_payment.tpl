@@ -56,8 +56,6 @@
                     [{include file="modules/osc/unzer/unzer_ideal.tpl" paymentid=$sPaymentID}]
                 [{elseif $sPaymentID == "oscunzer_installment"}]
                     [{include file="modules/osc/unzer/installment.tpl" paymentid=$sPaymentID}]
-                [{elseif $sPaymentID == "oscunzer_invoice"}]
-                    [{include file="modules/osc/unzer/unzer_invoice.tpl" paymentid=$sPaymentID}]
                 [{elseif $sPaymentID == "oscunzer_invoice-secured"}]
                     [{include file="modules/osc/unzer/unzer_invoice_securred.tpl" paymentid=$sPaymentID}]
                 [{elseif $sPaymentID == "oscunzer_paypal"}]
@@ -73,7 +71,8 @@
                 [{elseif $sPaymentID == "oscunzer_sofort"}]
                     [{include file="modules/osc/unzer/unzer_sofort.tpl" paymentid=$sPaymentID}]
                 [{else}]
-                    [{$smarty.block.parent}]
+                    [{assign var="payment" value=$oView->getPayment()}]
+                    [{$payment->oxpayments__oxdesc->value}]
                 [{/if}]
             </div>
         </div>

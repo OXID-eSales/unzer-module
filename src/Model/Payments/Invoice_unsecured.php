@@ -1,7 +1,8 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Model;
+namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Core\Registry;
 use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -70,7 +71,7 @@ class Invoice_unsecured extends Payment
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
             // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = new Unzer($unzerHelper->getShopPrivateKey());
+            $unzer = $unzerHelper->getUnzer();
             $unzer->setDebugMode(true)->setDebugHandler(new ExampleDebugHandler());
 
             /** @var Invoice $invoice */
@@ -84,7 +85,7 @@ class Invoice_unsecured extends Payment
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $unzerHelper->redirectUrl(self::CONTROLLER_URL), $customer, $orderId);
+            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, Registry::getConfig()->getShopHomeUrl() . 'cl=order', $customer, $orderId);
 
             // You'll need to remember the shortId to show it on the success or failure page
             $_SESSION['ShortId'] = $transaction->getShortId();
@@ -105,7 +106,8 @@ class Invoice_unsecured extends Payment
                     $transaction->getDescriptor()
                 );
 
-            $unzerHelper->redirect($unzerHelper->redirectUrl(self::RETURN_CONTROLLER_URL));
+            //TODO SUCCESS CHECK Dummy Redirect
+            \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
 
         } catch (UnzerApiException $e) {
             $merchantMessage = $e->getMerchantMessage();
@@ -113,6 +115,8 @@ class Invoice_unsecured extends Payment
         } catch (RuntimeException $e) {
             $merchantMessage = $e->getMessage();
         }
-        $unzerHelper->redirect($unzerHelper->redirectUrl(self::FAILURE_URL), $merchantMessage, $clientMessage);
+        //TODO ERROR Dummy Redirect
+        \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
+
     }
 }
