@@ -31,7 +31,6 @@ $aModule = [
         \OxidEsales\Eshop\Application\Controller\PaymentController::class       => \OxidSolutionCatalysts\Unzer\Controller\Extend\PaymentController::class,
         \OxidEsales\Eshop\Core\ViewConfig::class                                => \OxidSolutionCatalysts\Unzer\Core\Extend\ViewConfig::class,
         \OxidEsales\Eshop\Application\Model\Payment::class                      => \OxidSolutionCatalysts\Unzer\Model\Extend\Payment::class,
-
     ],
     'controllers' => [
         'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\Extend\AdminOrderController::class,
