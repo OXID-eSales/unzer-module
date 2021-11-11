@@ -122,3 +122,4 @@ class InvoiceUnsecured extends UnzerPayment
         \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
     }
 }
+

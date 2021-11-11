@@ -24,3 +24,4 @@ class PaymentController extends PaymentController_parent
         return (bool) true;
     }
 }
+

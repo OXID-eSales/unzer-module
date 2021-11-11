@@ -140,3 +140,4 @@ class UnzerHelper
         return $oSession->getUser();
     }
 }
+

@@ -64,3 +64,4 @@ class InvoiceSecured extends UnzerPayment
         //TODO
     }
 }
+
