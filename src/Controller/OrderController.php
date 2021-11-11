@@ -32,11 +32,11 @@ class OrderController extends OrderController_parent
      */
     public function execute(): string
     {
-        try{
+        try {
             $Dispatcher = oxnew(DispatcherController::class);
             $Dispatcher->validatePayment();
-        }catch (UnzerApiException | \RuntimeException $e) {
-            Registry::getUtilsView()->addErrorToDisplay($e);
+        } catch (UnzerApiException | \RuntimeException $e) {
+            //catch
         }
 
         return parent::execute();
