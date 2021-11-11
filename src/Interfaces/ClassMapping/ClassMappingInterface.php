@@ -2,7 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping;
 
-use OxidSolutionCatalysts\Unzer\Model\Payments\Invoice_unsecured;
+use OxidSolutionCatalysts\Unzer\Model\Payments\InvoiceUnsecured;
 
 /**
  * Interface ConstantInterface
@@ -10,6 +10,6 @@ use OxidSolutionCatalysts\Unzer\Model\Payments\Invoice_unsecured;
 interface ClassMappingInterface
 {
     const UNZERCLASSNAMEMAPPING = [
-        'oscunzer_invoice' => Invoice_unsecured::class
+        'oscunzer_invoice' => InvoiceUnsecured::class
     ];
 }

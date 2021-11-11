@@ -10,7 +10,7 @@ use UnzerSDK\Unzer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
 
-class Invoice_unsecured extends Payment
+class InvoiceUnsecured extends Payment
 {
     /**
      * @var mixed|\OxidEsales\Eshop\Application\Model\Payment
