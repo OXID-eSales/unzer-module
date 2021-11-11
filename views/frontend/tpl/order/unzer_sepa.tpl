@@ -29,6 +29,7 @@
 
         // Handle payment form submission.
         let form = document.getElementById('payment-form');
+    let uiban = $('#sepa-secured-ibaen .iban>.input>input').value;
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             let sepaDirectDebitSecuredPromise = SepaDirectDebitSecured.createResource();

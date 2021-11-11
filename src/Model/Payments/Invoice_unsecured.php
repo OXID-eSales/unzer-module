@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payment;
+namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
 use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
@@ -11,18 +11,6 @@ use UnzerSDK\Resources\PaymentTypes\Invoice;
 
 class Invoice_unsecured extends Payment
 {
-    /**
-     * @var mixed|\OxidEsales\Eshop\Application\Model\Payment
-     */
-    protected $_oPayment;
-
-    public function __construct($oxpaymentid)
-    {
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
-
     /**
      * @return string
      */
@@ -45,22 +33,6 @@ class Invoice_unsecured extends Payment
     public function getSyncMode(): string
     {
         return 'SYNC';
-    }
-
-    /**
-     * @return string
-     */
-    public function getID(): string
-    {
-        return $this->_oPayment->getId();
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
     public function validate()

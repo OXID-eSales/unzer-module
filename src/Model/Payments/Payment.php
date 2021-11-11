@@ -1,18 +1,12 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payment;
+namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Customer;
-use RuntimeException;
-use UnzerSDK\examples\ExampleDebugHandler;
-use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\PaymentTypes\Prepayment;
-use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
-use UnzerSDK\Resources\TransactionTypes\Authorization;
-use UnzerSDK\Unzer;
 
 abstract class Payment
 {
@@ -21,6 +15,20 @@ abstract class Payment
     const FAILURE_URL = "";
     const PENDING_URL = "order";
     const SUCCESS_URL = "thankyou";
+
+    /**
+     * @var mixed|\OxidEsales\Eshop\Application\Model\Payment
+     */
+    protected $_oPayment;
+
+    public function __construct($oxpaymentid)
+    {
+        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment->load($oxpaymentid);
+        $this->_oPayment = $oPayment;
+    }
+
+
 
     /**
      * @return string
@@ -40,12 +48,18 @@ abstract class Payment
     /**
      * @return string
      */
-    abstract public function getID(): string;
+    public function getID(): string
+    {
+        return $this->_oPayment->getId();
+    }
 
     /**
      * @return string
      */
-    abstract public function getPaymentProcedure(): string;
+    public function getPaymentProcedure(): string
+    {
+        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+    }
 
     /**
      * @return mixed
@@ -53,10 +67,10 @@ abstract class Payment
     abstract public function validate();
 
     /**
-     * @param Customer
-     * @param User
+     * @param Customer $customer
+     * @param User $oUser
      */
-    public function setCustomerData($customer, $oUser)
+    public function setCustomerData(Customer $customer, User $oUser)
     {
         $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
         $customer->setCompany($oUser->oxuser__oxcompany->value);
@@ -75,7 +89,7 @@ abstract class Payment
     }
 
     /**
-     * @return object|\OxidEsales\Eshop\Application\Model\Basket|null
+     * @return object|Basket|null
      */
     public function getBasket()
     {
