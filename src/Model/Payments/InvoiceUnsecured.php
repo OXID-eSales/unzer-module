@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -10,7 +11,7 @@ use UnzerSDK\Unzer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
 
-class InvoiceUnsecured extends Payment
+class InvoiceUnsecured extends UnzerPayment
 {
     /**
      * @var mixed|\OxidEsales\Eshop\Application\Model\Payment
@@ -69,7 +70,7 @@ class InvoiceUnsecured extends Payment
      */
     public function validate()
     {
-        $unzerHelper = $this->getUnzerHelper();
+        $unzerHelper = oxNew(UnzerHelper::class);
 
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
@@ -80,8 +81,8 @@ class InvoiceUnsecured extends Payment
             /** @var Invoice $invoice */
             $invoice = $unzer->createPaymentType(new Invoice());
 
-            $oUser = $this->getUser();
-            $oBasket = $this->getBasket();
+            $oUser = $unzerHelper->getUser();
+            $oBasket = $unzerHelper->getBasket();
 
             $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
             $this->setCustomerData($customer, $oUser);

@@ -17,7 +17,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Controller;
 
-use \OxidSolutionCatalysts\Unzer\Controller\Extend\PaymentController;
+use \OxidSolutionCatalysts\Unzer\Controller\PaymentController;
 
 class PaymentControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {

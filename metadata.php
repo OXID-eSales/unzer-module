@@ -28,12 +28,13 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class       => \OxidSolutionCatalysts\Unzer\Controller\Extend\PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class                                => \OxidSolutionCatalysts\Unzer\Core\Extend\ViewConfig::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class                      => \OxidSolutionCatalysts\Unzer\Model\Extend\Payment::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class       => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class                                => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class                      => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class         => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class,
     ],
     'controllers' => [
-        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\Extend\AdminOrderController::class,
+        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,
         'unzer_dispatcher'  =>   \OxidSolutionCatalysts\Unzer\Controller\DispatcherController::class,
     ],
     'templates' => [
@@ -70,11 +71,6 @@ $aModule = [
             'block' => 'shippingAndPayment',
             'file' => 'views/frontend/blocks/unzer_select_payment.tpl'
         ],
-        [
-            'template' => 'page/checkout/order.tpl',
-            'block' => 'checkout_order_btn_confirm_bottom',
-            'file' => 'views/frontend/blocks/unzer_checkout_order_btn_confirm_bottom.tpl'
-        ]
     ],
     'settings' => [
         [

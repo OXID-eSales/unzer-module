@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Controller\Admin\Extend;
+namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
 

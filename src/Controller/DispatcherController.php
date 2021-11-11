@@ -15,15 +15,16 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 
 class DispatcherController extends FrontendController implements ClassMappingInterface
 {
     public function validatePayment()
     {
-        $paymentid = Registry::get(Request::class)->getRequestParameter('paymentid');
+        $Unzerhelper = oxNew(UnzerHelper::class);
+        $oBasket = $Unzerhelper->getBasket();
+        $paymentid = $oBasket->getPaymentId();
         $oPayment = oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
         $oPayment->validate();
     }

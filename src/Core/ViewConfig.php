@@ -20,7 +20,7 @@
  * @author    OXID Solution Catalysts
  */
 
-namespace OxidSolutionCatalysts\Unzer\Core\Extend;
+namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 

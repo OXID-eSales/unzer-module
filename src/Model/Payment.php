@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Model\Extend;
+namespace OxidSolutionCatalysts\Unzer\Model;
 
 class Payment extends Payment_parent
 {

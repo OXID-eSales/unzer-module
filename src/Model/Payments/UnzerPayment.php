@@ -2,13 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Customer;
 
-abstract class Payment
+abstract class UnzerPayment
 {
     const CONTROLLER_URL = "order";
     const RETURN_CONTROLLER_URL = "order";
@@ -57,31 +54,5 @@ abstract class Payment
         $customer->setSalutation($oUser->oxuser__oxsal->value);
         $customer->setEmail($oUser->oxuser__oxusername->value);
         $customer->setPhone($oUser->oxuser__oxfon->value);
-    }
-
-    /**
-     * @return false|User|null
-     */
-    public function getUser()
-    {
-        $oSession = Registry::getSession();
-        return $oSession->getUser();
-    }
-
-    /**
-     * @return object|Basket|null
-     */
-    public function getBasket()
-    {
-        $oSession = Registry::getSession();
-        return $oSession->getBasket();
-    }
-
-    /**
-     * @return mixed|UnzerHelper
-     */
-    public function getUnzerHelper()
-    {
-        return oxNew(UnzerHelper::class);
     }
 }
