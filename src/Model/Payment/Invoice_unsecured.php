@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Model;
+namespace OxidSolutionCatalysts\Unzer\Model\Payment;
 
 use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
