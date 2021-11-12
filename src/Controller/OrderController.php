@@ -16,7 +16,6 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Exceptions\UnzerApiException;
 
 class OrderController extends OrderController_parent
 {

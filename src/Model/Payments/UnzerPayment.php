@@ -86,7 +86,6 @@ abstract class UnzerPayment
                 // The payment process has been successful.
                 // You show the success page.
                 // Goods can be shipped.
-                return;
             } elseif ($payment->isPending()) {
                 if ($transaction->isSuccess()) {
                     if ($transaction instanceof Authorization) {
@@ -100,7 +99,6 @@ abstract class UnzerPayment
                     // In any case:
                     // * You can show the success page.
                     // * You can set order status to pending payment
-                    return;
                 } elseif ($transaction->isPending()) {
 
                     // The initial transaction of invoice types will not change to success but stay pending.
@@ -108,7 +106,6 @@ abstract class UnzerPayment
                     if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
                         // Awaiting payment by the customer.
                         // Goods can be shipped immediately except for Prepayment type.
-                        return;
                     }
 
                     // In cases of a redirect to an external service (e.g. 3D secure, PayPal, etc) it sometimes takes time for
@@ -117,7 +114,6 @@ abstract class UnzerPayment
 
                     // Use the webhooks feature to stay informed about changes of payment and transaction (e.g. cancel, success)
                     // then you can handle the states as shown above in transaction->isSuccess() branch.
-                    return;
                 }
             }
             // If the payment is neither success nor pending something went wrong.
