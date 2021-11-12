@@ -42,14 +42,14 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function isUnzerOrder()
     {
-        $active = false;
+        $isUnzer = false;
 
         $order = $this->getEditObject();
         if ($order && strpos($order->getFieldData('oxpaymenttype'), "oscunzer") !== false) {
-            $active = true;
+            $isUnzer = true;
         }
 
-        return $active;
+        return $isUnzer;
     }
 
     /**

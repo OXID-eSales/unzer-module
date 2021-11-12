@@ -22,6 +22,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Unzer;
@@ -110,7 +112,7 @@ class UnzerHelper
     /**
      * @return string
      */
-    public function getUnzerSystemMode(): string
+    public static function getUnzerSystemMode(): string
     {
         $SystemMode = self::getConfigParam('UnzerSystemMode');
         if ($SystemMode) {
@@ -121,19 +123,20 @@ class UnzerHelper
     }
 
     /**
-     * @param string $url
+     * @return object|Basket|null
      */
-    public function redirect(string $url)
+    public static function getBasket()
     {
-        Registry::getUtils()->redirect($url, true, 302);
+        $oSession = Registry::getSession();
+        return $oSession->getBasket();
     }
 
     /**
-     * @param string
-     * @return string
+     * @return false|User|null
      */
-    public function redirectUrl($cl): string
+    public static function getUser()
     {
-        return Registry::getConfig()->getShopHomeUrl() . 'cl=' . $cl;
+        $oSession = Registry::getSession();
+        return $oSession->getUser();
     }
 }
