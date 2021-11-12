@@ -14,19 +14,9 @@ abstract class UnzerPayment
     const SUCCESS_URL = "thankyou";
 
     /**
-     * @return string
+     * @param string $oxpaymentid
      */
-    abstract public function getPaymentMethod(): string;
-
-    /**
-     * @return string
-     */
-    abstract public function getPaymentCode(): string;
-
-    /**
-     * @return string
-     */
-    abstract public function getSyncMode(): string;
+    abstract public function __construct(string $oxpaymentid);
 
     /**
      * @return string

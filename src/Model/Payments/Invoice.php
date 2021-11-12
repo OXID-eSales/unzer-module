@@ -2,6 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use RuntimeException;
@@ -9,44 +10,22 @@ use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Unzer;
 use UnzerSDK\Resources\CustomerFactory;
-use UnzerSDK\Resources\PaymentTypes\Invoice;
 
-class InvoiceUnsecured extends UnzerPayment
+class Invoice extends UnzerPayment
 {
     /**
-     * @var mixed|\OxidEsales\Eshop\Application\Model\Payment
+     * @var mixed|Payment
      */
     protected $_oPayment;
 
-    public function __construct($oxpaymentid)
+    /**
+     * @param string $oxpaymentid
+     */
+    public function __construct(string $oxpaymentid)
     {
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment = oxNew(Payment::class);
         $oPayment->load($oxpaymentid);
         $this->_oPayment = $oPayment;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return 'invoice';
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentCode(): string
-    {
-        return 'IV';
-    }
-
-    /**
-     * @return string
-     */
-    public function getSyncMode(): string
-    {
-        return 'SYNC';
     }
 
     /**
@@ -70,19 +49,17 @@ class InvoiceUnsecured extends UnzerPayment
      */
     public function validate()
     {
-        $unzerHelper = oxNew(UnzerHelper::class);
-
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
             // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = $unzerHelper->getUnzer();
+            $unzer = UnzerHelper::getUnzer();
             $unzer->setDebugMode(true)->setDebugHandler(new ExampleDebugHandler());
 
             /** @var Invoice $invoice */
-            $invoice = $unzer->createPaymentType(new Invoice());
+            $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice());
 
-            $oUser = $unzerHelper->getUser();
-            $oBasket = $unzerHelper->getBasket();
+            $oUser = UnzerHelper::getUser();
+            $oBasket = UnzerHelper::getBasket();
 
             $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
             $this->setCustomerData($customer, $oUser);

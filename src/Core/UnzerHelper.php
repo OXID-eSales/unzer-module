@@ -112,7 +112,7 @@ class UnzerHelper
     /**
      * @return string
      */
-    public function getUnzerSystemMode(): string
+    public static function getUnzerSystemMode(): string
     {
         $SystemMode = self::getConfigParam('UnzerSystemMode');
         if ($SystemMode) {
@@ -125,7 +125,7 @@ class UnzerHelper
     /**
      * @return object|Basket|null
      */
-    public function getBasket()
+    public static function getBasket()
     {
         $oSession = Registry::getSession();
         return $oSession->getBasket();
@@ -134,7 +134,7 @@ class UnzerHelper
     /**
      * @return false|User|null
      */
-    public function getUser()
+    public static function getUser()
     {
         $oSession = Registry::getSession();
         return $oSession->getUser();
