@@ -58,7 +58,7 @@ class Sepa extends Payment
 
     public function getPaymentMethod(): string
     {
-       return "sepa";
+        return "sepa";
     }
 
     public function getPaymentCode(): string
@@ -107,9 +107,9 @@ class Sepa extends Payment
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            /* @var Charge|AbstractUnzerResource $transaction */
-            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirectUrl(self::CONTROLLER_URL), null, $orderId);
-            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
+//            /* @var Charge|AbstractUnzerResource $transaction */
+//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirectUrl(self::CONTROLLER_URL), null, $orderId);
+//            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }

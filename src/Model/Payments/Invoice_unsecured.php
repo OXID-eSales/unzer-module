@@ -1,27 +1,9 @@
 <?php
-/**
- * This file is part of OXID eSales Unzer module.
- *
- * OXID eSales Unzer module is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * OXID eSales Unzer module is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OXID eSales Unzer module.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @copyright 2003-2021 OXID eSales AG
- * @link      http://www.oxid-esales.com
- * @author    OXID Solution Catalysts
- */
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -29,8 +11,20 @@ use UnzerSDK\Unzer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
 
-class Invoice_unsecured extends Payment
+class InvoiceUnsecured extends UnzerPayment
 {
+    /**
+     * @var mixed|\OxidEsales\Eshop\Application\Model\Payment
+     */
+    protected $_oPayment;
+
+    public function __construct($oxpaymentid)
+    {
+        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment->load($oxpaymentid);
+        $this->_oPayment = $oPayment;
+    }
+
     /**
      * @return string
      */
@@ -55,14 +49,31 @@ class Invoice_unsecured extends Payment
         return 'SYNC';
     }
 
+    /**
+     * @return string
+     */
+    public function getID(): string
+    {
+        return $this->_oPayment->getId();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentProcedure(): string
+    {
+        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+    }
+
+    /**
+     * @return mixed|void
+     */
     public function validate()
     {
-        $unzerHelper = $this->getUnzerHelper();
-
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
             // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = new Unzer($unzerHelper->getShopPrivateKey());
+            $unzer = UnzerHelper::getUnzer();
             $unzer->setDebugMode(true)->setDebugHandler(new ExampleDebugHandler());
 
             /** @var Invoice $invoice */
@@ -76,7 +87,7 @@ class Invoice_unsecured extends Payment
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $unzerHelper->redirectUrl(self::CONTROLLER_URL), $customer, $orderId);
+            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, Registry::getConfig()->getShopHomeUrl() . 'cl=order', $customer, $orderId);
 
             // You'll need to remember the shortId to show it on the success or failure page
             $_SESSION['ShortId'] = $transaction->getShortId();
@@ -105,6 +116,7 @@ class Invoice_unsecured extends Payment
         } catch (RuntimeException $e) {
             $merchantMessage = $e->getMessage();
         }
-        $unzerHelper->redirect($unzerHelper->redirectUrl(self::FAILURE_URL), $merchantMessage, $clientMessage);
+        //TODO ERROR Dummy Redirect
+        \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
     }
 }

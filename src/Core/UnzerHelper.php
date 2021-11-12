@@ -112,7 +112,7 @@ class UnzerHelper
     /**
      * @return string
      */
-    public function getUnzerSystemMode(): string
+    public static function getUnzerSystemMode(): string
     {
         $SystemMode = self::getConfigParam('UnzerSystemMode');
         if ($SystemMode) {
@@ -125,7 +125,7 @@ class UnzerHelper
     /**
      * @param string $url
      */
-    public function redirect(string $url)
+    public static function redirect(string $url)
     {
         Registry::getUtils()->redirect($url, true, 302);
     }
@@ -134,7 +134,7 @@ class UnzerHelper
      * @param string
      * @return string
      */
-    public function redirectUrl($cl): string
+    public static function redirectUrl($cl): string
     {
         return Registry::getConfig()->getShopHomeUrl() . 'cl=' . $cl;
     }
