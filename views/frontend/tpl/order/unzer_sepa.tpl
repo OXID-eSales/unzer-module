@@ -1,66 +1,64 @@
-<form id="payment-form">
-    <div id="sepa-secured-IBAN" class="field">
+[{block name="unzer_sepajs"}]
+    [{oxscript include="https://static.unzer.com/v1/unzer.js"}]
+
+[{/block}]
+[{block name="unzer_sepa_css"}]
+    [{oxstyle include="https://static.unzer.com/v1/unzer.css"}]
+[{/block}]
+
+<div id="payment-form-sepa">
+    <div id="sepa-IBAN" class="field">
         <!-- The IBAN field UI Element will be inserted here -->
     </div>
-    <div id="customer" class="field">
-        <!-- The customer form UI element will be inserted here -->
-    </div>
     <div class="field" id="error-holder" style="color: #9f3a38"></div>
-    <button class="unzerUI primary button fluid" id="submit-button" type="submit">[{oxmultilang ident="PAY"}]</button>
-</form>
-
+</div>
 
 [{capture assign="unzerSepaDirectJS"}]
-    <script type="text/javascript">
-        [{capture name="javaScript"}]
-        // Create an Unzer instance with your public key
-        let unzerInstance = new unzer([{$unzerPublicKey}]);
+    var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
+    var submitButton = submitBasketForm.querySelector('.submitButton');
+    var divHidden = submitBasketForm.querySelector('.hidden');
 
-        // Create a SEPA Direct Debit Secured instance and render the form
-        let SepaDirectDebitSecured = unzerInstance.SepaDirectDebitSecured();
-        SepaDirectDebitSecured.create('sepa-direct-debit-secured', {
-            containerId: 'sepa-secured-IBAN'
-        });
+    let hiddenInputFnc = divHidden.querySelector('input[name="fnc"]');
+    hiddenInputFnc.setAttribute('value', 'validatePayment');
 
-        // Creat a customer instance and render the form
-        let Customer = unzerInstance.Customer();
-        Customer.create({
-            containerId: 'customer'
-        });
+    let hiddenInputCl = divHidden.querySelector('input[name="cl"]');
+    hiddenInputCl.setAttribute('value', 'unzer_dispatcher');
 
-        // Handle payment form submission.
-        let form = document.getElementById('payment-form');
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            let sepaDirectDebitSecuredPromise = SepaDirectDebitSecured.createResource();
-            let customerPromise = Customer.createCustomer();
-            Promise.all([sepaDirectDebitSecuredPromise, customerPromise])
-                .then(function(values) {
-                    let paymentType = values[0];
-                    let customer = values[1];
-                    let hiddenInputPaymentTypeId = document.createElement('input');
-                    hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
-                    hiddenInputPaymentTypeId.setAttribute('name', 'paymentTypeId');
-                    hiddenInputPaymentTypeId.setAttribute('value', paymentType.id);
-                    form.appendChild(hiddenInputPaymentTypeId);
+    let hiddenInputPaymentTypeId = divHidden.querySelector('paymentTypeId');
+    hiddenInputPaymentTypeId = document.createElement('input');
+    hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
+    hiddenInputPaymentTypeId.setAttribute('name', 'paymentTypeId');
+    divHidden.appendChild(hiddenInputPaymentTypeId);
 
-                    let hiddenInputCustomerId = document.createElement('input');
-                    hiddenInputCustomerId.setAttribute('type', 'hidden');
-                    hiddenInputCustomerId.setAttribute('name', 'customerId');
-                    hiddenInputCustomerId.setAttribute('value', customer.id);
-                    form.appendChild(hiddenInputCustomerId);
+    hiddenInputOxPaymentId = document.createElement('input');
+    hiddenInputOxPaymentId.setAttribute('type', 'hidden');
+    hiddenInputOxPaymentId.setAttribute('name', 'paymentid');
+    hiddenInputOxPaymentId.setAttribute('value', '[{$payment->getId()}]');
+    divHidden.appendChild(hiddenInputOxPaymentId);
 
-                    form.setAttribute('method', 'POST');
-                    form.setAttribute('action', [{$sClUrl}]);
+    submitButton.disabled = true;
+    // Create an Unzer instance with your public key
+    let unzerInstance = new unzer('[{$unzerpub}]');
 
-                    // Submitting the form
-                    form.submit();
-                })
-                .catch(function(error) {
-                    $('#error-holder').html(error.message)
-                })
-        });
-        [{/capture}]
-    </script>
-    [{/capture}]
+    // Create a SEPA Direct Debit instance and render the form
+    let SepaDirectDebit = unzerInstance.SepaDirectDebit();
+    SepaDirectDebit.create('sepa-direct-debit', {
+    containerId: 'sepa-IBAN'
+    });
+    var form = document.getElementById('payment-form-sepa');
+
+    form.addEventListener('keyup', function(event) {
+    event.preventDefault();
+    SepaDirectDebit.createResource()
+    .then(function(data) {
+    submitButton.disabled = false;
+    hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(data) );
+
+    })
+    .catch(function(error) {
+    submitButton.disabled = true;
+    hiddenInputPaymentTypeId.setAttribute('value', 'validatePayment' );
+    })
+    });
+[{/capture}]
 [{oxscript add=$unzerSepaDirectJS}]
