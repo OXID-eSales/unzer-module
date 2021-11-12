@@ -5,10 +5,8 @@ namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Unzer;
 use UnzerSDK\Resources\CustomerFactory;
 
 class Invoice extends UnzerPayment
@@ -45,9 +43,17 @@ class Invoice extends UnzerPayment
     }
 
     /**
-     * @return mixed|void
+     * @return bool
      */
-    public function validate()
+    public function isRecurringPaymentType(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return void
+     */
+    public function execute()
     {
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
@@ -66,36 +72,20 @@ class Invoice extends UnzerPayment
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, Registry::getConfig()->getShopHomeUrl() . 'cl=order', $customer, $orderId);
+            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
 
             // You'll need to remember the shortId to show it on the success or failure page
-            $_SESSION['ShortId'] = $transaction->getShortId();
-            $_SESSION['PaymentId'] = $transaction->getPaymentId();
-            $_SESSION['additionalPaymentInformation'] =
-                sprintf(
-                    "Please transfer the amount of %f %s to the following account:<br /><br />"
-                    . "Holder: %s<br/>"
-                    . "IBAN: %s<br/>"
-                    . "BIC: %s<br/><br/>"
-                    . "<i>Please use only this identification number as the descriptor: </i><br/>"
-                    . "%s",
-                    $transaction->getAmount(),
-                    $transaction->getCurrency(),
-                    $transaction->getHolder(),
-                    $transaction->getIban(),
-                    $transaction->getBic(),
-                    $transaction->getDescriptor()
-                );
+            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
+            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
 
-            //TODO SUCCESS CHECK Dummy Redirect
-            \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
-        } catch (UnzerApiException $e) {
-            $merchantMessage = $e->getMerchantMessage();
-            $clientMessage = $e->getClientMessage();
-        } catch (RuntimeException $e) {
-            $merchantMessage = $e->getMessage();
+            $html = sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'), $transaction->getAmount(), $transaction->getCurrency());
+            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'), $transaction->getHolder());
+            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'), $transaction->getIban());
+            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'), $transaction->getBic());
+            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'), $transaction->getDescriptor());
+            Registry::getSession()->setVariable('additionalPaymentInformation', $html);
+        } catch (UnzerApiException | \RuntimeException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
-        //TODO ERROR Dummy Redirect
-        \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=order', true, 302);
     }
 }

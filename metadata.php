@@ -72,6 +72,17 @@ $aModule = [
             'block' => 'shippingAndPayment',
             'file' => 'views/frontend/blocks/unzer_select_payment.tpl'
         ],
+        //email
+        [
+            'template' => 'email/plain/order_cust.tpl',
+            'block' => 'email_plain_order_cust_paymentinfo',
+            'file' => 'views/frontend/blocks/email/unzer_email_plain_order_cust_paymentinfo.tpl'
+        ],
+        [
+            'template' => 'email/html/order_cust.tpl',
+            'block' => 'email_html_order_cust_paymentinfo',
+            'file' => 'views/frontend/blocks/email/unzer_email_html_order_cust_paymentinfo.tpl'
+        ],
     ],
     'settings' => [
         [

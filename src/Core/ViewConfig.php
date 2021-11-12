@@ -22,6 +22,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class ViewConfig extends ViewConfig_parent
@@ -71,5 +72,15 @@ class ViewConfig extends ViewConfig_parent
     public function getUnzerPrivKey(): string
     {
         return $this->getUnzerHelper()->getShopPrivateKey();
+    }
+
+    /**
+     * retrieve additional payment information from session
+     *
+     * @return string
+     */
+    public function getSessionPaymentInfo()
+    {
+        return Registry::getSession()->getVariable('additionalPaymentInformation');
     }
 }
