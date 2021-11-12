@@ -22,8 +22,7 @@ class DispatcherController extends FrontendController implements ClassMappingInt
 {
     public function validatePayment()
     {
-        $Unzerhelper = oxNew(UnzerHelper::class);
-        $oBasket = $Unzerhelper->getBasket();
+        $oBasket = UnzerHelper::getBasket();
         $paymentid = $oBasket->getPaymentId();
         $oPayment = oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
         $oPayment->validate();

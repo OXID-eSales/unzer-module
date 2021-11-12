@@ -16,6 +16,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Exceptions\UnzerApiException;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class OrderController extends OrderController_parent
 {
@@ -33,12 +34,17 @@ class OrderController extends OrderController_parent
     public function execute(): string
     {
         try {
-            $Dispatcher = oxnew(DispatcherController::class);
+            $Dispatcher = oxNew(DispatcherController::class);
             $Dispatcher->validatePayment();
         } catch (UnzerApiException | \RuntimeException $e) {
             //catch
         }
 
         return parent::execute();
+    }
+
+    public function getUnzerPubKey()
+    {
+        return UnzerHelper::getShopPublicKey();
     }
 }
