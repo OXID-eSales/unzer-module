@@ -84,9 +84,6 @@ abstract class Payment
         return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
-    /**
-     * @return mixed
-     */
     abstract public function validate();
 
     /**

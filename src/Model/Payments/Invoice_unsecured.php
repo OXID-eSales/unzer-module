@@ -11,19 +11,12 @@ use UnzerSDK\Unzer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
 
-class InvoiceUnsecured extends UnzerPayment
+class InvoiceUnsecured extends Payment
 {
     /**
      * @var mixed|\OxidEsales\Eshop\Application\Model\Payment
      */
     protected $_oPayment;
-
-    public function __construct($oxpaymentid)
-    {
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
 
     /**
      * @return string
