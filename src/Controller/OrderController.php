@@ -44,4 +44,9 @@ class OrderController extends OrderController_parent
 
         return parent::execute();
     }
+
+    public function getUnzerPubKey()
+    {
+        return UnzerHelper::getShopPublicKey();
+    }
 }
