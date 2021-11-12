@@ -38,9 +38,9 @@ class OrderController extends OrderController_parent
         $oPayment = oxNew(Payment::class);
         $oPayment->load($paymentid);
 
-        if($oPayment->isUnzerPayment()){
-                $Dispatcher = oxnew(DispatcherController::class);
-                $Dispatcher->executePayment($paymentid);
+        if ($oPayment->isUnzerPayment()) {
+            $Dispatcher = oxnew(DispatcherController::class);
+            $Dispatcher->executePayment($paymentid);
         }
 
         return parent::execute();

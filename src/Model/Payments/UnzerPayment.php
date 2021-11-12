@@ -47,16 +47,25 @@ abstract class UnzerPayment
      */
     public function setCustomerData(Customer $customer, User $oUser)
     {
-        if ($oUser->oxuser__oxbirthdate->value != "'0000-00-00'") $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
-        if ($oUser->oxuser__oxcompany->value) $customer->setCompany($oUser->oxuser__oxcompany->value);
-        if ($oUser->oxuser__oxsal->value) $customer->setSalutation($oUser->oxuser__oxsal->value);
-        if ($oUser->oxuser__oxusername->value) $customer->setEmail($oUser->oxuser__oxusername->value);
-        if ($oUser->oxuser__oxfon->value) $customer->setPhone($oUser->oxuser__oxfon->value);
+        if ($oUser->oxuser__oxbirthdate->value != "'0000-00-00'") {
+            $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
+        }
+        if ($oUser->oxuser__oxcompany->value) {
+            $customer->setCompany($oUser->oxuser__oxcompany->value);
+        }
+        if ($oUser->oxuser__oxsal->value) {
+            $customer->setSalutation($oUser->oxuser__oxsal->value);
+        }
+        if ($oUser->oxuser__oxusername->value) {
+            $customer->setEmail($oUser->oxuser__oxusername->value);
+        }
+        if ($oUser->oxuser__oxfon->value) {
+            $customer->setPhone($oUser->oxuser__oxfon->value);
+        }
     }
 
     public function checkpaymentstatus()
     {
-
         if (!Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
         }
