@@ -89,7 +89,7 @@ abstract class UnzerPayment
                     if ($transaction instanceof Authorization) {
                         // Payment is ready to be captured.
                         // Goods can be shipped later AFTER charge.
-                    } else {
+                    }else{
                         // Payment is not done yet (e.g. Prepayment)
                         // Goods can be shipped later after incoming payment (event).
                     }
@@ -121,7 +121,8 @@ abstract class UnzerPayment
             // Check the result message of the initial transaction to find out what went wrong.
             if ($transaction instanceof AbstractTransactionType) {
                 // For better debugging log the error message in your error log
-                //TODO WRITE LOG
+                $clientMessage = $transaction->getMessage()->getCustomer();
+                UnzerHelper::redirectOnError(self::CONTROLLER_URL, $clientMessage);
             }
         } catch (UnzerApiException | \RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
