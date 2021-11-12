@@ -66,6 +66,6 @@ class SepaSecured extends UnzerPayment
 
     public function validate()
     {
-       //TODO
+        //TODO
     }
 }

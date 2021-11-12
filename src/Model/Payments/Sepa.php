@@ -14,8 +14,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use Monolog\Registry;
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 
