@@ -54,11 +54,12 @@ $aModule = [
         'modules/osc/unzer/unzer_giro.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_giro.tpl',
         'modules/osc/unzer/unzer_installment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment.tpl',
         'modules/osc/unzer/unzer_invoice.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice.tpl',
-        'modules/osc/unzer/unzer_invoice_securred.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_securred.tpl',
+        'modules/osc/unzer/unzer_invoice_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_secured.tpl',
         'modules/osc/unzer/unzer_paypal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal.tpl',
         'modules/osc/unzer/unzer_paypal_recurring.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal_recurring.tpl',
         'modules/osc/unzer/unzer_prepayment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_prepayment.tpl',
         'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
+        'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
         'modules/osc/unzer/unzer_sofort.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sofort.tpl',
         'modules/osc/unzer/unzer_wechat.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_wechat.tpl'
     ],

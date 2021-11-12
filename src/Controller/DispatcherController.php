@@ -1,15 +1,23 @@
 <?php
 /**
- * This Software is the property of OXID eSales and is protected
- * by copyright law - it is NOT Freeware.
+ * This file is part of OXID eSales Unzer module.
  *
- * Any unauthorized use of this software without a valid license key
- * is a violation of the license agreement and will be prosecuted by
- * civil and criminal law.
+ * OXID eSales Unzer module is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OXID eSales Unzer module is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OXID eSales Unzer module.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @copyright 2003-2021 OXID eSales AG
+ * @link      http://www.oxid-esales.com
  * @author    OXID Solution Catalysts
- * @link      https://www.oxid-esales.com
  */
 
 namespace OxidSolutionCatalysts\Unzer\Controller;

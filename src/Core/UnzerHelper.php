@@ -25,6 +25,8 @@ namespace OxidSolutionCatalysts\Unzer\Core;
 use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Unzer;
+use UnzerSDK\Validators\PrivateKeyValidator;
+use UnzerSDK\Validators\PublicKeyValidator;
 
 class UnzerHelper
 {
@@ -91,7 +93,7 @@ class UnzerHelper
 
     public static function validateSettings(): bool
     {
-        return self::getShopPublicKey() !== '' && self::getShopPrivateKey() !== '';
+        return PrivateKeyValidator::validate(self::getShopPrivateKey()) && PublicKeyValidator::validate(self::getShopPublicKey());
     }
 
     /**

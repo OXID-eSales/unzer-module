@@ -1,23 +1,32 @@
 <?php
 /**
- * This Software is the property of OXID eSales and is protected
- * by copyright law - it is NOT Freeware.
+ * This file is part of OXID eSales Unzer module.
  *
- * Any unauthorized use of this software without a valid license key
- * is a violation of the license agreement and will be prosecuted by
- * civil and criminal law.
+ * OXID eSales Unzer module is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OXID eSales Unzer module is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OXID eSales Unzer module.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @copyright 2003-2021 OXID eSales AG
+ * @link      http://www.oxid-esales.com
  * @author    OXID Solution Catalysts
- * @link      https://www.oxid-esales.com
  */
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
-use UnzerSDK\Unzer;
+use UnzerSDK\Resources\AbstractUnzerResource;
+use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class Sepa extends Payment
 {
@@ -67,26 +76,42 @@ class Sepa extends Payment
         return $this->sPaymentId;
     }
 
+    private function getPaymentParams()
+    {
+        if (!$this->aPaymentParams) {
+            $jsonobj = Registry::getRequest()->getRequestParameter('paymentTypeId');
+            $this->aPaymentParams = json_decode($jsonobj);
+        }
+        return $this->aPaymentParams;
+    }
+
+    private function getUzrIban()
+    {
+        if (array_key_exists('iban', $this->getPaymentParams())) {
+            return $this->getPaymentParams()->iban;
+        } else {
+            // TODO Translate Error/OXMULTILANG
+            UnzerHelper::redirectOnError('order', 'Ungültige Iban');
+        }
+    }
+
     public function validate()
     {
-        $oUnzer = UnzerHelper::getUnzer();
-
         try {
-            $uzrSepa = new SepaDirectDebit();
+            $oUnzer = UnzerHelper::getUnzer();
+            $sIban = $this->getUzrIban();
+            $uzrSepa = new SepaDirectDebit($sIban);
             $sepa = $oUnzer->createPaymentType($uzrSepa);
 
-            $oUser = $this->getUser();
             $oBasket = $this->getBasket();
-            $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-            $this->setCustomerData($customer, $oUser);
+
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirectUrl(self::CONTROLLER_URL), $customer, $orderId);
-
-
-
+            /* @var Charge|AbstractUnzerResource $transaction */
+            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirectUrl(self::CONTROLLER_URL), null, $orderId);
+            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
         } catch (\Exception $ex) {
-
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
     }
 }
