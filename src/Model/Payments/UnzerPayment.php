@@ -66,11 +66,9 @@ abstract class UnzerPayment
 
     public function checkpaymentstatus()
     {
-        if (!Registry::getSession()->getVariable('PaymentId')) {
+        if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
         }
-
-        $paymentId = $_SESSION['PaymentId'];
 
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
@@ -123,8 +121,7 @@ abstract class UnzerPayment
             // Check the result message of the initial transaction to find out what went wrong.
             if ($transaction instanceof AbstractTransactionType) {
                 // For better debugging log the error message in your error log
-                $merchantMessage = $transaction->getMessage()->getMerchant();
-                $clientMessage = $transaction->getMessage()->getCustomer();
+                //TODO WRITE LOG
             }
         } catch (UnzerApiException | \RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
