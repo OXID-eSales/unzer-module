@@ -73,7 +73,7 @@ class Sepa extends UnzerPayment
         $oUnzer = UnzerHelper::getUnzer();
 
         try {
-            $uzrSepa = new SepaDirectDebit();
+            $uzrSepa = new SepaDirectDebit("iban");
             $sepa = $oUnzer->createPaymentType($uzrSepa);
 
             $oUser = UnzerHelper::getUser();
@@ -82,11 +82,8 @@ class Sepa extends UnzerPayment
             $this->setCustomerData($customer, $oUser);
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirectUrl(self::CONTROLLER_URL), $customer, $orderId);
-
-
+            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(),$oBasket->getBasketCurrency()->name,self::CONTROLLER_URL,$customer,$orderId);
         } catch (\Exception $ex) {
-
         }
     }
 }

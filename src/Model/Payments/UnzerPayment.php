@@ -29,7 +29,7 @@ abstract class UnzerPayment
     abstract public function getPaymentProcedure(): string;
 
     /**
-     * @return mixed
+     * @return mixed|void
      */
     abstract public function validate();
 

@@ -55,8 +55,8 @@ class Invoice extends UnzerPayment
             $unzer = UnzerHelper::getUnzer();
             $unzer->setDebugMode(true)->setDebugHandler(new ExampleDebugHandler());
 
-            /** @var Invoice $invoice */
-            $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice());
+            /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
+            $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice);
 
             $oUser = UnzerHelper::getUser();
             $oBasket = UnzerHelper::getBasket();
