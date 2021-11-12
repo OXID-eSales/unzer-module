@@ -1,5 +1,5 @@
 [{assign var="payment" value=$oView->getPayment()}]
-[{if $payment->isUnzerPaymentMethod()}]
+[{if $payment->isUnzerPayment()}]
     [{assign var="sPaymentID" value=$payment->getId()}]
     [{assign var="unzerpub" value=$oView->getUnzerPubKey()}]
     <div class="row">

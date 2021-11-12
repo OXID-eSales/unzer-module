@@ -22,6 +22,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class ViewConfig extends ViewConfig_parent
 {
     /** @var UnzerHelper|null \OxidSolutionCatalysts\Unzer\Core\UnzerHelper */

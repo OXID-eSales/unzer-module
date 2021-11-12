@@ -1,44 +1,49 @@
 <?php
 /**
- * This file is part of OXID eSales Unzer module.
+ * This Software is the property of OXID eSales and is protected
+ * by copyright law - it is NOT Freeware.
  *
- * OXID eSales Unzer module is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * OXID eSales Unzer module is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OXID eSales Unzer module.  If not, see <http://www.gnu.org/licenses/>.
+ * Any unauthorized use of this software without a valid license key
+ * is a violation of the license agreement and will be prosecuted by
+ * civil and criminal law.
  *
  * @copyright 2003-2021 OXID eSales AG
- * @link      http://www.oxid-esales.com
  * @author    OXID Solution Catalysts
+ * @link      https://www.oxid-esales.com
  */
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
-class Sepa extends Payment
+class Sepa extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $sPaymentId = 'oscunzer_sepa';
+    protected string $sIban;
 
     /**
-     * @var string
+     * @var mixed|Payment
      */
-    protected $sIban;
+    protected $_oPayment;
+
+    /**
+     * @var array
+     */
+    protected array $aPaymentParams;
+
+    public function __construct($oxpaymentid)
+    {
+        $oPayment = oxNew(Payment::class);
+        $oPayment->load($oxpaymentid);
+        $this->_oPayment = $oPayment;
+    }
 
     /**
      * @return string
@@ -56,24 +61,17 @@ class Sepa extends Payment
         $this->sIban = $sIban;
     }
 
-    public function getPaymentMethod(): string
-    {
-        return "sepa";
-    }
-
-    public function getPaymentCode(): string
-    {
-        return "sepa";
-    }
-
-    public function getSyncMode(): string
-    {
-        return "sepa";
-    }
-
     public function getID(): string
     {
-        return $this->sPaymentId;
+        return $this->_oPayment->getId();
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentProcedure(): string
+    {
+        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
     private function getPaymentParams()
@@ -85,6 +83,9 @@ class Sepa extends Payment
         return $this->aPaymentParams;
     }
 
+    /**
+     * @return   string|void
+     */
     private function getUzrIban()
     {
         if (array_key_exists('iban', $this->getPaymentParams())) {
@@ -103,12 +104,12 @@ class Sepa extends Payment
             $uzrSepa = new SepaDirectDebit($sIban);
             $sepa = $oUnzer->createPaymentType($uzrSepa);
 
-            $oBasket = $this->getBasket();
+            $oBasket = UnzerHelper::getBasket();
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
 //            /* @var Charge|AbstractUnzerResource $transaction */
-//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirectUrl(self::CONTROLLER_URL), null, $orderId);
+//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, self::CONTROLLER_URL, null, $orderId);
 //            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
