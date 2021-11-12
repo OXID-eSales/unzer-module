@@ -89,7 +89,7 @@ abstract class UnzerPayment
                     if ($transaction instanceof Authorization) {
                         // Payment is ready to be captured.
                         // Goods can be shipped later AFTER charge.
-                    }else{
+                    } else {
                         // Payment is not done yet (e.g. Prepayment)
                         // Goods can be shipped later after incoming payment (event).
                     }
