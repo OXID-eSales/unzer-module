@@ -34,7 +34,7 @@ class OrderController extends OrderController_parent
     public function execute(): string
     {
         try {
-            $Dispatcher = oxnew(DispatcherController::class);
+            $Dispatcher = oxNew(DispatcherController::class);
             $Dispatcher->validatePayment();
         } catch (UnzerApiException | \RuntimeException $e) {
             //catch
