@@ -132,6 +132,7 @@ class UnzerHelper
 
     /**
      * @param string
+     *
      * @return string
      */
     public static function redirectUrl($cl): string

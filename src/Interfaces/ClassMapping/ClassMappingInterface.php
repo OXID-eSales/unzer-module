@@ -22,7 +22,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping;
 
-use OxidSolutionCatalysts\Unzer\Model\Payments\Invoice_unsecured;
+use OxidSolutionCatalysts\Unzer\Model\Payments\InvoiceUnsecured;
 use OxidSolutionCatalysts\Unzer\Model\Payments\Sepa;
 
 /**
@@ -31,7 +31,7 @@ use OxidSolutionCatalysts\Unzer\Model\Payments\Sepa;
 interface ClassMappingInterface
 {
     const UNZERCLASSNAMEMAPPING = [
-        'oscunzer_invoice' => Invoice_unsecured::class,
+        'oscunzer_invoice' => InvoiceUnsecured::class,
         'oscunzer_sepa' => Sepa::class
     ];
 }
