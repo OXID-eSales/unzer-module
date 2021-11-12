@@ -94,7 +94,15 @@ class Sepa extends UnzerPayment
         }
     }
 
-    public function validate()
+    /**
+     * @return bool
+     */
+    public function isRecurringPaymentType(): bool
+    {
+        return true;
+    }
+
+    public function execute()
     {
         try {
             $oUnzer = UnzerHelper::getUnzer();
@@ -107,7 +115,7 @@ class Sepa extends UnzerPayment
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
 //            /* @var Charge|AbstractUnzerResource $transaction */
-//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, self::CONTROLLER_URL, null, $orderId);
+//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), null, $orderId);
 //            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());

@@ -60,6 +60,20 @@ class UnzerHelper
         exit;
     }
 
+    /**
+     * @param $destination
+     * @return string
+     */
+    public static function redirecturl($destination): string
+    {
+        // redirect to payment-selection page:
+        $oSession = Registry::getSession();
+        $dstUrl = Registry::getConfig()->getShopCurrentUrl();
+        $dstUrl .= '&cl=' . $destination;
+
+        return $oSession->processUrl($dstUrl);
+    }
+
     public static function getConfigBool($sVarName, $bDefaultValue = false): bool
     {
         $rv = self::getConfigParam($sVarName, $bDefaultValue);

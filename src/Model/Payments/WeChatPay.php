@@ -43,7 +43,15 @@ class WeChatPay extends UnzerPayment
         return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
-    public function validate()
+    /**
+     * @return bool
+     */
+    public function isRecurringPaymentType(): bool
+    {
+        return false;
+    }
+
+    public function execute()
     {
         //TODO
     }

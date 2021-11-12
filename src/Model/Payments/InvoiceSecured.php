@@ -35,9 +35,17 @@ class InvoiceSecured extends UnzerPayment
     }
 
     /**
+     * @return bool
+     */
+    public function isRecurringPaymentType(): bool
+    {
+        return false;
+    }
+
+    /**
      * @return mixed|void
      */
-    public function validate()
+    public function execute()
     {
         //TODO
     }
