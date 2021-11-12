@@ -15,17 +15,13 @@
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
 use OxidEsales\Eshop\Application\Model\Payment;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Resources\CustomerFactory;
-use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
-use UnzerSDK\Unzer;
 
 class SepaSecured extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $sIban;
+    protected string $sIban;
 
     /**
      * @var mixed|Payment
@@ -70,20 +66,6 @@ class SepaSecured extends UnzerPayment
 
     public function validate()
     {
-        $oUnzer = UnzerHelper::getUnzer();
-
-        try {
-            $uzrSepa = new SepaDirectDebit("iban");
-            $sepa = $oUnzer->createPaymentType($uzrSepa);
-
-            $oUser = UnzerHelper::getUser();
-            $oBasket = UnzerHelper::getBasket();
-            $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-            $this->setCustomerData($customer, $oUser);
-            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-
-            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, self::CONTROLLER_URL, $customer, $orderId);
-        } catch (\Exception $ex) {
-        }
+       //TODO
     }
 }

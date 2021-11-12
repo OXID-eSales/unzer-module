@@ -14,23 +14,27 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Monolog\Registry;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
-use UnzerSDK\Unzer;
 
 class Sepa extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $sIban;
+    protected string $sIban;
 
     /**
      * @var mixed|Payment
      */
     protected $_oPayment;
+
+    /**
+     * @var array
+     */
+    protected array $aPaymentParams;
 
     public function __construct($oxpaymentid)
     {
@@ -68,22 +72,45 @@ class Sepa extends UnzerPayment
         return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
+    private function getPaymentParams()
+    {
+        if (!$this->aPaymentParams) {
+            $jsonobj = Registry::getRequest()->getRequestParameter('paymentTypeId');
+            $this->aPaymentParams = json_decode($jsonobj);
+        }
+        return $this->aPaymentParams;
+    }
+
+    /**
+     * @return   string|void
+     */
+    private function getUzrIban()
+    {
+        if (array_key_exists('iban', $this->getPaymentParams())) {
+            return $this->getPaymentParams()->iban;
+        } else {
+            // TODO Translate Error/OXMULTILANG
+            UnzerHelper::redirectOnError('order', 'Ungültige Iban');
+        }
+    }
+
     public function validate()
     {
-        $oUnzer = UnzerHelper::getUnzer();
-
         try {
-            $uzrSepa = new SepaDirectDebit("iban");
+            $oUnzer = UnzerHelper::getUnzer();
+            $sIban = $this->getUzrIban();
+            $uzrSepa = new SepaDirectDebit($sIban);
             $sepa = $oUnzer->createPaymentType($uzrSepa);
 
-            $oUser = UnzerHelper::getUser();
             $oBasket = UnzerHelper::getBasket();
-            $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-            $this->setCustomerData($customer, $oUser);
+
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(),$oBasket->getBasketCurrency()->name,self::CONTROLLER_URL,$customer,$orderId);
+//            /* @var Charge|AbstractUnzerResource $transaction */
+//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, self::CONTROLLER_URL, null, $orderId);
+//            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
         } catch (\Exception $ex) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
     }
 }
