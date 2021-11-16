@@ -9,7 +9,7 @@ class PaymentGateway extends PaymentGateway_parent
 {
     /**
      * @param float $dAmount
-     * @param \OxidEsales\Eshop\Application\Model\Order $oOrder
+     * @param \OxidEsales\Eshop\Application\Model\Order|object $oOrder
      * @return bool
      */
     public function executePayment($dAmount, &$oOrder)

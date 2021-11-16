@@ -29,11 +29,17 @@ class Sepa extends UnzerPayment
      */
     protected string $sIban;
 
+    /**
+     * @var Payment
+     */
+    protected Payment $oPayment;
+
+
     public function __construct($oxpaymentid)
     {
         $oPayment = oxNew(Payment::class);
         $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
+        $this->$oPayment = $oPayment;
     }
 
     /**
@@ -54,7 +60,7 @@ class Sepa extends UnzerPayment
 
     public function getID(): string
     {
-        return $this->_oPayment->getId();
+        return $this->oPayment->getId();
     }
 
     /**
@@ -62,7 +68,7 @@ class Sepa extends UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+        return $this->oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
     private function getPaymentParams()
@@ -110,26 +116,19 @@ class Sepa extends UnzerPayment
     {
         try {
             $oUnzer = UnzerHelper::getUnzer();
-
-
             $sId = $this->getUzrId();
             $uzrSepa = $oUnzer->fetchPaymentType($sId);
             $oBasket = UnzerHelper::getBasket();
-
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
             $oUser = UnzerHelper::getUser();
             $oBasket = UnzerHelper::getBasket();
-
-
             $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
             $this->setCustomerData($customer, $oUser);
 
-            /* @var Charge|AbstractUnzerResource $transaction */
             $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
 //           // You'll need to remember the shortId to show it on the success or failure page
             Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
             Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
-
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
