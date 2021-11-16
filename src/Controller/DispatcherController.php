@@ -26,6 +26,6 @@ class DispatcherController extends FrontendController implements ClassMappingInt
     {
         $oUnzerPayment = oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
         $oUnzerPayment->execute();
-        $oUnzerPayment->checkpaymentstatus();
+        return $oUnzerPayment->checkpaymentstatus();
     }
 }

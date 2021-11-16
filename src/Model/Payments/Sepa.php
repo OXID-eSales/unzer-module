@@ -17,6 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -85,6 +86,19 @@ class Sepa extends UnzerPayment
     }
 
     /**
+     * @return   string|void
+     */
+    private function getUzrId()
+    {
+        if (array_key_exists('id', $this->getPaymentParams())) {
+            return $this->getPaymentParams()->id;
+        } else {
+            // TODO Translate Error/OXMULTILANG
+            UnzerHelper::redirectOnError('order', 'Ungültige ID');
+        }
+    }
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool
@@ -97,20 +111,21 @@ class Sepa extends UnzerPayment
         try {
             $oUnzer = UnzerHelper::getUnzer();
 
-            $sIban = $this->getUzrIban();
-            $uzrSepa = new SepaDirectDebit($sIban);
 
-            // TODO Wieso muss Bic und Holder angegeben werden, in Demo nicht enthalten.
-            // Es gibt aber einen Fehler invalid bankaccount blaba wenn Bic oder Holder nicht gesetzt
-            $uzrSepa->setBic('TESTDETT421');
-            $uzrSepa->setHolder('chiptanscatest2');
-            $sepa = $oUnzer->createPaymentType($uzrSepa);
+            $sId = $this->getUzrId();
+            $uzrSepa = $oUnzer->fetchPaymentType($sId);
             $oBasket = UnzerHelper::getBasket();
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
+            $oUser = UnzerHelper::getUser();
+            $oBasket = UnzerHelper::getBasket();
 
-          /* @var Charge|AbstractUnzerResource $transaction */
-         $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), null, $orderId);
+
+            $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
+            $this->setCustomerData($customer, $oUser);
+
+            /* @var Charge|AbstractUnzerResource $transaction */
+            $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
 //           // You'll need to remember the shortId to show it on the success or failure page
             Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
             Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());

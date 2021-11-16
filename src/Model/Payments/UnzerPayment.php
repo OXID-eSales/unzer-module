@@ -80,50 +80,17 @@ abstract class UnzerPayment
             $payment = $unzer->fetchPayment($paymentId);
             $transaction = $payment->getInitialTransaction();
 
-            if ($payment->isCompleted()) {
-                // The payment process has been successful.
-                // You show the success page.
-                // Goods can be shipped.
-            } elseif ($payment->isPending()) {
-                if ($transaction->isSuccess()) {
-                    if ($transaction instanceof Authorization) {
-                        // Payment is ready to be captured.
-                        // Goods can be shipped later AFTER charge.
-                    } else {
-                        // Payment is not done yet (e.g. Prepayment)
-                        // Goods can be shipped later after incoming payment (event).
-                    }
-
-                    // In any case:
-                    // * You can show the success page.
-                    // * You can set order status to pending payment
-                } elseif ($transaction->isPending()) {
-
-                    // The initial transaction of invoice types will not change to success but stay pending.
-                    $paymentType = $payment->getPaymentType();
-                    if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
-                        // Awaiting payment by the customer.
-                        // Goods can be shipped immediately except for Prepayment type.
-                    }
-
-                    // In cases of a redirect to an external service (e.g. 3D secure, PayPal, etc) it sometimes takes time for
-                    // the payment to update it's status after redirect into shop.
-                    // In this case the payment and the transaction are pending at first and change to cancel or success later.
-
-                    // Use the webhooks feature to stay informed about changes of payment and transaction (e.g. cancel, success)
-                    // then you can handle the states as shown above in transaction->isSuccess() branch.
-                }
+            if ($transaction->isSuccess()) {
+                // TODO log success
+                return true;
+            } else if ($transaction->isPending()) {
+                // TODO Handle Pending...
+                return false;
+            } else if ($transaction->isError()) {
+                // TODO Handle Error
+                return false;
             }
-            // If the payment is neither success nor pending something went wrong.
-            // In this case do not create the order or cancel it if you already did.
-            // Redirect to an error page in your shop and show a message if you want.
-
-            // Check the result message of the initial transaction to find out what went wrong.
-            if ($transaction instanceof AbstractTransactionType) {
-                // For better debugging log the error message in your error log
-                $clientMessage = $transaction->getMessage()->getCustomer();
-                UnzerHelper::redirectOnError(self::CONTROLLER_URL, $clientMessage);
-            }
+        
         } catch (UnzerApiException | \RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
