@@ -1,5 +1,5 @@
 [{$smarty.block.parent}]
-[{if $edit->oxpayments__oxid->value eq "oscunzer_card" || $edit->oxpayments__oxid->value eq "oscunzer_paypal" || $edit->oxpayments__oxid->value eq "oscunzer_applepay"}]
+[{if $edit->oxpayments__oxid->value eq "oscunzer_card" || $edit->oxpayments__oxid->value eq "oscunzer_paypal"}]
     <tr>
         <td class="edittext" width="70">
             [{oxmultilang ident="OSCUNZER_PAYMENT_PROCEDURE"}]

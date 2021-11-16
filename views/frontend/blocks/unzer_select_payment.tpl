@@ -46,8 +46,8 @@
                 </div>
                 <div class="card-body">
                     [{$payment->oxpayments__oxdesc->value}]
-                    [{if $sPaymentID == "oscunzer_banktransfer"}]
-                        [{include file="modules/osc/unzer/unzer_banktransfer.tpl"}]
+                    [{if $sPaymentID == "oscunzer_pis"}]
+                        [{include file="modules/osc/unzer/unzer_pis.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_card"}]
                         [{include file="modules/osc/unzer/unzer_card.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_eps"}]
@@ -64,8 +64,6 @@
                         [{include file="modules/osc/unzer/unzer_invoice_securred.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_paypal"}]
                         [{include file="modules/osc/unzer/unzer_paypal.tpl"}]
-                    [{elseif $sPaymentID == "oscunzer_post-finance"}]
-                        [{include file="modules/osc/unzer/unzer_invoice.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_prepayment"}]
                         [{include file="modules/osc/unzer/unzer_prepayment.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_sepa"}]
@@ -82,7 +80,3 @@
 [{else}]
     [{$smarty.block.parent}]
 [{/if}]
-
-
-
-

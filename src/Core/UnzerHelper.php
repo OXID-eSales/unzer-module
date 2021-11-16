@@ -32,6 +32,77 @@ use UnzerSDK\Validators\PublicKeyValidator;
 
 class UnzerHelper
 {
+    private static array $_aRDFinserts = [
+        'oscunzer_card_mastercard' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'MasterCard',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_visa' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'VISA',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_americanexpress' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'AmericanExpress',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_dinersclub' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'DinersClub',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_jcb' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'JCB',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_prepayment' => [
+            'oxpaymentid' => 'oscunzer_prepayment',
+            'oxobjectid' => 'ByBankTransferInAdvance',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_pis' => [
+            'oxpaymentid' => 'oscunzer_pis',
+            'oxobjectid' => 'ByBankTransferInAdvance',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_invoice' => [
+            'oxpaymentid' => 'oscunzer_invoice',
+            'oxobjectid' => 'ByInvoice',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_invoice-secured' => [
+            'oxpaymentid' => 'oscunzer_invoice-secured',
+            'oxobjectid' => 'ByInvoice',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_sepa' => [
+            'oxpaymentid' => 'oscunzer_sepa',
+            'oxobjectid' => 'DirectDebit',
+            'oxtype' => 'rdfapayment',
+        ],
+        'ooscunzer_sepa-secured' => [
+            'oxpaymentid' => 'oscunzer_sepa-secured',
+            'oxobjectid' => 'DirectDebit',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_paypal' => [
+            'oxpaymentid' => 'oscunzer_paypal',
+            'oxobjectid' => 'PayPal',
+            'oxtype' => 'rdfapayment',
+        ],
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getRDFinserts(): array
+    {
+        return self::$_aRDFinserts;
+    }
+
     /**
      * @return string
      */

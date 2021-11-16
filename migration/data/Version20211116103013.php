@@ -53,208 +53,208 @@ final class Version20211116103013 extends AbstractMigration
     {
         //Payment -> Country Assignment
 
+        //bancontact
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                            VALUES(?, ?, ?, ?)", [md5("oscunzer_bancontact." . $this->_aCountry['Belgien'] . ".oxcountry"), 'oscunzer_bancontact', $this->_aCountry['Belgien'], 'oxcountry']);
+
         //invoice
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Belgien'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Belgien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Deutschland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Estland'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Estland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Finnland'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Finnland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Frankreich'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Frankreich'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Griechenland'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Griechenland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Irland'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Irland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Italien'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Italien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Lettland'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Lettland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Litauen'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Litauen'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Luxemburg'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Luxemburg'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Malta'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Malta'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Niederlande'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Niederlande'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Portugal'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Portugal'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Slowakei'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Slowakei'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Slowenien'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Slowenien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Spanien'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Spanien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Zypern'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Zypern'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_invoice', $this->_aCountry['Österreich'], 'oxcountry']);
 
         //invoice-secured
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice-secured." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_invoice-secured', $this->_aCountry['Deutschland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_invoice-secured." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_invoice-secured', $this->_aCountry['Österreich'], 'oxcountry']);
 
-        //bank-transfer
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
-                            VALUES(?, ?, ?, ?)", [md5("oscunzer_banktransfer." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_banktransfer', $this->_aCountry['Deutschland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
-                            VALUES(?, ?, ?, ?)", [md5("oscunzer_banktransfer." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_banktransfer', $this->_aCountry['Österreich'], 'oxcountry']);
+        //pis
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                            VALUES(?, ?, ?, ?)", [md5("oscunzer_pis." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_pis', $this->_aCountry['Deutschland'], 'oxcountry']);
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                            VALUES(?, ?, ?, ?)", [md5("oscunzer_pis." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_pis', $this->_aCountry['Österreich'], 'oxcountry']);
 
         //installment
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_installment." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_installment', $this->_aCountry['Deutschland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_installment." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_installment', $this->_aCountry['Österreich'], 'oxcountry']);
 
         //prepayment
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Belgien'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Belgien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Deutschland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Estland'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Estland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Finnland'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Finnland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Frankreich'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Frankreich'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Griechenland'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Griechenland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Irland'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Irland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Italien'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Italien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Lettland'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Lettland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Litauen'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Litauen'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Luxemburg'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Luxemburg'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Malta'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Malta'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Niederlande'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Niederlande'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Portugal'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Portugal'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Slowakei'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Slowakei'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Slowenien'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Slowenien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Spanien'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Spanien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Zypern'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Zypern'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_prepayment." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_prepayment', $this->_aCountry['Österreich'], 'oxcountry']);
 
         //sepa-direct-debit-secured
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa-secured." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_sepa-secured', $this->_aCountry['Deutschland'], 'oxcountry']);
 
         //giropay
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_giropay." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_giropay', $this->_aCountry['Deutschland'], 'oxcountry']);
 
         //ideal
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_ideal." . $this->_aCountry['Niederlande'] . ".oxcountry"), 'oscunzer_ideal', $this->_aCountry['Niederlande'], 'oxcountry']);
 
         //eps
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_eps." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_eps', $this->_aCountry['Österreich'], 'oxcountry']);
 
-        //post-finance
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
-                            VALUES(?, ?, ?, ?)", [md5("oscunzer_post-finance." . $this->_aCountry['Schweiz'] . ".oxcountry"), 'oscunzer_post-finance', $this->_aCountry['Schweiz'], 'oxcountry']);
-
         //przelewy24
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_przelewy24." . $this->_aCountry['Polen'] . ".oxcountry"), 'oscunzer_przelewy24', $this->_aCountry['Polen'], 'oxcountry']);
 
         //sepa-direct-debit
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Belgien'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Belgien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Deutschland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Estland'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Estland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Finnland'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Finnland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Frankreich'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Frankreich'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Griechenland'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Griechenland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Irland'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Irland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Italien'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Italien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Lettland'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Lettland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Litauen'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Litauen'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Luxemburg'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Luxemburg'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Malta'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Malta'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Niederlande'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Niederlande'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Portugal'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Portugal'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Slowakei'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Slowakei'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Slowenien'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Slowenien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Spanien'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Spanien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Zypern'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Zypern'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sepa." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_sepa', $this->_aCountry['Österreich'], 'oxcountry']);
 
         //sofort
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Schweden'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Schweden'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Norwegen'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Norwegen'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Finnland'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Finnland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Dänemark'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Dänemark'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Deutschland'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Deutschland'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Niederlande'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Niederlande'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Belgien'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Belgien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Schweiz'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Schweiz'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Frankreich'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Frankreich'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Italien'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Italien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Polen'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Polen'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Spanien'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Spanien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Portugal'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Portugal'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Großbritannien'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Großbritannien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Ungarn'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Ungarn'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Tschechien'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Tschechien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Slowakei'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Slowakei'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Australien'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Australien'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['USA'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['USA'], 'oxcountry']);
-        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`) 
+        $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [md5("oscunzer_sofort." . $this->_aCountry['Österreich'] . ".oxcountry"), 'oscunzer_sofort', $this->_aCountry['Österreich'], 'oxcountry']);
     }
 

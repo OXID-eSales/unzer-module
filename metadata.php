@@ -44,7 +44,7 @@ $aModule = [
         // frontend
         'modules/osc/unzer/unzer_alipay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_alipay.tpl',
         'modules/osc/unzer/unzer_bancontact.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_bancontact.tpl',
-        'modules/osc/unzer/unzer_banktransfer.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_banktransfer.tpl',
+        'modules/osc/unzer/unzer_pis.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_pis.tpl',
         'modules/osc/unzer/unzer_card.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_card.tpl',
         'modules/osc/unzer/unzer_card_recurring.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_card_recurring.tpl',
         'modules/osc/unzer/unzer_eps_charge.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_eps_charge.tpl',
