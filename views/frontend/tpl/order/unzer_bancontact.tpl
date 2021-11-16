@@ -7,7 +7,7 @@
 </form>
 
 
-[{capture assign="unzerBankContactJS"}]
+[{capture assign="unzerBanContactJS"}]
     <script type="text/javascript">
         [{capture name="javaScript"}]
         // Create an Unzer instance with your public key
@@ -45,4 +45,4 @@
         [{/capture}]
     </script>
 [{/capture}]
-[{oxscript add=$unzerBankContactJS}]
+[{oxscript add=$unzerBanContactJS}]
