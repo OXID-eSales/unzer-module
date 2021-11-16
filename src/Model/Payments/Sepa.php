@@ -39,7 +39,7 @@ class Sepa extends UnzerPayment
     {
         $oPayment = oxNew(Payment::class);
         $oPayment->load($oxpaymentid);
-        $this->$oPayment = $oPayment;
+        $this->oPayment = $oPayment;
     }
 
     /**
