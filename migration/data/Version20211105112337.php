@@ -9,13 +9,12 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
 
-
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
 final class Version20211105112337 extends AbstractMigration
 {
-    private static array $_aPayments = ['oscunzer_alipay', 'oscunzer_bancontact', 'oscunzer_card',
+    private static array $aPayments = ['oscunzer_alipay', 'oscunzer_bancontact', 'oscunzer_card',
         'oscunzer_cardrecurring', 'oscunzer_eps', 'oscunzer_giropay', 'oscunzer_ideal',
         'oscunzer_installment', 'oscunzer_invoice', 'oscunzer_invoice-secured', 'oscunzer_paypal',
         'oscunzer_pis', 'oscunzer_prepayment', 'oscunzer_przelewy24', 'oscunzer_sepa',
@@ -33,10 +32,11 @@ final class Version20211105112337 extends AbstractMigration
          WHERE (`OXID` = 'oscunzer_sepa-secured' || `OXID` = 'oscunzer_invoice-secured')
           ;");
 
-        foreach (self::$_aPayments as $paymentid) {
+        foreach (self::$aPayments as $paymentid) {
             $oxid = md5($paymentid . "oxidstandard.oxdelset");
             $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
-                            select '" . $oxid . "', '" . $paymentid . "', 'oxidstandard', 'oxdelset' from oxdeliveryset where oxid = 'oxidstandard' ");
+                            select '" . $oxid . "', '" . $paymentid . "', 'oxidstandard', 'oxdelset'
+                            from oxdeliveryset where oxid = 'oxidstandard' ");
         }
 
         foreach (UnzerHelper::getRDFinserts() as $oxid => $aRDF) {
