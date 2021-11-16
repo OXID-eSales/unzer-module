@@ -79,7 +79,6 @@ abstract class UnzerPayment
             // Redirect to success if the payment has been successfully completed.
             $payment = $unzer->fetchPayment($paymentId);
             $transaction = $payment->getInitialTransaction();
-
             if ($transaction->isSuccess()) {
                 // TODO log success
                 return true;
@@ -90,7 +89,6 @@ abstract class UnzerPayment
                 // TODO Handle Error
                 return false;
             }
-        
         } catch (UnzerApiException | \RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
