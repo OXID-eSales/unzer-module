@@ -38,7 +38,7 @@ class OrderController extends OrderController_parent
         $oPayment->load($paymentid);
 
         if ($oPayment->isUnzerPayment()) {
-            $Dispatcher = oxnew(DispatcherController::class);
+            $Dispatcher = oxNew(DispatcherController::class);
             $Dispatcher->executePayment($paymentid);
         }
 

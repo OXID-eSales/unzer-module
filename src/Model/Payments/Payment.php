@@ -41,10 +41,7 @@ abstract class Payment
      */
     protected $_oPayment;
 
-    /**
-     * @var array
-     */
-    protected $aPaymentParams;
+
 
     public function __construct($oxpaymentid)
     {

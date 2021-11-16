@@ -28,16 +28,6 @@ class Sepa extends UnzerPayment
      */
     protected string $sIban;
 
-    /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    /**
-     * @var array
-     */
-    protected array $aPaymentParams;
-
     public function __construct($oxpaymentid)
     {
         $oPayment = oxNew(Payment::class);
@@ -76,11 +66,9 @@ class Sepa extends UnzerPayment
 
     private function getPaymentParams()
     {
-        if (!$this->aPaymentParams) {
-            $jsonobj = Registry::getRequest()->getRequestParameter('paymentTypeId');
-            $this->aPaymentParams = json_decode($jsonobj);
-        }
-        return $this->aPaymentParams;
+        $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
+        $blubb = json_decode($jsonobj);
+        return $blubb;
     }
 
     /**
@@ -108,17 +96,25 @@ class Sepa extends UnzerPayment
     {
         try {
             $oUnzer = UnzerHelper::getUnzer();
+
             $sIban = $this->getUzrIban();
             $uzrSepa = new SepaDirectDebit($sIban);
-            $sepa = $oUnzer->createPaymentType($uzrSepa);
 
+            // TODO Wieso muss Bic und Holder angegeben werden, in Demo nicht enthalten.
+            // Es gibt aber einen Fehler invalid bankaccount blaba wenn Bic oder Holder nicht gesetzt
+            $uzrSepa->setBic('TESTDETT421');
+            $uzrSepa->setHolder('chiptanscatest2');
+            $sepa = $oUnzer->createPaymentType($uzrSepa);
             $oBasket = UnzerHelper::getBasket();
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-//            /* @var Charge|AbstractUnzerResource $transaction */
-//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), null, $orderId);
-//            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
+          /* @var Charge|AbstractUnzerResource $transaction */
+         $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), null, $orderId);
+//           // You'll need to remember the shortId to show it on the success or failure page
+            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
+            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
+
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
