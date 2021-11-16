@@ -22,6 +22,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
@@ -40,6 +41,32 @@ class Events
     private static array $_aPayments = [
         //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
+        //Alipay is China’s leading third-party mobile and online payment solution.
+        'oscunzer_alipay' => [
+            'insert' => 0,
+            'de_desc' => "Alipay",
+            'en_desc' => "Alipay",
+            'de_longdesc' => "Alipay ist Chinas führende Zahlungs- und Lifestyleplattform. Sie wurde 2004 von der Alibaba
+            Group gegründet. Inzwischen zählt Alipay 870 Millionen Nutzer. 80 Prozent Marktanteil im Mobile Payment- und
+            mehr als 50 Prozent im Online-Bereich machen AliPay unverzichtbar für Händler, die nach China verkaufen. Auch
+            die vielen chinesischen Touristen bezahlen im Ausland gerne mit ihrer heimischen Zahlungsmethode. Das wichtigste
+            Produkt ist das Alipay Wallet. Mit der zugehörigen App können Käufer Transaktionen direkt mit dem Smartphone vornehmen.",
+            'en_longdesc' => "Alipay is China's leading payment and lifestyle platform. It was founded in 2004 by the Alibaba
+            Group. Alipay now has 870 million users. 80 percent of the market share in mobile payment and more than 50 percent
+            in the online area make AliPay indispensable for merchants who sell to China. The many Chinese tourists abroad
+            also like to pay with their domestic payment method. The most important product is the Alipay wallet. With the
+            associated app, buyers can carry out transactions directly with their smartphone."
+        ],
+
+        //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
+        'oscunzer_bancontact' => [
+            'insert' => 0,
+            'de_desc' => "Bancontact",
+            'en_desc' => "Bancontact",
+            'de_longdesc' => "Bancontact ist ein belgisches Unternehmen, das benutzerfreundliche Lösungen für ein einfaches tägliches Einkaufserlebnis bietet.",
+            'en_longdesc' => "Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience."
+        ],
+
         //Credit cards and debit cards are the most common payment method in e-commerce.
         'oscunzer_card' => [
             'insert' => 1,
@@ -53,49 +80,32 @@ class Events
             providers."
         ],
 
-        //Unzer Direct Debit lets you accept payments in euro.
-        'oscunzer_sepa' => [
-            'insert' => 1,
-            'de_desc' => "SEPA-Lastschrift",
-            'en_desc' => "SEPA Direct Debit",
-            'de_longdesc' => "Sie erteilen ein SEPA-Lastschriftmandat",
-            'en_longdesc' => "You issue a SEPA direct debit mandate"
+        //Credit cards and debit cards are the most common payment method in e-commerce.
+        'oscunzer_cardrecurring' => [
+            'insert' => 0,
+            'de_desc' => "Kreditkarte (wiederkehrende Zahlungen)",
+            'en_desc' => "Credit Card (recurring Payment)",
+            'de_longdesc' => "Von Europa, über Nordamerika bis Asien: kartenbasierte Zahlungsmethoden sind international
+            verbreitet. In vielen Teilen der Welt haben sie schon längst das Bargeld abgelöst. Mit Unzer können Sie einfach
+            alle wichtigen Anbieter akzeptieren.",
+            'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
+            world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
+            providers."
         ],
 
-        //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
-        'oscunzer_sepa-secured' => [
+        //Electronic Payment Standard (EPS) is an online payment system used in Austria.
+        'oscunzer_eps' => [
             'insert' => 1,
-            'de_desc' => "SEPA-Lastschrift Secured",
-            'en_desc' => "SEPA Direct Debit Secured",
-            'de_longdesc' => "Sie erteilen ein SEPA-Lastschriftmandat",
-            'en_longdesc' => "You issue a SEPA direct debit mandate through a"
-        ],
-
-        //Sofort is an online payment method used in select European countries.
-        'oscunzer_sofort' => [
-            'insert' => 1,
-            'de_desc' => "Sofort",
-            'en_desc' => "Sofort",
-            'de_longdesc' => "Sofortüberweisung (gesicherter Kanal)",
-            'en_longdesc' => "Instant bank transfer (secure channel)"
-        ],
-
-        //Unzer Invoice lets you issue an invoice and then collect the payment.
-        'oscunzer_invoice' => [
-            'insert' => 1,
-            'de_desc' => "Rechnung",
-            'en_desc' => "Invoice",
-            'de_longdesc' => "Rechnung, ausgestellt von Unzer",
-            'en_longdesc' => "Invoice, issued by Unzer"
-        ],
-
-        //Unzer Invoice Secured lets you issue an invoice and then collect the payment, your payment is secured.
-        'oscunzer_invoice-secured' => [
-            'insert' => 1,
-            'de_desc' => "Rechnung Secured",
-            'en_desc' => "Invoice Secured",
-            'de_longdesc' => "Rechnung, ausgestellt von Unzer (gesicherter Kanal)",
-            'en_longdesc' => "Invoice, issued by Unzer (secure channel)"
+            'de_desc' => "EPS",
+            'en_desc' => "EPS",
+            'de_longdesc' => "Electronic Payment Standard – oder kurz eps – ist ein österreichisches Direktüberweisung-Verfahren.
+            Es wurde von den größten Banken des Landes gemeinsam mit der Regierung konzipiert. Ähnlich wie mit dem deutschen
+            Gegenstück Giropay können Käufer mit eps sicher und ohne Übermittlung von sensiblen Daten zahlen. Händlern bietet
+            Electronic Payment Standard vor allem Schutz vor Zahlungsausfällen.",
+            'en_longdesc' => "Electronic Payment Standard - or eps for short - is an Austrian direct transfer procedure.
+            It was designed by the country's largest banks together with the government. Similar to the German counterpart
+            Giropay, buyers can use eps to pay securely and without transmitting sensitive data. Electronic Payment Standard
+            offers merchants above all protection against payment defaults."
         ],
 
         //Giropay is an online payment method used in Germany.
@@ -126,78 +136,6 @@ class Events
             online transaction in the Netherlands."
         ],
 
-        //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
-        'oscunzer_prepayment' => [
-            'insert' => 1,
-            'de_desc' => "Vorkasse",
-            'en_desc' => "Prepayment",
-            'de_longdesc' => "Bei der Vorauskasse oder Vorkasse erklärt schon der Name, wie die Zahlungsmethode funktioniert:
-            Online-Käufer überweisen das Geld für Ihre Bestellung im Voraus. Erst wenn der Betrag eingegangen ist, verschickt
-            der Händler die Ware.",
-            'en_longdesc' => "In the case of prepayment or prepayment, the name already explains how the payment method works:
-            online buyers transfer the money for their order in advance. Only when the amount has been received does the
-            dealer send the goods."
-        ],
-
-        //Unzer Bank Transfer lets your customers pay directly from their bank account.
-        'oscunzer_banktransfer' => [
-            'insert' => 1,
-            'de_desc' => "Banktransfer",
-            'en_desc' => "Bank Transfer",
-            'de_longdesc' => "Unzer Bank Transfer ist unser Direktüberweisungs- oder auch Zahlungsauslösedienst. Mit ihm
-            können Käufer im Checkout-Prozess komfortabel eine Überweisung beauftragen. Dazu geben sie die Zugangsdaten
-            ihres Online-Bankings ein und authentifizieren sich zusätzlich mit einer TAN. Unzer bank transfer prüft in Echtzeit,
-            ob das Konto gedeckt ist. Der Betrag wird direkt abgebucht.",
-            'en_longdesc' => "Unzer Bank Transfer is our direct transfer or payment initiation service. With it, buyers
-            can conveniently order a transfer in the checkout process. To do this, they enter the access data for their
-            online banking and also authenticate themselves with a TAN. Unzer bank transfer checks in real time whether
-            the account is sufficient. The amount will be debited directly."
-        ],
-
-        //Electronic Payment Standard (EPS) is an online payment system used in Austria.
-        'oscunzer_eps' => [
-            'insert' => 1,
-            'de_desc' => "EPS",
-            'en_desc' => "EPS",
-            'de_longdesc' => "Electronic Payment Standard – oder kurz eps – ist ein österreichisches Direktüberweisung-Verfahren.
-            Es wurde von den größten Banken des Landes gemeinsam mit der Regierung konzipiert. Ähnlich wie mit dem deutschen
-            Gegenstück Giropay können Käufer mit eps sicher und ohne Übermittlung von sensiblen Daten zahlen. Händlern bietet
-            Electronic Payment Standard vor allem Schutz vor Zahlungsausfällen.",
-            'en_longdesc' => "Electronic Payment Standard - or eps for short - is an Austrian direct transfer procedure.
-            It was designed by the country's largest banks together with the government. Similar to the German counterpart
-            Giropay, buyers can use eps to pay securely and without transmitting sensitive data. Electronic Payment Standard
-            offers merchants above all protection against payment defaults."
-        ],
-
-        //PostFinance e-finance is an online direct payment method used in Switzerland.
-        'oscunzer_post-finance' => [
-            'insert' => 1,
-            'de_desc' => "PostFinance E-Finance",
-            'en_desc' => "PostFinance E-Finance",
-            'de_longdesc' => "Die PostFinance AG ist zu 100% eine Konzerngesellschaft der Schweizerischen Post AG. Sie gehört
-            zu den führenden Finanzinstituten der Schweiz. Über 3 Millionen Privat- und Geschäftskunden vertrauen ihr. Mit
-            dem Onlinebanking PostFinance E-Finance können Käufer elektronisch bezahlen. Die Voraussetzungen: ein Bankkonto
-            bei der PostFinance und Schweizer Franken als Währung.",
-            'en_longdesc' => "PostFinance AG is a 100% subsidiary of Swiss Post AG. It is one of the leading financial institutions
-            in Switzerland. Over 3 million private and business customers trust her. Buyers can pay electronically with PostFinance
-            e-finance online banking. The requirements: a bank account with PostFinance and Swiss francs as the currency."
-        ],
-        //Apple Pay is a popular mobile payment and digital wallet service provided by Apple.
-        'oscunzer_applepay' => [
-            'insert' => 0,
-            'de_desc' => "Apple Pay",
-            'en_desc' => "Apple Pay",
-            'de_longdesc' => "Apple Pay ist das Zahlungssystem des Technologieunternehmens Apple. Käufer können damit kontaktlos
-            und sicher in Geschäften, in Apps oder in Online-Shops bezahlen. Am POS halten sie dazu ihr Smart-phone an das
-            Kassenterminal und legen den Finger auf die Touch ID. Daraufhin wird die Transaktion wird mit Hilfe von Near
-            Field Communication (NFC) und der eigenen Wallet App durchgeführt. Darin muss eine Kreditkarte hinterlegt sein,
-            deren Anbieter mit Apple kooperiert.",
-            'en_longdesc' => "Apple Pay is the payment system from the technology company Apple. Buyers can use it to make
-            contactless and secure payments in shops, in apps or in online shops. To do this, at the POS, hold your smartphone
-            to the cash register terminal and place your finger on the Touch ID. The transaction is then carried out with
-            the help of Near Field Communication (NFC) and your own wallet app. A credit card whose provider cooperates with
-            Apple must be stored in it."
-        ],
         //Unzer Installment lets your customers pay in monthly payments.
         'oscunzer_installment' => [
             'insert' => 1,
@@ -206,6 +144,25 @@ class Events
             'de_longdesc' => "Ratenzahlung mit Unzer",
             'en_longdesc' => "Unzer installment"
         ],
+
+        //Unzer Invoice lets you issue an invoice and then collect the payment.
+        'oscunzer_invoice' => [
+            'insert' => 1,
+            'de_desc' => "Rechnung",
+            'en_desc' => "Invoice",
+            'de_longdesc' => "Rechnung, ausgestellt von Unzer",
+            'en_longdesc' => "Invoice, issued by Unzer"
+        ],
+
+        //Unzer Invoice Secured lets you issue an invoice and then collect the payment, your payment is secured.
+        'oscunzer_invoice-secured' => [
+            'insert' => 1,
+            'de_desc' => "Rechnung Secured",
+            'en_desc' => "Invoice Secured",
+            'de_longdesc' => "Rechnung, ausgestellt von Unzer (gesicherter Kanal)",
+            'en_longdesc' => "Invoice, issued by Unzer (secure channel)"
+        ],
+
         //PayPal is one of the world’s most popular online payment systems.
         'oscunzer_paypal' => [
             'insert' => 1,
@@ -223,6 +180,20 @@ class Events
             the payment is considered secure. "
         ],
 
+        //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
+        'oscunzer_prepayment' => [
+            'insert' => 1,
+            'de_desc' => "Vorkasse",
+            'en_desc' => "Prepayment",
+            'de_longdesc' => "Bei der Vorauskasse oder Vorkasse erklärt schon der Name, wie die Zahlungsmethode funktioniert:
+            Online-Käufer überweisen das Geld für Ihre Bestellung im Voraus. Erst wenn der Betrag eingegangen ist, verschickt
+            der Händler die Ware.",
+            'en_longdesc' => "In the case of prepayment or prepayment, the name already explains how the payment method works:
+            online buyers transfer the money for their order in advance. Only when the amount has been received does the
+            dealer send the goods."
+        ],
+
+
         //Przelewy24 is an online payment method used in Poland.
         'oscunzer_przelewy24' => [
             'insert' => 0,
@@ -235,6 +206,48 @@ class Events
             'en_longdesc' => "Przelewy24 is the most popular online payment method in Poland. It not only enables buyers
             to make payments from their own bank account or credit card. It also supports alternative payment methods such
             as SMS. The requirement for use is an account with one of the more than 150 Polish banks that Przelewy24 supports."
+        ],
+
+        //Unzer Direct Debit lets you accept payments in euro.
+        'oscunzer_sepa' => [
+            'insert' => 1,
+            'de_desc' => "SEPA-Lastschrift",
+            'en_desc' => "SEPA Direct Debit",
+            'de_longdesc' => "Sie erteilen ein SEPA-Lastschriftmandat",
+            'en_longdesc' => "You issue a SEPA direct debit mandate"
+        ],
+
+        //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
+        'oscunzer_sepa-secured' => [
+            'insert' => 1,
+            'de_desc' => "SEPA-Lastschrift Secured",
+            'en_desc' => "SEPA Direct Debit Secured",
+            'de_longdesc' => "Sie erteilen ein SEPA-Lastschriftmandat",
+            'en_longdesc' => "You issue a SEPA direct debit mandate through a"
+        ],
+
+        //Sofort is an online payment method used in select European countries.
+        'oscunzer_sofort' => [
+            'insert' => 1,
+            'de_desc' => "Sofort",
+            'en_desc' => "Sofort",
+            'de_longdesc' => "Sofortüberweisung (gesicherter Kanal)",
+            'en_longdesc' => "Instant bank transfer (secure channel)"
+        ],
+
+        //Unzer Bank Transfer lets your customers pay directly from their bank account.
+        'oscunzer_pis' => [
+            'insert' => 1,
+            'de_desc' => "Banktransfer",
+            'en_desc' => "Bank Transfer",
+            'de_longdesc' => "Unzer Bank Transfer ist unser Direktüberweisungs- oder auch Zahlungsauslösedienst. Mit ihm
+            können Käufer im Checkout-Prozess komfortabel eine Überweisung beauftragen. Dazu geben sie die Zugangsdaten
+            ihres Online-Bankings ein und authentifizieren sich zusätzlich mit einer TAN. Unzer bank transfer prüft in Echtzeit,
+            ob das Konto gedeckt ist. Der Betrag wird direkt abgebucht.",
+            'en_longdesc' => "Unzer Bank Transfer is our direct transfer or payment initiation service. With it, buyers
+            can conveniently order a transfer in the checkout process. To do this, they enter the access data for their
+            online banking and also authenticate themselves with a TAN. Unzer bank transfer checks in real time whether
+            the account is sufficient. The amount will be debited directly."
         ],
 
         //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
@@ -251,86 +264,6 @@ class Events
             app, analogous to WhatsApp. Over time, the app has been expanded to include more and more tools - in 2015 also
             a payment system comparable to Google Pay or Apple Pay. Thanks to the WeChat social platform, WeChat Pay has
             a huge user base of over a billion chat users. Of these, around 600 million already trust WeChat Pay."
-        ],
-
-        //Alipay is China’s leading third-party mobile and online payment solution.
-        'oscunzer_alipay' => [
-            'insert' => 0,
-            'de_desc' => "Alipay",
-            'en_desc' => "Alipay",
-            'de_longdesc' => "Alipay ist Chinas führende Zahlungs- und Lifestyleplattform. Sie wurde 2004 von der Alibaba
-            Group gegründet. Inzwischen zählt Alipay 870 Millionen Nutzer. 80 Prozent Marktanteil im Mobile Payment- und
-            mehr als 50 Prozent im Online-Bereich machen AliPay unverzichtbar für Händler, die nach China verkaufen. Auch
-            die vielen chinesischen Touristen bezahlen im Ausland gerne mit ihrer heimischen Zahlungsmethode. Das wichtigste
-            Produkt ist das Alipay Wallet. Mit der zugehörigen App können Käufer Transaktionen direkt mit dem Smartphone vornehmen.",
-            'en_longdesc' => "Alipay is China's leading payment and lifestyle platform. It was founded in 2004 by the Alibaba
-            Group. Alipay now has 870 million users. 80 percent of the market share in mobile payment and more than 50 percent
-            in the online area make AliPay indispensable for merchants who sell to China. The many Chinese tourists abroad
-            also like to pay with their domestic payment method. The most important product is the Alipay wallet. With the
-            associated app, buyers can carry out transactions directly with their smartphone."
-        ],
-    ];
-
-    private static array $_aRDFinserts = [
-        'oscunzer_card_mastercard' => [
-            'oxpaymentid' => 'oscunzer_card',
-            'oxobjectid' => 'MasterCard',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_card_visa' => [
-            'oxpaymentid' => 'oscunzer_card',
-            'oxobjectid' => 'VISA',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_card_americanexpress' => [
-            'oxpaymentid' => 'oscunzer_card',
-            'oxobjectid' => 'AmericanExpress',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_card_dinersclub' => [
-            'oxpaymentid' => 'oscunzer_card',
-            'oxobjectid' => 'DinersClub',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_card_jcb' => [
-            'oxpaymentid' => 'oscunzer_card',
-            'oxobjectid' => 'JCB',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_prepayment' => [
-            'oxpaymentid' => 'oscunzer_prepayment',
-            'oxobjectid' => 'ByBankTransferInAdvance',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_banktransfer' => [
-            'oxpaymentid' => 'oscunzer_banktransfer',
-            'oxobjectid' => 'ByBankTransferInAdvance',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_invoice' => [
-            'oxpaymentid' => 'oscunzer_invoice',
-            'oxobjectid' => 'ByInvoice',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_invoice-secured' => [
-            'oxpaymentid' => 'oscunzer_invoice-secured',
-            'oxobjectid' => 'ByInvoice',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_sepa' => [
-            'oxpaymentid' => 'oscunzer_sepa',
-            'oxobjectid' => 'DirectDebit',
-            'oxtype' => 'rdfapayment',
-        ],
-        'ooscunzer_sepa-secured' => [
-            'oxpaymentid' => 'oscunzer_sepa-secured',
-            'oxobjectid' => 'DirectDebit',
-            'oxtype' => 'rdfapayment',
-        ],
-        'oscunzer_paypal' => [
-            'oxpaymentid' => 'oscunzer_paypal',
-            'oxobjectid' => 'PayPal',
-            'oxtype' => 'rdfapayment',
         ],
     ];
 
@@ -460,7 +393,7 @@ class Events
      */
     public static function disableUnzerRDFA()
     {
-        foreach (self::$_aRDFinserts as $oxid => $aRDF) {
+        foreach (UnzerHelper::getRDFinserts() as $oxid => $aRDF) {
             $query = "DELETE FROM `oxobject2payment` WHERE `OXID` = ?";
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid]);
         }

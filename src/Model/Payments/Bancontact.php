@@ -12,13 +12,11 @@
  * @link      https://www.oxid-esales.com
  */
 
-// TODO: PostFinance is not yet part of the SDK, so the payment will come later. As of November 16, 2021
-
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
 use OxidEsales\Eshop\Application\Model\Payment;
 
-class PostFinance extends UnzerPayment
+class Bancontact extends UnzerPayment
 {
     /**
      * @var mixed|Payment
