@@ -67,8 +67,7 @@ class Invoice extends UnzerPayment
             $oUser = UnzerHelper::getUser();
             $oBasket = UnzerHelper::getBasket();
 
-            $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-            $this->setCustomerData($customer, $oUser);
+            $customer = $this->getCustomerData($oUser);
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 

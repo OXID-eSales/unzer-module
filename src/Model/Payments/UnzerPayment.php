@@ -2,12 +2,15 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\CustomerFactory;
+use \UnzerSDK\Resources\EmbeddedResources\Address;
 use UnzerSDK\Unzer;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
@@ -20,6 +23,17 @@ abstract class UnzerPayment
     const FAILURE_URL = "";
     const PENDING_URL = "order";
     const SUCCESS_URL = "thankyou";
+
+    /**
+     * @var Payment
+     */
+    protected Payment $oPayment;
+
+
+    /**
+     * @var null|array
+     */
+    protected $aPaymentParams = null;
 
     /**
      * @param string $oxpaymentid
@@ -42,11 +56,13 @@ abstract class UnzerPayment
     abstract public function execute();
 
     /**
-     * @param Customer $customer
      * @param User $oUser
+     *
+     * @return Customer
      */
-    public function setCustomerData(Customer $customer, User $oUser)
+    public function getCustomerData(User $oUser)
     {
+        $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
         if ($oUser->oxuser__oxbirthdate->value != "'0000-00-00'") {
             $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
         }
@@ -62,6 +78,24 @@ abstract class UnzerPayment
         if ($oUser->oxuser__oxfon->value) {
             $customer->setPhone($oUser->oxuser__oxfon->value);
         }
+        if ($oUser->oxuser__oxsal->value) {
+            $customer->setSalutation($oUser->oxuser__oxsal->value);
+        }
+
+        $billingAddress = $customer->getBillingAddress();
+        if ($oUser->oxuser__oxcity->value) {
+            $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
+        }
+        if ($oUser->oxuser__oxstreet->value) {
+            $billingAddress->setStreet($oUser->oxuser__oxstreet->value . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : ''));
+        }
+        if ($oUser->oxuser__oxzip->value) {
+            $billingAddress->setZip($oUser->oxuser__oxzip->value);
+        }
+        if ($oUser->oxuser__oxmobfon->value) {
+            $customer->setMobile($oUser->oxuser__oxmobfon->value);
+        }
+        return $customer;
     }
 
     public function checkpaymentstatus()

@@ -21,6 +21,7 @@ use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\TransactionTypes\Charge;
+use UnzerSDK\Traits\CanDirectCharge;
 
 class Sepa extends UnzerPayment
 {
@@ -28,12 +29,6 @@ class Sepa extends UnzerPayment
      * @var string
      */
     protected string $sIban;
-
-    /**
-     * @var Payment
-     */
-    protected Payment $oPayment;
-
 
     public function __construct($oxpaymentid)
     {
@@ -73,9 +68,11 @@ class Sepa extends UnzerPayment
 
     private function getPaymentParams()
     {
-        $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-        $blubb = json_decode($jsonobj);
-        return $blubb;
+        if ($this->aPaymentParams == null) {
+            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
+            $this->aPaymentParams = json_decode($jsonobj);
+        }
+        return $this->aPaymentParams;
     }
 
     /**
@@ -117,13 +114,13 @@ class Sepa extends UnzerPayment
         try {
             $oUnzer = UnzerHelper::getUnzer();
             $sId = $this->getUzrId();
+            /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
             $uzrSepa = $oUnzer->fetchPaymentType($sId);
             $oBasket = UnzerHelper::getBasket();
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
             $oUser = UnzerHelper::getUser();
             $oBasket = UnzerHelper::getBasket();
-            $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-            $this->setCustomerData($customer, $oUser);
+            $customer = $this->getCustomerData($oUser);
 
             $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
 //           // You'll need to remember the shortId to show it on the success or failure page
