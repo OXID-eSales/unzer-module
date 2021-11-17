@@ -151,10 +151,10 @@ abstract class UnzerPayment
             if ($transaction->isSuccess()) {
                 // TODO log success
                 return true;
-            } else if ($transaction->isPending()) {
+            } elseif ($transaction->isPending()) {
                 // TODO Handle Pending...
                 return false;
-            } else if ($transaction->isError()) {
+            } elseif ($transaction->isError()) {
                 // TODO Handle Error
                 return false;
             }
