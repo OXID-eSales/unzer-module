@@ -81,8 +81,8 @@ abstract class UnzerPayment
         $billingAddress = $customer->getBillingAddress();
         $oBillCountry = $oUser->getUserCountry();
 
-        if ($oBillCountry->oxcountry__oxtitle->value) {
-            $billingAddress->setCountry($oBillCountry->oxcountry__oxtitle->value);
+        if ($oBillCountry) {
+            $billingAddress->setCountry($oBillCountry);
         }
         if ($oUser->oxuser__oxcompany->value) {
             $billingAddress->setName($oUser->oxuser__oxcompany->value);
