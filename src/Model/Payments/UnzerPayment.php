@@ -159,6 +159,7 @@ abstract class UnzerPayment
             }
         } catch (UnzerApiException | \RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
+            return false;
         }
     }
 }
