@@ -4,17 +4,14 @@ namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
-use \UnzerSDK\Resources\EmbeddedResources\Address;
-use UnzerSDK\Unzer;
-use UnzerSDK\Resources\PaymentTypes\Prepayment;
-use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
-use UnzerSDK\Resources\TransactionTypes\Authorization;
+
 
 abstract class UnzerPayment
 {
@@ -60,7 +57,7 @@ abstract class UnzerPayment
      *
      * @return Customer
      */
-    public function getCustomerData(User $oUser)
+    public function getCustomerData(User $oUser, Order $oOrder = null)
     {
         $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
         if ($oUser->oxuser__oxbirthdate->value != "'0000-00-00'") {
@@ -83,6 +80,17 @@ abstract class UnzerPayment
         }
 
         $billingAddress = $customer->getBillingAddress();
+        $oBillCountry = $oUser->getUserCountry();
+
+        if ($oBillCountry->oxcountry__oxtitle->value) {
+            $billingAddress->setCountry($oBillCountry->oxcountry__oxtitle->value);
+        }
+        if ($oUser->oxuser__oxcompany->value) {
+            $billingAddress->setName($oUser->oxuser__oxcompany->value);
+        } else {
+            $billingAddress->setName($oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value);
+        }
+
         if ($oUser->oxuser__oxcity->value) {
             $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
         }
@@ -95,10 +103,37 @@ abstract class UnzerPayment
         if ($oUser->oxuser__oxmobfon->value) {
             $customer->setMobile($oUser->oxuser__oxmobfon->value);
         }
+        if ($oOrder !== null) {
+            $oDelAddress = $oOrder->getDelAddressInfo();
+            $shippingAddress = $customer->getShippingAddress();
+
+            if ($oDelAddress->oxaddress__oxcompany->value) {
+                $shippingAddress->setName($oDelAddress->oxaddress__oxcompany->value);
+            } else {
+                $shippingAddress->setName($oDelAddress->oxaddress__oxfname->value . ' ' . $oDelAddress->oxaddress__oxlname->value);
+            }
+
+            if ($oDelAddress->oxaddress__oxstreet->value) {
+                $shippingAddress->setStreet($oDelAddress->oxaddress__oxstreet->value . ($oDelAddress->oxaddress__oxstreetnr->value !== '' ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value : ''));
+            }
+
+            if ($oDelAddress->oxaddress__oxstreet->value) {
+                $shippingAddress->setCity($oDelAddress->oxaddress__oxstreet->value);
+            }
+
+            if ($oDelAddress->oxaddress__oxzip->value) {
+                $shippingAddress->setZip($oDelAddress->oxaddress__oxzip->value);
+            }
+
+            if ($oDelAddress->oxaddress__oxcountry->value) {
+                $shippingAddress->setCountry($oDelAddress->oxaddress__oxcountry->value);
+            }
+        }
+
         return $customer;
     }
 
-    public function checkpaymentstatus()
+    public function checkPaymentstatus()
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
