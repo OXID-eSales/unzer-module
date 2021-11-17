@@ -12,7 +12,6 @@ use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
 
-
 abstract class UnzerPayment
 {
     const CONTROLLER_URL = "order";
