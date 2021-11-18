@@ -20,7 +20,7 @@ use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class OrderController extends OrderController_parent
 {
-    protected $blSepaMandateConfirm;
+    protected $blSepaMandateConfirmError = 0;
 
     public function getUnzerPubKey()
     {
@@ -32,18 +32,32 @@ class OrderController extends OrderController_parent
         return Registry::getConfig()->getActiveShop()->getFieldData('oxcompany');
     }
 
-    protected function _validateTermsAndConditions() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    public function execute() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        if (!$this->getSession()->checkSessionChallenge()) {
+            return;
+        }
+
+        if (!$this->_validateTermsAndConditions()) {
+            $this->_blConfirmAGBError = 1;
+
+            return;
+        }
         if ($this->getPayment()->getId() === 'oscunzer_sepa') {
             $oConfig = Registry::getConfig();
 
-            $blSepaMandateConfirm = $oConfig->getRequestParameter('oscunzersepaagreement');
+            $blSepaMandateConfirm = $oConfig->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {
-                $blValid = false;
+                $this->blSepaMandateConfirmError = 1;
+                return;
             }
         }
 
-        $blValid &= parent::_validateTermsAndConditions();
-        return $blValid;
+        return parent::execute();
+    }
+
+    public function isSepaMandateConfirmationError()
+    {
+        return $this->blSepaMandateConfirmError;
     }
 }

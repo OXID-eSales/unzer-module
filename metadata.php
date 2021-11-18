@@ -75,9 +75,9 @@ $aModule = [
             'file' => 'views/frontend/blocks/unzer_select_payment.tpl'
         ],
         [
-            'template' => 'page/checkout/inc/agb.tpl',
-            'block' => 'checkout_order_agb_inner',
-            'file' => 'views/frontend/blocks/unzer_checkout_order_agb_inner.tpl'
+            'template' => 'page/checkout/order.tpl',
+            'block' => 'checkout_order_errors',
+            'file' => 'views/frontend/blocks/checkout_order_errors.tpl'
         ],
         //email
         [
