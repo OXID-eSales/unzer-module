@@ -212,7 +212,7 @@ abstract class UnzerPayment
             } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $payment->getPaymentType();
-                if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
+                if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType()) {
                     return true;
                 }
                 $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());

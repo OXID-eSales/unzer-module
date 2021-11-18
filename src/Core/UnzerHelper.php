@@ -263,7 +263,7 @@ class UnzerHelper
     }
 
     /**
-     * @param string $code
+     * @param int|string $code
      * @param string $callback
      * @return array|string
      */
@@ -332,8 +332,7 @@ class UnzerHelper
         $metadata = new Metadata();
         $metadata->setShopType("Oxid eShop " . (new Facts)->getEdition());
         $metadata->setShopVersion(ShopVersion::getVersion());
-        $metadata->addMetadata('shopid', Registry::getConfig()->getShopId());
-        $metadata->addMetadata('shopid', Registry::getConfig()->getShopId());
+        $metadata->addMetadata('shopid', (string) Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $UnzerPayment->getPaymentMethod());
         $metadata->addMetadata('paymentprocedure', $UnzerPayment->getPaymentProcedure());
 
