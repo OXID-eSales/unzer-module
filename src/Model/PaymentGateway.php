@@ -9,11 +9,14 @@ use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
 class PaymentGateway extends PaymentGateway_parent
 {
     /**
-     * @param float $dAmount
-     * @param Order|object $oOrder
+     * Executes payment, returns true on success.
+     *
+     * @param double $dAmount Goods amount
+     * @param object $oOrder  User ordering object
+     *
      * @return bool
      */
-    public function executePayment(float $dAmount, &$oOrder): bool
+    public function executePayment(float $dAmount, object &$oOrder): bool
     {
         $oPayment = oxNew(Payment::class);
         if ($oPayment->load($oOrder->oxorder__oxpaymenttype->value)) {
