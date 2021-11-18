@@ -40,7 +40,7 @@ class GiroPay extends UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
     }
     /**
      * @return bool
@@ -50,9 +50,16 @@ class GiroPay extends UnzerPayment
         return false;
     }
 
-
     public function execute()
     {
         //TODO
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethod(): string
+    {
+        return 'giropay';
     }
 }

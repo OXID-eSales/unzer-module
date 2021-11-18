@@ -2,14 +2,20 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Exception;
+use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\CustomerFactory;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\CustomerFactory;
 
 abstract class UnzerPayment
@@ -44,12 +50,22 @@ abstract class UnzerPayment
     /**
      * @return string
      */
+    abstract public function getPaymentMethod(): string;
+
+    /**
+     * @return string
+     */
     abstract public function getPaymentProcedure(): string;
 
     /**
      * @return mixed|void
      */
     abstract public function execute();
+
+    /**
+     * @var AbstractTransactionType|null
+     */
+    protected ?AbstractTransactionType $_transaction;
 
     /**
      * @param User $oUser
@@ -119,7 +135,37 @@ abstract class UnzerPayment
             if ($oDelAddress->oxaddress__oxstreet->value) {
                 $shippingAddress->setCity($oDelAddress->oxaddress__oxstreet->value);
             }
+        if ($oUser->oxuser__oxsal->value) {
+            $customer->setSalutation($oUser->oxuser__oxsal->value);
+        }
 
+        $billingAddress = $customer->getBillingAddress();
+        if ($oUser->oxuser__oxcity->value) {
+            $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
+        }
+        if ($oUser->oxuser__oxstreet->value) {
+            $billingAddress->setStreet($oUser->oxuser__oxstreet->value . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : ''));
+        }
+        if ($oUser->oxuser__oxzip->value) {
+            $billingAddress->setZip($oUser->oxuser__oxzip->value);
+        }
+        if ($oUser->oxuser__oxmobfon->value) {
+            $customer->setMobile($oUser->oxuser__oxmobfon->value);
+        }
+
+        if ($oUser->oxuser__oxcountryid->value) {
+            $oCountry = oxnew(Country::class);
+            if ($oCountry->load($oUser->oxuser__oxcountryid->value)) {
+                $billingAddress->setCountry($oUser->oxcountry__oxisoalpha2->value);
+            }
+        }
+        return $customer;
+    }
+
+    /**
+     * @return bool|void
+     */
+    public function checkpaymentstatus()
             if ($oDelAddress->oxaddress__oxzip->value) {
                 $shippingAddress->setZip($oDelAddress->oxaddress__oxzip->value);
             }
@@ -158,6 +204,25 @@ abstract class UnzerPayment
                 return false;
             }
         } catch (UnzerApiException | \RuntimeException $e) {
+            $this->_transaction = $payment->getInitialTransaction();
+            if ($this->_transaction->isSuccess()) {
+                // TODO log success
+                $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
+                return true;
+            } else if ($this->_transaction->isPending()) {
+                // TODO Handle Pending...
+                $paymentType = $payment->getPaymentType();
+                if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
+                    return true;
+                }
+                $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
+                return false;
+            } else if ($this->_transaction->isError()) {
+                UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer()));
+            }
+        } catch (UnzerApiException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
             return false;
         }
