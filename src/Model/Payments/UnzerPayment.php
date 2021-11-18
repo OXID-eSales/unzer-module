@@ -2,16 +2,18 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Exception;
+use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Unzer;
-use UnzerSDK\Resources\PaymentTypes\Prepayment;
+use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
-use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 abstract class UnzerPayment
 {
@@ -34,6 +36,11 @@ abstract class UnzerPayment
     /**
      * @return string
      */
+    abstract public function getPaymentMethod(): string;
+
+    /**
+     * @return string
+     */
     abstract public function getPaymentProcedure(): string;
 
     /**
@@ -42,12 +49,19 @@ abstract class UnzerPayment
     abstract public function execute();
 
     /**
-     * @param Customer $customer
-     * @param User $oUser
+     * @var AbstractTransactionType|null
      */
-    public function setCustomerData(Customer $customer, User $oUser)
+    protected ?AbstractTransactionType $_transaction;
+
+    /**
+     * @param User $oUser
+     *
+     * @return Customer
+     */
+    public function getCustomerData(User $oUser): Customer
     {
-        if ($oUser->oxuser__oxbirthdate->value != "'0000-00-00'") {
+        $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
+        if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
             $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
         }
         if ($oUser->oxuser__oxcompany->value) {
@@ -62,8 +76,36 @@ abstract class UnzerPayment
         if ($oUser->oxuser__oxfon->value) {
             $customer->setPhone($oUser->oxuser__oxfon->value);
         }
+        if ($oUser->oxuser__oxsal->value) {
+            $customer->setSalutation($oUser->oxuser__oxsal->value);
+        }
+
+        $billingAddress = $customer->getBillingAddress();
+        if ($oUser->oxuser__oxcity->value) {
+            $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
+        }
+        if ($oUser->oxuser__oxstreet->value) {
+            $billingAddress->setStreet($oUser->oxuser__oxstreet->value . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : ''));
+        }
+        if ($oUser->oxuser__oxzip->value) {
+            $billingAddress->setZip($oUser->oxuser__oxzip->value);
+        }
+        if ($oUser->oxuser__oxmobfon->value) {
+            $customer->setMobile($oUser->oxuser__oxmobfon->value);
+        }
+
+        if ($oUser->oxuser__oxcountryid->value) {
+            $oCountry = oxnew(Country::class);
+            if ($oCountry->load($oUser->oxuser__oxcountryid->value)) {
+                $billingAddress->setCountry($oUser->oxcountry__oxisoalpha2->value);
+            }
+        }
+        return $customer;
     }
 
+    /**
+     * @return bool|void
+     */
     public function checkpaymentstatus()
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
@@ -78,53 +120,25 @@ abstract class UnzerPayment
 
             // Redirect to success if the payment has been successfully completed.
             $payment = $unzer->fetchPayment($paymentId);
-            $transaction = $payment->getInitialTransaction();
-
-            if ($payment->isCompleted()) {
-                // The payment process has been successful.
-                // You show the success page.
-                // Goods can be shipped.
-            } elseif ($payment->isPending()) {
-                if ($transaction->isSuccess()) {
-                    if ($transaction instanceof Authorization) {
-                        // Payment is ready to be captured.
-                        // Goods can be shipped later AFTER charge.
-                    } else {
-                        // Payment is not done yet (e.g. Prepayment)
-                        // Goods can be shipped later after incoming payment (event).
-                    }
-
-                    // In any case:
-                    // * You can show the success page.
-                    // * You can set order status to pending payment
-                } elseif ($transaction->isPending()) {
-
-                    // The initial transaction of invoice types will not change to success but stay pending.
-                    $paymentType = $payment->getPaymentType();
-                    if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
-                        // Awaiting payment by the customer.
-                        // Goods can be shipped immediately except for Prepayment type.
-                    }
-
-                    // In cases of a redirect to an external service (e.g. 3D secure, PayPal, etc) it sometimes takes time for
-                    // the payment to update it's status after redirect into shop.
-                    // In this case the payment and the transaction are pending at first and change to cancel or success later.
-
-                    // Use the webhooks feature to stay informed about changes of payment and transaction (e.g. cancel, success)
-                    // then you can handle the states as shown above in transaction->isSuccess() branch.
+            $this->_transaction = $payment->getInitialTransaction();
+            if ($this->_transaction->isSuccess()) {
+                // TODO log success
+                $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
+                return true;
+            } else if ($this->_transaction->isPending()) {
+                // TODO Handle Pending...
+                $paymentType = $payment->getPaymentType();
+                if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
+                    return true;
                 }
+                $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
+                return false;
+            } else if ($this->_transaction->isError()) {
+                UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer()));
             }
-            // If the payment is neither success nor pending something went wrong.
-            // In this case do not create the order or cancel it if you already did.
-            // Redirect to an error page in your shop and show a message if you want.
-
-            // Check the result message of the initial transaction to find out what went wrong.
-            if ($transaction instanceof AbstractTransactionType) {
-                // For better debugging log the error message in your error log
-                $clientMessage = $transaction->getMessage()->getCustomer();
-                UnzerHelper::redirectOnError(self::CONTROLLER_URL, $clientMessage);
-            }
-        } catch (UnzerApiException | \RuntimeException $e) {
+        } catch (UnzerApiException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
     }

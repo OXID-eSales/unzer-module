@@ -71,7 +71,7 @@ class Sepa extends UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
     }
 
     private function getPaymentParams()
@@ -122,5 +122,13 @@ class Sepa extends UnzerPayment
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethod(): string
+    {
+        return 'sepa-direct-debit';
     }
 }

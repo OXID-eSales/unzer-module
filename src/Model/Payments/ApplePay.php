@@ -42,7 +42,7 @@ class ApplePay extends UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
     }
 
     /**
@@ -56,5 +56,13 @@ class ApplePay extends UnzerPayment
     public function execute()
     {
         //TODO
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethod(): string
+    {
+        return 'alipay';
     }
 }
