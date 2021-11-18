@@ -209,7 +209,7 @@ abstract class UnzerPayment
                 // TODO log success
                 $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
                 return true;
-            } else if ($this->_transaction->isPending()) {
+            } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $payment->getPaymentType();
                 if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
@@ -217,7 +217,7 @@ abstract class UnzerPayment
                 }
                 $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
                 return false;
-            } else if ($this->_transaction->isError()) {
+            } elseif ($this->_transaction->isError()) {
                 UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer()));
             }
         } catch (UnzerApiException $e) {

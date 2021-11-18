@@ -22,7 +22,6 @@ class TransactionList extends ListModel
      */
     public function getTransactionList()
     {
-
         $oListObject = $this->getBaseObject();
         $sFieldList = $oListObject->getSelectFields();
 
