@@ -20,7 +20,6 @@ class PaymentGateway extends PaymentGateway_parent
             if ($oPayment->isUnzerPayment()) {
                 $Dispatcher = oxNew(DispatcherController::class);
                 if ($Dispatcher->executePayment($oPayment->getId())) {
-
                     return true;
                 }
                 return false;
