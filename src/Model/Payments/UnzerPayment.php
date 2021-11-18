@@ -147,9 +147,9 @@ abstract class UnzerPayment
     }
 
     /**
-     * @return bool|void
+     * @return bool
      */
-    public function checkPaymentstatus()
+    public function checkPaymentstatus(): bool
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
@@ -178,9 +178,11 @@ abstract class UnzerPayment
                 return false;
             } elseif ($this->_transaction->isError()) {
                 UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer()));
+                return false;
             }
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+            return false;
         } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
             return false;
