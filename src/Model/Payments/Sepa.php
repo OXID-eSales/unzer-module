@@ -17,9 +17,11 @@ namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\TransactionTypes\Charge;
+use UnzerSDK\Traits\CanDirectCharge;
 
 class Sepa extends UnzerPayment
 {
@@ -28,21 +30,11 @@ class Sepa extends UnzerPayment
      */
     protected string $sIban;
 
-    /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    /**
-     * @var array
-     */
-    protected array $aPaymentParams;
-
     public function __construct($oxpaymentid)
     {
         $oPayment = oxNew(Payment::class);
         $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
+        $this->oPayment = $oPayment;
     }
 
     /**
@@ -63,7 +55,7 @@ class Sepa extends UnzerPayment
 
     public function getID(): string
     {
-        return $this->_oPayment->getId();
+        return $this->oPayment->getId();
     }
 
     /**
@@ -71,13 +63,13 @@ class Sepa extends UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+        return $this->oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
     private function getPaymentParams()
     {
-        if (!$this->aPaymentParams) {
-            $jsonobj = Registry::getRequest()->getRequestParameter('paymentTypeId');
+        if ($this->aPaymentParams == null) {
+            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
             $this->aPaymentParams = json_decode($jsonobj);
         }
         return $this->aPaymentParams;
@@ -97,6 +89,19 @@ class Sepa extends UnzerPayment
     }
 
     /**
+     * @return   string|void
+     */
+    private function getUzrId()
+    {
+        if (array_key_exists('id', $this->getPaymentParams())) {
+            return $this->getPaymentParams()->id;
+        } else {
+            // TODO Translate Error/OXMULTILANG
+            UnzerHelper::redirectOnError('order', 'Ungültige ID');
+        }
+    }
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool
@@ -108,17 +113,19 @@ class Sepa extends UnzerPayment
     {
         try {
             $oUnzer = UnzerHelper::getUnzer();
-            $sIban = $this->getUzrIban();
-            $uzrSepa = new SepaDirectDebit($sIban);
-            $sepa = $oUnzer->createPaymentType($uzrSepa);
-
+            $sId = $this->getUzrId();
+            /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
+            $uzrSepa = $oUnzer->fetchPaymentType($sId);
             $oBasket = UnzerHelper::getBasket();
-
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
+            $oUser = UnzerHelper::getUser();
+            $oBasket = UnzerHelper::getBasket();
+            $customer = $this->getCustomerData($oUser);
 
-//            /* @var Charge|AbstractUnzerResource $transaction */
-//            $transaction = $sepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), null, $orderId);
-//            //TODO Weitere Verarbeitung, Prüfung $transaction->getMessage , ->getError, ->isSuccess => return $transaction; ?
+            $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
+//           // You'll need to remember the shortId to show it on the success or failure page
+            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
+            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
