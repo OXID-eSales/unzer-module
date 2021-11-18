@@ -10,14 +10,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class Order extends Order_parent
 {
-    /**
-     * @param Basket $oBasket              Basket object
-     * @param object $oUser                Current User object
-     * @param bool                                       $blRecalculatingOrder Order recalculation
-     * @return integer
-     * @throws UnzerApiException
-     */
-    public function finalizeOrder(Basket $oBasket, object $oUser, bool $blRecalculatingOrder = false): int
+    public function finalizeOrder($oBasket, $oUser, $blRecalculatingOrder = false): int
     {
         $int = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
 
