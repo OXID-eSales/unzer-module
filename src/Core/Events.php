@@ -25,6 +25,7 @@ namespace OxidSolutionCatalysts\Unzer\Core;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -338,15 +339,38 @@ class Events
         }
     }
 
+    public static function addStaticVCMS()
+    {
+        $oContent = oxNew(Content::class);
+        if (!$oContent->loadByIdent('oscunzersepamandatetext')) {
+            $oContent->setEnableMultilang(false);
+            $oContent->setTitle('Unzer Sepamandatstext');
+            $oContent->oxcontents__oxactive = new Field(1);
+            $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class=""][text]SEPA Lastschrift-Mandat (Bankeinzug)
+
+Ich ermächtige [{$sMerchantName}], Zahlungen von meinem Konto mittels SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von [{$sMerchantName}] auf mein Konto gezogenen SEPA Lastschriften einzulösen.
+
+Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrags verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.
+
+Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften weise ich meine Bank unwiderruflich an, [{$sMerchantName}] oder Dritten auf Anforderung meinen Namen, Adresse und Geburtsdatum vollständig mitzuteilen.[/text][/col][/row][{/veparse}]' );
+            $oContent->oxcontents__oxcontent_1 = new Field('[{veparse}][row][col size="12" offset="0" class="col-xs-12"][text background_color="" background_image="" background_fixed="" fullwidth="" class=""]By signing this mandate form, you authorise [{$sMerchantName}] to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from [{$sMerchantName}].<br><br>Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding this SEPA mandate are explained in a statement that you can obtain from your bank.<br><br>In case of refusal or rejection of direct debit payment I instruct my bank irrevocably to inform [{$sMerchantName}] or any third party upon request about my name, address and date of birth.<br><br><br>[/text][/col][/row][{/veparse}] ');
+
+            $oContent->save();
+        }
+    }
+
     /**
      * Execute action on activate event
      *
      * @return void
      */
-    public static function onActivate()
+        public static function onActivate()
     {
         // adding record to oxPayment table
         self::addUnzerPaymentMethods();
+
+        // adding content for SEPA-Text
+        self::addStaticVCMS();
 
         // execute module migrations
         self::executeModuleMigrations();

@@ -15,12 +15,35 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class OrderController extends OrderController_parent
 {
+    protected $blSepaMandateConfirm;
+
     public function getUnzerPubKey()
     {
         return UnzerHelper::getShopPublicKey();
+    }
+
+    public function getShopCompanyName()
+    {
+        return Registry::getConfig()->getActiveShop()->getFieldData('oxcompany');
+    }
+
+    protected function _validateTermsAndConditions() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        if ($this->getPayment()->getId() === 'oscunzer_sepa') {
+            $oConfig = Registry::getConfig();
+
+            $blSepaMandateConfirm = $oConfig->getRequestParameter('oscunzersepaagreement');
+            if (!$blSepaMandateConfirm) {
+                $blValid = false;
+            }
+        }
+
+        $blValid &= parent::_validateTermsAndConditions();
+        return $blValid;
     }
 }
