@@ -22,9 +22,9 @@ class DispatcherController extends FrontendController implements ClassMappingInt
 {
     /**
      * @param string $paymentid
-     * @return bool|void
+     * @return bool
      */
-    public function executePayment(string $paymentid)
+    public function executePayment(string $paymentid): bool
     {
         /**
          * @var UnzerPayment $oUnzerPayment
