@@ -16,6 +16,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
+use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 
 class DispatcherController extends FrontendController implements ClassMappingInterface
 {

@@ -33,12 +33,12 @@ class Sepa extends UnzerPayment
     /**
      * @var mixed|Payment
      */
-    protected $oPayment;
+    protected $_oPayment;
 
     /**
      * @var array
      */
-    protected array $aPaymentParams;
+    protected ?array $aPaymentParams;
 
     public function __construct($oxpaymentid)
     {
@@ -126,7 +126,6 @@ class Sepa extends UnzerPayment
             $sId = $this->getUzrId();
             /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
             $uzrSepa = $oUnzer->fetchPaymentType($sId);
-            $oBasket = UnzerHelper::getBasket();
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
             $oUser = UnzerHelper::getUser();
             $oBasket = UnzerHelper::getBasket();

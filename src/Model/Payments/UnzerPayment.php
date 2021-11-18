@@ -2,21 +2,17 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use Exception;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
-use UnzerSDK\Resources\CustomerFactory;
 
 abstract class UnzerPayment
 {
@@ -31,11 +27,10 @@ abstract class UnzerPayment
      */
     protected Payment $oPayment;
 
-
     /**
      * @var null|array
      */
-    protected $aPaymentParams = null;
+    protected ?array $aPaymentParams = null;
 
     /**
      * @param string $oxpaymentid
@@ -69,13 +64,13 @@ abstract class UnzerPayment
 
     /**
      * @param User $oUser
-     *
+     * @param Order|null $oOrder
      * @return Customer
      */
-    public function getCustomerData(User $oUser, Order $oOrder = null)
+    public function getCustomerData(User $oUser, Order $oOrder = null): Customer
     {
         $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-        if ($oUser->oxuser__oxbirthdate->value != "'0000-00-00'") {
+        if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
             $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
         }
         if ($oUser->oxuser__oxcompany->value) {
@@ -95,10 +90,10 @@ abstract class UnzerPayment
         }
 
         $billingAddress = $customer->getBillingAddress();
-        $oBillCountry = $oUser->getUserCountry();
 
-        if ($oBillCountry) {
-            $billingAddress->setCountry($oBillCountry);
+        $oCountry = oxnew(Country::class);
+        if ($oCountry->load($oUser->oxuser__oxcountryid->value)) {
+            $billingAddress->setCountry($oCountry->oxcountry__oxisoalpha2->value);
         }
         if ($oUser->oxuser__oxcompany->value) {
             $billingAddress->setName($oUser->oxuser__oxcompany->value);
@@ -135,49 +130,25 @@ abstract class UnzerPayment
             if ($oDelAddress->oxaddress__oxstreet->value) {
                 $shippingAddress->setCity($oDelAddress->oxaddress__oxstreet->value);
             }
-        if ($oUser->oxuser__oxsal->value) {
-            $customer->setSalutation($oUser->oxuser__oxsal->value);
-        }
 
-        $billingAddress = $customer->getBillingAddress();
-        if ($oUser->oxuser__oxcity->value) {
-            $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
-        }
-        if ($oUser->oxuser__oxstreet->value) {
-            $billingAddress->setStreet($oUser->oxuser__oxstreet->value . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : ''));
-        }
-        if ($oUser->oxuser__oxzip->value) {
-            $billingAddress->setZip($oUser->oxuser__oxzip->value);
-        }
-        if ($oUser->oxuser__oxmobfon->value) {
-            $customer->setMobile($oUser->oxuser__oxmobfon->value);
-        }
+            if ($oDelAddress->oxaddress__oxzip->value) {
+                $shippingAddress->setZip($oDelAddress->oxaddress__oxzip->value);
+            }
 
-        if ($oUser->oxuser__oxcountryid->value) {
             $oCountry = oxnew(Country::class);
-            if ($oCountry->load($oUser->oxuser__oxcountryid->value)) {
-                $billingAddress->setCountry($oUser->oxcountry__oxisoalpha2->value);
+            if ($oCountry->load($oDelAddress->oxaddress__oxcountryid->value)) {
+                $oCountry->load($oDelAddress->oxaddress__oxcountryid->value);
+
+                $billingAddress->setCountry($oCountry->oxcountry__oxisoalpha2->value);
             }
         }
+
         return $customer;
     }
 
     /**
      * @return bool|void
      */
-    public function checkpaymentstatus()
-            if ($oDelAddress->oxaddress__oxzip->value) {
-                $shippingAddress->setZip($oDelAddress->oxaddress__oxzip->value);
-            }
-
-            if ($oDelAddress->oxaddress__oxcountry->value) {
-                $shippingAddress->setCountry($oDelAddress->oxaddress__oxcountry->value);
-            }
-        }
-
-        return $customer;
-    }
-
     public function checkPaymentstatus()
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
@@ -192,18 +163,6 @@ abstract class UnzerPayment
 
             // Redirect to success if the payment has been successfully completed.
             $payment = $unzer->fetchPayment($paymentId);
-            $transaction = $payment->getInitialTransaction();
-            if ($transaction->isSuccess()) {
-                // TODO log success
-                return true;
-            } elseif ($transaction->isPending()) {
-                // TODO Handle Pending...
-                return false;
-            } elseif ($transaction->isError()) {
-                // TODO Handle Error
-                return false;
-            }
-        } catch (UnzerApiException | \RuntimeException $e) {
             $this->_transaction = $payment->getInitialTransaction();
             if ($this->_transaction->isSuccess()) {
                 // TODO log success
