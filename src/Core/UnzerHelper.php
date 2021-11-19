@@ -265,6 +265,7 @@ class UnzerHelper
     /**
      * @param string $orderid
      * @throws UnzerApiException
+     * @throws Exception
      */
     public static function writeTransactionToDB(string $orderid)
     {
@@ -286,7 +287,7 @@ class UnzerHelper
             $oTrans->oscunzertransaction__metadata = new Field($metadata->jsonSerialize());
         }
         $oTrans->oscunzertransaction__customerid = new Field($unzerCustomer->getId());
-        $oTrans->oscunzertransaction__oxactiondate = new Field(date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
+        $oTrans->oscunzertransaction__oxactiondate = new Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
         $oTrans->oscunzertransaction__oxaction = new Field($unzerPayment->getStateName());
         $oTrans->save();
     }
