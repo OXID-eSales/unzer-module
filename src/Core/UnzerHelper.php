@@ -22,18 +22,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
-use D3\ModCfg\Application\Model\Exception\d3_cfg_mod_exception;
-use D3\ModCfg\Application\Model\Exception\d3ShopCompatibilityAdapterException;
-use Doctrine\DBAL\DBALException;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
-use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DisplayError;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-use OxidEsales\Eshop\Core\Exception\StandardException;
-use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
@@ -41,15 +33,10 @@ use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\EmbeddedResources\Message;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
-use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
-use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
-use UnzerSDK\Validators\PrivateKeyValidator;
-use UnzerSDK\Validators\PublicKeyValidator;
 
 class UnzerHelper
 {
@@ -188,18 +175,17 @@ class UnzerHelper
 
     public static function getShopPublicKey()
     {
-        return self::getConfigParam('UnzerPublicKey');
+        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerPublicKey');
     }
 
     public static function getShopPrivateKey()
     {
-        return self::getConfigParam('UnzerPrivateKey');
+        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerPrivateKey');
     }
 
-
-    public static function validateSettings(): bool
+    public static function getAPIKey()
     {
-        return PrivateKeyValidator::validate(self::getShopPrivateKey()) && PublicKeyValidator::validate(self::getShopPublicKey());
+        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerApiKey');
     }
 
     /**
@@ -209,10 +195,7 @@ class UnzerHelper
      */
     public static function getUnzer(): ?Unzer
     {
-        if (self::validateSettings()) {
-            return oxNew(Unzer::class, self::getShopPrivateKey());
-        }
-        return null;
+        return oxNew(Unzer::class, self::getShopPrivateKey());
     }
 
     /**
@@ -282,6 +265,7 @@ class UnzerHelper
     /**
      * @param string $orderid
      * @throws UnzerApiException
+     * @throws Exception
      */
     public static function writeTransactionToDB(string $orderid)
     {
@@ -303,7 +287,7 @@ class UnzerHelper
             $oTrans->oscunzertransaction__metadata = new Field($metadata->jsonSerialize());
         }
         $oTrans->oscunzertransaction__customerid = new Field($unzerCustomer->getId());
-        $oTrans->oscunzertransaction__oxactiondate = new Field(date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
+        $oTrans->oscunzertransaction__oxactiondate = new Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
         $oTrans->oscunzertransaction__oxaction = new Field($unzerPayment->getStateName());
         $oTrans->save();
     }

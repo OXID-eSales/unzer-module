@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use RuntimeException;
@@ -11,6 +10,11 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class Invoice extends UnzerPayment
 {
+    /**
+     * @var string
+     */
+    protected string $Paymentmethod = 'invoice';
+
     /**
      * @return bool
      */
@@ -53,13 +57,5 @@ class Invoice extends UnzerPayment
         } catch (RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return 'invoice';
     }
 }

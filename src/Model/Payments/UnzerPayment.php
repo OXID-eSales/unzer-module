@@ -28,6 +28,11 @@ abstract class UnzerPayment
     protected Payment $oPayment;
 
     /**
+     * @var string
+     */
+    protected string $Paymentmethod;
+
+    /**
      * @var null|array
      */
     protected ?array $aPaymentParams = null;
@@ -58,8 +63,10 @@ abstract class UnzerPayment
     /**
      * @return string
      */
-    abstract public function getPaymentMethod(): string;
-
+    public function getPaymentMethod(): string
+    {
+        return $this->Paymentmethod;
+    }
 
     /**
      * @return string

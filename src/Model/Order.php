@@ -2,11 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use Exception;
-use OxidEsales\Eshop\Application\Model\Basket;
-use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Exceptions\UnzerApiException;
 
 class Order extends Order_parent
 {

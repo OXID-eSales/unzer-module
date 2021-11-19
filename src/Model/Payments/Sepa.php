@@ -14,17 +14,18 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
-use UnzerSDK\Resources\AbstractUnzerResource;
-use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Traits\CanDirectCharge;
 
 class Sepa extends UnzerPayment
 {
+    /**
+     * @var string
+     */
+    protected string $Paymentmethod = 'sepa-direct-debit';
+
     /**
      * @var string
      */
@@ -100,13 +101,5 @@ class Sepa extends UnzerPayment
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return 'sepa-direct-debit';
     }
 }
