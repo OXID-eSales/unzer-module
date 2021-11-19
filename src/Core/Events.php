@@ -345,7 +345,7 @@ class Events
         if (!$oContent->loadByIdent('oscunzersepamandatetext')) {
             $oContent->setEnableMultilang(false);
             $oContent->setTitle('Unzer Sepa');
-            $oContent->oxcontents__oxloadid = new Field ('oscunzersepamandatetext');
+            $oContent->oxcontents__oxloadid = new Field('oscunzersepamandatetext');
             $oContent->oxcontents__oxactive = new Field(1);
             $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class="col-xs-12"][text background_color="" background_image="" background_fixed="" fullwidth="" class=""]<p>SEPA Lastschrift-Mandat (Bankeinzug)
 
@@ -360,7 +360,7 @@ class Events
         $oContent = oxNew(Content::class);
         if (!$oContent->loadByIdent('oscunzersepamandateconfirmation')) {
             $oContent->setTitle('Unzer Sepamandatsbestätigung');
-            $oContent->oxcontents__oxloadid = new Field ('oscunzersepamandateconfirmation');
+            $oContent->oxcontents__oxloadid = new Field('oscunzersepamandateconfirmation');
             $oContent->oxcontents__oxactive = new Field(1);
             $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class=""][text][{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
 <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandat</a> bestätigen.
@@ -407,12 +407,12 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      */
     public static function onDeactivate()
     {
-        // If Unzer is activated on other sub shops do not remove payment methods
-//        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
-//            return;
-//        }
-//        self::disableUnzerPaymentMethods();
-//        self::disableUnzerRDFA();
+//         If Unzer is activated on other sub shops do not remove payment methods
+        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
+            return;
+        }
+        self::disableUnzerPaymentMethods();
+        self::disableUnzerRDFA();
     }
 
     /**

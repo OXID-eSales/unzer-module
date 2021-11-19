@@ -20,7 +20,12 @@ use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class OrderController extends OrderController_parent
 {
-    protected $blSepaMandateConfirmError = 0;
+    /**
+     * Config option "blConfirmSEPA"
+     *
+     * @var bool
+     */
+    protected $blSepaMandateConfirmError = null;
 
     public function getUnzerPubKey()
     {
