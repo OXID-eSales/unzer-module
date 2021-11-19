@@ -14,7 +14,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
-use OxidEsales\Eshop\Application\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class OrderController extends OrderController_parent
