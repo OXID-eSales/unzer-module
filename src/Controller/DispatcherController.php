@@ -21,14 +21,16 @@ use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 class DispatcherController extends FrontendController implements ClassMappingInterface
 {
     /**
-     * @param string $sPaymentId
+     * @param string $paymentid
      * @return bool
      */
-    public function executePayment(string $sPaymentId): bool
+    public function executePayment(string $paymentid): bool
     {
-        /* @var UnzerPayment $oUnzerPayment */
-        $oUnzerPayment = oxNew(self::UNZERCLASSNAMEMAPPING[$sPaymentId], $sPaymentId);
+        /**
+         * @var UnzerPayment $oUnzerPayment
+         */
+        $oUnzerPayment = oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
         $oUnzerPayment->execute();
-        return $oUnzerPayment->checkPaymentstatus();
+        return $oUnzerPayment->checkpaymentstatus();
     }
 }

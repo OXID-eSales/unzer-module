@@ -5,43 +5,12 @@ namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\CustomerFactory;
 
 class Invoice extends UnzerPayment
 {
-    /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    /**
-     * @param string $oxpaymentid
-     */
-    public function __construct(string $oxpaymentid)
-    {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
-
-    /**
-     * @return string
-     */
-    public function getID(): string
-    {
-        return $this->_oPayment->getId();
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
-    }
-
     /**
      * @return bool
      */
@@ -71,20 +40,26 @@ class Invoice extends UnzerPayment
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
 
-            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
+            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, UnzerHelper::getMetadata($this));
 
             // You'll need to remember the shortId to show it on the success or failure page
             Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
             Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
 
-            $html = sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'), $transaction->getAmount(), $transaction->getCurrency());
-            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'), $transaction->getHolder());
-            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'), $transaction->getIban());
-            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'), $transaction->getBic());
-            $html .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'), $transaction->getDescriptor());
-            Registry::getSession()->setVariable('additionalPaymentInformation', $html);
-        } catch (UnzerApiException | \RuntimeException $e) {
+            $bankData = UnzerHelper::getBankData($transaction);
+            Registry::getSession()->setVariable('additionalPaymentInformation', $bankData);
+        } catch (UnzerApiException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        } catch (RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethod(): string
+    {
+        return 'invoice';
     }
 }

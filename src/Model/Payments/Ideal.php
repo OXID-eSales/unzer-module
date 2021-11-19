@@ -19,31 +19,6 @@ use OxidEsales\Eshop\Application\Model\Payment;
 class Ideal extends UnzerPayment
 {
     /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    public function __construct($oxpaymentid)
-    {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
-
-    public function getID(): string
-    {
-        return $this->_oPayment->getId();
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
-    }
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool
@@ -54,5 +29,13 @@ class Ideal extends UnzerPayment
     public function execute()
     {
         //TODO
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethod(): string
+    {
+        return 'ideal';
     }
 }
