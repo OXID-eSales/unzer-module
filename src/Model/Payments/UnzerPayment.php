@@ -33,24 +33,41 @@ abstract class UnzerPayment
     protected ?array $aPaymentParams = null;
 
     /**
+     * @var mixed|Payment
+     */
+    protected $_oPayment;
+
+    /**
      * @param string $oxpaymentid
      */
-    abstract public function __construct(string $oxpaymentid);
+    public function __construct(string $oxpaymentid)
+    {
+        $oPayment = oxNew(Payment::class);
+        $oPayment->load($oxpaymentid);
+        $this->_oPayment = $oPayment;
+    }
 
     /**
      * @return string
      */
-    abstract public function getID(): string;
+    public function getID(): string
+    {
+        return $this->_oPayment->getId();
+    }
 
     /**
      * @return string
      */
     abstract public function getPaymentMethod(): string;
 
+
     /**
      * @return string
      */
-    abstract public function getPaymentProcedure(): string;
+    public function getPaymentProcedure(): string
+    {
+        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
+    }
 
     /**
      * @return mixed|void
@@ -153,7 +170,6 @@ abstract class UnzerPayment
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
-            return false;
         }
 
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
@@ -167,7 +183,7 @@ abstract class UnzerPayment
             $this->_transaction = $payment->getInitialTransaction();
             if ($this->_transaction->isSuccess()) {
                 // TODO log success
-                $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
+                //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
                 return true;
             } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
@@ -175,18 +191,15 @@ abstract class UnzerPayment
                 if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType()) {
                     return true;
                 }
-                $msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
-                return false;
+                // TODO Logging
+                //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
             } elseif ($this->_transaction->isError()) {
                 UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer()));
-                return false;
             }
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-            return false;
         } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
-            return false;
         }
         return false;
     }

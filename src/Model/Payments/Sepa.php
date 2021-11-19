@@ -31,21 +31,9 @@ class Sepa extends UnzerPayment
     protected string $sIban;
 
     /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    /**
      * @var array
      */
     protected ?array $aPaymentParams;
-
-    public function __construct($oxpaymentid)
-    {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
 
     /**
      * @return string
@@ -62,12 +50,6 @@ class Sepa extends UnzerPayment
     {
         $this->sIban = $sIban;
     }
-
-    public function getID(): string
-    {
-        return $this->oPayment->getId();
-    }
-
 
     private function getPaymentParams()
     {

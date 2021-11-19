@@ -24,18 +24,6 @@ class SepaSecured extends UnzerPayment
     protected string $sIban;
 
     /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    public function __construct($oxpaymentid)
-    {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
-
-    /**
      * @return string
      */
     public function getSIban(): string
@@ -50,12 +38,6 @@ class SepaSecured extends UnzerPayment
     {
         $this->sIban = $sIban;
     }
-
-    public function getID(): string
-    {
-        return $this->_oPayment->getId();
-    }
-
 
     /**
      * @return bool

@@ -5,35 +5,12 @@ namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use RuntimeException;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class Invoice extends UnzerPayment
 {
-    /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    /**
-     * @param string $oxpaymentid
-     */
-    public function __construct(string $oxpaymentid)
-    {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
-
-    /**
-     * @return string
-     */
-    public function getID(): string
-    {
-        return $this->_oPayment->getId();
-    }
-
-
     /**
      * @return bool
      */
@@ -73,7 +50,7 @@ class Invoice extends UnzerPayment
             Registry::getSession()->setVariable('additionalPaymentInformation', $bankData);
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-        } catch (\RuntimeException | \Exception $e) {
+        } catch (RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
     }
