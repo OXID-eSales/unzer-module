@@ -1,6 +1,5 @@
 [{block name="unzer_sepajs"}]
     [{oxscript include="https://static.unzer.com/v1/unzer.js"}]
-
     [{/block}]
 [{block name="unzer_sepa_css"}]
     [{oxstyle include="https://static.unzer.com/v1/unzer.css"}]
@@ -12,52 +11,25 @@
     </div>
     <div class="field" id="error-holder" style="color: #9f3a38"></div>
 </div>
-<div id="payment-form-sepa-confirm">
-    <input id="oscunzersepaagreement" type="checkbox" name="oscunzersepaagreement" value="1">
-    [{oxscript add="$('#oscunzersepaagreement').click(function(){ $('input[name=oscunzersepaagreement]').val($(this).is(':checked') ? '1' : '0');});"}]
-    <a href="javascript:void(0)" data-toggle="modal" data-target="#sepaconfirmmodal">
-        Sepa-Einzug bestätigen
-    </a>
-</div>
 
-<div class="modal fade" id="sepaconfirmmodal" role="dialog">
-    <div class="modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <span class="h4 modal-title" id="sepa-confirm-modallabel">
-                    Sepa-Bestätigung
-                </span>
-            </div>
-            <div class="modal-body">
-                [{assign var=sMerchantName value=$oView->getShopCompanyName()}]
-                [{oxifcontent ident="oscunzersepamandatetext" object="oContent"}]
-                [{$oContent->oxcontents__oxcontent->value}]
-                [{/oxifcontent}]
-            </div>
-        </div>
+<div id="payment-sepa-confirm">
+    <div class="sepaagreement" id="sepaagree_unzer">
+        <input id="oscunzersepaagreement" type="checkbox" name="oscunzersepaagreement" value="1">
+        <label for="oscunzersepaagreement">
+            [{oxifcontent ident="oscunzersepamandateconfirmation" object="oCont"}]
+                [{$oCont->oxcontents__oxcontent->value}]
+            [{/oxifcontent}]
+        </label>
+        [{oxscript add="$('#oscunzersepaagreement').click(function(){ $('input[name=oscunzersepaagreement]').val($(this).is(':checked') ? '1' : '0');});"}]
     </div>
 </div>
 
 [{capture assign="unzerSepaDirectJS"}]
-    var span = document.getElementsByClassName("close")[0];
-    var modalbackdrop = document.getElementsByClassName("modal-backdrop") ;
 
-    var modal = document.getElementById("sepaconfirmmodal");
-    span.onclick = function() {
-    modal.style.display = "none";
-    modalbackdrop.style.display = "none";
-    }
-    window.onclick = function(event) {
-    if (event.target == modal) {
-    modal.style.display = "none";
-    modalbackdrop.style.display = "none";
-    }
-    }
     var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
     var divHidden = submitBasketForm.querySelector('.hidden');
 
-    let hiddenInputPaymentTypeId = divHidden.querySelector('paymentTypeId');
+    let hiddenInputPaymentTypeId = divHidden.querySelector('paymentData');
     hiddenInputPaymentTypeId = document.createElement('input');
     hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
     hiddenInputPaymentTypeId.setAttribute('name', 'paymentData');

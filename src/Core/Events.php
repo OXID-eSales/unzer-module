@@ -344,17 +344,33 @@ class Events
         $oContent = oxNew(Content::class);
         if (!$oContent->loadByIdent('oscunzersepamandatetext')) {
             $oContent->setEnableMultilang(false);
-            $oContent->setTitle('Unzer Sepamandatstext');
+            $oContent->setTitle('Unzer Sepa');
+            $oContent->oxcontents__oxloadid = new Field ('oscunzersepamandatetext');
             $oContent->oxcontents__oxactive = new Field(1);
-            $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class=""][text]SEPA Lastschrift-Mandat (Bankeinzug)
+            $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class="col-xs-12"][text background_color="" background_image="" background_fixed="" fullwidth="" class=""]<p>SEPA Lastschrift-Mandat (Bankeinzug)
 
-Ich ermächtige [{$sMerchantName}], Zahlungen von meinem Konto mittels SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von [{$sMerchantName}] auf mein Konto gezogenen SEPA Lastschriften einzulösen.
+</p><p>Ich ermächtige [{$oxcmp_shop->oxshops__oxname->value}], Zahlungen von meinem Konto mittels SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von[{$oxcmp_shop->oxshops__oxname->value}] auf mein Konto gezogenen SEPA Lastschriften einzulösen.</p><p>Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrags verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.
 
-Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrags verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.
+</p><p>Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften weise ich meine Bank unwiderruflich an, [{$oxcmp_shop->oxshops__oxname->value}]oder Dritten auf Anforderung meinen Namen, Adresse und Geburtsdatum vollständig mitzuteilen.</p>[/text][/col][/row][{/veparse}]' );
+            $oContent->oxcontents__oxcontent_1 = new Field('[{veparse}][row][col size="12" offset="0" class="col-xs-12"][text background_color="" background_image="" background_fixed="" fullwidth="" class=""]By signing this mandate form, you authorise [{$oxcmp_shop->oxshops__oxname->value}] to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from [{$oxcmp_shop->oxshops__oxname->value}].<br><br>Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding this SEPA mandate are explained in a statement that you can obtain from your bank.<br><br>In case of refusal or rejection of direct debit payment I instruct my bank irrevocably to inform [{$oxcmp_shop->oxshops__oxname->value}] or any third party upon request about my name, address and date of birth.<br><br><br>[/text][/col][/row][{/veparse}] ');
+            $oContent->oxcontents__oxtitle_1 = new Field ('Sepa Text');
+            $oContent->save();
+        }
 
-Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften weise ich meine Bank unwiderruflich an, [{$sMerchantName}] oder Dritten auf Anforderung meinen Namen, Adresse und Geburtsdatum vollständig mitzuteilen.[/text][/col][/row][{/veparse}]' );
-            $oContent->oxcontents__oxcontent_1 = new Field('[{veparse}][row][col size="12" offset="0" class="col-xs-12"][text background_color="" background_image="" background_fixed="" fullwidth="" class=""]By signing this mandate form, you authorise [{$sMerchantName}] to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from [{$sMerchantName}].<br><br>Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding this SEPA mandate are explained in a statement that you can obtain from your bank.<br><br>In case of refusal or rejection of direct debit payment I instruct my bank irrevocably to inform [{$sMerchantName}] or any third party upon request about my name, address and date of birth.<br><br><br>[/text][/col][/row][{/veparse}] ');
-
+        $oContent = oxNew(Content::class);
+        if (!$oContent->loadByIdent('oscunzersepamandateconfirmation')) {
+            $oContent->setTitle('Unzer Sepamandatsbestätigung');
+            $oContent->oxcontents__oxloadid = new Field ('oscunzersepamandateconfirmation');
+            $oContent->oxcontents__oxactive = new Field(1);
+            $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class=""][text][{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+<a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandat</a> bestätigen.
+[{/oxifcontent}]
+[/text][/col][/row][{/veparse}]');
+            $oContent->oxcontents__oxcontent_1 = new Field('[{veparse}][row][col size="12" offset="0" class=""][text][{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandate</a>.
+[{/oxifcontent}]
+[/text][/col][/row][{/veparse}]');
+            $oContent->oxcontents__oxtitle_1 = new Field ('Sepa Confirmation');
             $oContent->save();
         }
     }
@@ -364,7 +380,7 @@ Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen 
      *
      * @return void
      */
-        public static function onActivate()
+    public static function onActivate()
     {
         // adding record to oxPayment table
         self::addUnzerPaymentMethods();
@@ -392,11 +408,11 @@ Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen 
     public static function onDeactivate()
     {
         // If Unzer is activated on other sub shops do not remove payment methods
-        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
-            return;
-        }
-        self::disableUnzerPaymentMethods();
-        self::disableUnzerRDFA();
+//        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
+//            return;
+//        }
+//        self::disableUnzerPaymentMethods();
+//        self::disableUnzerRDFA();
     }
 
     /**

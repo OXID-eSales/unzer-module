@@ -27,11 +27,6 @@ class OrderController extends OrderController_parent
         return UnzerHelper::getShopPublicKey();
     }
 
-    public function getShopCompanyName()
-    {
-        return Registry::getConfig()->getActiveShop()->getFieldData('oxcompany');
-    }
-
     public function execute() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->getSession()->checkSessionChallenge()) {
@@ -44,11 +39,10 @@ class OrderController extends OrderController_parent
             return;
         }
         if ($this->getPayment()->getId() === 'oscunzer_sepa') {
-            $oConfig = Registry::getConfig();
-
-            $blSepaMandateConfirm = $oConfig->getRequestParameter('sepaConfirmation');
+            $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {
                 $this->blSepaMandateConfirmError = 1;
+
                 return;
             }
         }
