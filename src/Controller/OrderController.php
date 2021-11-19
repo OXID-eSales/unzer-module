@@ -32,6 +32,17 @@ class OrderController extends OrderController_parent
         return UnzerHelper::getShopPublicKey();
     }
 
+    /**
+     * Checks for order rules confirmation ("ord_agb", "ord_custinfo" form values)(if no
+     * rules agreed - returns to order view), loads basket contents (plus applied
+     * price/amount discount if available - checks for stock, checks user data (if no
+     * data is set - returns to user login page). Stores order info to database
+     * (\OxidEsales\Eshop\Application\Model\Order::finalizeOrder()). According to sum for items automatically assigns
+     * user to special user group ( \OxidEsales\Eshop\Application\Model\User::onOrderExecute(); if this option is not
+     * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
+     *
+     * @return string
+     */
     public function execute() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->getSession()->checkSessionChallenge()) {
@@ -39,14 +50,14 @@ class OrderController extends OrderController_parent
         }
 
         if (!$this->_validateTermsAndConditions()) {
-            $this->_blConfirmAGBError = 1;
+            $this->_blConfirmAGBError = true;
 
             return;
         }
         if ($this->getPayment()->getId() === 'oscunzer_sepa') {
             $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {
-                $this->blSepaMandateConfirmError = 1;
+                $this->blSepaMandateConfirmError = true;
 
                 return;
             }
