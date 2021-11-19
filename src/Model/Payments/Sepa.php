@@ -124,7 +124,7 @@ class Sepa extends UnzerPayment
         try {
             $oUnzer = UnzerHelper::getUnzer();
             $sId = $this->getUzrId();
-            /* @var SepaDirectDebit $uzrSepa */
+            /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
             $uzrSepa = $oUnzer->fetchPaymentType($sId);
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
             $oUser = UnzerHelper::getUser();

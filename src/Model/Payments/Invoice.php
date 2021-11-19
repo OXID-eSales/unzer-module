@@ -7,7 +7,6 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\CustomerFactory;
 
 class Invoice extends UnzerPayment
 {
