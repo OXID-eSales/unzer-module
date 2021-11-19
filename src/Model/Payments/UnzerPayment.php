@@ -153,6 +153,7 @@ abstract class UnzerPayment
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
+            return false;
         }
 
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
@@ -187,5 +188,6 @@ abstract class UnzerPayment
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
             return false;
         }
+        return false;
     }
 }
