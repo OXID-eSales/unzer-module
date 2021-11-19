@@ -78,7 +78,7 @@ abstract class Payment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
+        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
     }
 
     abstract public function validate();

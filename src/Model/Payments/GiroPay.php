@@ -36,13 +36,6 @@ class GiroPay extends UnzerPayment
     }
 
     /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
-    }
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

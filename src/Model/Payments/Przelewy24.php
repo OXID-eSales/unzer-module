@@ -35,13 +35,6 @@ class Przelewy24 extends UnzerPayment
         return $this->_oPayment->getId();
     }
 
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
-    }
 
     /**
      * @return bool

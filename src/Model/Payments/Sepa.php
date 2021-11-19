@@ -68,13 +68,6 @@ class Sepa extends UnzerPayment
         return $this->oPayment->getId();
     }
 
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
-    }
 
     private function getPaymentParams()
     {
