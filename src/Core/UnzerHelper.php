@@ -26,11 +26,10 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use UnzerSDK\Unzer;
-use UnzerSDK\Validators\PrivateKeyValidator;
-use UnzerSDK\Validators\PublicKeyValidator;
 
-class UnzerHelper
+class UnzerHelper implements ClassMappingInterface
 {
     /**
      * @return array
@@ -167,31 +166,25 @@ class UnzerHelper
 
     public static function getShopPublicKey()
     {
-        return self::getConfigParam('UnzerPublicKey');
+        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerPublicKey');
     }
 
     public static function getShopPrivateKey()
     {
-        return self::getConfigParam('UnzerPrivateKey');
+        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerPrivateKey');
     }
 
-
-    public static function validateSettings(): bool
+    public static function getAPIKey()
     {
-        return PrivateKeyValidator::validate(self::getShopPrivateKey()) && PublicKeyValidator::validate(self::getShopPublicKey());
+        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerApiKey');
     }
 
     /**
-     * Create object UnzerSDK\Unzer with priv-Key
-     *
      * @return Unzer|null
      */
     public static function getUnzer(): ?Unzer
     {
-        if (self::validateSettings()) {
-            return oxNew(Unzer::class, self::getShopPrivateKey());
-        }
-        return null;
+        return oxNew(Unzer::class, self::getShopPrivateKey());
     }
 
     /**
