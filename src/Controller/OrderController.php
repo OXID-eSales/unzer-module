@@ -33,16 +33,16 @@ class OrderController extends OrderController_parent
     }
 
     /**
-     * Checks for order rules confirmation ("ord_agb", "ord_custinfo" form values)(if no
-     * rules agreed - returns to order view), loads basket contents (plus applied
-     * price/amount discount if available - checks for stock, checks user data (if no
-     * data is set - returns to user login page). Stores order info to database
-     * (\OxidEsales\Eshop\Application\Model\Order::finalizeOrder()). According to sum for items automatically assigns
-     * user to special user group ( \OxidEsales\Eshop\Application\Model\User::onOrderExecute(); if this option is not
-     * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
-     *
-     * @return string
-     */
+ * Checks for order rules confirmation ("ord_agb", "ord_custinfo" form values)(if no
+ * rules agreed - returns to order view), loads basket contents (plus applied
+ * price/amount discount if available - checks for stock, checks user data (if no
+ * data is set - returns to user login page). Stores order info to database
+ * (\OxidEsales\Eshop\Application\Model\Order::finalizeOrder()). According to sum for items automatically assigns
+ * user to special user group ( \OxidEsales\Eshop\Application\Model\User::onOrderExecute(); if this option is not
+ * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
+ *
+ * @return string|null
+ */
     public function execute() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->getSession()->checkSessionChallenge()) {
