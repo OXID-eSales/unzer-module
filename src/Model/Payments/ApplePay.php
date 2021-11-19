@@ -63,6 +63,6 @@ class ApplePay extends UnzerPayment
      */
     public function getPaymentMethod(): string
     {
-        return 'alipay';
+        return 'applepay';
     }
 }

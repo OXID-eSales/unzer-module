@@ -61,6 +61,6 @@ class Bancontact extends UnzerPayment
      */
     public function getPaymentMethod(): string
     {
-        return 'apple-pay';
+        return 'bancontact';
     }
 }

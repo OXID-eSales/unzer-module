@@ -61,6 +61,6 @@ class PIS extends UnzerPayment
      */
     public function getPaymentMethod(): string
     {
-        return 'PIS';
+        return 'pis';
     }
 }

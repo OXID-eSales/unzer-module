@@ -61,6 +61,6 @@ class AliPay extends UnzerPayment
      */
     public function getPaymentMethod(): string
     {
-        return 'Cards';
+        return 'alipay';
     }
 }
