@@ -14,10 +14,13 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Application\Model\Payment;
-
 class Installment extends UnzerPayment
 {
+    /**
+     * @var string
+     */
+    protected string $Paymentmethod = 'installment-secured';
+
     /**
      * @return bool
      */
@@ -29,13 +32,5 @@ class Installment extends UnzerPayment
     public function execute()
     {
         //TODO
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return 'installment-secured';
     }
 }

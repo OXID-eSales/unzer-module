@@ -14,10 +14,13 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Application\Model\Payment;
-
 class Sofort extends UnzerPayment
 {
+    /**
+     * @var string
+     */
+    protected string $Paymentmethod = 'sofort';
+
     /**
      * @return bool
      */
@@ -29,13 +32,5 @@ class Sofort extends UnzerPayment
     public function execute()
     {
         //TODO
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return 'sofort';
     }
 }

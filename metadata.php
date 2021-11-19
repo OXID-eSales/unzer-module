@@ -89,17 +89,32 @@ $aModule = [
     'settings' => [
         [
             'group' => 'merchant',
-            'name' => 'UnzerPublicKey',
+            'name' => 'sandbox-UnzerPublicKey',
             'type' => 'str'
         ],
         [
             'group' => 'merchant',
-            'name' => 'UnzerPrivateKey',
+            'name' => 'sandbox-UnzerPrivateKey',
             'type' => 'str'
         ],
         [
             'group' => 'merchant',
-            'name' => 'UnzerApiKey',
+            'name' => 'sandbox-UnzerApiKey',
+            'type' => 'str'
+        ],
+        [
+            'group' => 'merchant',
+            'name' => 'production-UnzerPublicKey',
+            'type' => 'str'
+        ],
+        [
+            'group' => 'merchant',
+            'name' => 'production-UnzerPrivateKey',
+            'type' => 'str'
+        ],
+        [
+            'group' => 'merchant',
+            'name' => 'production-UnzerApiKey',
             'type' => 'str'
         ],
         [

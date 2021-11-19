@@ -14,10 +14,13 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Application\Model\Payment;
-
 class Przelewy24 extends UnzerPayment
 {
+    /**
+     * @var string
+     */
+    protected string $Paymentmethod = 'przelewy24';
+
     /**
      * @return bool
      */
@@ -29,13 +32,5 @@ class Przelewy24 extends UnzerPayment
     public function execute()
     {
         //TODO
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return 'przelewy24';
     }
 }

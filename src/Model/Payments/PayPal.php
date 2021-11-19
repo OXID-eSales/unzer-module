@@ -14,10 +14,13 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Application\Model\Payment;
-
 class PayPal extends UnzerPayment
 {
+    /**
+     * @var string
+     */
+    protected string $Paymentmethod = 'paypal';
+
     /**
      * @return bool
      */
@@ -29,13 +32,5 @@ class PayPal extends UnzerPayment
     public function execute()
     {
         //TODO
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return 'paypal';
     }
 }
