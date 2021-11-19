@@ -30,12 +30,10 @@ class Sepa extends UnzerPayment
      */
     protected string $sIban;
 
-    public function __construct($oxpaymentid)
-    {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->oPayment = $oPayment;
-    }
+    /**
+     * @var array
+     */
+    protected ?array $aPaymentParams;
 
     /**
      * @return string
@@ -51,19 +49,6 @@ class Sepa extends UnzerPayment
     public function setSIban(string $sIban): void
     {
         $this->sIban = $sIban;
-    }
-
-    public function getID(): string
-    {
-        return $this->oPayment->getId();
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->oPayment->oxpayment__oxpaymentprocedure->value;
     }
 
     private function getPaymentParams()
@@ -116,7 +101,6 @@ class Sepa extends UnzerPayment
             $sId = $this->getUzrId();
             /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
             $uzrSepa = $oUnzer->fetchPaymentType($sId);
-            $oBasket = UnzerHelper::getBasket();
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
             $oUser = UnzerHelper::getUser();
             $oBasket = UnzerHelper::getBasket();
@@ -129,5 +113,13 @@ class Sepa extends UnzerPayment
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethod(): string
+    {
+        return 'sepa-direct-debit';
     }
 }

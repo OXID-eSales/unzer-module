@@ -14,7 +14,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
-use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 

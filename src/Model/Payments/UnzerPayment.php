@@ -2,16 +2,17 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 
 abstract class UnzerPayment
 {
@@ -26,26 +27,47 @@ abstract class UnzerPayment
      */
     protected Payment $oPayment;
 
-
     /**
      * @var null|array
      */
-    protected $aPaymentParams = null;
+    protected ?array $aPaymentParams = null;
+
+    /**
+     * @var mixed|Payment
+     */
+    protected $_oPayment;
 
     /**
      * @param string $oxpaymentid
      */
-    abstract public function __construct(string $oxpaymentid);
+    public function __construct(string $oxpaymentid)
+    {
+        $oPayment = oxNew(Payment::class);
+        $oPayment->load($oxpaymentid);
+        $this->_oPayment = $oPayment;
+    }
 
     /**
      * @return string
      */
-    abstract public function getID(): string;
+    public function getID(): string
+    {
+        return $this->_oPayment->getId();
+    }
 
     /**
      * @return string
      */
-    abstract public function getPaymentProcedure(): string;
+    abstract public function getPaymentMethod(): string;
+
+
+    /**
+     * @return string
+     */
+    public function getPaymentProcedure(): string
+    {
+        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
+    }
 
     /**
      * @return mixed|void
@@ -53,14 +75,19 @@ abstract class UnzerPayment
     abstract public function execute();
 
     /**
+     * @var AbstractTransactionType|null
+     */
+    protected ?AbstractTransactionType $_transaction;
+
+    /**
      * @param User $oUser
-     *
+     * @param Order|null $oOrder
      * @return Customer
      */
-    public function getCustomerData(User $oUser, Order $oOrder = null)
+    public function getCustomerData(User $oUser, Order $oOrder = null): Customer
     {
         $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-        if ($oUser->oxuser__oxbirthdate->value != "'0000-00-00'") {
+        if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
             $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
         }
         if ($oUser->oxuser__oxcompany->value) {
@@ -78,9 +105,6 @@ abstract class UnzerPayment
         if ($oUser->oxuser__oxsal->value) {
             $customer->setSalutation($oUser->oxuser__oxsal->value);
         }
-
-        $billingAddress = $customer->getBillingAddress();
-        $oBillCountry = $oUser->getUserCountry();
 
         $billingAddress = $customer->getBillingAddress();
 
@@ -139,7 +163,10 @@ abstract class UnzerPayment
         return $customer;
     }
 
-    public function checkPaymentstatus()
+    /**
+     * @return bool
+     */
+    public function checkPaymentstatus(): bool
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
@@ -153,20 +180,27 @@ abstract class UnzerPayment
 
             // Redirect to success if the payment has been successfully completed.
             $payment = $unzer->fetchPayment($paymentId);
-            $transaction = $payment->getInitialTransaction();
-            if ($transaction->isSuccess()) {
+            $this->_transaction = $payment->getInitialTransaction();
+            if ($this->_transaction->isSuccess()) {
                 // TODO log success
+                //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
                 return true;
-            } elseif ($transaction->isPending()) {
+            } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
-                return false;
-            } elseif ($transaction->isError()) {
-                // TODO Handle Error
-                return false;
+                $paymentType = $payment->getPaymentType();
+                if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType()) {
+                    return true;
+                }
+                // TODO Logging
+                //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
+            } elseif ($this->_transaction->isError()) {
+                UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer()));
             }
-        } catch (UnzerApiException | \RuntimeException $e) {
+        } catch (UnzerApiException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
-            return false;
         }
+        return false;
     }
 }

@@ -19,8 +19,8 @@ class PaymentController extends PaymentController_parent
     /**
      * @return bool
      */
-    public function doSomething()
+    public function doSomething(): bool
     {
-        return (bool) true;
+        return true;
     }
 }

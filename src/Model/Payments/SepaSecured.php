@@ -24,18 +24,6 @@ class SepaSecured extends UnzerPayment
     protected string $sIban;
 
     /**
-     * @var mixed|Payment
-     */
-    protected $_oPayment;
-
-    public function __construct($oxpaymentid)
-    {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
-    }
-
-    /**
      * @return string
      */
     public function getSIban(): string
@@ -51,19 +39,6 @@ class SepaSecured extends UnzerPayment
         $this->sIban = $sIban;
     }
 
-    public function getID(): string
-    {
-        return $this->_oPayment->getId();
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        return $this->_oPayment->oxpayment__oxpaymentprocedure->value;
-    }
-
     /**
      * @return bool
      */
@@ -75,5 +50,13 @@ class SepaSecured extends UnzerPayment
     public function execute()
     {
         //TODO
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentMethod(): string
+    {
+        return 'sepa-direct-debit-secured';
     }
 }
