@@ -63,19 +63,6 @@ class Sepa extends UnzerPayment
     /**
      * @return   string|void
      */
-    private function getUzrIban()
-    {
-        if (array_key_exists('iban', $this->getPaymentParams())) {
-            return $this->getPaymentParams()->iban;
-        } else {
-            // TODO Translate Error/OXMULTILANG
-            UnzerHelper::redirectOnError('order', 'Ungültige Iban');
-        }
-    }
-
-    /**
-     * @return   string|void
-     */
     private function getUzrId()
     {
         if (array_key_exists('id', $this->getPaymentParams())) {
