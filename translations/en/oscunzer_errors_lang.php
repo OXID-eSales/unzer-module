@@ -624,4 +624,5 @@ $aLang = array(
     'oscunzer_800.400.158'   => 'The customer salutation/name is incomplete.',
     'oscunzer_800.400.159'   => 'Merchant not live at partner system.',
     'oscunzer_800.400.160'   => 'Invalid reference at partner system.',
+    'oscunzer_WRONGPAYMENTID'     => 'Invalid Payment-ID. Please choose another payment method.',
 );
