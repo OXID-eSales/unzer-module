@@ -69,7 +69,7 @@ class Transaction extends BaseModel
     {
         $json=$this->getRawField('METADATA');
         if ($json) {
-            return json_decode($json,true);
+            return json_decode($json, true);
         }
 
         return [];
