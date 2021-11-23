@@ -74,6 +74,11 @@ $aModule = [
             'block' => 'shippingAndPayment',
             'file' => 'views/frontend/blocks/unzer_select_payment.tpl'
         ],
+        [
+            'template' => 'page/checkout/order.tpl',
+            'block' => 'checkout_order_errors',
+            'file' => 'views/frontend/blocks/checkout_order_errors.tpl'
+        ],
         //email
         [
             'template' => 'email/plain/order_cust.tpl',
