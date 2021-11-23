@@ -32,11 +32,6 @@ class Sepa extends UnzerPayment
     protected string $sIban;
 
     /**
-     * @var array
-     */
-    protected ?array $aPaymentParams;
-
-    /**
      * @return string
      */
     public function getSIban(): string
@@ -56,7 +51,7 @@ class Sepa extends UnzerPayment
     {
         if ($this->aPaymentParams == null) {
             $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-            $this->aPaymentParams = json_decode($jsonobj);
+            $this->aPaymentParams = json_decode($jsonobj, true);
         }
         return $this->aPaymentParams;
     }
