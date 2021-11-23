@@ -42,27 +42,17 @@ class OrderController extends OrderController_parent
      *
      * @return string
      */
-    public function execute() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    public function execute()
     {
-        if (!$this->getSession()->checkSessionChallenge()) {
-            return;
-        }
+        $result = parent::execute();
 
-        if (!$this->_validateTermsAndConditions()) {
-            $this->_blConfirmAGBError = true;
-
-            return;
-        }
         if ($this->getPayment()->getId() === 'oscunzer_sepa') {
             $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {
                 $this->blSepaMandateConfirmError = true;
-
-                return;
+                $result = '';
             }
         }
-
-        return parent::execute();
     }
 
     public function isSepaMandateConfirmationError()
