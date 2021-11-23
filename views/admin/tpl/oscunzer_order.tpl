@@ -22,19 +22,19 @@
             <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
         </tr>
         <tr>
-            <td>Unzer Customer-ID:</td>
+            <td>[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID"}]</td>
             <td>&nbsp;</td>
             <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
         </tr>
         <tr>
-            <td>Unzer OrderState:</td>
+            <td>[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</td>
             <td>&nbsp;</td>
             <td>
                 [{$oUnzerTransaction->getUnzerAction()|escape}]
             </td>
         </tr>
         <tr>
-            <td>Unzer Type-ID:</td>
+            <td>[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</td>
             <td>&nbsp;</td>
             <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
         </tr>
@@ -46,7 +46,7 @@
     [{capture assign="additionalData"}]
     [{assign var="aPaymentData" value=$oUnzerTransaction->getUnzerMetaData()}]
     [{if is_array($aPaymentData)}]
-    <div><b>Payment-Info:</b></div>
+    <div><b>[{oxmultilang ident="OSCUNZER_TRANSACTION_PAYMENTMETA"}]</b></div>
     <table>
         [{foreach from=$aPaymentData key="paramName" item="paramValue"}]
         [{assign var="bHasAdditionalData" value=true}]
