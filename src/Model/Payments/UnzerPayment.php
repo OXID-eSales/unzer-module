@@ -8,10 +8,12 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
+use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 
 abstract class UnzerPayment
@@ -86,6 +88,34 @@ abstract class UnzerPayment
      */
     protected ?AbstractTransactionType $_transaction;
 
+
+    /**
+     * @param \OxidEsales\EshopCommunity\Application\Model\Basket|null $oBasket
+     * @return Basket
+     */
+    public function getUnzerBasket($oBasket, $orderId)
+    {
+        $basket = new Basket($orderId, $oBasket->getNettoSum(), $oBasket->getBasketCurrency()->name);
+
+        $basketContents = $oBasket->getContents();
+
+        $aBasketItems = $basket->getBasketItems();
+        /**
+         * @var string $sBasketItemKey
+         * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
+         */
+        foreach ($basketContents as $sBasketItemKey => $oBasketItem) {
+            $basketItem = new BasketItem($oBasketItem->getTitle(), $oBasketItem->getPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getAmount());
+       
+            $oBasketItem->setBasketItemKey($oBasketItem->getId());
+//            $basketItem->setImageUrl($oBasketItem->getIconUrl());
+            $aBasketItems [] = $basketItem;
+        }
+
+        $basket->setBasketItems($aBasketItems);
+
+        return $basket;
+    }
     /**
      * @param User $oUser
      * @param Order|null $oOrder

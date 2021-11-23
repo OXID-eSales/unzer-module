@@ -43,7 +43,7 @@ interface ClassMappingInterface
         'oscunzer_prepayment' => PrePayment::class,
         'oscunzer_przelewy24' => Przelewy24::class,
         'oscunzer_sepa' => Sepa::class,
-        'oscunzer_sepa-secured' => Sepa::class,
+        'oscunzer_sepa-secured' => SepaSecured::class,
         'oscunzer_sofort' => Sofort::class,
         'oscunzer_unzerpayment' => UnzerPayment::class,
         'oscunzer_wechatpay' => Wechatpay::class,

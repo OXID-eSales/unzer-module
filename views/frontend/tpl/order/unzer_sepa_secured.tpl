@@ -10,7 +10,18 @@
     <div class="field" id="error-holder" style="color: #9f3a38"></div>
 </div>
 
-[{capture assign="unzerSepaDirectJS"}]
+<div id="payment-sepa-confirm">
+    <div class="sepaagreement" id="sepaagree_unzer">
+        <input id="oscunzersepaagreement" type="checkbox" name="oscunzersepaagreement" value="1">
+        <label for="oscunzersepaagreement">
+            [{oxifcontent ident="oscunzersepamandateconfirmation" object="oCont"}]
+            [{$oCont->oxcontents__oxcontent->value}]
+            [{/oxifcontent}]
+        </label>
+        [{oxscript add="$('#oscunzersepaagreement').click(function(){ $('input[name=oscunzersepaagreement]').val($(this).is(':checked') ? '1' : '0');});"}]
+    </div>
+</div>
+[{capture assign="unzerSepaDirectSecurredJS"}]
 
     var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
     var divHidden = submitBasketForm.querySelector('.hidden');
@@ -45,7 +56,7 @@
     SepaDirectDebitSecured.create('sepa-direct-debit-secured', {
     containerId: 'sepa-secured-IBAN'
     });
-    var form = document.getElementById('payment-form-sepa');
+    var form = document.getElementById('payment-form');
 
     form.addEventListener('keyup', function(event) {
     event.preventDefault();
@@ -58,4 +69,4 @@
     })
     });
     [{/capture}]
-[{oxscript add=$unzerSepaDirectJS}]
+[{oxscript add=$unzerSepaDirectSecurredJS}]

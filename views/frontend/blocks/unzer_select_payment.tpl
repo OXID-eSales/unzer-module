@@ -69,7 +69,7 @@
                     [{elseif $sPaymentID == "oscunzer_sepa"}]
                         [{include file="modules/osc/unzer/unzer_sepa.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_sepa-secured"}]
-                        [{include file="modules/osc/unzer/unzer_sepa.tpl"}]
+                        [{include file="modules/osc/unzer/unzer_sepa_secured.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_sofort"}]
                         [{include file="modules/osc/unzer/unzer_sofort.tpl"}]
                     [{/if}]
