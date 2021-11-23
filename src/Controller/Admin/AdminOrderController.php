@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Model\Transaction;
 
 /**
  * Order class wrapper for Unzer module
@@ -28,6 +29,7 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
         $this->_aViewData["sOxid"] = $this->getEditObjectId();
         if ($this->isUnzerOrder()) {
             $this->_aViewData['oOrder'] = $this->getEditObject();
+            $this->_aViewData['oUnzerTransaction'] = Transaction::getTransactionByOxidOrderId($this->getEditObjectId());
         } else {
             $this->_aViewData['sMessage'] = Registry::getLang()->translateString("OSCUNZER_NO_UNZER_ORDER");
         }
