@@ -24,6 +24,7 @@ namespace OxidSolutionCatalysts\Unzer\Core;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Field;
@@ -32,6 +33,7 @@ use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
+use OxidSolutionCatalysts\Unzer\Model\UnzerLogger;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
@@ -128,9 +130,15 @@ class UnzerHelper
     public static function redirectOnError($destination, $unzerErrorMessage = null)
     {
         self::addErrorToDisplay($unzerErrorMessage);
-
         // redirect to payment-selection page:
         $oSession = Registry::getSession();
+
+        //Remove temporary order
+        $oOrder = oxNew(Order::class);
+        if ($oOrder->load($oSession->getVariable('sess_challenge'))) {
+            $oOrder->delete();
+        }
+
         $dstUrl = Registry::getConfig()->getShopCurrentUrl();
         $dstUrl .= '&cl=' . $destination;
 
@@ -286,7 +294,9 @@ class UnzerHelper
             $oTrans->oscunzertransaction__metadataid = new Field($metadata->getId());
             $oTrans->oscunzertransaction__metadata = new Field($metadata->jsonSerialize());
         }
-        $oTrans->oscunzertransaction__customerid = new Field($unzerCustomer->getId());
+        if ($unzerCustomer) {
+            $oTrans->oscunzertransaction__customerid = new Field($unzerCustomer->getId());
+        }
         $oTrans->oscunzertransaction__oxactiondate = new Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
         $oTrans->oscunzertransaction__oxaction = new Field($unzerPayment->getStateName());
         $oTrans->save();
@@ -316,10 +326,18 @@ class UnzerHelper
         $metadata = new Metadata();
         $metadata->setShopType("Oxid eShop " . (new Facts)->getEdition());
         $metadata->setShopVersion(ShopVersion::getVersion());
-        $metadata->addMetadata('shopid', (string) Registry::getConfig()->getShopId());
+        $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $UnzerPayment->getPaymentMethod());
         $metadata->addMetadata('paymentprocedure', $UnzerPayment->getPaymentProcedure());
 
         return $metadata;
+    }
+
+    /**
+     * @return UnzerLogger
+     */
+    public static function getUnzerLogger(): UnzerLogger
+    {
+        return oxNew(UnzerLogger::class);
     }
 }
