@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This Software is the property of OXID eSales and is protected
  * by copyright law - it is NOT Freeware.
@@ -44,15 +45,37 @@ class OrderController extends OrderController_parent
      */
     public function execute()
     {
-        $result = parent::execute();
+        $foundIssue = false;
+        $result = '';
+
+        if (!$this->getSession()->checkSessionChallenge()) {
+            $foundIssue = true;
+        }
+
+        if (!$this->_validateTermsAndConditions()) {
+            $this->_blConfirmAGBError = 1;
+            $foundIssue = true;
+        }
+
+        // additional check if we really really have a user now
+        $oUser = $this->getUser();
+        if (!$oUser) {
+            $foundIssue = true;
+            $result = 'user';
+        }
 
         if ($this->getPayment()->getId() === 'oscunzer_sepa') {
             $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {
                 $this->blSepaMandateConfirmError = true;
-                $result = '';
+                $foundIssue = true;
             }
         }
+
+        if (!$foundIssue) {
+            $result = parent::execute();
+        }
+
         return $result;
     }
 
