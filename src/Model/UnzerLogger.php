@@ -22,12 +22,12 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
+use Exception;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use RuntimeException;
 
 class UnzerLogger extends Logger
 {
@@ -50,7 +50,7 @@ class UnzerLogger extends Logger
     {
         $this->setLoggingFile();
 
-        $this->logLevel = self::setLogLevel();
+        $this->setLogLevel();
         $handler = new RotatingFileHandler($this->logfile, 14);
 
         $handler->pushProcessor(new UidProcessor());
@@ -62,7 +62,7 @@ class UnzerLogger extends Logger
     /**
      * @return int
      */
-    public static function setLogLevel(): int
+    public function setLogLevel(): int
     {
         /*
         * 0 = Debug
@@ -71,13 +71,18 @@ class UnzerLogger extends Logger
         */
         switch (UnzerHelper::getConfigParam('UnzerLogLevel')) {
             case 0:
-                return Logger::DEBUG;
+                $this->logLevel = Logger::DEBUG;
+                break;
             case 1:
-                return Logger::WARNING;
+                $this->logLevel = Logger::WARNING;
+                break;
             case 2:
-                return Logger::ERROR;
+                $this->logLevel = Logger::ERROR;
+                break;
+            default:
+                $this->logLevel = Logger::DEBUG;
         }
-        return Logger::DEBUG;
+        return $this->logLevel;
     }
 
     /**
@@ -114,14 +119,13 @@ class UnzerLogger extends Logger
 
     /**
      * @return string
+     * @throws Exception
      */
     public function getUnzerLogFolder(): string
     {
         $logfolder = getShopBasePath() . 'log/unzer/';
-        if (!is_dir($logfolder)) {
-            if (!mkdir($logfolder) && !is_dir($logfolder)) {
-                throw new RuntimeException(sprintf('Directory "%s" was not created', $logfolder));
-            }
+        if (!is_dir($logfolder) && !mkdir($logfolder)) {
+                throw new Exception(sprintf('Directory "%s" was not created', $logfolder));
         }
 
         return $logfolder;
