@@ -125,7 +125,7 @@ class UnzerLogger extends Logger
     {
         $logfolder = getShopBasePath() . 'log/unzer/';
         if (!is_dir($logfolder) && !mkdir($logfolder)) {
-                throw new Exception(sprintf('Directory "%s" was not created', $logfolder));
+            throw new Exception(sprintf('Directory "%s" was not created', $logfolder));
         }
 
         return $logfolder;
