@@ -62,7 +62,7 @@ class Sepa extends UnzerPayment
     private function getUzrId()
     {
         if (array_key_exists('id', $this->getPaymentParams())) {
-            return $this->getPaymentParams()->id;
+            return $this->getPaymentParams()['id'];
         } else {
             // TODO Translate Error/OXMULTILANG
             UnzerHelper::redirectOnError('order', 'Ungültige ID');
