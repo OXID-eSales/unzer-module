@@ -53,6 +53,7 @@ class OrderController extends OrderController_parent
                 $result = '';
             }
         }
+        return $result;
     }
 
     public function isSepaMandateConfirmationError()
