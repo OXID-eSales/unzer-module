@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use Exception;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -81,17 +80,14 @@ class Transaction extends BaseModel
     {
         $sLongFieldName=$this->_getFieldLongName($sFieldName);
 
-        if (isset($this->{$sLongFieldName}))
-        {
+        if (isset($this->{$sLongFieldName})) {
             $fieldData=$this->{$sLongFieldName};
-            if ($fieldData instanceof Field)
-            {
+            if ($fieldData instanceof Field) {
                 $val= $fieldData->rawValue;
 
                 // Fix for MariaDB empty default-value issue with some oxid versions:
                 // (causes quotes to be saved instead of empty string)
-                if (is_string($val))
-                {
+                if (is_string($val)) {
                     $val=trim($val, " \"'"); // remove surrounding quotes
                 }
 
