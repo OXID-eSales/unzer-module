@@ -32,11 +32,6 @@ class Sepa extends UnzerPayment
     protected string $sIban;
 
     /**
-     * @var array
-     */
-    protected ?array $aPaymentParams;
-
-    /**
      * @return string
      */
     public function getSIban(): string
@@ -56,22 +51,9 @@ class Sepa extends UnzerPayment
     {
         if ($this->aPaymentParams == null) {
             $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-            $this->aPaymentParams = json_decode($jsonobj);
+            $this->aPaymentParams = json_decode($jsonobj, true);
         }
         return $this->aPaymentParams;
-    }
-
-    /**
-     * @return   string|void
-     */
-    private function getUzrIban()
-    {
-        if (array_key_exists('iban', $this->getPaymentParams())) {
-            return $this->getPaymentParams()->iban;
-        } else {
-            // TODO Translate Error/OXMULTILANG
-            UnzerHelper::redirectOnError('order', 'Ungültige Iban');
-        }
     }
 
     /**
@@ -80,7 +62,7 @@ class Sepa extends UnzerPayment
     private function getUzrId()
     {
         if (array_key_exists('id', $this->getPaymentParams())) {
-            return $this->getPaymentParams()->id;
+            return $this->getPaymentParams()['id'];
         } else {
             // TODO Translate Error/OXMULTILANG
             UnzerHelper::redirectOnError('order', 'Ungültige ID');

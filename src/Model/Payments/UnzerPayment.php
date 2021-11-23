@@ -115,7 +115,7 @@ abstract class UnzerPayment
 
         $billingAddress = $customer->getBillingAddress();
 
-        $oCountry = oxnew(Country::class);
+        $oCountry = oxNew(Country::class);
         if ($oCountry->load($oUser->oxuser__oxcountryid->value)) {
             $billingAddress->setCountry($oCountry->oxcountry__oxisoalpha2->value);
         }
@@ -159,7 +159,7 @@ abstract class UnzerPayment
                 $shippingAddress->setZip($oDelAddress->oxaddress__oxzip->value);
             }
 
-            $oCountry = oxnew(Country::class);
+            $oCountry = oxNew(Country::class);
             if ($oCountry->load($oDelAddress->oxaddress__oxcountryid->value)) {
                 $oCountry->load($oDelAddress->oxaddress__oxcountryid->value);
 
