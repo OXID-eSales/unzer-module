@@ -22,15 +22,6 @@
             </div>
         </div>
     </div>
-    <div class="field">
-        <button
-                id="submit-button"
-                class="unzerUI primary button fluid"
-                type="submit"
-        >
-            Pay
-        </button>
-    </div>
     <div class="field" id="error-holder" style="color: #9f3a38"> </div>
 </form>
 
@@ -65,15 +56,23 @@
 
     let $errorHolder = $('#error-holder');
 
-    var form = document.getElementById('payment-form-card');
-    form.addEventListener('submit', function(event) {
+    $('#orderConfirmAgbBottom').find(".submitButton").click(function(e) {
+    e.preventDefault();
+    $('#payment-form-card').submit();
+    });
+
+    $( "#payment-form-card" ).submit(function( event ) {
     event.preventDefault();
     Card.createResource()
     .then(function(result) {
     hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(result) );
+    $('#orderConfirmAgbBottom').submit();
     })
     .catch(function(error) {
     hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(error) );
+        $('html, body').animate({
+        scrollTop: $("#orderPayment").offset().top - 150
+        }, 350);
     })
     });
 
