@@ -225,7 +225,7 @@ abstract class UnzerPayment
             } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $payment->getPaymentType();
-                if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType()) {
+                if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
                     return true;
                 }
                 // TODO Logging
@@ -239,5 +239,27 @@ abstract class UnzerPayment
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
         return false;
+    }
+
+    public function getPaymentParams()
+    {
+        if ($this->aPaymentParams == null) {
+            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
+            $this->aPaymentParams = json_decode($jsonobj, true);
+        }
+        return $this->aPaymentParams;
+    }
+
+    /**
+     * @return   string|void
+     */
+    public function getUzrId()
+    {
+        if (array_key_exists('id', $this->getPaymentParams())) {
+            return $this->getPaymentParams()['id'];
+        } else {
+            UnzerHelper::getUnzerLogger()->error('Paymentid from tpl not set', ["cl" => __CLASS__, "fnc" => __METHOD__]);
+            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige Zahldaten'));
+        }
     }
 }
