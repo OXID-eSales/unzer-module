@@ -61,7 +61,7 @@
                     [{elseif $sPaymentID == "oscunzer_invoice"}]
                         [{include file="modules/osc/unzer/unzer_invoice.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_invoice-secured"}]
-                        [{include file="modules/osc/unzer/unzer_invoice_securred.tpl"}]
+                        [{include file="modules/osc/unzer/unzer_invoice_secured.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_paypal"}]
                         [{include file="modules/osc/unzer/unzer_paypal.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_prepayment"}]

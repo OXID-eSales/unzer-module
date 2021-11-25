@@ -23,6 +23,7 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
@@ -35,6 +36,7 @@ use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Model\UnzerLogger;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -203,6 +205,7 @@ class UnzerHelper
      */
     public static function getUnzer(): ?Unzer
     {
+
         return oxNew(Unzer::class, self::getShopPrivateKey());
     }
 
@@ -339,5 +342,26 @@ class UnzerHelper
     public static function getUnzerLogger(): UnzerLogger
     {
         return oxNew(UnzerLogger::class);
+    }
+
+    /**
+     * @param Basket $oBasket
+     * @param string $orderId
+     * @return \UnzerSDK\Resources\Basket
+     */
+    public static function getUnzerBasket(Basket $oBasket, string $orderId): \UnzerSDK\Resources\Basket
+    {
+        $aUnzerBasketItem = [];
+        $aBasketItems = $oBasket->getContents();
+        foreach ($aBasketItems as $oBasketItem) {
+            /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
+            $basketItem = (new BasketItem($oBasketItem->getTitle(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getBruttoPrice(), $oBasketItem->getAmount()))
+                ->setAmountGross($oBasketItem->getPrice()->getPrice())
+                ->setAmountVat($oBasketItem->getPrice()->getVatValue());
+
+            $aUnzerBasketItem[] = $basketItem;
+        }
+
+        return new \UnzerSDK\Resources\Basket($orderId, $oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $aUnzerBasketItem);
     }
 }

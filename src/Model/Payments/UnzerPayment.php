@@ -95,7 +95,7 @@ abstract class UnzerPayment
     {
         $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
         if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
-            $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
+            $customer->setBirthDate($oUser->oxuser__oxbirthdate->value);
         }
         if ($oUser->oxuser__oxcompany->value) {
             $customer->setCompany($oUser->oxuser__oxcompany->value);
@@ -108,9 +108,6 @@ abstract class UnzerPayment
         }
         if ($oUser->oxuser__oxfon->value) {
             $customer->setPhone($oUser->oxuser__oxfon->value);
-        }
-        if ($oUser->oxuser__oxsal->value) {
-            $customer->setSalutation($oUser->oxuser__oxsal->value);
         }
 
         $billingAddress = $customer->getBillingAddress();
