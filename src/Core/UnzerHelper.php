@@ -354,7 +354,7 @@ class UnzerHelper
         $aBasketItems = $oBasket->getContents();
         foreach ($aBasketItems as $oBasketItem) {
             /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
-            $basketItem = (new BasketItem($oBasketItem->getTitle(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getBruttoPrice(), $oBasketItem->getAmount()))
+            $basketItem = (new BasketItem($oBasketItem->getTitle(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getBruttoPrice(), (int) $oBasketItem->getAmount()))
                 ->setAmountGross($oBasketItem->getPrice()->getPrice())
                 ->setAmountVat($oBasketItem->getPrice()->getVatValue());
 
