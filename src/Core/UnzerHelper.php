@@ -205,7 +205,6 @@ class UnzerHelper
      */
     public static function getUnzer(): ?Unzer
     {
-
         return oxNew(Unzer::class, self::getShopPrivateKey());
     }
 
