@@ -53,7 +53,7 @@ class Card extends UnzerPayment
             } else {
                 $transaction = $uzrCard->authorize($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
             }
-           // You'll need to remember the shortId to show it on the success or failure page
+            // You'll need to remember the shortId to show it on the success or failure page
             Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
             Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
         } catch (UnzerApiException $e) {
