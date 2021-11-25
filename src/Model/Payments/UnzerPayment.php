@@ -79,6 +79,14 @@ abstract class UnzerPayment
     }
 
     /**
+     * @return bool
+     */
+    public function isDirectCharge()
+    {
+        return (strpos($this->_oPayment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
+    }
+
+    /**
      * @return mixed|void
      */
     abstract public function execute();
