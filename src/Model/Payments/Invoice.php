@@ -32,7 +32,6 @@ class Invoice extends UnzerPayment
         try {
             // Create an Unzer object using your private key and register a debug handler if you want to.
             $unzer = UnzerHelper::getUnzer();
-            $unzer->setDebugMode(true)->setDebugHandler(new ExampleDebugHandler());
 
             /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
             $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice);
@@ -53,10 +52,8 @@ class Invoice extends UnzerPayment
             $bankData = UnzerHelper::getBankData($transaction);
             Registry::getSession()->setVariable('additionalPaymentInformation', $bankData);
         } catch (UnzerApiException $e) {
-            UnzerHelper::getUnzerLogger()->error($e->getMessage(), ["code" => $e->getCode(), "cl" => __CLASS__, "fnc" => __METHOD__]);
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
         } catch (Exception $e) {
-            UnzerHelper::getUnzerLogger()->error($e->getMessage(), ["code" => $e->getCode(), "cl" => __CLASS__, "fnc" => __METHOD__]);
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
     }

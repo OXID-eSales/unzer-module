@@ -34,6 +34,7 @@ use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Model\UnzerLogger;
+use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
@@ -171,6 +172,14 @@ class UnzerHelper
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public static function isDebugModeOn(): bool
+    {
+        return self::getConfigBool("UnzerDebug");
+    }
+
     public static function getConfigParam($sVarName, $defaultValue = null)
     {
         $oConfig = Registry::getConfig();
@@ -203,7 +212,12 @@ class UnzerHelper
      */
     public static function getUnzer(): ?Unzer
     {
-        return oxNew(Unzer::class, self::getShopPrivateKey());
+        $unzer = oxNew(Unzer::class, self::getShopPrivateKey());
+
+        if (self::isDebugModeOn()) {
+            $unzer->setDebugMode(true)->setDebugHandler(oxNew(UnzerLogger::class));
+        }
+        return $unzer;
     }
 
     /**
@@ -331,13 +345,5 @@ class UnzerHelper
         $metadata->addMetadata('paymentprocedure', $UnzerPayment->getPaymentProcedure());
 
         return $metadata;
-    }
-
-    /**
-     * @return UnzerLogger
-     */
-    public static function getUnzerLogger(): UnzerLogger
-    {
-        return oxNew(UnzerLogger::class);
     }
 }
