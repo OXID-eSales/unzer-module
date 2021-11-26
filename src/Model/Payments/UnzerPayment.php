@@ -38,18 +38,17 @@ abstract class UnzerPayment
     protected ?array $aPaymentParams = null;
 
     /**
-     * @var mixed|Payment
+     * @var array|bool
      */
-    protected $_oPayment;
+    protected $aCurrencies = false;
 
     /**
      * @param string $oxpaymentid
      */
     public function __construct(string $oxpaymentid)
     {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
+        $this->oPayment = oxNew(Payment::class);
+        $this->oPayment->load($oxpaymentid);
     }
 
     /**
@@ -57,7 +56,7 @@ abstract class UnzerPayment
      */
     public function getID(): string
     {
-        return $this->_oPayment->getId();
+        return $this->oPayment->getId();
     }
 
     /**
@@ -93,7 +92,7 @@ abstract class UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
+        return $this->oPayment->oxpayments__oxpaymentprocedure->value;
     }
 
     /**
