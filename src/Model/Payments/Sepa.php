@@ -65,19 +65,6 @@ class Sepa extends UnzerPayment
     }
 
     /**
-     * @return   string|void
-     */
-    private function getUzrId()
-    {
-        if (array_key_exists('id', $this->getPaymentParams())) {
-            return $this->getPaymentParams()['id'];
-        } else {
-            UnzerHelper::getUnzerLogger()->error('Paymentid from tpl not set', ["cl" => __CLASS__, "fnc" => __METHOD__]);
-            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
-        }
-    }
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

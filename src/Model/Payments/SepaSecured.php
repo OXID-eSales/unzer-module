@@ -69,19 +69,6 @@ class SepaSecured extends UnzerPayment
         return $this->aPaymentParams;
     }
 
-    /**
-     * @return   string|void
-     */
-    private function getUzrId()
-    {
-        if (array_key_exists('id', $this->getPaymentParams())) {
-            return $this->getPaymentParams()['id'];
-        } else {
-            // TODO Translate Error/OXMULTILANG
-            UnzerHelper::redirectOnError('order', 'Ungültige ID');
-        }
-    }
-
     public function execute()
     {
         try {

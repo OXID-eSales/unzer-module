@@ -107,6 +107,18 @@ abstract class UnzerPayment
      */
     protected ?AbstractTransactionType $_transaction;
 
+    /**
+     * @return   string|void
+     */
+    private function getUzrId()
+    {
+        if (array_key_exists('id', $this->getPaymentParams())) {
+            return $this->getPaymentParams()['id'];
+        } else {
+            UnzerHelper::getUnzerLogger()->error(UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Paymentid from tpl not set'), ["cl" => __CLASS__, "fnc" => __METHOD__]);
+            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
+        }
+    }
 
     /**
      * @param \OxidEsales\EshopCommunity\Application\Model\Basket|null $oBasket
@@ -124,11 +136,12 @@ abstract class UnzerPayment
          * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
          */
         foreach ($basketContents as $sBasketItemKey => $oBasketItem) {
-            $basketItem = new BasketItem($oBasketItem->getTitle(), $oBasketItem->getPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getAmount());
-
-            $oBasketItem->setBasketItemKey($oBasketItem->getArticle()->getId());
-//            $basketItem->setImageUrl($oBasketItem->getIconUrl());
-            $aBasketItems [] = $basketItem;
+            $aBasketItems[] = new BasketItem(
+                $oBasketItem->getTitle(),
+                $oBasketItem->getPrice()->getNettoPrice(),
+                $oBasketItem->getUnitPrice()->getNettoPrice(),
+                $oBasketItem->getAmount()
+            );
         }
 
         $basket->setBasketItems($aBasketItems);
