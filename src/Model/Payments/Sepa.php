@@ -55,28 +55,6 @@ class Sepa extends UnzerPayment
         $this->sIban = $sIban;
     }
 
-    private function getPaymentParams()
-    {
-        if ($this->aPaymentParams == null) {
-            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-            $this->aPaymentParams = json_decode($jsonobj, true);
-        }
-        return $this->aPaymentParams;
-    }
-
-    /**
-     * @return   string|void
-     */
-    private function getUzrId()
-    {
-        if (array_key_exists('id', $this->getPaymentParams())) {
-            return $this->getPaymentParams()['id'];
-        } else {
-            UnzerHelper::getUnzerLogger()->error('Paymentid from tpl not set', ["cl" => __CLASS__, "fnc" => __METHOD__]);
-            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
-        }
-    }
-
     /**
      * @return bool
      */
@@ -102,10 +80,8 @@ class Sepa extends UnzerPayment
             Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
             Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
         } catch (UnzerApiException $e) {
-            UnzerHelper::getUnzerLogger()->error($e->getMessage(), ["code" => $e->getCode(), "cl" => __CLASS__, "fnc" => __METHOD__]);
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
         } catch (Exception $e) {
-            UnzerHelper::getUnzerLogger()->error($e->getMessage(), ["code" => $e->getCode(), "cl" => __CLASS__, "fnc" => __METHOD__]);
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
     }

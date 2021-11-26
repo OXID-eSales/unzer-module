@@ -8,10 +8,12 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
+use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 
 abstract class UnzerPayment
@@ -105,6 +107,55 @@ abstract class UnzerPayment
      */
     protected ?AbstractTransactionType $_transaction;
 
+    /**
+     * @return   string|void
+     */
+    public function getUzrId()
+    {
+        if (array_key_exists('id', $this->getPaymentParams())) {
+            return $this->getPaymentParams()['id'];
+        } else {
+            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
+        }
+    }
+
+    public function getPaymentParams()
+    {
+        if ($this->aPaymentParams == null) {
+            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
+            $this->aPaymentParams = json_decode($jsonobj, true);
+        }
+        return $this->aPaymentParams;
+    }
+
+    /**
+     * @param \OxidEsales\EshopCommunity\Application\Model\Basket|null $oBasket
+     * @return Basket
+     */
+    public function getUnzerBasket($oBasket, $orderId)
+    {
+        $basket = new Basket($orderId, $oBasket->getNettoSum(), $oBasket->getBasketCurrency()->name);
+
+        $basketContents = $oBasket->getContents();
+
+        $aBasketItems = $basket->getBasketItems();
+        /**
+         * @var string $sBasketItemKey
+         * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
+         */
+        foreach ($basketContents as $oBasketItem) {
+            $aBasketItems[] = new BasketItem(
+                $oBasketItem->getTitle(),
+                $oBasketItem->getPrice()->getNettoPrice(),
+                $oBasketItem->getUnitPrice()->getNettoPrice(),
+                (int)$oBasketItem->getAmount()
+            );
+        }
+
+        $basket->setBasketItems($aBasketItems);
+
+        return $basket;
+    }
     /**
      * @param User $oUser
      * @param Order|null $oOrder
