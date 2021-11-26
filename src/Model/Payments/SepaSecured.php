@@ -27,6 +27,11 @@ class SepaSecured extends UnzerPayment
     protected string $Paymentmethod = 'sepa-direct-debit-secured';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = ['EUR'];
+
+    /**
      * @var string
      */
     protected string $sIban;
@@ -53,28 +58,6 @@ class SepaSecured extends UnzerPayment
     public function isRecurringPaymentType(): bool
     {
         return false;
-    }
-
-    private function getPaymentParams()
-    {
-        if ($this->aPaymentParams == null) {
-            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-            $this->aPaymentParams = json_decode($jsonobj, true);
-        }
-        return $this->aPaymentParams;
-    }
-
-    /**
-     * @return   string|void
-     */
-    private function getUzrId()
-    {
-        if (array_key_exists('id', $this->getPaymentParams())) {
-            return $this->getPaymentParams()['id'];
-        } else {
-            // TODO Translate Error/OXMULTILANG
-            UnzerHelper::redirectOnError('order', 'Ungültige ID');
-        }
     }
 
     public function execute()

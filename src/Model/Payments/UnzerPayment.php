@@ -40,18 +40,17 @@ abstract class UnzerPayment
     protected ?array $aPaymentParams = null;
 
     /**
-     * @var mixed|Payment
+     * @var array|bool
      */
-    protected $_oPayment;
+    protected $aCurrencies = false;
 
     /**
      * @param string $oxpaymentid
      */
     public function __construct(string $oxpaymentid)
     {
-        $oPayment = oxNew(Payment::class);
-        $oPayment->load($oxpaymentid);
-        $this->_oPayment = $oPayment;
+        $this->oPayment = oxNew(Payment::class);
+        $this->oPayment->load($oxpaymentid);
     }
 
     /**
@@ -59,7 +58,7 @@ abstract class UnzerPayment
      */
     public function getID(): string
     {
-        return $this->_oPayment->getId();
+        return $this->oPayment->getId();
     }
 
     /**
@@ -71,11 +70,31 @@ abstract class UnzerPayment
     }
 
     /**
+     * @return mixed
+     */
+    public function getPaymentCurrencies()
+    {
+        return $this->aCurrencies;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPaymentTypeAllowed(): bool
+    {
+        if ($this->getPaymentCurrencies() && in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function getPaymentProcedure(): string
     {
-        return $this->_oPayment->oxpayments__oxpaymentprocedure->value;
+        return $this->oPayment->oxpayments__oxpaymentprocedure->value;
     }
 
     /**
@@ -96,6 +115,26 @@ abstract class UnzerPayment
      */
     protected ?AbstractTransactionType $_transaction;
 
+    /**
+     * @return   string|void
+     */
+    public function getUzrId()
+    {
+        if (array_key_exists('id', $this->getPaymentParams())) {
+            return $this->getPaymentParams()['id'];
+        } else {
+            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
+        }
+    }
+
+    public function getPaymentParams()
+    {
+        if ($this->aPaymentParams == null) {
+            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
+            $this->aPaymentParams = json_decode($jsonobj, true);
+        }
+        return $this->aPaymentParams;
+    }
 
     /**
      * @param \OxidEsales\EshopCommunity\Application\Model\Basket|null $oBasket
@@ -112,12 +151,13 @@ abstract class UnzerPayment
          * @var string $sBasketItemKey
          * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
          */
-        foreach ($basketContents as $sBasketItemKey => $oBasketItem) {
-            $basketItem = new BasketItem($oBasketItem->getTitle(), $oBasketItem->getPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getAmount());
-       
-            $oBasketItem->setBasketItemKey($oBasketItem->getId());
-//            $basketItem->setImageUrl($oBasketItem->getIconUrl());
-            $aBasketItems [] = $basketItem;
+        foreach ($basketContents as $oBasketItem) {
+            $aBasketItems[] = new BasketItem(
+                $oBasketItem->getTitle(),
+                $oBasketItem->getPrice()->getNettoPrice(),
+                $oBasketItem->getUnitPrice()->getNettoPrice(),
+                (int)$oBasketItem->getAmount()
+            );
         }
 
         $basket->setBasketItems($aBasketItems);
@@ -133,7 +173,7 @@ abstract class UnzerPayment
     {
         $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
         if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
-            $customer->setBirthDate(date('Y-m-d', $oUser->oxuser__oxbirthdate->value));
+            $customer->setBirthDate($oUser->oxuser__oxbirthdate->value);
         }
         if ($oUser->oxuser__oxcompany->value) {
             $customer->setCompany($oUser->oxuser__oxcompany->value);
@@ -146,9 +186,6 @@ abstract class UnzerPayment
         }
         if ($oUser->oxuser__oxfon->value) {
             $customer->setPhone($oUser->oxuser__oxfon->value);
-        }
-        if ($oUser->oxuser__oxsal->value) {
-            $customer->setSalutation($oUser->oxuser__oxsal->value);
         }
 
         $billingAddress = $customer->getBillingAddress();

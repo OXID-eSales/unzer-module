@@ -23,98 +23,22 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use Exception;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Logger;
-use Monolog\Processor\UidProcessor;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Interfaces\DebugHandlerInterface;
 
-class UnzerLogger extends Logger
+class UnzerLogger implements DebugHandlerInterface
 {
+    private const LOG_TYPE_APPEND_TO_FILE = 3;
+
     /**
-     * The loglevel that is configured
+     * {@inheritDoc}
      *
-     * @var int
+     * ATTENTION: Please make sure the destination file is writable.
+     * @throws Exception
      */
-    protected int $logLevel;
-
-    /**
-     * @var string
-     */
-    private string $logfile;
-
-    /**
-     *
-     */
-    public function __construct()
+    public function log(string $message): void
     {
-        $this->setLoggingFile();
-
-        $this->setLogLevel();
-        $handler = new RotatingFileHandler($this->logfile, 14);
-
-        $handler->pushProcessor(new UidProcessor());
-        $handler->setFormatter(new LineFormatter());
-
-        parent::__construct('Unzer', array($handler));
-    }
-
-    /**
-     * @return int
-     */
-    public function setLogLevel(): int
-    {
-        /*
-        * 0 = Debug
-        * 1 = Warning
-        * 2 = Error
-        */
-        switch (UnzerHelper::getConfigParam('UnzerLogLevel')) {
-            case 0:
-                $this->logLevel = Logger::DEBUG;
-                break;
-            case 1:
-                $this->logLevel = Logger::WARNING;
-                break;
-            case 2:
-                $this->logLevel = Logger::ERROR;
-                break;
-            default:
-                $this->logLevel = Logger::DEBUG;
-        }
-        return $this->logLevel;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLogLevel(): int
-    {
-        return $this->logLevel;
-    }
-
-    /**
-     * Adds a log record.
-     *
-     * @param int $level The logging level
-     * @param string $message The log message
-     * @param array $context The log context
-     * @return bool Whether the record has been processed
-     */
-    public function addRecord($level, $message, array $context = array()): bool
-    {
-        $result = false;
-        if ($level >= $this->logLevel) {
-            $result = parent::addRecord($level, $message, $context);
-        }
-
-        return $result;
-    }
-
-    public function setLoggingFile()
-    {
-        $this->logfile = $this->getUnzerLogFolder();
-        $this->logfile .= "unzer.log";
+        /** @noinspection ForgottenDebugOutputInspection */
+        error_log($message . "\n", self::LOG_TYPE_APPEND_TO_FILE, $this->getUnzerLoggingPath());
     }
 
     /**
@@ -129,5 +53,23 @@ class UnzerLogger extends Logger
         }
 
         return $logfolder;
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function getUnzerLogFile(): string
+    {
+        return "unzer_" . date("Y-m-d") . ".log";
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function getUnzerLoggingPath(): string
+    {
+        return $this->getUnzerLogFolder() . $this->getUnzerLogFile();
     }
 }
