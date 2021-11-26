@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This Software is the property of OXID eSales and is protected
  * by copyright law - it is NOT Freeware.
@@ -16,8 +17,10 @@ namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 use UnzerSDK\Traits\CanDirectCharge;
+use Exception;
 
 class Sepa extends UnzerPayment
 {
@@ -64,8 +67,8 @@ class Sepa extends UnzerPayment
         if (array_key_exists('id', $this->getPaymentParams())) {
             return $this->getPaymentParams()['id'];
         } else {
-            // TODO Translate Error/OXMULTILANG
-            UnzerHelper::redirectOnError('order', 'Ungültige ID');
+            UnzerHelper::getUnzerLogger()->error('Paymentid from tpl not set', ["cl" => __CLASS__, "fnc" => __METHOD__]);
+            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
         }
     }
 
@@ -93,8 +96,12 @@ class Sepa extends UnzerPayment
 //           // You'll need to remember the shortId to show it on the success or failure page
             Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
             Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
-        } catch (\Exception $ex) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
+        } catch (UnzerApiException $e) {
+            UnzerHelper::getUnzerLogger()->error($e->getMessage(), ["code" => $e->getCode(), "cl" => __CLASS__, "fnc" => __METHOD__]);
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        } catch (Exception $e) {
+            UnzerHelper::getUnzerLogger()->error($e->getMessage(), ["code" => $e->getCode(), "cl" => __CLASS__, "fnc" => __METHOD__]);
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
     }
 }

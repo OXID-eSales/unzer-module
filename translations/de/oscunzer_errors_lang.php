@@ -624,4 +624,5 @@ $aLang = array(
     'oscunzer_800.400.158'   => 'Die Attribute Anrede/Name sind unvollständig.',
     'oscunzer_800.400.159'   => 'Der Webshop ist nicht produktiv.',
     'oscunzer_800.400.160'   => 'Es wurde kein (gültiger) Vorgang zur TB-Vorgangskennung gefunden.',
+    'oscunzer_WRONGPAYMENTID'     => 'Keine Payment-Id gesetzt. Bitte eine andere Zahlmethode verwenden.',
 );
