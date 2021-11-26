@@ -148,7 +148,7 @@ abstract class UnzerPayment
                 $oBasketItem->getTitle(),
                 $oBasketItem->getPrice()->getNettoPrice(),
                 $oBasketItem->getUnitPrice()->getNettoPrice(),
-                $oBasketItem->getAmount()
+                (int)$oBasketItem->getAmount()
             );
         }
 
