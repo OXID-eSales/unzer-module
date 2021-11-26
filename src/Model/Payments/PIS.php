@@ -22,6 +22,11 @@ class PIS extends UnzerPayment
     protected string $Paymentmethod = 'pis';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = false;
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

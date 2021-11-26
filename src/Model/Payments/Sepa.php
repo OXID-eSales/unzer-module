@@ -30,6 +30,11 @@ class Sepa extends UnzerPayment
     protected string $Paymentmethod = 'sepa-direct-debit';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = ['EUR'];
+
+    /**
      * @var string
      */
     protected string $sIban;

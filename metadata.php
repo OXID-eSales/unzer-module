@@ -30,6 +30,7 @@ $aModule = [
     'extend' => [
         \OxidEsales\Eshop\Application\Controller\PaymentController::class       => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
         \OxidEsales\Eshop\Core\ViewConfig::class                                => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
+        \OxidEsales\Eshop\Core\Config::class                                    => \OxidSolutionCatalysts\Unzer\Core\Config::class,
         \OxidEsales\Eshop\Application\Model\Payment::class                      => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class         => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class,
         \OxidEsales\Eshop\Application\Model\PaymentGateway::class               => \OxidSolutionCatalysts\Unzer\Model\PaymentGateway::class,
@@ -52,7 +53,7 @@ $aModule = [
         'modules/osc/unzer/unzer_eps_charge.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_eps_charge.tpl',
         'modules/osc/unzer/unzer_giro.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_giro.tpl',
         'modules/osc/unzer/unzer_installment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment.tpl',
-        'modules/osc/unzer/unzer_invoice_securred.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_securred.tpl',
+        'modules/osc/unzer/unzer_invoice_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_secured.tpl',
         'modules/osc/unzer/unzer_paypal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal.tpl',
         'modules/osc/unzer/unzer_paypal_recurring.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal_recurring.tpl',
         'modules/osc/unzer/unzer_prepayment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_prepayment.tpl',
@@ -72,12 +73,17 @@ $aModule = [
         [
             'template' => 'page/checkout/order.tpl',
             'block' => 'shippingAndPayment',
-            'file' => 'views/frontend/blocks/unzer_select_payment.tpl'
+            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment.tpl'
         ],
         [
             'template' => 'page/checkout/order.tpl',
             'block' => 'checkout_order_errors',
-            'file' => 'views/frontend/blocks/checkout_order_errors.tpl'
+            'file' => 'views/frontend/blocks/page/checkout/checkout_order_errors.tpl'
+        ],
+        [
+            'template' => 'page/checkout/payment.tpl',
+            'block' => 'select_payment',
+            'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
         ],
         //email
         [

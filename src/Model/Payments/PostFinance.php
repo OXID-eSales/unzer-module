@@ -24,6 +24,11 @@ class PostFinance extends UnzerPayment
     protected string $Paymentmethod = 'post-finance-efinance';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = false;
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

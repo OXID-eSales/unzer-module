@@ -22,6 +22,11 @@ class WeChatPay extends UnzerPayment
     protected string $Paymentmethod = 'wechatpay';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = false;
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

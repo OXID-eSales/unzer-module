@@ -22,6 +22,11 @@ class PrePayment extends UnzerPayment
     protected string $Paymentmethod = 'prepayment';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = ['EUR'];
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

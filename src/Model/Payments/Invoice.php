@@ -16,6 +16,11 @@ class Invoice extends UnzerPayment
     protected string $Paymentmethod = 'invoice';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = ['EUR'];
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool
