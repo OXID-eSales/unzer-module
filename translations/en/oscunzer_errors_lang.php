@@ -386,6 +386,7 @@ $aLang = array(
     "oscunzer_300.200.401"   => "general technical system error",
     "oscunzer_300.200.500"   => "general technical system error",
     "oscunzer_300.200.600"   => "unsupported media type",
+    "oscunzer_330.100.202"   => "The currency is not supported by the selected payment method.",
     "oscunzer_400.100.100"   => "general technical system error",
     "oscunzer_400.100.101"   => "general technical system error",
     "oscunzer_400.100.102"   => "general technical system error",
@@ -624,4 +625,5 @@ $aLang = array(
     'oscunzer_800.400.158'   => 'The customer salutation/name is incomplete.',
     'oscunzer_800.400.159'   => 'Merchant not live at partner system.',
     'oscunzer_800.400.160'   => 'Invalid reference at partner system.',
+    'oscunzer_WRONGPAYMENTID'     => 'Invalid Payment-ID. Please choose another payment method.',
 );

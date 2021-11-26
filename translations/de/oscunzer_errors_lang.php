@@ -386,6 +386,7 @@ $aLang = array(
     "oscunzer_300.200.401"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_300.200.500"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_300.200.600"   => "Dateityp nicht unterstützt",
+    "oscunzer_330.100.202"   => "Die Währung wird von der gewählten Zahlungsart nicht unterstützt.",
     "oscunzer_400.100.100"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_400.100.101"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_400.100.102"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
@@ -624,4 +625,5 @@ $aLang = array(
     'oscunzer_800.400.158'   => 'Die Attribute Anrede/Name sind unvollständig.',
     'oscunzer_800.400.159'   => 'Der Webshop ist nicht produktiv.',
     'oscunzer_800.400.160'   => 'Es wurde kein (gültiger) Vorgang zur TB-Vorgangskennung gefunden.',
+    'oscunzer_WRONGPAYMENTID'     => 'Keine Payment-Id gesetzt. Bitte eine andere Zahlmethode verwenden.',
 );

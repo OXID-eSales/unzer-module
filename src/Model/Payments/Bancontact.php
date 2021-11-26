@@ -22,6 +22,11 @@ class Bancontact extends UnzerPayment
     protected string $Paymentmethod = 'bancontact';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = false;
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

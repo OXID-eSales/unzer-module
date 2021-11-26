@@ -1,61 +1,62 @@
-<form id="payment-form">
-    <div id="example-invoice-secured"></div>
-    <div id="customer" class="field">
-        <!-- The customer form UI element will be inserted here -->
-    </div>
-    <div class="field" id="error-holder" style="color: #9f3a38"></div>
-    <button class="unzerUI primary button fluid" id="submit-button" type="submit">[{oxmultilang ident="PAY"}]</button>
-</form>
+[{block name="unzer_inv_secured_birthdate"}]
+    [{if $oxcmp_user->oxuser__oxbirthdate->value == "0000-00-00"}]
+        <form id="inv_secured_birthdate" class="js-oxValidate form-horizontal" novalidate="novalidate">
+            <div class="form-group row oxDate">
+                <label class="col-12 col-lg-3 req" for="oxDay">[{oxmultilang ident="BIRTHDATE"}]</label>
+                <div class="col-3 col-lg-3">
+                    <input id="birthdate_day" class="oxDay form-control" type="text" maxlength="2" value=""
+                           placeholder="[{oxmultilang ident="DAY"}]" required autocomplete="bday-day">
+                </div>
+                <div class="col-6 col-lg-3">
+                    <select id="birthdate_month" class="oxMonth form-control" required autocomplete="bday-month">
+                        <option value="" label="-">-</option>
+                        [{section name="month" start=1 loop=13}]
+                            <option value="[{$smarty.section.month.index}]" label="[{$smarty.section.month.index}]">
+                                [{oxmultilang ident="MONTH_NAME_"|cat:$smarty.section.month.index}]
+                            </option>
+                        [{/section}]
+                    </select>
+                </div>
+                <div class="col-3 col-lg-3">
+                    <input id="birthdate_year" class="oxYear form-control" type="text" maxlength="4" value=""
+                           placeholder="[{oxmultilang ident="YEAR"}]" required autocomplete="bday-year">
+                </div>
+                <div class="offset-lg-3 col-lg-9 col-12">
+                    <div class="help-block"></div>
+                </div>
+            </div>
+        </form>
+        [{capture assign="unzerInvSecuredJS"}]
+            $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+                if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+                    event.preventDefault();
+                    $( "#inv_secured_birthdate" ).submit();
+                }
+            });
+
+            $( "#inv_secured_birthdate" ).submit(function( event ) {
+                event.preventDefault();
+                    setTimeout(function(){
+                    if(!$( '.oxDate' ).hasClass("text-danger")){
+
+                        let hiddenInputBirthdate = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'birthdate')
+                        .val($('#birthdate_year').val()+'-'+$('#birthdate_month').val()+'-'+$('#birthdate_day').val());
+                        $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputBirthdate);
 
 
-[{capture assign="unzerInvoiceSecuredJS"}]
-    <script type="text/javascript">
-        [{capture name="javaScript"}]
-        // Create an Unzer instance with your public key
-        let unzerInstance = new unzer([{$unzerPublicKey}]);
+                        $( '#orderConfirmAgbBottom' ).addClass("submitable");
+                        $( "#orderConfirmAgbBottom" ).submit();
 
-        // Create an Invoice Secured instance
-        let InvoiceSecured = unzerInstance.InvoiceSecured();
-
-        // Create a customer instance and render the customer form
-        let Customer = unzerInstance.Customer();
-        Customer.create({
-            containerId: 'customer'
-        });
-
-        // Handle payment form submission.
-        let form = document.getElementById('payment-form');
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            let InvoiceSecuredPromise = InvoiceSecured.createResource();
-            let customerPromise = Customer.createCustomer();
-            Promise.all([InvoiceSecuredPromise, customerPromise])
-                .then(function(values) {
-                    let paymentType = values[0];
-                    let customer = values[1];
-                    let hiddenInputPaymentTypeId = document.createElement('input');
-                    hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
-                    hiddenInputPaymentTypeId.setAttribute('name', 'paymentTypeId');
-                    hiddenInputPaymentTypeId.setAttribute('value', paymentType.id);
-                    form.appendChild(hiddenInputPaymentTypeId);
-
-                    let hiddenInputCustomerId = document.createElement('input');
-                    hiddenInputCustomerId.setAttribute('type', 'hidden');
-                    hiddenInputCustomerId.setAttribute('name', 'customerId');
-                    hiddenInputCustomerId.setAttribute('value', customer.id);
-                    form.appendChild(hiddenInputCustomerId);
-
-                    form.setAttribute('method', 'POST');
-                    form.setAttribute('action', [{$sClUrl}]);
-
-                    // Submitting the form
-                    form.submit();
-                })
-                .catch(function(error) {
-                    $('#error-holder').html(error.customerMessage || error.message || 'Error')
-                })
-        });
+                    }else{
+                        $('html, body').animate({
+                            scrollTop: $("#orderPayment").offset().top - 150
+                        }, 350);
+                    }
+                }, 100);
+            });
         [{/capture}]
-    </script>
-    [{/capture}]
-[{oxscript add=$unzerInvoiceSecuredJS}]
+        [{oxscript add=$unzerInvSecuredJS}]
+    [{/if}]
+[{/block}]

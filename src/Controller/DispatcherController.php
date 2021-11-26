@@ -15,10 +15,9 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
-use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
-class DispatcherController extends FrontendController implements ClassMappingInterface
+class DispatcherController extends FrontendController
 {
     /**
      * @param string $paymentid
@@ -26,10 +25,7 @@ class DispatcherController extends FrontendController implements ClassMappingInt
      */
     public function executePayment(string $paymentid): bool
     {
-        /**
-         * @var UnzerPayment $oUnzerPayment
-         */
-        $oUnzerPayment = oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
+        $oUnzerPayment = UnzerHelper::getUnzerObjectbyPaymentId($paymentid);
         $oUnzerPayment->execute();
         return $oUnzerPayment->checkpaymentstatus();
     }

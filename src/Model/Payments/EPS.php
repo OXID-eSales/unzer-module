@@ -22,6 +22,11 @@ class EPS extends UnzerPayment
     protected string $Paymentmethod = 'eps';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = false;
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

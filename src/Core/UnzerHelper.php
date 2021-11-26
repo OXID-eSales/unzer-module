@@ -23,6 +23,7 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
@@ -31,17 +32,19 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
+use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Model\UnzerLogger;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
 
-class UnzerHelper
+class UnzerHelper implements ClassMappingInterface
 {
     /**
      * @return array
@@ -345,5 +348,43 @@ class UnzerHelper
         $metadata->addMetadata('paymentprocedure', $UnzerPayment->getPaymentProcedure());
 
         return $metadata;
+    }
+
+    /**
+     * @return UnzerLogger
+     */
+    public static function getUnzerLogger(): UnzerLogger
+    {
+        return oxNew(UnzerLogger::class);
+    }
+
+    /**
+     * @param Basket $oBasket
+     * @param string $orderId
+     * @return \UnzerSDK\Resources\Basket
+     */
+    public static function getUnzerBasket(Basket $oBasket, string $orderId): \UnzerSDK\Resources\Basket
+    {
+        $aUnzerBasketItem = [];
+        $aBasketItems = $oBasket->getContents();
+        foreach ($aBasketItems as $oBasketItem) {
+            /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
+            $basketItem = (new BasketItem($oBasketItem->getTitle(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getBruttoPrice(), (int)$oBasketItem->getAmount()))
+                ->setAmountGross($oBasketItem->getPrice()->getPrice())
+                ->setAmountVat($oBasketItem->getPrice()->getVatValue());
+
+            $aUnzerBasketItem[] = $basketItem;
+        }
+
+        return new \UnzerSDK\Resources\Basket($orderId, $oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $aUnzerBasketItem);
+    }
+
+    /**
+     * @param $paymentid
+     * @return UnzerPayment
+     */
+    public static function getUnzerObjectbyPaymentId($paymentid): UnzerPayment
+    {
+        return oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
     }
 }
