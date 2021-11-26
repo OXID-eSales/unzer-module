@@ -137,10 +137,9 @@ $aModule = [
         ],
         [
             'group' => 'environment',
-            'name' => 'UnzerLogLevel',
-            'type' => 'select',
+            'name' => 'UnzerDebug',
+            'type' => 'bool',
             'value' => '0',
-            'constraints' => '0|1|2'
         ],
     ],
     'events' => [

@@ -36,6 +36,7 @@ use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Model\UnzerLogger;
+use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
@@ -174,6 +175,14 @@ class UnzerHelper implements ClassMappingInterface
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public static function isDebugModeOn(): bool
+    {
+        return self::getConfigBool("UnzerDebug");
+    }
+
     public static function getConfigParam($sVarName, $defaultValue = null)
     {
         $oConfig = Registry::getConfig();
@@ -206,7 +215,12 @@ class UnzerHelper implements ClassMappingInterface
      */
     public static function getUnzer(): ?Unzer
     {
-        return oxNew(Unzer::class, self::getShopPrivateKey());
+        $unzer = oxNew(Unzer::class, self::getShopPrivateKey());
+
+        if (self::isDebugModeOn()) {
+            $unzer->setDebugMode(true)->setDebugHandler(oxNew(UnzerLogger::class));
+        }
+        return $unzer;
     }
 
     /**
