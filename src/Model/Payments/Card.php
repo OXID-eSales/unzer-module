@@ -62,7 +62,6 @@ class Card extends UnzerPayment
             Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
             Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
         } catch (UnzerApiException $e) {
-            UnzerHelper::getUnzerLogger()->error($e->getMessage(), ["code" => $e->getCode(), "cl" => __CLASS__, "fnc" => __METHOD__]);
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
         }
     }
