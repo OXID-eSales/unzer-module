@@ -19,6 +19,7 @@ use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 use UnzerSDK\Traits\CanDirectCharge;
+use \Exception;
 
 class Sepa extends UnzerPayment
 {
