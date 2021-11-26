@@ -72,5 +72,4 @@ class UnzerLogger implements DebugHandlerInterface
     {
         return $this->getUnzerLogFolder() . $this->getUnzerLogFile();
     }
-
 }
