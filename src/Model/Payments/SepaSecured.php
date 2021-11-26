@@ -60,15 +60,6 @@ class SepaSecured extends UnzerPayment
         return false;
     }
 
-    private function getPaymentParams()
-    {
-        if ($this->aPaymentParams == null) {
-            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-            $this->aPaymentParams = json_decode($jsonobj, true);
-        }
-        return $this->aPaymentParams;
-    }
-
     public function execute()
     {
         try {

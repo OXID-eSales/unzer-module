@@ -55,15 +55,6 @@ class Sepa extends UnzerPayment
         $this->sIban = $sIban;
     }
 
-    private function getPaymentParams()
-    {
-        if ($this->aPaymentParams == null) {
-            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-            $this->aPaymentParams = json_decode($jsonobj, true);
-        }
-        return $this->aPaymentParams;
-    }
-
     /**
      * @return bool
      */
