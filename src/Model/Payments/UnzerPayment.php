@@ -125,8 +125,8 @@ abstract class UnzerPayment
          */
         foreach ($basketContents as $sBasketItemKey => $oBasketItem) {
             $basketItem = new BasketItem($oBasketItem->getTitle(), $oBasketItem->getPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getAmount());
-       
-            $oBasketItem->setBasketItemKey($oBasketItem->getId());
+
+            $oBasketItem->setBasketItemKey($oBasketItem->getArticle()->getId());
 //            $basketItem->setImageUrl($oBasketItem->getIconUrl());
             $aBasketItems [] = $basketItem;
         }
