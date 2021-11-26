@@ -30,7 +30,7 @@ class Card extends UnzerPayment
     /**
      * @var array|bool
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool
