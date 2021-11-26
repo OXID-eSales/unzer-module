@@ -21,10 +21,8 @@ $aLang = [
     'SHOP_MODULE_UnzerSystemMode_0' => 'Sandbox',
     'SHOP_MODULE_UnzerSystemMode_1' => 'Livebetrieb',
     'HELP_SHOP_MODULE_UnzerSystemMode' => 'Wechseln Sie hier zwischen Sandbox (Testmodus) und Livebetrieb',
-    'SHOP_MODULE_UnzerDebug' => 'Debugmoduks aktivieren',
-    'HELP_SHOP_MODULE_UnzerDebug' => 'Im aktiven Debugmodus werden Log-Files in das Verzeichnis /log/unzer geschrieben.',
+    'SHOP_MODULE_UnzerDebug' => 'Debug-Modus aktivieren',
+    'HELP_SHOP_MODULE_UnzerDebug' => 'Im aktiven Debug-Modus werden Log-Files in das Verzeichnis /log/unzer geschrieben.',
     'HELP_SHOP_MODULE_UnzerLogLevel' => 'Das Log Level bestimmt, welche Ereignisse in der Logdatei protokolliert werden. Mögliche Werte
      sind Debug (alles), Warning (Warnungen und Fehler), oder Error (nur Fehler).',
-
-
 ];

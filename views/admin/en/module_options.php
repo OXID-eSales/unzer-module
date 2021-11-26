@@ -25,5 +25,4 @@ $aLang = [
     'SHOP_MODULE_UnzerDebug' => 'Enable debug mode',
     'HELP_SHOP_MODULE_UnzerDebug' => 'In active debug mode, log files are written to the /log/unzer directory.',
     'HELP_SHOP_MODULE_UnzerLogLevel' => 'The log level determines which events are logged in the log file. Possible values are Debug (all), Warning (warnings and errors), or Error (only errors).',
-
 ];
