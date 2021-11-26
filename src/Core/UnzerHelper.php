@@ -32,6 +32,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
+use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Model\UnzerLogger;
@@ -42,7 +43,7 @@ use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
 
-class UnzerHelper
+class UnzerHelper implements ClassMappingInterface
 {
     /**
      * @return array
@@ -354,7 +355,7 @@ class UnzerHelper
         $aBasketItems = $oBasket->getContents();
         foreach ($aBasketItems as $oBasketItem) {
             /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
-            $basketItem = (new BasketItem($oBasketItem->getTitle(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getBruttoPrice(), (int) $oBasketItem->getAmount()))
+            $basketItem = (new BasketItem($oBasketItem->getTitle(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getBruttoPrice(), (int)$oBasketItem->getAmount()))
                 ->setAmountGross($oBasketItem->getPrice()->getPrice())
                 ->setAmountVat($oBasketItem->getPrice()->getVatValue());
 
@@ -362,5 +363,14 @@ class UnzerHelper
         }
 
         return new \UnzerSDK\Resources\Basket($orderId, $oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $aUnzerBasketItem);
+    }
+
+    /**
+     * @param $paymentid
+     * @return UnzerPayment
+     */
+    public static function getUnzerObjectbyPaymentId($paymentid): UnzerPayment
+    {
+        return oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
     }
 }

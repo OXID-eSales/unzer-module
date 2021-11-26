@@ -22,6 +22,11 @@ class Przelewy24 extends UnzerPayment
     protected string $Paymentmethod = 'przelewy24';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = false;
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

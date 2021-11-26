@@ -22,6 +22,11 @@ class Card extends UnzerPayment
     protected string $Paymentmethod = 'card';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = false;
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

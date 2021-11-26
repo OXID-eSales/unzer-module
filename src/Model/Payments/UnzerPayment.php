@@ -69,6 +69,26 @@ abstract class UnzerPayment
     }
 
     /**
+     * @return mixed
+     */
+    public function getPaymentCurrencies()
+    {
+        return $this->aCurrencies;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPaymentTypeAllowed(): bool
+    {
+        if ($this->getPaymentCurrencies() && in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function getPaymentProcedure(): string

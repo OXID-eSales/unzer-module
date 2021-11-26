@@ -22,6 +22,11 @@ class SepaSecured extends UnzerPayment
     protected string $Paymentmethod = 'sepa-direct-debit-secured';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = ['EUR'];
+
+    /**
      * @var string
      */
     protected string $sIban;
