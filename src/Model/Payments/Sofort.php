@@ -22,6 +22,11 @@ class Sofort extends UnzerPayment
     protected string $Paymentmethod = 'sofort';
 
     /**
+     * @var array|bool
+     */
+    protected $aCurrencies = ['EUR'];
+
+    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool
