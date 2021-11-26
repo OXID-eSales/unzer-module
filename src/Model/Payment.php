@@ -29,7 +29,7 @@ class Payment extends Payment_parent
      */
     public function isUnzerPaymentTypeAllowed(): bool
     {
-        if (UnzerHelper::getUnzerObjectbyPaymentId($this->oxpayments__oxid->value)->isPaymentTypeAllowed()) {
+        if ($this->isUnzerPayment() && UnzerHelper::getUnzerObjectbyPaymentId($this->oxpayments__oxid->value)->isPaymentTypeAllowed()) {
             return true;
         }
         return false;

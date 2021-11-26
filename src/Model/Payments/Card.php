@@ -14,6 +14,12 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
+use UnzerSDK\Traits\CanDirectCharge;
+
 class Card extends UnzerPayment
 {
     /**
@@ -24,7 +30,7 @@ class Card extends UnzerPayment
     /**
      * @var array|bool
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool
@@ -36,6 +42,27 @@ class Card extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        try {
+            $oUnzer = UnzerHelper::getUnzer();
+            $sId = $this->getUzrId();
+            /* @var \UnzerSDK\Resources\PaymentTypes\Card $uzrCard */
+            $uzrCard = $oUnzer->fetchPaymentType($sId);
+            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
+            $oUser = UnzerHelper::getUser();
+            $oBasket = UnzerHelper::getBasket();
+
+            $customer = $this->getCustomerData($oUser);
+
+            if ($this->isDirectCharge()) {
+                $transaction = $uzrCard->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
+            } else {
+                $transaction = $uzrCard->authorize($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
+            }
+            // You'll need to remember the shortId to show it on the success or failure page
+            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
+            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
+        } catch (UnzerApiException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        }
     }
 }

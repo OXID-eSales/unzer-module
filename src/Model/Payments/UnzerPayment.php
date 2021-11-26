@@ -82,7 +82,13 @@ abstract class UnzerPayment
      */
     public function isPaymentTypeAllowed(): bool
     {
-        if ($this->getPaymentCurrencies() && in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())) {
+        if (
+            is_array($this->getPaymentCurrencies()) &&
+            (
+                !count($this->getPaymentCurrencies()) ||
+                isset($this->getPaymentCurrencies()[Registry::getConfig()->getActShopCurrencyObject()->name])
+            )
+        ) {
             return true;
         }
 
@@ -95,6 +101,14 @@ abstract class UnzerPayment
     public function getPaymentProcedure(): string
     {
         return $this->oPayment->oxpayments__oxpaymentprocedure->value;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDirectCharge()
+    {
+        return (strpos($this->oPayment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
     }
 
     /**
@@ -262,7 +276,7 @@ abstract class UnzerPayment
             } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $payment->getPaymentType();
-                if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType()) {
+                if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
                     return true;
                 }
                 // TODO Logging
