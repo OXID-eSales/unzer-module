@@ -115,7 +115,6 @@ abstract class UnzerPayment
         if (array_key_exists('id', $this->getPaymentParams())) {
             return $this->getPaymentParams()['id'];
         } else {
-            UnzerHelper::getUnzerLogger()->error(UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Paymentid from tpl not set'), ["cl" => __CLASS__, "fnc" => __METHOD__]);
             UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
         }
     }
