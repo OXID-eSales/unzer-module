@@ -2,17 +2,17 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Utility;
 
-use Monolog\Logger;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use PHPUnit\Framework\TestCase;
+use UnzerSDK\Interfaces\DebugHandlerInterface;
 
-class LoggerTest extends TestCase
+class DebugHandlerTest extends TestCase
 {
     public function testLoggerAvailable(): void
     {
         $container = ContainerFactory::getInstance()->getContainer();
-        $logger = $container->get('OxidSolutionCatalysts\Unzer\Logger');
+        $logger = $container->get('OxidSolutionCatalysts\Unzer\Utility\DebugHandler');
 
-        $this->assertInstanceOf(Logger::class, $logger);
+        $this->assertInstanceOf(DebugHandlerInterface::class, $logger);
     }
 }

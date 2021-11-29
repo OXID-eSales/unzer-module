@@ -19,7 +19,7 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\MonologLoggerFactory
     public: true
     arguments:
-      'OxidEsales\EshopCommunity\Internal\Framework\Logger\Configuration\MonologConfigurationInterface': '@OxidSolutionCatalysts\Unzer\Logger\Configuration'
+      $configuration: '@OxidSolutionCatalysts\Unzer\Logger\Configuration'
 
   OxidSolutionCatalysts\Unzer\Logger\Configuration:
     class: OxidEsales\EshopCommunity\Internal\Framework\Logger\Configuration\MonologConfiguration
@@ -32,3 +32,9 @@ services:
   OxidSolutionCatalysts\Unzer\Utility\Context:
     class: OxidSolutionCatalysts\Unzer\Utility\Context
     public: true
+
+  OxidSolutionCatalysts\Unzer\Utility\DebugHandler:
+    class: OxidSolutionCatalysts\Unzer\Utility\DebugHandler
+    public: true
+    arguments:
+      $moduleLogger: '@OxidSolutionCatalysts\Unzer\Logger'
