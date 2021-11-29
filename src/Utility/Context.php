@@ -18,11 +18,11 @@ class Context extends BasicContext
 
     public function getUnzerLogFilePath(): string
     {
-        return Path::join(
+        return Path::join([
             $this->shopConfig->getLogsDir(),
             'unzer',
             $this->getUnzerLogFileName()
-        );
+        ]);
     }
 
     private function getUnzerLogFileName(): string
