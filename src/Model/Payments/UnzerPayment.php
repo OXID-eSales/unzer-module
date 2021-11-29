@@ -86,7 +86,7 @@ abstract class UnzerPayment
             is_array($this->getPaymentCurrencies()) &&
             (
                 !count($this->getPaymentCurrencies()) ||
-                isset($this->getPaymentCurrencies()[Registry::getConfig()->getActShopCurrencyObject()->name])
+                in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())
             )
         ) {
             return true;
