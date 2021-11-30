@@ -120,7 +120,7 @@ class UnzerHelper implements ClassMappingInterface
      */
     public static function getModuleId(): string
     {
-        return 'osc-unzer';
+        return \OxidSolutionCatalysts\Unzer\Module::MODULE_ID;
     }
 
     public static function addErrorToDisplay($errorMsg)
