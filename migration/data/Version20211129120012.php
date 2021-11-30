@@ -49,7 +49,6 @@ final class Version20211129120012 extends AbstractMigration
     protected function createPayments(): void
     {
         foreach (Events::getUnzerPayments() as $paymentId => $paymentDefinitions) {
-
             if ($paymentDefinitions['insert'] === 0) {
                 continue;
             }
@@ -58,7 +57,6 @@ final class Version20211129120012 extends AbstractMigration
             $sqlValues = [$paymentId, 1, 0, 10000, 'abs'];
             foreach ($this->getLanguageIds() as $langId => $langAbbr) {
                 if (isset($paymentDefinitions[$langAbbr . '_desc'])) {
-
                     $langRows .= ($langId == 0) ? ', `OXDESC`, `OXLONGDESC`' :
                         sprintf(', `OXDESC_%s`, `OXLONGDESC_%s`', $langId, $langId);
                     $sqlPlaceHolder .= ', ?, ?';

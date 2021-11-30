@@ -393,7 +393,8 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
         }
     }
 
-    public static function getUnzerPayments() {
+    public static function getUnzerPayments()
+    {
         return self::$_aPayments;
     }
 
