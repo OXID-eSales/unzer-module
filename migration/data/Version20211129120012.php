@@ -19,6 +19,7 @@ final class Version20211129120012 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->createPayments();
+        $this->createStaticContent();
     }
 
     public function down(Schema $schema): void
@@ -66,6 +67,31 @@ final class Version20211129120012 extends AbstractMigration
 
             $this->addSql(
                 "INSERT IGNORE INTO `oxpayments` (`OXID`, `OXACTIVE`, `OXFROMAMOUNT`, `OXTOAMOUNT`, `OXADDSUMTYPE`
+                " . $langRows . ")
+                VALUES (" . $sqlPlaceHolder . ")",
+                $sqlValues
+            );
+        }
+    }
+
+    protected function createStaticContent()
+    {
+        foreach (Events::getStaticVCMS() as $oContent) {
+            $langRows = '';
+            $sqlPlaceHolder = '?, ?, ?';
+            $sqlValues = [md5($oContent['OXLOADID'] . '1'), $oContent['OXLOADID'], 1];
+            foreach ($this->getLanguageIds() as $langId => $langAbbr) {
+                if (isset($oContent['oxcontent_'.$langAbbr])) {
+                    $langRows .= ($langId == 0) ? ', `OXTITLE`, `OXCONTENT`, `OXACTIVE`' :
+                        sprintf(', `OXTITLE_%s`, `OXCONTENT_%s`, `OXACTIVE_%s`', $langId, $langId, $langId);
+                    $sqlPlaceHolder .= ', ?, ?, ?';
+                    $sqlValues[] = $oContent['oxtitle_'.$langAbbr];
+                    $sqlValues[] = $oContent['oxcontent_'.$langAbbr];
+                    $sqlValues[] = '1';
+                }
+            }
+
+            $this->addSql("INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
                 " . $langRows . ")
                 VALUES (" . $sqlPlaceHolder . ")",
                 $sqlValues
