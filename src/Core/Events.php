@@ -485,6 +485,5 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
                 }
             }
         }
-
     }
 }
