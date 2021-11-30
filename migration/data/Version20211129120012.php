@@ -16,8 +16,6 @@ use OxidSolutionCatalysts\Unzer\Core\Events;
  */
 final class Version20211129120012 extends AbstractMigration
 {
-
-
     public function up(Schema $schema): void
     {
         $this->createPayments();
