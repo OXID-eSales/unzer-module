@@ -10,7 +10,6 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
-use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
@@ -170,6 +169,7 @@ abstract class UnzerPayment
 
         return $basket;
     }
+
     /**
      * @param User $oUser
      * @param Order|null $oOrder
@@ -264,7 +264,6 @@ abstract class UnzerPayment
         try {
             // Create an Unzer object using your private key and register a debug handler if you want to.
             $unzer = UnzerHelper::getUnzer();
-            $unzer->setDebugMode(true)->setDebugHandler(new ExampleDebugHandler());
 
             // Redirect to success if the payment has been successfully completed.
             $payment = $unzer->fetchPayment($paymentId);
@@ -276,7 +275,7 @@ abstract class UnzerPayment
             } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $payment->getPaymentType();
-                if ($paymentType instanceof PrePayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
+                if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
                     return true;
                 }
                 // TODO Logging
