@@ -38,3 +38,7 @@ services:
     public: true
     arguments:
       $moduleLogger: '@OxidSolutionCatalysts\Unzer\Logger'
+
+  OxidSolutionCatalysts\Unzer\Service\:
+    resource: 'src/Service/*'
+    public: true
