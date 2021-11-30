@@ -8,6 +8,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use RuntimeException;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\examples\ExampleDebugHandler;
@@ -27,17 +28,17 @@ abstract class UnzerPayment
     /**
      * @var Payment
      */
-    protected Payment $oPayment;
+    protected $oPayment;
 
     /**
      * @var string
      */
-    protected string $Paymentmethod;
+    protected $Paymentmethod;
 
     /**
      * @var null|array
      */
-    protected ?array $aPaymentParams = null;
+    protected $aPaymentParams = null;
 
     /**
      * @var array|bool
@@ -70,7 +71,7 @@ abstract class UnzerPayment
     }
 
     /**
-     * @return mixed
+     * @return array|bool
      */
     public function getPaymentCurrencies()
     {
@@ -119,7 +120,7 @@ abstract class UnzerPayment
     /**
      * @var AbstractTransactionType|null
      */
-    protected ?AbstractTransactionType $_transaction;
+    protected $_transaction;
 
     /**
      * @return   string|void
@@ -143,10 +144,11 @@ abstract class UnzerPayment
     }
 
     /**
-     * @param \OxidEsales\EshopCommunity\Application\Model\Basket|null $oBasket
+     * @param \OxidEsales\Eshop\Application\Model\Basket|null $oBasket
+     * @param $orderId
      * @return Basket
      */
-    public function getUnzerBasket($oBasket, $orderId)
+    public function getUnzerBasket(?\OxidEsales\Eshop\Application\Model\Basket $oBasket, $orderId): Basket
     {
         $basket = new Basket($orderId, $oBasket->getNettoSum(), $oBasket->getBasketCurrency()->name);
 
@@ -286,7 +288,7 @@ abstract class UnzerPayment
             }
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
         return false;

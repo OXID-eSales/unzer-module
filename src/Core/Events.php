@@ -22,6 +22,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use Exception;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidEsales\Eshop\Application\Model\Payment;
@@ -39,7 +43,10 @@ use Psr\Container\ContainerInterface;
  */
 class Events
 {
-    private static array $_aPayments = [
+    /**
+     * @var array[]
+     */
+    private static $_aPayments = [
         //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
         //Alipay is China’s leading third-party mobile and online payment solution.
@@ -272,6 +279,7 @@ class Events
      * Add Unzer payment methods set EN and DE (long) descriptions
      *
      * @return void
+     * @throws Exception
      */
     public static function addUnzerPaymentMethods()
     {
@@ -327,6 +335,7 @@ class Events
      * Disables Unzer payment methods
      *
      * @return void
+     * @throws Exception
      */
     public static function disableUnzerPaymentMethods()
     {
@@ -379,6 +388,7 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      * Execute action on activate event
      *
      * @return void
+     * @throws Exception
      */
     public static function onActivate()
     {
@@ -404,13 +414,15 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      * Execute action on deactivate event
      *
      * @return void
+     * @throws Exception
      */
     public static function onDeactivate()
     {
-//         If Unzer is activated on other sub shops do not remove payment methods
+        // If Unzer is activated on other sub shops do not remove payment methods
         if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
             return;
         }
+
         self::disableUnzerPaymentMethods();
         self::disableUnzerRDFA();
     }
@@ -430,12 +442,13 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      * Disable Unzer RDF
      *
      * @return void
+     * @throws DatabaseConnectionException|DatabaseErrorException
      */
     public static function disableUnzerRDFA()
     {
         foreach (UnzerHelper::getRDFinserts() as $oxid => $aRDF) {
             $query = "DELETE FROM `oxobject2payment` WHERE `OXID` = ?";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid]);
+            DatabaseProvider::getDb()->execute($query, [$oxid]);
         }
     }
 
@@ -455,9 +468,9 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      *
      * Clears the tmp folder
      *
-     * @return true
+     * @return void
      */
-    private static function clearTmp()
+    private static function clearTmp(): void
     {
         $oConf = Registry::getConfig();
         $sTmpDir = realpath($oConf->getConfigParam('sCompileDir'));
@@ -473,6 +486,5 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
             }
         }
 
-        return true;
     }
 }

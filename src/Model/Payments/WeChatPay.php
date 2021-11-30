@@ -19,7 +19,7 @@ class WeChatPay extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'wechatpay';
+    protected $Paymentmethod = 'wechatpay';
 
     /**
      * @var array|bool

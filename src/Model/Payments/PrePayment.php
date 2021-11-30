@@ -19,7 +19,7 @@ class PrePayment extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'prepayment';
+    protected $Paymentmethod = 'prepayment';
 
     /**
      * @var array|bool

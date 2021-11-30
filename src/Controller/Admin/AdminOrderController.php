@@ -2,13 +2,16 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 
 /**
  * Order class wrapper for Unzer module
  */
-class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AdminOrderController extends AdminDetailsController
 {
     /**
      * Active order object
@@ -21,8 +24,9 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
      * name of template file "oscunzer_order.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
-    public function render()
+    public function render(): string
     {
         parent::render();
 
@@ -42,7 +46,7 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @return bool
      */
-    public function isUnzerOrder()
+    public function isUnzerOrder(): bool
     {
         $isUnzer = false;
 
@@ -55,32 +59,15 @@ class AdminOrderController extends \OxidEsales\Eshop\Application\Controller\Admi
     }
 
     /**
-     * Returns active/editable object id
-     *
-     * @return string
-     */
-    public function getEditObjectId()
-    {
-        if (
-            null === ($sId = $this->_sEditObjectId) &&
-            null === ($sId = Registry::getConfig()->getRequestParameter("oxid"))
-        ) {
-            $sId = Registry::getSession()->getVariable("saved_oxid");
-        }
-
-        return $sId;
-    }
-
-    /**
      * Returns editable order object
      *
      * @return object
      */
-    public function getEditObject()
+    public function getEditObject(): ?object
     {
         $soxId = $this->getEditObjectId();
         if ($this->editObject === null && isset($soxId) && $soxId != '-1') {
-            $this->editObject = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+            $this->editObject = oxNew(Order::class);
             $this->editObject->load($soxId);
         }
 

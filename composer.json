@@ -11,9 +11,8 @@
         }
     },
     "require": {
-        "php": "^7.1",
         "unzerdev/php-sdk": "v1.1",
-        "oxid-esales/oxideshop-ce": "^v6.6.0"
+        "oxid-esales/oxideshop-ce": "^v6.8.0"
     },
     "require-dev": {
 

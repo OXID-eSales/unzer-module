@@ -28,9 +28,7 @@ use OxidEsales\Eshop\Core\Registry;
 class Config extends Config_parent
 {
     /**
-     * Sets the actual currency and deletes the paymentid sessions var if the selected currency is not supported by the selected unter payment method
-     *
-     * @param int $cur 0 = EUR, 1 = GBP, 2 = CHF
+     * @inerhitDoc
      */
     public function setActShopCurrency($cur)
     {

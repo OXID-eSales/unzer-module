@@ -19,7 +19,7 @@ class CardRecurring extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'card-recurring';
+    protected $Paymentmethod = 'card-recurring';
 
     /**
      * @var array|bool
