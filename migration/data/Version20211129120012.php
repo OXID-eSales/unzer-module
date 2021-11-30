@@ -23,6 +23,7 @@ final class Version20211129120012 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
+        // this down() migration is auto-generated, please modify it to your needs
     }
 
     protected $aIsoCountries;
@@ -54,20 +55,14 @@ final class Version20211129120012 extends AbstractMigration
             $sqlPlaceHolder = '?, ?, ?, ?, ?';
             $sqlValues = [$paymentId, 1, 0, 10000, 'abs'];
             foreach ($this->getLanguageIds() as $langId => $langAbbr) {
-                if (isset($paymentDefinitions[$langAbbr . '_desc'])) {
-                    $langRows .= ($langId == 0) ? ', `OXDESC`, `OXLONGDESC`' :
-                        sprintf(', `OXDESC_%s`, `OXLONGDESC_%s`', $langId, $langId);
-                    $sqlPlaceHolder .= ', ?, ?';
-                    $sqlValues[] = $paymentDefinitions[$langAbbr . '_desc'];
-                    $sqlValues[] = $paymentDefinitions[$langAbbr . '_longdesc'];
-                }
+                $langRows .= ($langId == 0) ? ', `OXDESC`, `OXLONGDESC`' :
+                    sprintf(', `OXDESC_%s`, `OXLONGDESC_%s`', $langId, $langId);
+                $sqlPlaceHolder .= ', ?, ?';
+                $sqlValues[] = $paymentDefinitions[$langAbbr . '_desc'];
+                $sqlValues[] = $paymentDefinitions[$langAbbr . '_longdesc'];
             }
-            foreach ($paymentDefinitions['countries'] as $country) {
-                if (array_key_exists($country, $this->getIsoCountries())) {
-                    $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
-                            VALUES(?, ?, ?, ?)", [md5($paymentId . $this->getIsoCountries()[$country] . ".oxcountry"), $paymentId, $this->getIsoCountries()[$country], 'oxcountry']);
-                }
-            }
+
+            $this->setCountriesToPayment($paymentDefinitions, $paymentId);
 
             $this->addSql(
                 "INSERT IGNORE INTO `oxpayments` (`OXID`, `OXACTIVE`, `OXFROMAMOUNT`, `OXTOAMOUNT`, `OXADDSUMTYPE`
@@ -75,6 +70,16 @@ final class Version20211129120012 extends AbstractMigration
                 VALUES (" . $sqlPlaceHolder . ")",
                 $sqlValues
             );
+        }
+    }
+
+    protected function setCountriesToPayment($paymentDefinitions, $paymentId)
+    {
+        foreach ($paymentDefinitions['countries'] as $country) {
+            if (array_key_exists($country, $this->getIsoCountries())) {
+                $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                            VALUES(?, ?, ?, ?)", [md5($paymentId . $this->getIsoCountries()[$country] . ".oxcountry"), $paymentId, $this->getIsoCountries()[$country], 'oxcountry']);
+            }
         }
     }
 
