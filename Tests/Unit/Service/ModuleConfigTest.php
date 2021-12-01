@@ -11,47 +11,56 @@ use PHPUnit\Framework\TestCase;
 class ModuleConfigTest extends TestCase
 {
     /**
-     * @dataProvider debugModeDataProvider
+     * @dataProvider getSettingsDataProvider
      */
-    public function testDebugMode($configValue, $expected): void
+    public function testSettings($values, $settingMethod, $settingValue): void
     {
-        $msbMock = $this->createPartialMock(ModuleSettingBridge::class, ['get']);
-        $msbMock->method('get')->with('UnzerDebug', Module::MODULE_ID)->willReturn($configValue);
-        $sut = $this->getSut($msbMock);
-
-        $this->assertSame($expected, $sut->isDebugMode());
+        $sut = new ModuleConfig($this->getBridgeStub($values));
+        $this->assertSame($settingValue, $sut->$settingMethod());
     }
 
-    public function debugModeDataProvider(): array
+    public function getSettingsDataProvider(): array
     {
         return [
-            [false, false],
-            [true, true],
+            [
+                'values' => [
+                    ['UnzerDebug', Module::MODULE_ID, true],
+                ],
+                'settingMethod' => 'isDebugMode',
+                'settingValue' => true
+            ],
+            [
+                'values' => [
+                    ['UnzerDebug', Module::MODULE_ID, false],
+                ],
+                'settingMethod' => 'isDebugMode',
+                'settingValue' => false
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 1],
+                ],
+                'settingMethod' => 'getSystemMode',
+                'settingValue' => ModuleConfig::SYSTEM_MODE_PRODUCTION
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 0],
+                ],
+                'settingMethod' => 'getSystemMode',
+                'settingValue' => ModuleConfig::SYSTEM_MODE_SANDBOX
+            ],
         ];
     }
 
-    /**
-     * @dataProvider getSystemModeDataProvider
-     */
-    public function testGetSystemMode($configValue, $expected): void
+    protected function getBridgeStub($valueMap): ModuleSettingBridgeInterface
     {
-        $msbMock = $this->createPartialMock(ModuleSettingBridge::class, ['get']);
-        $msbMock->method('get')->with('UnzerSystemMode', Module::MODULE_ID)->willReturn($configValue);
-        $sut = $this->getSut($msbMock);
+        $bridgeStub = $this->createPartialMock(
+            ModuleSettingBridgeInterface::class,
+            ['save', 'get']
+        );
+        $bridgeStub->method('get')->willReturnMap($valueMap);
 
-        $this->assertSame($expected, $sut->getSystemMode());
-    }
-
-    public function getSystemModeDataProvider(): array
-    {
-        return [
-            [1, ModuleConfig::SYSTEM_MODE_PRODUCTION],
-            [0, ModuleConfig::SYSTEM_MODE_SANDBOX],
-        ];
-    }
-
-    private function getSut(ModuleSettingBridgeInterface $moduleSettingBridge): ModuleConfig
-    {
-        return new ModuleConfig($moduleSettingBridge);
+        return $bridgeStub;
     }
 }
