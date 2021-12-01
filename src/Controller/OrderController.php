@@ -27,11 +27,6 @@ class OrderController extends OrderController_parent
      */
     protected $blSepaMandateConfirmError = null;
 
-    public function getUnzerPubKey()
-    {
-        return UnzerHelper::getShopPublicKey();
-    }
-
     /**
      * Checks for order rules confirmation ("ord_agb", "ord_custinfo", "sepaConfirmation" form values)(if no
      * rules agreed - returns to order view), loads basket contents (plus applied

@@ -36,6 +36,7 @@ use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
@@ -165,49 +166,6 @@ class UnzerHelper implements ClassMappingInterface
         return $oSession->processUrl($dstUrl);
     }
 
-    public static function getConfigBool($sVarName, $bDefaultValue = false): bool
-    {
-        $rv = self::getConfigParam($sVarName, $bDefaultValue);
-        if ($rv) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isDebugModeOn(): bool
-    {
-        return self::getConfigBool("UnzerDebug");
-    }
-
-    public static function getConfigParam($sVarName, $defaultValue = null)
-    {
-        $oConfig = Registry::getConfig();
-        $rv = $oConfig->getShopConfVar($sVarName, null, 'module:' . self::getModuleId());
-        if ($rv !== null) {
-            return $rv;
-        }
-        return $defaultValue;
-    }
-
-    public static function getShopPublicKey()
-    {
-        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerPublicKey');
-    }
-
-    public static function getShopPrivateKey()
-    {
-        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerPrivateKey');
-    }
-
-    public static function getAPIKey()
-    {
-        return self::getConfigParam(self::getUnzerSystemMode() . '-UnzerApiKey');
-    }
-
     /**
      * Create object UnzerSDK\Unzer with priv-Key
      *
@@ -215,28 +173,18 @@ class UnzerHelper implements ClassMappingInterface
      */
     public static function getUnzer(): ?Unzer
     {
-        $unzer = oxNew(Unzer::class, self::getShopPrivateKey());
+        $di = ContainerFactory::getInstance()->getContainer();
 
-        if (self::isDebugModeOn()) {
-            $container = ContainerFactory::getInstance()->getContainer();
-            $debugHandler = $container->get('OxidSolutionCatalysts\Unzer\Utility\DebugHandler');
+        /** @var ModuleSettings $moduleSettings */
+        $moduleSettings = $di->get(ModuleSettings::class);
 
+        $unzer = oxNew(Unzer::class, $moduleSettings->getShopPrivateKey());
+
+        if ($moduleSettings->isDebugMode()) {
+            $debugHandler = $di->get('OxidSolutionCatalysts\Unzer\Utility\DebugHandler');
             $unzer->setDebugMode(true)->setDebugHandler($debugHandler);
         }
         return $unzer;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getUnzerSystemMode(): string
-    {
-        $SystemMode = self::getConfigParam('UnzerSystemMode');
-        if ($SystemMode) {
-            return "production";
-        } else {
-            return "sandbox";
-        }
     }
 
     /**
