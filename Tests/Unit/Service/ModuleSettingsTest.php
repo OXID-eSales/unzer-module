@@ -4,17 +4,17 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;
-use OxidSolutionCatalysts\Unzer\Service\ModuleConfig;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use PHPUnit\Framework\TestCase;
 
-class ModuleConfigTest extends TestCase
+class ModuleSettingsTest extends TestCase
 {
     /**
      * @dataProvider getSettingsDataProvider
      */
     public function testSettings($values, $settingMethod, $settingValue): void
     {
-        $sut = new ModuleConfig($this->getBridgeStub($values));
+        $sut = new ModuleSettings($this->getBridgeStub($values));
         $this->assertSame($settingValue, $sut->$settingMethod());
     }
 
@@ -40,14 +40,14 @@ class ModuleConfigTest extends TestCase
                     ['UnzerSystemMode', Module::MODULE_ID, 1],
                 ],
                 'settingMethod' => 'getSystemMode',
-                'settingValue' => ModuleConfig::SYSTEM_MODE_PRODUCTION
+                'settingValue' => ModuleSettings::SYSTEM_MODE_PRODUCTION
             ],
             [
                 'values' => [
                     ['UnzerSystemMode', Module::MODULE_ID, 0],
                 ],
                 'settingMethod' => 'getSystemMode',
-                'settingValue' => ModuleConfig::SYSTEM_MODE_SANDBOX
+                'settingValue' => ModuleSettings::SYSTEM_MODE_SANDBOX
             ],
             [
                 'values' => [
@@ -106,7 +106,7 @@ class ModuleConfigTest extends TestCase
         ];
     }
 
-    protected function getBridgeStub($valueMap): ModuleSettingBridgeInterface
+    private function getBridgeStub($valueMap): ModuleSettingBridgeInterface
     {
         $bridgeStub = $this->createPartialMock(
             ModuleSettingBridgeInterface::class,

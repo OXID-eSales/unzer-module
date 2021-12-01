@@ -5,7 +5,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;
 
-class ModuleConfig
+class ModuleSettings
 {
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
     public const SYSTEM_MODE_PRODUCTION = 'production';
@@ -27,27 +27,27 @@ class ModuleConfig
     public function getSystemMode(): string
     {
         if ($this->getSettingValue('UnzerSystemMode')) {
-            return "production";
+            return self::SYSTEM_MODE_PRODUCTION;
         }
-        return "sandbox";
+        return self::SYSTEM_MODE_SANDBOX;
     }
 
     public function getShopPublicKey(): string
     {
-        return $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
+        return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
     }
 
     public function getShopPrivateKey(): string
     {
-        return $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKey');
+        return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKey');
     }
 
     public function getAPIKey(): string
     {
-        return $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
+        return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
-    protected function getSettingValue($key)
+    private function getSettingValue($key)
     {
         return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
     }
