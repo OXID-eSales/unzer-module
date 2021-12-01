@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridge;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ModuleConfig;
@@ -49,6 +48,60 @@ class ModuleConfigTest extends TestCase
                 ],
                 'settingMethod' => 'getSystemMode',
                 'settingValue' => ModuleConfig::SYSTEM_MODE_SANDBOX
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 0],
+                    ['sandbox-UnzerPublicKey', Module::MODULE_ID, 'sandboxPublicKey'],
+                    ['production-UnzerPublicKey', Module::MODULE_ID, 'productionPublicKey'],
+                ],
+                'settingMethod' => 'getShopPublicKey',
+                'settingValue' => 'sandboxPublicKey'
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 1],
+                    ['sandbox-UnzerPublicKey', Module::MODULE_ID, 'sandboxPublicKey'],
+                    ['production-UnzerPublicKey', Module::MODULE_ID, 'productionPublicKey'],
+                ],
+                'settingMethod' => 'getShopPublicKey',
+                'settingValue' => 'productionPublicKey'
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 0],
+                    ['sandbox-UnzerPrivateKey', Module::MODULE_ID, 'sandboxPrivateKey'],
+                    ['production-UnzerPrivateKey', Module::MODULE_ID, 'productionPrivateKey'],
+                ],
+                'settingMethod' => 'getShopPrivateKey',
+                'settingValue' => 'sandboxPrivateKey'
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 1],
+                    ['sandbox-UnzerPrivateKey', Module::MODULE_ID, 'sandboxPrivateKey'],
+                    ['production-UnzerPrivateKey', Module::MODULE_ID, 'productionPrivateKey'],
+                ],
+                'settingMethod' => 'getShopPrivateKey',
+                'settingValue' => 'productionPrivateKey'
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 0],
+                    ['sandbox-UnzerApiKey', Module::MODULE_ID, 'sandboxAPIKey'],
+                    ['production-UnzerApiKey', Module::MODULE_ID, 'productionAPIKey'],
+                ],
+                'settingMethod' => 'getAPIKey',
+                'settingValue' => 'sandboxAPIKey'
+            ],
+            [
+                'values' => [
+                    ['UnzerSystemMode', Module::MODULE_ID, 1],
+                    ['sandbox-UnzerApiKey', Module::MODULE_ID, 'sandboxAPIKey'],
+                    ['production-UnzerApiKey', Module::MODULE_ID, 'productionAPIKey'],
+                ],
+                'settingMethod' => 'getAPIKey',
+                'settingValue' => 'productionAPIKey'
             ],
         ];
     }
