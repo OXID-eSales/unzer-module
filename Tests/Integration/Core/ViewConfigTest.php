@@ -20,10 +20,24 @@ class ViewConfigTest extends UnitTestCase
         $bridge->save('production-UnzerPrivateKey', 'privatekey', Module::MODULE_ID);
         $bridge->save('production-UnzerApiKey', 'apikey', Module::MODULE_ID);
 
-        /** @var \OxidSolutionCatalysts\Unzer\Core\ViewConfig $viewConfig */
-        $viewConfig = Registry::get(\OxidEsales\Eshop\Core\ViewConfig::class);
+        $viewConfig = $this->getViewConfig();
         $this->assertSame(ModuleSettings::SYSTEM_MODE_PRODUCTION, $viewConfig->getUnzerSystemMode());
         $this->assertSame('publickey', $viewConfig->getUnzerPubKey());
         $this->assertSame('privatekey', $viewConfig->getUnzerPrivKey());
+    }
+
+    public function testGetSessionPaymentInfo()
+    {
+        $testValue = 'something';
+        $session = Registry::getSession();
+        $session->setVariable('additionalPaymentInformation', $testValue);
+
+        $viewConfig = $this->getViewConfig();
+        $this->assertSame($testValue, $viewConfig->getSessionPaymentInfo());
+    }
+
+    private function getViewConfig(): \OxidSolutionCatalysts\Unzer\Core\ViewConfig
+    {
+        return Registry::get(\OxidEsales\Eshop\Core\ViewConfig::class);
     }
 }
