@@ -8,9 +8,7 @@ use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
 class PaymentGateway extends PaymentGateway_parent
 {
     /**
-     * @param $dAmount
-     * @param $oOrder
-     * @return bool
+     * @inerhitDoc
      */
     public function executePayment($dAmount, &$oOrder): bool
     {
@@ -21,6 +19,6 @@ class PaymentGateway extends PaymentGateway_parent
                 return $Dispatcher->executePayment($oPayment->getId());
             }
         }
-        return $this->executePayment($dAmount, $oOrder);
+        return parent::executePayment($dAmount, $oOrder);
     }
 }
