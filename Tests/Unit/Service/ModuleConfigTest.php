@@ -30,6 +30,26 @@ class ModuleConfigTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider getSystemModeDataProvider
+     */
+    public function testGetSystemMode($configValue, $expected): void
+    {
+        $msbMock = $this->createPartialMock(ModuleSettingBridge::class, ['get']);
+        $msbMock->method('get')->with('UnzerSystemMode', Module::MODULE_ID)->willReturn($configValue);
+        $sut = $this->getSut($msbMock);
+
+        $this->assertSame($expected, $sut->getSystemMode());
+    }
+
+    public function getSystemModeDataProvider(): array
+    {
+        return [
+            [1, ModuleConfig::SYSTEM_MODE_PRODUCTION],
+            [0, ModuleConfig::SYSTEM_MODE_SANDBOX],
+        ];
+    }
+
     private function getSut(ModuleSettingBridgeInterface $moduleSettingBridge): ModuleConfig
     {
         return new ModuleConfig($moduleSettingBridge);
