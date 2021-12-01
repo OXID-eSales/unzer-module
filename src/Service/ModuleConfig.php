@@ -32,6 +32,21 @@ class ModuleConfig
         return "sandbox";
     }
 
+    public function getShopPublicKey(): string
+    {
+        return $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
+    }
+
+    public function getShopPrivateKey(): string
+    {
+        return $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKey');
+    }
+
+    public function getAPIKey(): string
+    {
+        return $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
+    }
+
     protected function getSettingValue($key)
     {
         return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
