@@ -27,7 +27,7 @@ use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 
 class ViewConfig extends ViewConfig_parent
 {
-    protected function getModuleConfig(): ModuleSettings
+    private function getUnzerModuleSettings(): ModuleSettings
     {
         return $this->getContainer()->get(ModuleSettings::class);
     }
@@ -39,7 +39,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerSystemMode(): string
     {
-        return $this->getModuleConfig()->getSystemMode();
+        return $this->getUnzerModuleSettings()->getSystemMode();
     }
 
     /**
@@ -49,7 +49,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPubKey(): string
     {
-        return $this->getModuleConfig()->getShopPublicKey();
+        return $this->getUnzerModuleSettings()->getShopPublicKey();
     }
 
     /**
@@ -59,7 +59,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPrivKey(): string
     {
-        return $this->getModuleConfig()->getShopPrivateKey();
+        return $this->getUnzerModuleSettings()->getShopPrivateKey();
     }
 
     /**
