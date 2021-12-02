@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: install
-        run: composer create-project oxid-professional-services/test-oxid /build/oxid --no-interaction -s dev --repository="{\"url\":\"https://github.com/keywan-ghadami-oxid/test-oxid.git\", \"type\":\"vcs\"}" --remove-vcs
+        run: composer create-project oxid-professional-services/test-oxid /build/oxid dev-oxid{{matrix.oxid}} --no-interaction -s dev --repository="{\"url\":\"https://github.com/keywan-ghadami-oxid/test-oxid.git\", \"type\":\"vcs\"}" --remove-vcs 
 
       - name: move artifacts to projects folder
         run: |
