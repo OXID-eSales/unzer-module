@@ -11,27 +11,28 @@ class Order extends Order_parent
     public function finalizeOrder($oBasket, $oUser, $blRecalculatingOrder = false): int
     {
         $blRedirectFromUzr = Registry::getRequest()->getRequestParameter('uzrredirect');
-        if ($blRedirectFromUzr){
+        if ($blRedirectFromUzr) {
             $orderId = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('sess_challenge');
             if ($this->load($orderId)) {
                 // order not saved TODO
             }
-            if (!$this->oxorder__oxordernr->value) {
-                $this->_setNumber();
-            } else {
-                oxNew(\OxidEsales\Eshop\Core\Counter::class)->update($this->_getCounterIdent(), $this->oxorder__oxordernr->value);
-            }
-
-            $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
-            // deleting remark info only when order is finished
-            \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable('ordrem');
-
-            //#4005: Order creation time is not updated when order processing is complete
-            if (!$blRecalculatingOrder) {
-                $this->_updateOrderDate();
-            }
 
             if ($this->checkUnzerPaymentStatus()) {
+                if (!$this->oxorder__oxordernr->value) {
+                    $this->_setNumber();
+                } else {
+                    oxNew(\OxidEsales\Eshop\Core\Counter::class)->update($this->_getCounterIdent(), $this->oxorder__oxordernr->value);
+                }
+
+                $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
+                // deleting remark info only when order is finished
+                \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable('ordrem');
+
+                //#4005: Order creation time is not updated when order processing is complete
+                if (!$blRecalculatingOrder) {
+                    $this->_updateOrderDate();
+                }
+
                 // store orderid
                 $oBasket->setOrderId($this->getId());
 
@@ -56,6 +57,9 @@ class Order extends Order_parent
                 }
 
                 return $iRet;
+            } else {
+                return self::ORDER_STATE_PAYMENTERROR;
+
             }
         } else {
             $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
