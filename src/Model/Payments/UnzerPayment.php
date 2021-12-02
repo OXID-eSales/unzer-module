@@ -16,6 +16,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
+use UnzerSDK\Unzer;
 
 abstract class UnzerPayment
 {
@@ -36,6 +37,11 @@ abstract class UnzerPayment
     protected $session;
 
     /**
+     * @var Unzer
+     */
+    protected $unzerSDK;
+
+    /**
      * @var string
      */
     protected string $Paymentmethod;
@@ -52,10 +58,12 @@ abstract class UnzerPayment
 
     public function __construct(
         Payment $payment,
-        Session $session
+        Session $session,
+        Unzer $unzerSDK
     ) {
         $this->payment = $payment;
         $this->session = $session;
+        $this->unzerSDK = $unzerSDK;
     }
 
     /**

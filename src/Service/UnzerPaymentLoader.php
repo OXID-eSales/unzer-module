@@ -49,13 +49,23 @@ class UnzerPaymentLoader
 
     private $session;
 
-    public function __construct(Session $session)
-    {
+    private $unzerSdkLoader;
+
+    public function __construct(
+        Session $session,
+        UnzerSDKLoader $unzerSDKLoader
+    ) {
         $this->session = $session;
+        $this->unzerSdkLoader = $unzerSDKLoader;
     }
 
     public function getUnzerPayment(PaymentModel $payment): AbstractUnzerPayment
     {
-        return oxNew(self::UNZERCLASSNAMEMAPPING[$payment->getId()], $payment, $this->session);
+        return oxNew(
+            self::UNZERCLASSNAMEMAPPING[$payment->getId()],
+            $payment,
+            $this->session,
+            $this->unzerSdkLoader->getUnzerSDK()
+        );
     }
 }
