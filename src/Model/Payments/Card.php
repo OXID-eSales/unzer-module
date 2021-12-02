@@ -43,7 +43,8 @@ class Card extends UnzerPayment
     public function execute()
     {
         try {
-            $oUnzer = UnzerHelper::getUnzer();
+            $oUnzer = $this->unzerSDK;
+
             $sId = $this->getUzrId();
             /* @var \UnzerSDK\Resources\PaymentTypes\Card $uzrCard */
             $uzrCard = $oUnzer->fetchPaymentType($sId);

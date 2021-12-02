@@ -63,7 +63,8 @@ class SepaSecured extends UnzerPayment
     public function execute()
     {
         try {
-            $oUnzer = UnzerHelper::getUnzer();
+            $oUnzer = $this->unzerSDK;
+
             $sId = $this->getUzrId();
             /* @var SepaDirectDebitSecured|CanDirectChargeWithCustomer $uzrSepa */
             $uzrSepa = $oUnzer->fetchPaymentType($sId);

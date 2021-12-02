@@ -35,8 +35,7 @@ class Invoice extends UnzerPayment
     {
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
-            // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = UnzerHelper::getUnzer();
+            $unzer = $this->unzerSDK;
 
             /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
             $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice);

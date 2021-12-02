@@ -167,21 +167,6 @@ class UnzerHelper
     }
 
     /**
-     * Create object UnzerSDK\Unzer with priv-Key
-     *
-     * @return Unzer|null
-     */
-    public static function getUnzer(): ?Unzer
-    {
-        /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $loader */
-        $loader = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class);
-
-        return $loader->getUnzerSDK();
-    }
-
-    /**
      * @param Charge $transaction
      * @return string
      */
@@ -254,7 +239,12 @@ class UnzerHelper
     public static function getInitialUnzerPayment(): ?Payment
     {
         if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
-            $unzer = self::getUnzer();
+            /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
+            $unzerSDKLoader = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class);
+            $unzer = $unzerSDKLoader->getUnzerSDK();
+
             return $unzer->fetchPayment($paymentId);
         }
 
