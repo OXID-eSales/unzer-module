@@ -20,7 +20,7 @@ abstract class UnzerPayment
     const CONTROLLER_URL = "order";
     const RETURN_CONTROLLER_URL = "order";
     const FAILURE_URL = "";
-    const PENDING_URL = "order";
+    const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
     const SUCCESS_URL = "thankyou";
 
     /**
@@ -254,8 +254,10 @@ abstract class UnzerPayment
     /**
      * @return bool
      */
-    public function checkPaymentstatus(): bool
+    public function checkPaymentstatus($blDoRedirect): bool
     {
+        $result = false;
+
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
         }
@@ -271,12 +273,16 @@ abstract class UnzerPayment
             if ($this->_transaction->isSuccess()) {
                 // TODO log success
                 //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
-                return true;
+                $result = true;
             } elseif ($this->_transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $payment->getPaymentType();
                 if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
-                    return true;
+                    if (!$blDoRedirect && $this->_transaction->getRedirectUrl()) {
+                        Registry::getUtils()->redirect($this->_transaction->getRedirectUrl(), false);
+                        exit;
+                    }
+                    $result = true;
                 }
                 // TODO Logging
                 //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
@@ -288,6 +294,6 @@ abstract class UnzerPayment
         } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
-        return false;
+        return $result;
     }
 }
