@@ -101,7 +101,7 @@ class Order extends Order_parent
         } elseif ($payment->isPending()) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
-                    $payment->getAuthorization()->charge($payment->getAmount());
+                    $payment->getAuthorization()->charge();
                 } else {
                     // Payment is not done yet (e.g. Prepayment)
                     // Goods can be shipped later after incoming payment (event).
