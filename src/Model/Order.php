@@ -58,8 +58,9 @@ class Order extends Order_parent
 
                 return $iRet;
             } else {
+                // payment is canceled
+                $this->delete();
                 return self::ORDER_STATE_PAYMENTERROR;
-
             }
         } else {
             $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
@@ -122,10 +123,7 @@ class Order extends Order_parent
                 return true;
             }
         }  else {
-            if ($payment->isCanceled()) {
-                return false;
-            }
-            // delete order?? and return 2 (paymenterror)?
+            return false;
         }
     }
 }
