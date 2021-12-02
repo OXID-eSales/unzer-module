@@ -13,6 +13,6 @@ class ModuleSettingsTest extends TestCase
         $container = ContainerFactory::getInstance()->getContainer();
         $service = $container->get(ModuleSettings::class);
 
-        $this->assertIsObject($service);
+        $this->assertInstanceOf(ModuleSettings::class, $service);
     }
 }
