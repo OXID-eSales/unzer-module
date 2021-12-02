@@ -24,10 +24,7 @@ abstract class UnzerPayment
     const PENDING_URL = "order";
     const SUCCESS_URL = "thankyou";
 
-    /**
-     * @var Payment
-     */
-    protected Payment $oPayment;
+    protected Payment $payment;
 
     /**
      * @var string
@@ -44,13 +41,9 @@ abstract class UnzerPayment
      */
     protected $aCurrencies = false;
 
-    /**
-     * @param string $oxpaymentid
-     */
-    public function __construct(string $oxpaymentid)
+    public function __construct(Payment $payment)
     {
-        $this->oPayment = oxNew(Payment::class);
-        $this->oPayment->load($oxpaymentid);
+        $this->payment = $payment;
     }
 
     /**
@@ -58,7 +51,7 @@ abstract class UnzerPayment
      */
     public function getID(): string
     {
-        return $this->oPayment->getId();
+        return $this->payment->getId();
     }
 
     /**
@@ -100,7 +93,7 @@ abstract class UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->oPayment->oxpayments__oxpaymentprocedure->value;
+        return $this->payment->oxpayments__oxpaymentprocedure->value;
     }
 
     /**
@@ -108,7 +101,7 @@ abstract class UnzerPayment
      */
     public function isDirectCharge()
     {
-        return (strpos($this->oPayment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
+        return (strpos($this->payment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
     }
 
     /**

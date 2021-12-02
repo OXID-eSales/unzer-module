@@ -1,7 +1,8 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping;
+namespace OxidSolutionCatalysts\Unzer\Service;
 
+use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidSolutionCatalysts\Unzer\Model\Payments\AliPay;
 use OxidSolutionCatalysts\Unzer\Model\Payments\Bancontact;
 use OxidSolutionCatalysts\Unzer\Model\Payments\Card;
@@ -19,15 +20,12 @@ use OxidSolutionCatalysts\Unzer\Model\Payments\Przelewy24;
 use OxidSolutionCatalysts\Unzer\Model\Payments\Sepa;
 use OxidSolutionCatalysts\Unzer\Model\Payments\SepaSecured;
 use OxidSolutionCatalysts\Unzer\Model\Payments\Sofort;
-use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Wechatpay;
+use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment as AbstractUnzerPayment;
+use OxidSolutionCatalysts\Unzer\Model\Payments\WeChatPay;
 
-/**
- * Interface ConstantInterface
- */
-interface ClassMappingInterface
+class UnzerPaymentLoader
 {
-    const UNZERCLASSNAMEMAPPING = [
+    public const UNZERCLASSNAMEMAPPING = [
         'oscunzer_alipay' => AliPay::class,
         'oscunzer_bancontact' => Bancontact::class,
         'oscunzer_card' => Card::class,
@@ -45,7 +43,11 @@ interface ClassMappingInterface
         'oscunzer_sepa' => Sepa::class,
         'oscunzer_sepa-secured' => SepaSecured::class,
         'oscunzer_sofort' => Sofort::class,
-        'oscunzer_unzerpayment' => UnzerPayment::class,
-        'oscunzer_wechatpay' => Wechatpay::class,
+        'oscunzer_wechatpay' => WeChatPay::class,
     ];
+
+    public function getUnzerPayment(PaymentModel $payment): AbstractUnzerPayment
+    {
+        return oxNew(self::UNZERCLASSNAMEMAPPING[$payment->getId()], $payment);
+    }
 }

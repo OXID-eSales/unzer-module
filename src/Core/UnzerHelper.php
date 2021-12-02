@@ -33,10 +33,10 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\Facts\Facts;
-use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
@@ -45,7 +45,7 @@ use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
 
-class UnzerHelper implements ClassMappingInterface
+class UnzerHelper
 {
     /**
      * @return array
@@ -328,6 +328,11 @@ class UnzerHelper implements ClassMappingInterface
      */
     public static function getUnzerObjectbyPaymentId($paymentid): UnzerPayment
     {
-        return oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
+        $payment = oxNew(Payment::class);
+        $payment->load($paymentid);
+
+        /** @var UnzerPaymentLoader $paymentLoader */
+        $paymentLoader = ContainerFactory::getInstance()->getContainer()->get(UnzerPaymentLoader::class);
+        return $paymentLoader->getUnzerPayment($payment);
     }
 }
