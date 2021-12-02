@@ -88,7 +88,7 @@ class Order extends Order_parent
 
     protected function checkUnzerPaymentStatus()
     {
-        $result = false,
+        $result = false;
         $sPayment = Registry::getSession()->getVariable('PaymentId');
         $payment = UnzerHelper::getUnzer()->fetchPayment($sPayment);
         $transaction = $payment->getInitialTransaction();
