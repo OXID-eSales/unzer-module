@@ -261,7 +261,7 @@ abstract class UnzerPayment
      */
     public function checkPaymentstatus(): bool
     {
-        if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
+        if (!$paymentId = $this->session->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
         }
 

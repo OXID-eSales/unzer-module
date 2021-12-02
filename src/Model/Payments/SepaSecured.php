@@ -75,8 +75,8 @@ class SepaSecured extends UnzerPayment
             $uzrBasket = $this->getUnzerBasket($oBasket, $orderId);
             $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, null, $uzrBasket);
 //           // You'll need to remember the shortId to show it on the success or failure page
-            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
-            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
+            $this->session->setVariable('ShortId', $transaction->getShortId());
+            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }

@@ -60,11 +60,11 @@ class InvoiceSecured extends UnzerPayment
             $transaction = $inv_secured->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, UnzerHelper::getMetadata($this), $basket);
 
             // You'll need to remember the shortId to show it on the success or failure page
-            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
-            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
+            $this->session->setVariable('ShortId', $transaction->getShortId());
+            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
 
             $bankData = UnzerHelper::getBankData($transaction);
-            Registry::getSession()->setVariable('additionalPaymentInformation', $bankData);
+            $this->session->setVariable('additionalPaymentInformation', $bankData);
             $oUser->save();
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
