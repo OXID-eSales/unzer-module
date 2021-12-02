@@ -321,18 +321,4 @@ class UnzerHelper
 
         return new \UnzerSDK\Resources\Basket($orderId, $oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $aUnzerBasketItem);
     }
-
-    /**
-     * @param $paymentid
-     * @return UnzerPayment
-     */
-    public static function getUnzerObjectbyPaymentId($paymentid): UnzerPayment
-    {
-        $payment = oxNew(Payment::class);
-        $payment->load($paymentid);
-
-        /** @var UnzerPaymentLoader $paymentLoader */
-        $paymentLoader = ContainerFactory::getInstance()->getContainer()->get(UnzerPaymentLoader::class);
-        return $paymentLoader->getUnzerPayment($payment);
-    }
 }
