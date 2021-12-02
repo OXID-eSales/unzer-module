@@ -173,18 +173,12 @@ class UnzerHelper
      */
     public static function getUnzer(): ?Unzer
     {
-        $di = ContainerFactory::getInstance()->getContainer();
+        /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $loader */
+        $loader = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class);
 
-        /** @var ModuleSettings $moduleSettings */
-        $moduleSettings = $di->get(ModuleSettings::class);
-
-        $unzer = oxNew(Unzer::class, $moduleSettings->getShopPrivateKey());
-
-        if ($moduleSettings->isDebugMode()) {
-            $debugHandler = $di->get('OxidSolutionCatalysts\Unzer\Service\DebugHandler');
-            $unzer->setDebugMode(true)->setDebugHandler($debugHandler);
-        }
-        return $unzer;
+        return $loader->getUnzerSDK();
     }
 
     /**
