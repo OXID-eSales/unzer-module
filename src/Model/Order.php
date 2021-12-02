@@ -5,6 +5,7 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class Order extends Order_parent
 {
