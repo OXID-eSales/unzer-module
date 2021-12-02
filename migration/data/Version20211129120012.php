@@ -106,7 +106,7 @@ final class Version20211129120012 extends AbstractMigration
 
     protected function getPrefixColumns($langRows, $tablePrefix)
     {
-       return str_replace($langRows, ', ', ', ' . $tablePrefix . '.');
+       return str_replace(', ', ', ' . $tablePrefix . '.', $langRows);
     }
 
     protected function setCountriesToPayment($paymentDefinitions, $paymentId)
