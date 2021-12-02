@@ -21,6 +21,6 @@ class PaymentGateway extends PaymentGateway_parent
                 return $Dispatcher->executePayment($oPayment->getId());
             }
         }
-        return $this->executePayment($dAmount, $oOrder);
+        return parent::executePayment($dAmount, $oOrder);
     }
 }

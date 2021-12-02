@@ -79,6 +79,47 @@ class OrderController extends OrderController_parent
         return $result;
     }
 
+    /**
+     * Checks for order rules confirmation ("ord_agb", "ord_custinfo" form values)(if no
+     * rules agreed - returns to order view), loads basket contents (plus applied
+     * price/amount discount if available - checks for stock, checks user data (if no
+     * data is set - returns to user login page). Stores order info to database
+     * (\OxidEsales\Eshop\Application\Model\Order::finalizeOrder()). According to sum for items automatically assigns
+     * user to special user group ( \OxidEsales\Eshop\Application\Model\User::onOrderExecute(); if this option is not
+     * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
+     *
+     * @return string
+     */
+    public function unzerExecuteAfterRedirect()
+    {
+        // get basket contents
+        $oUser = $this->getUser();
+        $oBasket = $this->getSession()->getBasket();
+        if ($oBasket->getProductsCount()) {
+            try {
+                $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+
+                //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
+                $iSuccess = $oOrder->finalizeOrder($oBasket, $oUser);
+
+                // performing special actions after user finishes order (assignment to special user groups)
+                $oUser->onOrderExecute($oBasket, $iSuccess);
+
+                // proceeding to next view
+
+                Registry::getUtils()->redirect(UnzerHelper::redirecturl($this->_getNextStep($iSuccess), false));
+                exit;
+            } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
+                $oEx->setDestination('basket');
+                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
+            } catch (\OxidEsales\Eshop\Core\Exception\NoArticleException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
+            }
+        }
+    }
+
     public function isSepaMandateConfirmationError()
     {
         return $this->blSepaMandateConfirmError;

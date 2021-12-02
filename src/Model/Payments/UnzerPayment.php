@@ -20,7 +20,7 @@ abstract class UnzerPayment
     const CONTROLLER_URL = "order";
     const RETURN_CONTROLLER_URL = "order";
     const FAILURE_URL = "";
-    const PENDING_URL = "order";
+    const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
     const SUCCESS_URL = "thankyou";
 
     /**
@@ -254,7 +254,7 @@ abstract class UnzerPayment
     /**
      * @return bool
      */
-    public function checkPaymentstatus(): bool
+    public function checkPaymentstatus($blDoRedirect): bool
     {
         if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
@@ -276,6 +276,10 @@ abstract class UnzerPayment
                 // TODO Handle Pending...
                 $paymentType = $payment->getPaymentType();
                 if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
+                    if (!$blDoRedirect && $this->_transaction->getRedirectUrl()) {
+                        Registry::getUtils()->redirect($this->_transaction->getRedirectUrl(), false);
+                        exit;
+                    }
                     return true;
                 }
                 // TODO Logging
