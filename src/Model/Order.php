@@ -8,7 +8,7 @@ use UnzerSDK\Resources\PaymentTypes\Prepayment;
 
 class Order extends Order_parent
 {
-    public function finalizeOrder($oBasket, $oUser, $blRecalculatingOrder = false): int
+    public function finalizeOrder($oBasket, $oUser, $blRecalculatingOrder = false)
     {
         $blRedirectFromUzr = Registry::getRequest()->getRequestParameter('uzrredirect');
         if ($blRedirectFromUzr) {
@@ -56,7 +56,7 @@ class Order extends Order_parent
                     $iRet = self::ORDER_STATE_OK;
                 }
 
-                return $iRet;
+                return (int) $iRet;
             } else {
                 // payment is canceled
                 $this->delete();
@@ -94,8 +94,6 @@ class Order extends Order_parent
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
                     $transCharge = $payment->getAuthorization()->charge($payment->getAmount());
-                    // Payment is ready to be captured.
-                    // Goods can be shipped later AFTER charge.
                 } else {
                     // Payment is not done yet (e.g. Prepayment)
                     // Goods can be shipped later after incoming payment (event).
