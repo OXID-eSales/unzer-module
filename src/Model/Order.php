@@ -3,12 +3,13 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Resources\PaymentTypes\Prepayment;
-use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class Order extends Order_parent
 {
+    /**
+     * @inerhitDoc
+     * @throws UnzerApiException
+     */
     public function finalizeOrder($oBasket, $oUser, $blRecalculatingOrder = false)
     {
         $blRedirectFromUzr = Registry::getRequest()->getRequestParameter('uzrredirect');
@@ -66,7 +67,7 @@ class Order extends Order_parent
         } else {
             $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
 
-            if ($this->oxorder__oxtransstatus->value == "OK") {
+            if ($this->oxorder__oxtransstatus->value == "OK" && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false) {
                 UnzerHelper::writeTransactionToDB($this->getId());
             }
         }

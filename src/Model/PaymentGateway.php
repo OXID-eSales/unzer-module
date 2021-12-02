@@ -8,9 +8,7 @@ use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
 class PaymentGateway extends PaymentGateway_parent
 {
     /**
-     * @param $dAmount
-     * @param $oOrder
-     * @return bool
+     * @inerhitDoc
      */
     public function executePayment($dAmount, &$oOrder): bool
     {
