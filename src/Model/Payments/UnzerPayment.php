@@ -7,6 +7,7 @@ use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
@@ -24,7 +25,15 @@ abstract class UnzerPayment
     const PENDING_URL = "order";
     const SUCCESS_URL = "thankyou";
 
-    protected Payment $payment;
+    /**
+     * @var Payment
+     */
+    protected $payment;
+
+    /**
+     * @var Session
+     */
+    protected $session;
 
     /**
      * @var string
@@ -41,9 +50,12 @@ abstract class UnzerPayment
      */
     protected $aCurrencies = false;
 
-    public function __construct(Payment $payment)
-    {
+    public function __construct(
+        Payment $payment,
+        Session $session
+    ) {
         $this->payment = $payment;
+        $this->session = $session;
     }
 
     /**

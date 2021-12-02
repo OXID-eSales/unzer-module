@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +17,9 @@ class UnzerPaymentLoaderTest extends TestCase
         $paymentStub = $this->createPartialMock(PaymentModel::class, ['getId']);
         $paymentStub->method('getId')->willReturn($paymentId);
 
-        $sut = new UnzerPaymentLoader();
+        $sessionStub = $this->createPartialMock(Session::class, []);
+        $sut = new UnzerPaymentLoader($sessionStub);
+
         $loadedPaymentType = $sut->getUnzerPayment($paymentStub);
         $this->assertInstanceOf($paymentClass, $loadedPaymentType);
         $this->assertSame($paymentId, $loadedPaymentType->getID());

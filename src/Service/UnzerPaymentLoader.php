@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Model\Payments\AliPay;
 use OxidSolutionCatalysts\Unzer\Model\Payments\Bancontact;
 use OxidSolutionCatalysts\Unzer\Model\Payments\Card;
@@ -46,8 +47,15 @@ class UnzerPaymentLoader
         'oscunzer_wechatpay' => WeChatPay::class,
     ];
 
+    private $session;
+
+    public function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
+
     public function getUnzerPayment(PaymentModel $payment): AbstractUnzerPayment
     {
-        return oxNew(self::UNZERCLASSNAMEMAPPING[$payment->getId()], $payment);
+        return oxNew(self::UNZERCLASSNAMEMAPPING[$payment->getId()], $payment, $this->session);
     }
 }

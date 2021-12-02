@@ -188,24 +188,6 @@ class UnzerHelper
     }
 
     /**
-     * @return object|Basket|null
-     */
-    public static function getBasket()
-    {
-        $oSession = Registry::getSession();
-        return $oSession->getBasket();
-    }
-
-    /**
-     * @return false|User|null
-     */
-    public static function getUser()
-    {
-        $oSession = Registry::getSession();
-        return $oSession->getUser();
-    }
-
-    /**
      * @param Charge $transaction
      * @return string
      */
@@ -249,7 +231,8 @@ class UnzerHelper
 
         $unzerPayment = self::getInitialUnzerPayment();
         $unzerCustomer = $unzerPayment->getCustomer();
-        $oUser = self::getUser();
+
+        $oUser = Registry::getSession()->getUser();
         $metadata = $unzerPayment->getMetadata();
 
         $oTrans->oscunzertransaction__oxorderid = new Field($orderid);

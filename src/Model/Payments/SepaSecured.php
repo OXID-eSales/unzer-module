@@ -68,8 +68,8 @@ class SepaSecured extends UnzerPayment
             /* @var SepaDirectDebitSecured|CanDirectChargeWithCustomer $uzrSepa */
             $uzrSepa = $oUnzer->fetchPaymentType($sId);
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-            $oUser = UnzerHelper::getUser();
-            $oBasket = UnzerHelper::getBasket();
+            $oUser = $this->session->getUser();
+            $oBasket = $this->session->getBasket();
             $customer = $this->getCustomerData($oUser);
 
             $uzrBasket = $this->getUnzerBasket($oBasket, $orderId);

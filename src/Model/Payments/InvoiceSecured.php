@@ -44,8 +44,8 @@ class InvoiceSecured extends UnzerPayment
             /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
             $inv_secured = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured);
 
-            $oUser = UnzerHelper::getUser();
-            $oBasket = UnzerHelper::getBasket();
+            $oUser = $this->session->getUser();
+            $oBasket = $this->session->getBasket();
 
             if ($birthdate = Registry::getRequest()->getRequestEscapedParameter('birthdate')) {
                 $oUser->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
