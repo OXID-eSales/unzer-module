@@ -181,7 +181,7 @@ class UnzerHelper implements ClassMappingInterface
         $unzer = oxNew(Unzer::class, $moduleSettings->getShopPrivateKey());
 
         if ($moduleSettings->isDebugMode()) {
-            $debugHandler = $di->get('OxidSolutionCatalysts\Unzer\Utility\DebugHandler');
+            $debugHandler = $di->get('OxidSolutionCatalysts\Unzer\Service\DebugHandler');
             $unzer->setDebugMode(true)->setDebugHandler($debugHandler);
         }
         return $unzer;

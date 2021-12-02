@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Utility;
+namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Monolog\Logger;
 

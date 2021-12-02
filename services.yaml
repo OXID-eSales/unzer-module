@@ -26,19 +26,16 @@ services:
     public: true
     arguments:
       $loggerName: 'Unzer Payment Logger'
-      $logFilePath: '@=service("OxidSolutionCatalysts\\Unzer\\Utility\\Context").getUnzerLogFilePath()'
+      $logFilePath: '@=service("OxidSolutionCatalysts\\Unzer\\Service\\Context").getUnzerLogFilePath()'
       $logLevel: !php/const Psr\Log\LogLevel::INFO
-
-  OxidSolutionCatalysts\Unzer\Utility\Context:
-    class: OxidSolutionCatalysts\Unzer\Utility\Context
-    public: true
-
-  OxidSolutionCatalysts\Unzer\Utility\DebugHandler:
-    class: OxidSolutionCatalysts\Unzer\Utility\DebugHandler
-    public: true
-    arguments:
-      $moduleLogger: '@OxidSolutionCatalysts\Unzer\Logger'
 
   OxidSolutionCatalysts\Unzer\Service\:
     resource: 'src/Service/*'
+    exclude: 'src/Service/{DebugHandler}'
     public: true
+
+  OxidSolutionCatalysts\Unzer\Service\DebugHandler:
+    class: OxidSolutionCatalysts\Unzer\Service\DebugHandler
+    public: true
+    arguments:
+      $moduleLogger: '@OxidSolutionCatalysts\Unzer\Logger'
