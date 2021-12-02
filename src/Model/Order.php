@@ -122,7 +122,7 @@ class Order extends Order_parent
                 $this->_setOrderStatus('NOT_FINISHED');
                 return true;
             }
-        }  else {
+        } else {
             return false;
         }
     }
