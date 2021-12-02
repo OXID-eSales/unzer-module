@@ -88,18 +88,20 @@ class Order extends Order_parent
 
     protected function checkUnzerPaymentStatus()
     {
+        $result = false,
         $sPayment = Registry::getSession()->getVariable('PaymentId');
         $payment = UnzerHelper::getUnzer()->fetchPayment($sPayment);
         $transaction = $payment->getInitialTransaction();
+
         if ($payment->isCompleted()) {
             // updating order trans status (success status)
             $this->_setOrderStatus('OK');
             $this->markUnzerOrderAsPaid();
-            return true;
+            $result = true;
         } elseif ($payment->isPending()) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
-                    $transCharge = $payment->getAuthorization()->charge($payment->getAmount());
+                    $payment->getAuthorization()->charge($payment->getAmount());
                 } else {
                     // Payment is not done yet (e.g. Prepayment)
                     // Goods can be shipped later after incoming payment (event).
@@ -108,7 +110,7 @@ class Order extends Order_parent
                 // In any case:
                 // * You can show the success page.
                 // * You can set order status to pending payment
-                return true;
+                $result = true;
             } elseif ($transaction->isPending()) {
                 // The initial transaction of invoice types will not change to success but stay pending.
                 $paymentType = $payment->getPaymentType();
@@ -124,10 +126,9 @@ class Order extends Order_parent
                 // Use the webhooks feature to stay informed about changes of payment and transaction (e.g. cancel, success)
                 // then you can handle the states as shown above in transaction->isSuccess() branch.
                 $this->_setOrderStatus('NOT_FINISHED');
-                return true;
+                $result = true;
             }
-        } else {
-            return false;
         }
+        return $result;
     }
 }
