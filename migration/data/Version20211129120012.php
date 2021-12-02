@@ -97,6 +97,16 @@ final class Version20211129120012 extends AbstractMigration
                 $sqlValues
             );
         }
+
+        $this->addSql("INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
+                " . $langRows . ")
+        SELECT md5(CONCAT(OXLOADID, s.OXID)), OXLOADID, s.OXID " . $this->getPrefixColumns($langRows, 'c') . "  FROM oxcontents c, oxshops s
+        WHERE OXLOADID IN ('oscunzersepamandatetext', 'oscunzersepamandateconfirmation') AND c.OXSHOPID=1");
+    }
+
+    protected function getPrefixColumns($langRows, $tablePrefix)
+    {
+       return str_replace($langRows, ', ', ', ' . $tablePrefix . '.');
     }
 
     protected function setCountriesToPayment($paymentDefinitions, $paymentId)
