@@ -7,27 +7,38 @@ use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use RuntimeException;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
+use UnzerSDK\Unzer;
 
 abstract class UnzerPayment
 {
-    const CONTROLLER_URL = "order";
-    const RETURN_CONTROLLER_URL = "order";
-    const FAILURE_URL = "";
-    const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
-    const SUCCESS_URL = "thankyou";
+    protected const CONTROLLER_URL = "order";
+    protected const RETURN_CONTROLLER_URL = "order";
+    protected const FAILURE_URL = "";
+    protected const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
+    protected const SUCCESS_URL = "thankyou";
 
     /**
      * @var Payment
      */
-    protected $oPayment;
+    protected $payment;
+
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @var Unzer
+     */
+    protected $unzerSDK;
 
     /**
      * @var string
@@ -44,13 +55,14 @@ abstract class UnzerPayment
      */
     protected $aCurrencies = false;
 
-    /**
-     * @param string $oxpaymentid
-     */
-    public function __construct(string $oxpaymentid)
-    {
-        $this->oPayment = oxNew(Payment::class);
-        $this->oPayment->load($oxpaymentid);
+    public function __construct(
+        Payment $payment,
+        Session $session,
+        Unzer $unzerSDK
+    ) {
+        $this->payment = $payment;
+        $this->session = $session;
+        $this->unzerSDK = $unzerSDK;
     }
 
     /**
@@ -58,7 +70,7 @@ abstract class UnzerPayment
      */
     public function getID(): string
     {
-        return $this->oPayment->getId();
+        return $this->payment->getId();
     }
 
     /**
@@ -100,7 +112,7 @@ abstract class UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->oPayment->oxpayments__oxpaymentprocedure->value;
+        return $this->payment->oxpayments__oxpaymentprocedure->value;
     }
 
     /**
@@ -108,7 +120,7 @@ abstract class UnzerPayment
      */
     public function isDirectCharge()
     {
-        return (strpos($this->oPayment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
+        return (strpos($this->payment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
     }
 
     /**
@@ -119,7 +131,7 @@ abstract class UnzerPayment
     /**
      * @var AbstractTransactionType|null
      */
-    protected $_transaction;
+    protected ?AbstractTransactionType $transaction;
 
     /**
      * @return   string|void
@@ -256,44 +268,44 @@ abstract class UnzerPayment
     /**
      * @return bool
      */
-    public function checkPaymentstatus($blDoRedirect): bool
+    public function checkPaymentstatus($blDoRedirect = false): bool
     {
         $result = false;
 
-        if (!$paymentId = Registry::getSession()->getVariable('PaymentId')) {
+        if (!$paymentId = $this->session->getVariable('PaymentId')) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
         }
 
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
+            $unzer = $this->unzerSDK;
             // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = UnzerHelper::getUnzer();
 
             // Redirect to success if the payment has been successfully completed.
-            $payment = $unzer->fetchPayment($paymentId);
-            $this->_transaction = $payment->getInitialTransaction();
-            if ($this->_transaction->isSuccess()) {
+            $unzerPayment = $unzer->fetchPayment($paymentId);
+            $this->transaction = $unzerPayment->getInitialTransaction();
+            if ($this->transaction->isSuccess()) {
                 // TODO log success
-                //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
+                //$msg = UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer());
                 $result = true;
-            } elseif ($this->_transaction->isPending()) {
+            } elseif ($this->transaction->isPending()) {
                 // TODO Handle Pending...
-                $paymentType = $payment->getPaymentType();
+                $paymentType = $unzerPayment->getPaymentType();
                 if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
-                    if (!$blDoRedirect && $this->_transaction->getRedirectUrl()) {
-                        Registry::getUtils()->redirect($this->_transaction->getRedirectUrl(), false);
+                    if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
+                        Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
                         exit;
                     }
                     $result = true;
                 }
                 // TODO Logging
-                //$msg = UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer());
-            } elseif ($this->_transaction->isError()) {
-                UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->_transaction->getMessage()->getCode(), $this->_transaction->getMessage()->getCustomer()));
+                //$msg = UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer());
+            } elseif ($this->transaction->isError()) {
+                UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer()));
             }
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
         return $result;

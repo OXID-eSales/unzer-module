@@ -10,6 +10,9 @@ services:
   OxidEsales\Eshop\Core\Config:
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getConfig' ]
 
+  OxidEsales\Eshop\Core\Session:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getSession' ]
+
   OxidSolutionCatalysts\Unzer\Logger:
     class: Monolog\Logger
     factory: ['@OxidSolutionCatalysts\Unzer\Logger\Factory', 'create']

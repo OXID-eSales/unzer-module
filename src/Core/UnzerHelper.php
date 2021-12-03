@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OXID eSales Unzer module.
  *
@@ -33,10 +34,10 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\Facts\Facts;
-use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
@@ -45,7 +46,7 @@ use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
 
-class UnzerHelper implements ClassMappingInterface
+class UnzerHelper
 {
     /**
      * @return array
@@ -171,45 +172,6 @@ class UnzerHelper implements ClassMappingInterface
     }
 
     /**
-     * Create object UnzerSDK\Unzer with priv-Key
-     *
-     * @return Unzer|null
-     */
-    public static function getUnzer(): ?Unzer
-    {
-        $di = ContainerFactory::getInstance()->getContainer();
-
-        /** @var ModuleSettings $moduleSettings */
-        $moduleSettings = $di->get(ModuleSettings::class);
-
-        $unzer = oxNew(Unzer::class, $moduleSettings->getShopPrivateKey());
-
-        if ($moduleSettings->isDebugMode()) {
-            $debugHandler = $di->get('OxidSolutionCatalysts\Unzer\Service\DebugHandler');
-            $unzer->setDebugMode(true)->setDebugHandler($debugHandler);
-        }
-        return $unzer;
-    }
-
-    /**
-     * @return object|Basket|null
-     */
-    public static function getBasket()
-    {
-        $oSession = Registry::getSession();
-        return $oSession->getBasket();
-    }
-
-    /**
-     * @return false|User|null
-     */
-    public static function getUser()
-    {
-        $oSession = Registry::getSession();
-        return $oSession->getUser();
-    }
-
-    /**
      * @param Charge $transaction
      * @return string
      */
@@ -253,7 +215,8 @@ class UnzerHelper implements ClassMappingInterface
 
         $unzerPayment = self::getInitialUnzerPayment();
         $unzerCustomer = $unzerPayment->getCustomer();
-        $oUser = self::getUser();
+
+        $oUser = Registry::getSession()->getUser();
         $metadata = $unzerPayment->getMetadata();
 
         $oTrans->oscunzertransaction__oxorderid = new Field($orderid);
@@ -281,7 +244,12 @@ class UnzerHelper implements ClassMappingInterface
     public static function getInitialUnzerPayment(): ?Payment
     {
         if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
-            $unzer = self::getUnzer();
+            /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
+            $unzerSDKLoader = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class);
+            $unzer = $unzerSDKLoader->getUnzerSDK();
+
             return $unzer->fetchPayment($paymentId);
         }
 
@@ -296,7 +264,7 @@ class UnzerHelper implements ClassMappingInterface
     public static function getMetadata(UnzerPayment $UnzerPayment): Metadata
     {
         $metadata = new Metadata();
-        $metadata->setShopType("Oxid eShop " . (new Facts)->getEdition());
+        $metadata->setShopType("Oxid eShop " . (new Facts())->getEdition());
         $metadata->setShopVersion(ShopVersion::getVersion());
         $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $UnzerPayment->getPaymentMethod());
@@ -324,14 +292,5 @@ class UnzerHelper implements ClassMappingInterface
         }
 
         return new \UnzerSDK\Resources\Basket($orderId, $oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $aUnzerBasketItem);
-    }
-
-    /**
-     * @param $paymentid
-     * @return UnzerPayment
-     */
-    public static function getUnzerObjectbyPaymentId($paymentid): UnzerPayment
-    {
-        return oxNew(self::UNZERCLASSNAMEMAPPING[$paymentid], $paymentid);
     }
 }

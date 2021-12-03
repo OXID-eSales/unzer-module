@@ -37,15 +37,13 @@ class InvoiceSecured extends UnzerPayment
     {
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
-            // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = UnzerHelper::getUnzer();
-            $unzer->setDebugMode(true)->setDebugHandler(new ExampleDebugHandler());
+            $unzer = $this->unzerSDK;
 
             /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
             $inv_secured = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured);
 
-            $oUser = UnzerHelper::getUser();
-            $oBasket = UnzerHelper::getBasket();
+            $oUser = $this->session->getUser();
+            $oBasket = $this->session->getBasket();
 
             if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
                 $oUser->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
@@ -60,11 +58,11 @@ class InvoiceSecured extends UnzerPayment
             $transaction = $inv_secured->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, UnzerHelper::getMetadata($this), $basket);
 
             // You'll need to remember the shortId to show it on the success or failure page
-            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
-            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
+            $this->session->setVariable('ShortId', $transaction->getShortId());
+            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
 
             $bankData = UnzerHelper::getBankData($transaction);
-            Registry::getSession()->setVariable('additionalPaymentInformation', $bankData);
+            $this->session->setVariable('additionalPaymentInformation', $bankData);
             $oUser->save();
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
