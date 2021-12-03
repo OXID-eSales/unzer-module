@@ -28,6 +28,8 @@ final class Version20211129120012 extends AbstractMigration
 
     protected $aIsoCountries;
 
+    protected $languageIds;
+
     private function getIsoCountries()
     {
         if (!$this->aIsoCountries) {
