@@ -156,12 +156,16 @@ class UnzerHelper
      * @param $destination
      * @return string
      */
-    public static function redirecturl($destination): string
+    public static function redirecturl($destination, $blWithSessionId = false): string
     {
         // redirect to payment-selection page:
         $oSession = Registry::getSession();
         $dstUrl = Registry::getConfig()->getShopCurrentUrl();
-        $dstUrl .= '&cl=' . $destination;
+        $dstUrl .= 'cl=' . $destination;
+
+        if ($blWithSessionId) {
+            $dstUrl .= '&force_sid=' . $oSession->getId();
+        }
 
         return $oSession->processUrl($dstUrl);
     }

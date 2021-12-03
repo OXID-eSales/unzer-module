@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer;
 
-
 /**
  * Main module information, activation, deactivation point
  */

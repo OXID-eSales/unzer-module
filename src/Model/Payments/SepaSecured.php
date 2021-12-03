@@ -14,6 +14,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Exception;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebitSecured;
@@ -24,7 +25,7 @@ class SepaSecured extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'sepa-direct-debit-secured';
+    protected $Paymentmethod = 'sepa-direct-debit-secured';
 
     /**
      * @var array|bool
@@ -34,7 +35,7 @@ class SepaSecured extends UnzerPayment
     /**
      * @var string
      */
-    protected string $sIban;
+    protected $sIban;
 
     /**
      * @return string
@@ -78,6 +79,7 @@ class SepaSecured extends UnzerPayment
 //           // You'll need to remember the shortId to show it on the success or failure page
             $this->session->setVariable('ShortId', $transaction->getShortId());
             $this->session->setVariable('PaymentId', $transaction->getPaymentId());
+        } catch (Exception $ex) {
         } catch (\Exception $ex) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
         }

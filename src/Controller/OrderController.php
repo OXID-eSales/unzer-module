@@ -35,6 +35,7 @@ class OrderController extends OrderController_parent
     }
 
     /**
+     * @inerhitDoc
      * Checks for order rules confirmation ("ord_agb", "ord_custinfo", "sepaConfirmation" form values)(if no
      * rules agreed - returns to order view), loads basket contents (plus applied
      * price/amount discount if available - checks for stock, checks user data (if no
@@ -81,6 +82,39 @@ class OrderController extends OrderController_parent
         return $result;
     }
 
+    public function unzerExecuteAfterRedirect()
+    {
+        // get basket contents
+        $oUser = $this->getUser();
+        $oBasket = $this->getSession()->getBasket();
+        if ($oBasket->getProductsCount()) {
+            try {
+                $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+
+                //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
+                $iSuccess = $oOrder->finalizeOrder($oBasket, $oUser);
+
+                // performing special actions after user finishes order (assignment to special user groups)
+                $oUser->onOrderExecute($oBasket, $iSuccess);
+
+                // proceeding to next view
+
+                Registry::getUtils()->redirect(UnzerHelper::redirecturl($this->_getNextStep($iSuccess), false));
+                exit;
+            } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
+                $oEx->setDestination('basket');
+                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
+            } catch (\OxidEsales\Eshop\Core\Exception\NoArticleException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
+            }
+        }
+    }
+
+    /**
+     * @return bool|null
+     */
     public function isSepaMandateConfirmationError()
     {
         return $this->blSepaMandateConfirmError;

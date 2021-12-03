@@ -25,7 +25,7 @@ class Card extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'card';
+    protected $Paymentmethod = 'card';
 
     /**
      * @var array|bool
@@ -55,9 +55,9 @@ class Card extends UnzerPayment
             $customer = $this->getCustomerData($oUser);
 
             if ($this->isDirectCharge()) {
-                $transaction = $uzrCard->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
+                $transaction = $uzrCard->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::PENDING_URL, true), $customer, $orderId);
             } else {
-                $transaction = $uzrCard->authorize($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
+                $transaction = $uzrCard->authorize($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::PENDING_URL, true), $customer, $orderId);
             }
             // You'll need to remember the shortId to show it on the success or failure page
             $this->session->setVariable('ShortId', $transaction->getShortId());

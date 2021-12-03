@@ -13,7 +13,7 @@ class Invoice extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'invoice';
+    protected $Paymentmethod = 'invoice';
 
     /**
      * @var array|bool
