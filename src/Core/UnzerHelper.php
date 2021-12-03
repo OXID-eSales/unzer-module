@@ -31,11 +31,11 @@ use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Interfaces\ClassMapping\ClassMappingInterface;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
-use OxidSolutionCatalysts\Unzer\Model\UnzerLogger;
 use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
@@ -222,7 +222,10 @@ class UnzerHelper implements ClassMappingInterface
         $unzer = oxNew(Unzer::class, self::getShopPrivateKey());
 
         if (self::isDebugModeOn()) {
-            $unzer->setDebugMode(true)->setDebugHandler(oxNew(UnzerLogger::class));
+            $container = ContainerFactory::getInstance()->getContainer();
+            $debugHandler = $container->get('OxidSolutionCatalysts\Unzer\Utility\DebugHandler');
+
+            $unzer->setDebugMode(true)->setDebugHandler($debugHandler);
         }
         return $unzer;
     }
@@ -352,14 +355,6 @@ class UnzerHelper implements ClassMappingInterface
         $metadata->addMetadata('paymentprocedure', $UnzerPayment->getPaymentProcedure());
 
         return $metadata;
-    }
-
-    /**
-     * @return UnzerLogger
-     */
-    public static function getUnzerLogger(): UnzerLogger
-    {
-        return oxNew(UnzerLogger::class);
     }
 
     /**
