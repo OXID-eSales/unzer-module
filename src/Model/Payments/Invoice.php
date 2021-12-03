@@ -16,7 +16,7 @@ class Invoice extends UnzerPayment
     protected $Paymentmethod = 'invoice';
 
     /**
-     * @var array|bool
+     * @var array
      */
     protected $aCurrencies = ['EUR'];
 
@@ -30,35 +30,23 @@ class Invoice extends UnzerPayment
 
     /**
      * @return void
+     * @throws UnzerApiException
+     * @throws Exception
      */
     public function execute()
     {
-        // Catch API errors, write the message to your log and show the ClientMessage to the client.
-        try {
-            $unzer = $this->unzerSDK;
+        /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
+        $invoice = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice);
 
-            /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
-            $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice);
+        $customer = $this->getCustomerData();
 
-            $oUser = $this->session->getUser();
-            $oBasket = $this->session->getBasket();
-
-            $customer = $this->getCustomerData($oUser);
-
-            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-
-            $transaction = $invoice->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, UnzerHelper::getMetadata($this));
-
-            // You'll need to remember the shortId to show it on the success or failure page
-            $this->session->setVariable('ShortId', $transaction->getShortId());
-            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
-
-            $bankData = UnzerHelper::getBankData($transaction);
-            $this->session->setVariable('additionalPaymentInformation', $bankData);
-        } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-        } catch (Exception $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
-        }
+        $transaction = $invoice->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata());
+        $this->setSessionVars($transaction);
     }
 }

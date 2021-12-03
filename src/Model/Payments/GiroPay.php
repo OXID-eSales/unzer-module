@@ -14,6 +14,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Exception;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class GiroPay extends UnzerPayment
 {
     /**
@@ -22,9 +26,9 @@ class GiroPay extends UnzerPayment
     protected $Paymentmethod = 'giropay';
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool
@@ -34,8 +38,24 @@ class GiroPay extends UnzerPayment
         return false;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        //TODO
+        /** @var \UnzerSDK\Resources\PaymentTypes\Giropay $giro */
+        $giro = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Giropay);
+
+        $customer = $this->getCustomerData();
+
+        $transaction = $giro->charge(
+            $this->basket->getPrice()->getPrice()
+            , $this->basket->getBasketCurrency()->name
+            , UnzerHelper::redirecturl(self::PENDING_URL)
+            , $customer, $this->unzerOrderId
+            , $this->getMetadata());
+        $this->setSessionVars($transaction);
     }
 }

@@ -18,7 +18,7 @@ class InvoiceSecured extends UnzerPayment
     protected $Paymentmethod = 'invoice-secured';
 
     /**
-     * @var array|bool
+     * @var array
      */
     protected $aCurrencies = ['EUR'];
 
@@ -32,42 +32,31 @@ class InvoiceSecured extends UnzerPayment
 
     /**
      * @return void
+     * @throws UnzerApiException
+     * @throws Exception
      */
     public function execute()
     {
-        // Catch API errors, write the message to your log and show the ClientMessage to the client.
-        try {
-            $unzer = $this->unzerSDK;
+        /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
+        $inv_secured = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured);
 
-            /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
-            $inv_secured = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured);
-
-            $oUser = $this->session->getUser();
-            $oBasket = $this->session->getBasket();
-
-            if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
-                $oUser->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
-            }
-
-            $customer = $this->getCustomerData($oUser);
-
-            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-
-            $basket = UnzerHelper::getUnzerBasket($oBasket, $orderId);
-
-            $transaction = $inv_secured->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, UnzerHelper::getMetadata($this), $basket);
-
-            // You'll need to remember the shortId to show it on the success or failure page
-            $this->session->setVariable('ShortId', $transaction->getShortId());
-            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
-
-            $bankData = UnzerHelper::getBankData($transaction);
-            $this->session->setVariable('additionalPaymentInformation', $bankData);
-            $oUser->save();
-        } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-        } catch (Exception $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
+        if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
+            $this->user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
         }
+
+        $customer = $this->getCustomerData();
+
+        $basket = $this->getUnzerBasket($this->basket);
+
+        $transaction = $inv_secured->charge(
+            $this->basket->getPrice()->getPrice()
+            , $this->basket->getBasketCurrency()->name
+            , UnzerHelper::redirecturl(self::CONTROLLER_URL)
+            , $customer
+            , $this->unzerOrderId
+            , $this->getMetadata()
+            , $basket);
+        $this->setSessionVars($transaction);
+        $this->user->save();
     }
 }

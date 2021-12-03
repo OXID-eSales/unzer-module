@@ -22,9 +22,9 @@ class PayPal extends UnzerPayment
     protected $Paymentmethod = 'paypal';
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool

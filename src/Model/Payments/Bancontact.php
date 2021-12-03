@@ -22,9 +22,9 @@ class Bancontact extends UnzerPayment
     protected $Paymentmethod = 'bancontact';
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool

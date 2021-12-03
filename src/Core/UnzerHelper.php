@@ -24,27 +24,21 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DisplayError;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Transaction;
-use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
-use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
-use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Charge;
-use UnzerSDK\Unzer;
 
 class UnzerHelper
 {
@@ -206,34 +200,35 @@ class UnzerHelper
 
     /**
      * @param string $orderid
+     * @param User $oUser
      * @throws UnzerApiException
-     * @throws Exception
      */
-    public static function writeTransactionToDB(string $orderid)
+    public static function writeTransactionToDB(string $orderid, User $oUser)
     {
         $oTrans = oxNew(Transaction::class);
 
         $unzerPayment = self::getInitialUnzerPayment();
         $unzerCustomer = $unzerPayment->getCustomer();
 
-        $oUser = Registry::getSession()->getUser();
         $metadata = $unzerPayment->getMetadata();
 
-        $oTrans->oscunzertransaction__oxorderid = new Field($orderid);
-        $oTrans->oscunzertransaction__oxshopid = new Field(Registry::getConfig()->getShopId());
-        $oTrans->oscunzertransaction__oxuserid = new Field($oUser->getId());
-        $oTrans->oscunzertransaction__amount = new Field($unzerPayment->getAmount()->getTotal());
-        $oTrans->oscunzertransaction__currency = new Field($unzerPayment->getCurrency());
-        $oTrans->oscunzertransaction__typeid = new Field($unzerPayment->getId());
+        $aParams['oscunzertransaction__oxorderid'] = $orderid;
+        $aParams['oscunzertransaction__oxshopid'] = Registry::getConfig()->getShopId();
+        $aParams['oscunzertransaction__oxuserid'] = $oUser->getId();
+        $aParams['oscunzertransaction__amount'] = $unzerPayment->getAmount()->getTotal();
+        $aParams['oscunzertransaction__currency'] = $unzerPayment->getCurrency();
+        $aParams['oscunzertransaction__typeid'] = $unzerPayment->getId();
         if ($metadata) {
-            $oTrans->oscunzertransaction__metadataid = new Field($metadata->getId());
-            $oTrans->oscunzertransaction__metadata = new Field($metadata->jsonSerialize());
+            $aParams['oscunzertransaction__metadataid'] = $metadata->getId();
+            $aParams['oscunzertransaction__metadata'] = $metadata->jsonSerialize();
         }
         if ($unzerCustomer) {
-            $oTrans->oscunzertransaction__customerid = new Field($unzerCustomer->getId());
+            $aParams['oscunzertransaction__customerid'] = $unzerCustomer->getId();
         }
-        $oTrans->oscunzertransaction__oxactiondate = new Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
-        $oTrans->oscunzertransaction__oxaction = new Field($unzerPayment->getStateName());
+        $aParams['oscunzertransaction__oxactiondate'] = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
+        $aParams['oscunzertransaction__oxaction'] = $unzerPayment->getStateName();
+
+        $oTrans->assign($aParams);
         $oTrans->save();
     }
 
@@ -254,43 +249,5 @@ class UnzerHelper
         }
 
         return null;
-    }
-
-    /**
-     * @param UnzerPayment $UnzerPayment
-     * @return Metadata
-     * @throws Exception
-     */
-    public static function getMetadata(UnzerPayment $UnzerPayment): Metadata
-    {
-        $metadata = new Metadata();
-        $metadata->setShopType("Oxid eShop " . (new Facts())->getEdition());
-        $metadata->setShopVersion(ShopVersion::getVersion());
-        $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
-        $metadata->addMetadata('paymentmethod', $UnzerPayment->getPaymentMethod());
-        $metadata->addMetadata('paymentprocedure', $UnzerPayment->getPaymentProcedure());
-
-        return $metadata;
-    }
-
-    /**
-     * @param Basket $oBasket
-     * @param string $orderId
-     * @return \UnzerSDK\Resources\Basket
-     */
-    public static function getUnzerBasket(Basket $oBasket, string $orderId): \UnzerSDK\Resources\Basket
-    {
-        $aUnzerBasketItem = [];
-        $aBasketItems = $oBasket->getContents();
-        foreach ($aBasketItems as $oBasketItem) {
-            /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
-            $basketItem = (new BasketItem($oBasketItem->getTitle(), $oBasketItem->getUnitPrice()->getNettoPrice(), $oBasketItem->getUnitPrice()->getBruttoPrice(), (int)$oBasketItem->getAmount()))
-                ->setAmountGross($oBasketItem->getPrice()->getPrice())
-                ->setAmountVat($oBasketItem->getPrice()->getVatValue());
-
-            $aUnzerBasketItem[] = $basketItem;
-        }
-
-        return new \UnzerSDK\Resources\Basket($orderId, $oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, $aUnzerBasketItem);
     }
 }

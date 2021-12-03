@@ -30,7 +30,7 @@ class Sepa extends UnzerPayment
     protected $Paymentmethod = 'sepa-direct-debit';
 
     /**
-     * @var array|bool
+     * @var array
      */
     protected $aCurrencies = ['EUR'];
 
@@ -63,27 +63,27 @@ class Sepa extends UnzerPayment
         return true;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        try {
-            $unzer = $this->unzerSDK;
+        $sId = $this->getUzrId();
+        /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
+        $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
-            $sId = $this->getUzrId();
-            /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
-            $uzrSepa = $unzer->fetchPaymentType($sId);
-            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-            $oUser = $this->session->getUser();
-            $oBasket = $this->session->getBasket();
-            $customer = $this->getCustomerData($oUser);
+        $customer = $this->getCustomerData();
 
-            $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
-//           // You'll need to remember the shortId to show it on the success or failure page
-            $this->session->setVariable('ShortId', $transaction->getShortId());
-            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
-        } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-        } catch (Exception $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
-        }
+        $transaction = $uzrSepa->charge(
+            $this->basket->getPrice()->getPrice()
+            , $this->basket->getBasketCurrency()->name
+            , UnzerHelper::redirecturl(self::CONTROLLER_URL)
+            , $customer
+            , $this->unzerOrderId
+            , $this->getMetadata());
+
+        $this->setSessionVars($transaction);
     }
 }
