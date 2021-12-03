@@ -78,17 +78,17 @@ final class Version20211129120012 extends AbstractMigration
 
     protected function createStaticContent(): void
     {
-        foreach (Events::getStaticVCMS() as $oContent) {
+        foreach (Events::getStaticContents() as $content) {
             $langRows = '';
             $sqlPlaceHolder = '?, ?, ?';
-            $sqlValues = [md5($oContent['OXLOADID'] . '1'), $oContent['OXLOADID'], 1];
+            $sqlValues = [md5($content['OXLOADID'] . '1'), $content['OXLOADID'], 1];
             foreach ($this->getLanguageIds() as $langId => $langAbbr) {
-                if (isset($oContent['oxcontent_' . $langAbbr])) {
+                if (isset($content['oxcontent_' . $langAbbr])) {
                     $langRows .= ($langId == 0) ? ', `OXTITLE`, `OXCONTENT`, `OXACTIVE`' :
                         sprintf(', `OXTITLE_%s`, `OXCONTENT_%s`, `OXACTIVE_%s`', $langId, $langId, $langId);
                     $sqlPlaceHolder .= ', ?, ?, ?';
-                    $sqlValues[] = $oContent['oxtitle_' . $langAbbr];
-                    $sqlValues[] = $oContent['oxcontent_' . $langAbbr];
+                    $sqlValues[] = $content['oxtitle_' . $langAbbr];
+                    $sqlValues[] = $content['oxcontent_' . $langAbbr];
                     $sqlValues[] = '1';
                 }
             }
