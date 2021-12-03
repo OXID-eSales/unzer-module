@@ -19,7 +19,7 @@ class Sofort extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'sofort';
+    protected $Paymentmethod = 'sofort';
 
     /**
      * @var array|bool

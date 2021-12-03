@@ -19,7 +19,7 @@ class Ideal extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'ideal';
+    protected $Paymentmethod = 'ideal';
 
     /**
      * @var array|bool

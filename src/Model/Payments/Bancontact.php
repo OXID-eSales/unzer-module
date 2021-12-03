@@ -19,7 +19,7 @@ class Bancontact extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'bancontact';
+    protected $Paymentmethod = 'bancontact';
 
     /**
      * @var array|bool
