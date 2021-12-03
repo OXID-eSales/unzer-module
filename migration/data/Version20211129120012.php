@@ -81,17 +81,18 @@ final class Version20211129120012 extends AbstractMigration
             $sqlPlaceHolder = '?, ?, ?';
             $sqlValues = [md5($oContent['OXLOADID'] . '1'), $oContent['OXLOADID'], 1];
             foreach ($this->getLanguageIds() as $langId => $langAbbr) {
-                if (isset($oContent['oxcontent_'.$langAbbr])) {
+                if (isset($oContent['oxcontent_' . $langAbbr])) {
                     $langRows .= ($langId == 0) ? ', `OXTITLE`, `OXCONTENT`, `OXACTIVE`' :
                         sprintf(', `OXTITLE_%s`, `OXCONTENT_%s`, `OXACTIVE_%s`', $langId, $langId, $langId);
                     $sqlPlaceHolder .= ', ?, ?, ?';
-                    $sqlValues[] = $oContent['oxtitle_'.$langAbbr];
-                    $sqlValues[] = $oContent['oxcontent_'.$langAbbr];
+                    $sqlValues[] = $oContent['oxtitle_' . $langAbbr];
+                    $sqlValues[] = $oContent['oxcontent_' . $langAbbr];
                     $sqlValues[] = '1';
                 }
             }
 
-            $this->addSql("INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
+            $this->addSql(
+                "INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
                 " . $langRows . ")
                 VALUES (" . $sqlPlaceHolder . ")",
                 $sqlValues
@@ -100,21 +101,32 @@ final class Version20211129120012 extends AbstractMigration
 
         $this->addSql("INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
                 " . $langRows . ")
-        SELECT md5(CONCAT(OXLOADID, s.OXID)), OXLOADID, s.OXID " . $this->getPrefixColumns($langRows, 'c') . "  FROM oxcontents c, oxshops s
+        SELECT md5(CONCAT(OXLOADID, s.OXID)), OXLOADID, s.OXID " .
+        $this->getPrefixColumns($langRows, 'c') .
+        " FROM oxcontents c, oxshops s
         WHERE OXLOADID IN ('oscunzersepamandatetext', 'oscunzersepamandateconfirmation') AND c.OXSHOPID=1");
     }
 
     protected function getPrefixColumns($langRows, $tablePrefix)
     {
-       return str_replace(', ', ', ' . $tablePrefix . '.', $langRows);
+        return str_replace(', ', ', ' . $tablePrefix . '.', $langRows);
     }
 
     protected function setCountriesToPayment($paymentDefinitions, $paymentId)
     {
         foreach ($paymentDefinitions['countries'] as $country) {
             if (array_key_exists($country, $this->getIsoCountries())) {
-                $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
-                            VALUES(?, ?, ?, ?)", [md5($paymentId . $this->getIsoCountries()[$country] . ".oxcountry"), $paymentId, $this->getIsoCountries()[$country], 'oxcountry']);
+                $this->addSql(
+                    "INSERT IGNORE INTO `oxobject2payment`
+                    (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                    VALUES(?, ?, ?, ?)",
+                    [
+                        md5($paymentId . $this->getIsoCountries()[$country] . ".oxcountry"),
+                        $paymentId,
+                        $this->getIsoCountries()[$country],
+                        'oxcountry'
+                    ]
+                );
             }
         }
     }
