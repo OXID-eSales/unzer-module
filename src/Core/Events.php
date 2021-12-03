@@ -45,7 +45,7 @@ class Events
     /**
      * @var array[]
      */
-    private static $_aPayments = [
+    private static $paymentDefinitions = [
         //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
         //Alipay is China’s leading third-party mobile and online payment solution.
@@ -293,6 +293,47 @@ class Events
     ];
 
     /**
+     * @var array[]
+     */
+    private static $staticContents = [
+        [
+            'oxloadid' => 'oscunzersepamandatetext',
+            'oxactive' => 1,
+            'oxtitle_de' => 'SEPA Lastschrift-Mandat (Bankeinzug)',
+            'oxtitle_en' => 'SEPA direct debit mandate (direct debit)',
+            'oxcontent_de' => '<p>Ich ermächtige [{$oxcmp_shop->oxshops__oxname->value}], Zahlungen von meinem Konto mittels
+                SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von
+                [{$oxcmp_shop->oxshops__oxname->value}] auf mein Konto gezogenen SEPA Lastschriften einzulösen.</p>
+                <p>Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum,die Erstattung des belasteten
+                Betrags verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.</p>
+                <p>Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften weise ich meine Bank
+                unwiderruflich an, [{$oxcmp_shop->oxshops__oxname->value}]oder Dritten auf Anforderung meinen Namen, Adresse und Geburtsdatum
+                vollständig mitzuteilen.</p>',
+            'oxcontent_en' => '<p>By signing this mandate form, you authorise [{$oxcmp_shop->oxshops__oxname->value}] to send instructions to
+                your bank to debit your account and your bank to debit your account in accordance with the instructions from
+                [{$oxcmp_shop->oxshops__oxname->value}].</p>
+                <p>Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your
+                agreement with your bank.</p>
+                <p>A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding
+                this SEPA mandate are explained in a statement that you can obtain from your bank.<br><br>In case of refusal or rejection
+                of direct debit payment I instruct my bank irrevocably to inform [{$oxcmp_shop->oxshops__oxname->value}] or any
+                third party upon request about my name, address and date of birth.</p>'
+        ],
+        [
+            'oxloadid' => 'oscunzersepamandateconfirmation',
+            'oxactive' => 1,
+            'oxtitle_de' => 'Unzer Sepa',
+            'oxtitle_en' => 'Unzer Sepa Text',
+            'oxcontent_de' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+                <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:\'plain=1\'}]\', \'agb_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandat</a> bestätigen.
+                [{/oxifcontent}]',
+            'oxcontent_en' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+                Confirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandate</a>.
+                [{/oxifcontent}]'
+        ]
+    ];
+
+    /**
      * Check if Unzer is used for sub-shops.
      *
      * @return bool
@@ -322,7 +363,7 @@ class Events
     public static function disableUnzerPaymentMethods()
     {
         $payment = oxNew(Payment::class);
-        foreach (self::$_aPayments as $paymentid => $aPayment) {
+        foreach (self::getUnzerPayments() as $paymentid => $aPayment) {
             if ($payment->load($paymentid)) {
                 $payment->oxpayments__oxactive = new Field(0);
                 $payment->save();
@@ -332,9 +373,13 @@ class Events
 
     public static function getUnzerPayments()
     {
-        return self::$_aPayments;
+        return self::$paymentDefinitions;
     }
 
+    public static function getStaticContents()
+    {
+        return self::$staticContents;
+    }
 
     /**
      * Execute action on activate event
