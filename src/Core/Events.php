@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OXID eSales Unzer module.
  *
@@ -62,7 +63,7 @@ class Events
             in the online area make AliPay indispensable for merchants who sell to China. The many Chinese tourists abroad
             also like to pay with their domestic payment method. The most important product is the Alipay wallet. With the
             associated app, buyers can carry out transactions directly with their smartphone.",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
@@ -86,7 +87,7 @@ class Events
             'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
             world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
             providers.",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Credit cards and debit cards are the most common payment method in e-commerce.
@@ -100,7 +101,7 @@ class Events
             'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
             world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
             providers.",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Electronic Payment Standard (EPS) is an online payment system used in Austria.
@@ -194,7 +195,7 @@ class Events
             million PayPal customers. Buyers then use it to pay in online shops in particular. But they also use the Google
             Pay app on their smartphone in brick-and-mortar retail. Since no bank details are transferred during the transaction,
             the payment is considered secure. ",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
@@ -287,7 +288,7 @@ class Events
             app, analogous to WhatsApp. Over time, the app has been expanded to include more and more tools - in 2015 also
             a payment system comparable to Google Pay or Apple Pay. Thanks to the WeChat social platform, WeChat Pay has
             a huge user base of over a billion chat users. Of these, around 600 million already trust WeChat Pay.",
-            'countries' => ''
+            'countries' => []
         ],
     ];
 
@@ -327,10 +328,6 @@ class Events
                 $payment->save();
             }
         }
-    }
-
-    {
-
     }
 
     public static function getUnzerPayments()
