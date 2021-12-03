@@ -31,7 +31,7 @@ final class Version20211129120012 extends AbstractMigration
 
     protected $languageIds;
 
-    private function getIsoCountries()
+    private function getIsoCountries(): array
     {
         if (!$this->aIsoCountries) {
             $sSql = "SELECT OXID, OXISOALPHA2 FROM oxcountry";
@@ -76,7 +76,7 @@ final class Version20211129120012 extends AbstractMigration
         }
     }
 
-    protected function createStaticContent()
+    protected function createStaticContent(): void
     {
         foreach (Events::getStaticVCMS() as $oContent) {
             $langRows = '';
@@ -109,12 +109,12 @@ final class Version20211129120012 extends AbstractMigration
         WHERE OXLOADID IN ('oscunzersepamandatetext', 'oscunzersepamandateconfirmation') AND c.OXSHOPID=1");
     }
 
-    protected function getPrefixColumns($langRows, $tablePrefix)
+    protected function getPrefixColumns($langRows, $tablePrefix): string
     {
         return str_replace(', ', ', ' . $tablePrefix . '.', $langRows);
     }
 
-    protected function setCountriesToPayment($paymentDefinitions, $paymentId)
+    protected function setCountriesToPayment($paymentDefinitions, $paymentId): void
     {
         foreach ($paymentDefinitions['countries'] as $country) {
             if (array_key_exists($country, $this->getIsoCountries())) {
@@ -136,7 +136,7 @@ final class Version20211129120012 extends AbstractMigration
     /**
      * get the language-IDs
      */
-    protected function getLanguageIds()
+    protected function getLanguageIds(): array
     {
         if (is_null($this->languageIds)) {
             $this->languageIds = [];
