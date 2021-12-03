@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OXID eSales Unzer module.
  *
@@ -263,7 +264,7 @@ class UnzerHelper
     public static function getMetadata(UnzerPayment $UnzerPayment): Metadata
     {
         $metadata = new Metadata();
-        $metadata->setShopType("Oxid eShop " . (new Facts)->getEdition());
+        $metadata->setShopType("Oxid eShop " . (new Facts())->getEdition());
         $metadata->setShopVersion(ShopVersion::getVersion());
         $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $UnzerPayment->getPaymentMethod());
