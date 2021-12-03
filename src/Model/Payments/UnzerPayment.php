@@ -282,15 +282,15 @@ abstract class UnzerPayment
             // Create an Unzer object using your private key and register a debug handler if you want to.
 
             // Redirect to success if the payment has been successfully completed.
-            $payment = $unzer->fetchPayment($paymentId);
-            $this->transaction = $payment->getInitialTransaction();
+            $unzerPayment = $unzer->fetchPayment($paymentId);
+            $this->transaction = $unzerPayment->getInitialTransaction();
             if ($this->transaction->isSuccess()) {
                 // TODO log success
                 //$msg = UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer());
                 $result = true;
             } elseif ($this->transaction->isPending()) {
                 // TODO Handle Pending...
-                $paymentType = $payment->getPaymentType();
+                $paymentType = $unzerPayment->getPaymentType();
                 if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
                     if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
                         Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
@@ -304,6 +304,7 @@ abstract class UnzerPayment
                 UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer()));
             }
         } catch (UnzerApiException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
         } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
