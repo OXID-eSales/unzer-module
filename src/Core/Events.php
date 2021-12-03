@@ -63,7 +63,8 @@ class Events
             Group. Alipay now has 870 million users. 80 percent of the market share in mobile payment and more than 50 percent
             in the online area make AliPay indispensable for merchants who sell to China. The many Chinese tourists abroad
             also like to pay with their domestic payment method. The most important product is the Alipay wallet. With the
-            associated app, buyers can carry out transactions directly with their smartphone."
+            associated app, buyers can carry out transactions directly with their smartphone.",
+            'countries' => ''
         ],
 
         //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
@@ -72,7 +73,8 @@ class Events
             'de_desc' => "Bancontact",
             'en_desc' => "Bancontact",
             'de_longdesc' => "Bancontact ist ein belgisches Unternehmen, das benutzerfreundliche Lösungen für ein einfaches tägliches Einkaufserlebnis bietet.",
-            'en_longdesc' => "Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience."
+            'en_longdesc' => "Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.",
+            'countries' => ['BE']
         ],
 
         //Credit cards and debit cards are the most common payment method in e-commerce.
@@ -85,7 +87,8 @@ class Events
             alle wichtigen Anbieter akzeptieren.",
             'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
             world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
-            providers."
+            providers.",
+            'countries' => ''
         ],
 
         //Credit cards and debit cards are the most common payment method in e-commerce.
@@ -98,7 +101,8 @@ class Events
             alle wichtigen Anbieter akzeptieren.",
             'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
             world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
-            providers."
+            providers.",
+            'countries' => ''
         ],
 
         //Electronic Payment Standard (EPS) is an online payment system used in Austria.
@@ -113,7 +117,8 @@ class Events
             'en_longdesc' => "Electronic Payment Standard - or eps for short - is an Austrian direct transfer procedure.
             It was designed by the country's largest banks together with the government. Similar to the German counterpart
             Giropay, buyers can use eps to pay securely and without transmitting sensitive data. Electronic Payment Standard
-            offers merchants above all protection against payment defaults."
+            offers merchants above all protection against payment defaults.",
+            'countries' => ['AT']
         ],
 
         //Giropay is an online payment method used in Germany.
@@ -126,7 +131,8 @@ class Events
             per Vorkasse bezahlen. Dabei werden keine sensiblen Daten an den Händler übermittelt.",
             'en_longdesc' => "Giropay is particularly widespread in Germany. The online process was specially designed
             and optimized by the German banking industry for e-commerce. Buyers can use it to pay securely in advance. No
-            sensitive data is transmitted to the dealer."
+            sensitive data is transmitted to the dealer.",
+            'countries' => ['DE']
         ],
 
         //iDEAL is the most popular method for online payments in the Netherlands.
@@ -141,7 +147,8 @@ class Events
             'en_longdesc' => "iDEAL is the most popular payment method in Dutch e-commerce and is seamlessly integrated into
             the online banking of almost all major banks in the country. Buyers can pay with their familiar access data.
             This convenient checkout process increases popularity and conversions. IDEAL is used for almost every second
-            online transaction in the Netherlands."
+            online transaction in the Netherlands.",
+            'countries' => ['NL']
         ],
 
         //Unzer Installment lets your customers pay in monthly payments.
@@ -150,7 +157,8 @@ class Events
             'de_desc' => "Ratenzahlung",
             'en_desc' => "Installment",
             'de_longdesc' => "Ratenzahlung mit Unzer",
-            'en_longdesc' => "Unzer installment"
+            'en_longdesc' => "Unzer installment",
+            'countries' => ['DE', 'AT']
         ],
 
         //Unzer Invoice lets you issue an invoice and then collect the payment.
@@ -159,7 +167,8 @@ class Events
             'de_desc' => "Rechnung",
             'en_desc' => "Invoice",
             'de_longdesc' => "Rechnung, ausgestellt von Unzer",
-            'en_longdesc' => "Invoice, issued by Unzer"
+            'en_longdesc' => "Invoice, issued by Unzer",
+            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT']
         ],
 
         //Unzer Invoice Secured lets you issue an invoice and then collect the payment, your payment is secured.
@@ -168,7 +177,8 @@ class Events
             'de_desc' => "Rechnung Secured",
             'en_desc' => "Invoice Secured",
             'de_longdesc' => "Rechnung, ausgestellt von Unzer (gesicherter Kanal)",
-            'en_longdesc' => "Invoice, issued by Unzer (secure channel)"
+            'en_longdesc' => "Invoice, issued by Unzer (secure channel)",
+            'countries' => ['DE', 'AT']
         ],
 
         //PayPal is one of the world’s most popular online payment systems.
@@ -185,7 +195,8 @@ class Events
             use the e-wallet worldwide - in over 200 markets and 25 currencies. In Germany alone you can reach around 25
             million PayPal customers. Buyers then use it to pay in online shops in particular. But they also use the Google
             Pay app on their smartphone in brick-and-mortar retail. Since no bank details are transferred during the transaction,
-            the payment is considered secure. "
+            the payment is considered secure. ",
+            'countries' => ''
         ],
 
         //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
@@ -198,7 +209,8 @@ class Events
             der Händler die Ware.",
             'en_longdesc' => "In the case of prepayment or prepayment, the name already explains how the payment method works:
             online buyers transfer the money for their order in advance. Only when the amount has been received does the
-            dealer send the goods."
+            dealer send the goods.",
+            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT']
         ],
 
 
@@ -213,7 +225,8 @@ class Events
             unterstützt.",
             'en_longdesc' => "Przelewy24 is the most popular online payment method in Poland. It not only enables buyers
             to make payments from their own bank account or credit card. It also supports alternative payment methods such
-            as SMS. The requirement for use is an account with one of the more than 150 Polish banks that Przelewy24 supports."
+            as SMS. The requirement for use is an account with one of the more than 150 Polish banks that Przelewy24 supports.",
+            'countries' => ['PL']
         ],
 
         //Unzer Direct Debit lets you accept payments in euro.
@@ -222,7 +235,8 @@ class Events
             'de_desc' => "SEPA-Lastschrift",
             'en_desc' => "SEPA Direct Debit",
             'de_longdesc' => "Sie erteilen ein SEPA-Lastschriftmandat",
-            'en_longdesc' => "You issue a SEPA direct debit mandate"
+            'en_longdesc' => "You issue a SEPA direct debit mandate",
+            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT']
         ],
 
         //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
@@ -231,7 +245,8 @@ class Events
             'de_desc' => "SEPA-Lastschrift Secured",
             'en_desc' => "SEPA Direct Debit Secured",
             'de_longdesc' => "Sie erteilen ein SEPA-Lastschriftmandat",
-            'en_longdesc' => "You issue a SEPA direct debit mandate through a"
+            'en_longdesc' => "You issue a SEPA direct debit mandate through a",
+            'countries' => ['DE']
         ],
 
         //Sofort is an online payment method used in select European countries.
@@ -240,7 +255,8 @@ class Events
             'de_desc' => "Sofort",
             'en_desc' => "Sofort",
             'de_longdesc' => "Sofortüberweisung (gesicherter Kanal)",
-            'en_longdesc' => "Instant bank transfer (secure channel)"
+            'en_longdesc' => "Instant bank transfer (secure channel)",
+            'countries' => ['SE', 'NO', 'FI', 'DK', 'DE', 'NL', 'BE', 'CH', 'FR', 'IT', 'PL', 'ES', 'PT', 'GB', 'HU', 'CZ', 'AU', 'SK', 'US']
         ],
 
         //Unzer Bank Transfer lets your customers pay directly from their bank account.
@@ -255,7 +271,8 @@ class Events
             'en_longdesc' => "Unzer Bank Transfer is our direct transfer or payment initiation service. With it, buyers
             can conveniently order a transfer in the checkout process. To do this, they enter the access data for their
             online banking and also authenticate themselves with a TAN. Unzer bank transfer checks in real time whether
-            the account is sufficient. The amount will be debited directly."
+            the account is sufficient. The amount will be debited directly.",
+            'countries' => ['DE', 'AT']
         ],
 
         //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
@@ -271,7 +288,8 @@ class Events
             'en_longdesc' => "WeChat Pay is a payment system from China operated by Tencent. WeChat was originally a communication
             app, analogous to WhatsApp. Over time, the app has been expanded to include more and more tools - in 2015 also
             a payment system comparable to Google Pay or Apple Pay. Thanks to the WeChat social platform, WeChat Pay has
-            a huge user base of over a billion chat users. Of these, around 600 million already trust WeChat Pay."
+            a huge user base of over a billion chat users. Of these, around 600 million already trust WeChat Pay.",
+            'countries' => ''
         ],
     ];
 
@@ -383,6 +401,12 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
             $oContent->save();
         }
     }
+
+    public static function getUnzerPayments()
+    {
+        return self::$_aPayments;
+    }
+
 
     /**
      * Execute action on activate event
