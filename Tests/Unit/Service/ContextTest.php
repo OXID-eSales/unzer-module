@@ -1,9 +1,9 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Utility;
+namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Core\Config;
-use OxidSolutionCatalysts\Unzer\Utility\Context;
+use OxidSolutionCatalysts\Unzer\Service\Context;
 use PHPUnit\Framework\TestCase;
 
 class ContextTest extends TestCase

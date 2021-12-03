@@ -1,9 +1,9 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Utility;
+namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use Monolog\Logger;
-use OxidSolutionCatalysts\Unzer\Utility\DebugHandler;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use PHPUnit\Framework\TestCase;
 
 class DebugHandlerTest extends TestCase
