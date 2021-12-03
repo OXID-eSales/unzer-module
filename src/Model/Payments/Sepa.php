@@ -66,11 +66,11 @@ class Sepa extends UnzerPayment
     public function execute()
     {
         try {
-            $oUnzer = $this->unzerSDK;
+            $unzer = $this->unzerSDK;
 
             $sId = $this->getUzrId();
             /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
-            $uzrSepa = $oUnzer->fetchPaymentType($sId);
+            $uzrSepa = $unzer->fetchPaymentType($sId);
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
             $oUser = $this->session->getUser();
             $oBasket = $this->session->getBasket();
