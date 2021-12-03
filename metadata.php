@@ -34,7 +34,7 @@ $aModule = [
         \OxidEsales\Eshop\Application\Model\Payment::class                      => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class         => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class,
         \OxidEsales\Eshop\Application\Model\PaymentGateway::class               => \OxidSolutionCatalysts\Unzer\Model\PaymentGateway::class,
-        \OxidEsales\Eshop\Application\Model\Order::class                        => \OxidSolutionCatalysts\Unzer\Model\Order::class
+        \OxidEsales\Eshop\Application\Model\Order::class                        => \OxidSolutionCatalysts\Unzer\Model\Order::class,
     ],
     'controllers' => [
         'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,
@@ -56,7 +56,6 @@ $aModule = [
         'modules/osc/unzer/unzer_invoice_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_secured.tpl',
         'modules/osc/unzer/unzer_paypal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal.tpl',
         'modules/osc/unzer/unzer_paypal_recurring.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal_recurring.tpl',
-        'modules/osc/unzer/unzer_prepayment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_prepayment.tpl',
         'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
         'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
         'modules/osc/unzer/unzer_sofort.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sofort.tpl',

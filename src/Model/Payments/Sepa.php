@@ -27,7 +27,7 @@ class Sepa extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'sepa-direct-debit';
+    protected $Paymentmethod = 'sepa-direct-debit';
 
     /**
      * @var array|bool
@@ -37,7 +37,7 @@ class Sepa extends UnzerPayment
     /**
      * @var string
      */
-    protected string $sIban;
+    protected $sIban;
 
     /**
      * @return string

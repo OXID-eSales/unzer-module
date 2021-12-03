@@ -21,7 +21,7 @@ class ApplePay extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'applepay';
+    protected $Paymentmethod = 'applepay';
 
     /**
      * @var array|bool
