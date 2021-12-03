@@ -38,7 +38,7 @@ class Invoice extends UnzerPayment
             $unzer = $this->unzerSDK;
 
             /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
-            $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice);
+            $invoice = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice());
 
             $oUser = $this->session->getUser();
             $oBasket = $this->session->getBasket();
