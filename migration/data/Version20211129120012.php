@@ -81,7 +81,7 @@ final class Version20211129120012 extends AbstractMigration
         foreach (Events::getStaticContents() as $content) {
             $langRows = '';
             $sqlPlaceHolder = '?, ?, ?';
-            $sqlValues = [md5($content['OXLOADID'] . '1'), $content['OXLOADID'], 1];
+            $sqlValues = [md5($content['oxloadid'] . '1'), $content['oxloadid'], 1];
             foreach ($this->getLanguageIds() as $langId => $langAbbr) {
                 if (isset($content['oxcontent_' . $langAbbr])) {
                     $langRows .= ($langId == 0) ? ', `OXTITLE`, `OXCONTENT`, `OXACTIVE`' :
