@@ -10,6 +10,9 @@ services:
   OxidEsales\Eshop\Core\Config:
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getConfig' ]
 
+  OxidEsales\Eshop\Core\Session:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getSession' ]
+
   OxidSolutionCatalysts\Unzer\Logger:
     class: Monolog\Logger
     factory: ['@OxidSolutionCatalysts\Unzer\Logger\Factory', 'create']
@@ -26,15 +29,16 @@ services:
     public: true
     arguments:
       $loggerName: 'Unzer Payment Logger'
-      $logFilePath: '@=service("OxidSolutionCatalysts\\Unzer\\Utility\\Context").getUnzerLogFilePath()'
+      $logFilePath: '@=service("OxidSolutionCatalysts\\Unzer\\Service\\Context").getUnzerLogFilePath()'
       $logLevel: !php/const Psr\Log\LogLevel::INFO
 
-  OxidSolutionCatalysts\Unzer\Utility\Context:
-    class: OxidSolutionCatalysts\Unzer\Utility\Context
+  OxidSolutionCatalysts\Unzer\Service\:
+    resource: 'src/Service/*'
+    exclude: 'src/Service/{DebugHandler}'
     public: true
 
-  OxidSolutionCatalysts\Unzer\Utility\DebugHandler:
-    class: OxidSolutionCatalysts\Unzer\Utility\DebugHandler
+  OxidSolutionCatalysts\Unzer\Service\DebugHandler:
+    class: OxidSolutionCatalysts\Unzer\Service\DebugHandler
     public: true
     arguments:
       $moduleLogger: '@OxidSolutionCatalysts\Unzer\Logger'

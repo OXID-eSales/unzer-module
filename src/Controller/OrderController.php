@@ -29,7 +29,9 @@ class OrderController extends OrderController_parent
 
     public function getUnzerPubKey()
     {
-        return UnzerHelper::getShopPublicKey();
+        /** @var \OxidSolutionCatalysts\Unzer\Service\ModuleSettings $settings */
+        $settings = $this->getContainer()->get(\OxidSolutionCatalysts\Unzer\Service\ModuleSettings::class);
+        return $settings->getShopPublicKey();
     }
 
     /**
@@ -44,7 +46,6 @@ class OrderController extends OrderController_parent
      *
      * @return string
      */
-    public function execute(): string
     public function execute()
     {
         $foundIssue = false;
@@ -114,7 +115,6 @@ class OrderController extends OrderController_parent
     /**
      * @return bool|null
      */
-    public function isSepaMandateConfirmationError(): ?bool
     public function isSepaMandateConfirmationError()
     {
         return $this->blSepaMandateConfirmError;

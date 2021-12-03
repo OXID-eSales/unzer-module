@@ -23,25 +23,13 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 
 class ViewConfig extends ViewConfig_parent
 {
-    /** @var UnzerHelper|null \OxidSolutionCatalysts\Unzer\Core\UnzerHelper */
-    protected $UnzerHelper = null;
-
-    /**
-     * Returns Unzer config.
-     *
-     * @return UnzerHelper
-     */
-    protected function getUnzerHelper(): ?UnzerHelper
+    private function getUnzerModuleSettings(): ModuleSettings
     {
-        if (is_null($this->UnzerHelper)) {
-            $this->UnzerHelper = oxNew(UnzerHelper::class);
-        }
-
-        return $this->UnzerHelper;
+        return $this->getContainer()->get(ModuleSettings::class);
     }
 
     /**
@@ -51,7 +39,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerSystemMode(): string
     {
-        return $this->getUnzerHelper()->getUnzerSystemMode();
+        return $this->getUnzerModuleSettings()->getSystemMode();
     }
 
     /**
@@ -61,7 +49,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPubKey(): string
     {
-        return $this->getUnzerHelper()->getShopPublicKey();
+        return $this->getUnzerModuleSettings()->getShopPublicKey();
     }
 
     /**
@@ -71,7 +59,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPrivKey(): string
     {
-        return $this->getUnzerHelper()->getShopPrivateKey();
+        return $this->getUnzerModuleSettings()->getShopPrivateKey();
     }
 
     /**

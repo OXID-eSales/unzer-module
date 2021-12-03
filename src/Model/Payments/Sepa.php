@@ -66,19 +66,20 @@ class Sepa extends UnzerPayment
     public function execute()
     {
         try {
-            $oUnzer = UnzerHelper::getUnzer();
+            $unzer = $this->unzerSDK;
+
             $sId = $this->getUzrId();
             /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
-            $uzrSepa = $oUnzer->fetchPaymentType($sId);
+            $uzrSepa = $unzer->fetchPaymentType($sId);
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-            $oUser = UnzerHelper::getUser();
-            $oBasket = UnzerHelper::getBasket();
+            $oUser = $this->session->getUser();
+            $oBasket = $this->session->getBasket();
             $customer = $this->getCustomerData($oUser);
 
             $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId);
 //           // You'll need to remember the shortId to show it on the success or failure page
-            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
-            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
+            $this->session->setVariable('ShortId', $transaction->getShortId());
+            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
         } catch (Exception $e) {

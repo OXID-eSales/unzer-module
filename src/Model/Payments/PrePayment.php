@@ -44,14 +44,13 @@ class PrePayment extends UnzerPayment
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
             // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = UnzerHelper::getUnzer();
+            $unzer = $this->unzerSDK;
 
             /** @var \UnzerSDK\Resources\PaymentTypes\Prepayment $prepayment */
             $prepayment = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Prepayment());
 
-            $oUser = UnzerHelper::getUser();
-            $oBasket = UnzerHelper::getBasket();
-
+            $oUser = $this->session->getUser();
+            $oBasket = $this->session->getBasket();
             $customer = $this->getCustomerData($oUser);
 
             $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));

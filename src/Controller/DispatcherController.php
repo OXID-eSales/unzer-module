@@ -15,8 +15,10 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
 
 class DispatcherController extends FrontendController
 {
@@ -26,13 +28,14 @@ class DispatcherController extends FrontendController
      */
     public function executePayment(string $paymentid): bool
     {
-        $isRedirect = Registry::getRequest()->getRequestParameter('uzrredirect');
-        if (!$isRedirect) {
-            $oUnzerPayment = UnzerHelper::getUnzerObjectbyPaymentId($paymentid);
+        $payment = oxNew(Payment::class);
+        $payment->load($paymentid);
 
-            $oUnzerPayment->execute();
-        }
+        /** @var UnzerPaymentLoader $paymentLoader */
+        $paymentLoader = ContainerFactory::getInstance()->getContainer()->get(UnzerPaymentLoader::class);
 
-        return $oUnzerPayment->checkpaymentstatus($isRedirect);
+        $oUnzerPayment = $paymentLoader->getUnzerPayment($payment);
+        $oUnzerPayment->execute();
+        return $oUnzerPayment->checkPaymentstatus();
     }
 }

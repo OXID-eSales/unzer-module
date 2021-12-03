@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Utility;
+namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
