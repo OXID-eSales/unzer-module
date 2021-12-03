@@ -77,12 +77,13 @@ class Sepa extends UnzerPayment
         $customer = $this->getCustomerData();
 
         $transaction = $uzrSepa->charge(
-            $this->basket->getPrice()->getPrice()
-            , $this->basket->getBasketCurrency()->name
-            , UnzerHelper::redirecturl(self::CONTROLLER_URL)
-            , $customer
-            , $this->unzerOrderId
-            , $this->getMetadata());
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
 
         $this->setSessionVars($transaction);
     }

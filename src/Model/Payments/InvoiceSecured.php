@@ -46,16 +46,18 @@ class InvoiceSecured extends UnzerPayment
 
         $customer = $this->getCustomerData();
 
-        $basket = $this->getUnzerBasket($this->basket);
+        $uzrBasket = $this->getUnzerBasket($this->basket);
 
         $transaction = $inv_secured->charge(
-            $this->basket->getPrice()->getPrice()
-            , $this->basket->getBasketCurrency()->name
-            , UnzerHelper::redirecturl(self::CONTROLLER_URL)
-            , $customer
-            , $this->unzerOrderId
-            , $this->getMetadata()
-            , $basket);
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata(),
+            $uzrBasket
+        );
+
         $this->setSessionVars($transaction);
         $this->user->save();
     }

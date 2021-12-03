@@ -51,12 +51,14 @@ class Sofort extends UnzerPayment
         $customer = $this->getCustomerData();
 
         $transaction = $sofort->charge(
-            $this->basket->getPrice()->getPrice()
-            , $this->basket->getBasketCurrency()->name
-            , UnzerHelper::redirecturl(self::PENDING_URL)
-            , $customer
-            , $this->unzerOrderId
-            , $this->getMetadata());
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
         $this->setSessionVars($transaction);
     }
 }

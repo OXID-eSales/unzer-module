@@ -56,21 +56,21 @@ class Card extends UnzerPayment
 
         if ($this->isDirectCharge()) {
             $transaction = $uzrCard->charge(
-                $this->basket->getPrice()->getPrice()
-                , $this->basket->getBasketCurrency()->name
-                , UnzerHelper::redirecturl(self::PENDING_URL, true)
-                , $customer
-                , $this->unzerOrderId
-                , $this->getMetadata()
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
             );
         } else {
             $transaction = $uzrCard->authorize(
-                $this->basket->getPrice()->getPrice()
-                , $this->basket->getBasketCurrency()->name
-                , UnzerHelper::redirecturl(self::PENDING_URL, true)
-                , $customer
-                , $this->unzerOrderId
-                , $this->getMetadata()
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
             );
         }
         $this->setSessionVars($transaction);

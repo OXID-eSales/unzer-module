@@ -57,7 +57,9 @@ class PrePayment extends UnzerPayment
             UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
-            $this->getMetadata());
+            $this->getMetadata()
+        );
+
         $this->setSessionVars($transaction);
     }
 }
