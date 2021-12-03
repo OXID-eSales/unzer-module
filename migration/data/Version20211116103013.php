@@ -12,7 +12,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20211116103013 extends AbstractMigration
 {
-    protected array $_aCountry = [
+    protected $_aCountry = [
         "Belgien" => "a7c40f632e04633c9.47194042",
         "Deutschland" => "a7c40f631fc920687.20179984",
         "Estland" => "8f241f110958b69e4.93886171",

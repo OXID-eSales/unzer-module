@@ -11,6 +11,9 @@ use UnzerSDK\Resources\TransactionTypes\Authorization;
 class Order extends Order_parent
 {
     /**
+     * @throws UnzerApiException
+     */
+    /**
      * @inerhitDoc
      * @throws UnzerApiException
      */

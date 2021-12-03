@@ -2,6 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -28,6 +29,9 @@ class Transaction extends BaseModel
         $this->init($this->_sCoreTable);
     }
 
+    /**
+     * @throws DatabaseConnectionException
+     */
     public static function getTransactionByOxidOrderId($oxorderid)
     {
         if ($oxorderid) {

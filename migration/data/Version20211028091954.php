@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Migrations;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
@@ -13,6 +14,9 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20211028091954 extends AbstractMigration
 {
+    /**
+     * @throws Exception
+     */
     public function __construct($version)
     {
         parent::__construct($version);

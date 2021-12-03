@@ -25,7 +25,7 @@ class Card extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'card';
+    protected $Paymentmethod = 'card';
 
     /**
      * @var array|bool
