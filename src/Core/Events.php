@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OXID eSales Unzer module.
  *
@@ -26,10 +27,8 @@ use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidEsales\Eshop\Application\Model\Payment;
-use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -46,7 +45,7 @@ class Events
     /**
      * @var array[]
      */
-    private static $_aPayments = [
+    private static $paymentDefinitions = [
         //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
         //Alipay is China’s leading third-party mobile and online payment solution.
@@ -64,7 +63,7 @@ class Events
             in the online area make AliPay indispensable for merchants who sell to China. The many Chinese tourists abroad
             also like to pay with their domestic payment method. The most important product is the Alipay wallet. With the
             associated app, buyers can carry out transactions directly with their smartphone.",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
@@ -88,7 +87,7 @@ class Events
             'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
             world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
             providers.",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Credit cards and debit cards are the most common payment method in e-commerce.
@@ -102,7 +101,7 @@ class Events
             'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
             world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
             providers.",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Electronic Payment Standard (EPS) is an online payment system used in Austria.
@@ -196,7 +195,7 @@ class Events
             million PayPal customers. Buyers then use it to pay in online shops in particular. But they also use the Google
             Pay app on their smartphone in brick-and-mortar retail. Since no bank details are transferred during the transaction,
             the payment is considered secure. ",
-            'countries' => ''
+            'countries' => []
         ],
 
         //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
@@ -289,44 +288,50 @@ class Events
             app, analogous to WhatsApp. Over time, the app has been expanded to include more and more tools - in 2015 also
             a payment system comparable to Google Pay or Apple Pay. Thanks to the WeChat social platform, WeChat Pay has
             a huge user base of over a billion chat users. Of these, around 600 million already trust WeChat Pay.",
-            'countries' => ''
+            'countries' => []
         ],
     ];
 
     /**
-     * Add Unzer payment methods set EN and DE (long) descriptions
-     *
-     * @return void
-     * @throws Exception
+     * @var array[]
      */
-    public static function addUnzerPaymentMethods()
-    {
-        foreach (self::$_aPayments as $paymentid => $aPayment) {
-            $payment = oxNew(Payment::class);
-            if (($aPayment['insert']) && (!$payment->load($paymentid))) {
-                $payment->setId($paymentid);
-                $payment->oxpayments__oxactive = new Field(0);
-                $payment->oxpayments__oxtoamount = new Field(1000000);
-
-                $language = Registry::getLang();
-                $languages = $language->getLanguageIds();
-
-                $paymentDescriptions = [
-                    'en' => ["desc" => $aPayment['en_desc'], "longdesc" => $aPayment['en_longdesc']],
-                    'de' => ["desc" => $aPayment['de_desc'], "longdesc" => $aPayment['de_longdesc']]
-                ];
-                foreach ($paymentDescriptions as $languageAbbreviation => $description) {
-                    $languageId = array_search($languageAbbreviation, $languages);
-                    if ($languageId !== false) {
-                        $payment->setLanguage($languageId);
-                        $payment->oxpayments__oxdesc = new Field($description['desc']);
-                        $payment->oxpayments__oxlongdesc = new Field($description['longdesc']);
-                        $payment->save();
-                    }
-                }
-            }
-        }
-    }
+    private static $staticContents = [
+        [
+            'oxloadid' => 'oscunzersepamandatetext',
+            'oxactive' => 1,
+            'oxtitle_de' => 'SEPA Lastschrift-Mandat (Bankeinzug)',
+            'oxtitle_en' => 'SEPA direct debit mandate (direct debit)',
+            'oxcontent_de' => '<p>Ich ermächtige [{$oxcmp_shop->oxshops__oxname->value}], Zahlungen von meinem Konto mittels
+                SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von
+                [{$oxcmp_shop->oxshops__oxname->value}] auf mein Konto gezogenen SEPA Lastschriften einzulösen.</p>
+                <p>Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum,die Erstattung des belasteten
+                Betrags verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.</p>
+                <p>Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften weise ich meine Bank
+                unwiderruflich an, [{$oxcmp_shop->oxshops__oxname->value}]oder Dritten auf Anforderung meinen Namen, Adresse und Geburtsdatum
+                vollständig mitzuteilen.</p>',
+            'oxcontent_en' => '<p>By signing this mandate form, you authorise [{$oxcmp_shop->oxshops__oxname->value}] to send instructions to
+                your bank to debit your account and your bank to debit your account in accordance with the instructions from
+                [{$oxcmp_shop->oxshops__oxname->value}].</p>
+                <p>Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your
+                agreement with your bank.</p>
+                <p>A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding
+                this SEPA mandate are explained in a statement that you can obtain from your bank.<br><br>In case of refusal or rejection
+                of direct debit payment I instruct my bank irrevocably to inform [{$oxcmp_shop->oxshops__oxname->value}] or any
+                third party upon request about my name, address and date of birth.</p>'
+        ],
+        [
+            'oxloadid' => 'oscunzersepamandateconfirmation',
+            'oxactive' => 1,
+            'oxtitle_de' => 'Unzer Sepa',
+            'oxtitle_en' => 'Unzer Sepa Text',
+            'oxcontent_de' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+                <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:\'plain=1\'}]\', \'agb_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandat</a> bestätigen.
+                [{/oxifcontent}]',
+            'oxcontent_en' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+                Confirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandate</a>.
+                [{/oxifcontent}]'
+        ]
+    ];
 
     /**
      * Check if Unzer is used for sub-shops.
@@ -358,7 +363,7 @@ class Events
     public static function disableUnzerPaymentMethods()
     {
         $payment = oxNew(Payment::class);
-        foreach (self::$_aPayments as $paymentid => $aPayment) {
+        foreach (self::getUnzerPayments() as $paymentid => $aPayment) {
             if ($payment->load($paymentid)) {
                 $payment->oxpayments__oxactive = new Field(0);
                 $payment->save();
@@ -366,47 +371,15 @@ class Events
         }
     }
 
-    public static function addStaticVCMS()
-    {
-        $oContent = oxNew(Content::class);
-        if (!$oContent->loadByIdent('oscunzersepamandatetext')) {
-            $oContent->setEnableMultilang(false);
-            $oContent->setTitle('Unzer Sepa');
-            $oContent->oxcontents__oxloadid = new Field('oscunzersepamandatetext');
-            $oContent->oxcontents__oxactive = new Field(1);
-            $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class="col-xs-12"][text background_color="" background_image="" background_fixed="" fullwidth="" class=""]<p>SEPA Lastschrift-Mandat (Bankeinzug)
-
-</p><p>Ich ermächtige [{$oxcmp_shop->oxshops__oxname->value}], Zahlungen von meinem Konto mittels SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von[{$oxcmp_shop->oxshops__oxname->value}] auf mein Konto gezogenen SEPA Lastschriften einzulösen.</p><p>Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrags verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.
-
-</p><p>Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften weise ich meine Bank unwiderruflich an, [{$oxcmp_shop->oxshops__oxname->value}]oder Dritten auf Anforderung meinen Namen, Adresse und Geburtsdatum vollständig mitzuteilen.</p>[/text][/col][/row][{/veparse}]');
-            $oContent->oxcontents__oxcontent_1 = new Field('[{veparse}][row][col size="12" offset="0" class="col-xs-12"][text background_color="" background_image="" background_fixed="" fullwidth="" class=""]By signing this mandate form, you authorise [{$oxcmp_shop->oxshops__oxname->value}] to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from [{$oxcmp_shop->oxshops__oxname->value}].<br><br>Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding this SEPA mandate are explained in a statement that you can obtain from your bank.<br><br>In case of refusal or rejection of direct debit payment I instruct my bank irrevocably to inform [{$oxcmp_shop->oxshops__oxname->value}] or any third party upon request about my name, address and date of birth.<br><br><br>[/text][/col][/row][{/veparse}]');
-            $oContent->oxcontents__oxtitle_1 = new Field('Sepa Text');
-            $oContent->save();
-        }
-
-        $oContent = oxNew(Content::class);
-        if (!$oContent->loadByIdent('oscunzersepamandateconfirmation')) {
-            $oContent->setTitle('Unzer Sepamandatsbestätigung');
-            $oContent->oxcontents__oxloadid = new Field('oscunzersepamandateconfirmation');
-            $oContent->oxcontents__oxactive = new Field(1);
-            $oContent->oxcontents__oxcontent = new Field('[{veparse}][row][col size="12" offset="0" class=""][text][{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
-<a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandat</a> bestätigen.
-[{/oxifcontent}]
-[/text][/col][/row][{/veparse}]');
-            $oContent->oxcontents__oxcontent_1 = new Field('[{veparse}][row][col size="12" offset="0" class=""][text][{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
-Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandate</a>.
-[{/oxifcontent}]
-[/text][/col][/row][{/veparse}]');
-            $oContent->oxcontents__oxtitle_1 = new Field('Sepa Confirmation');
-            $oContent->save();
-        }
-    }
-
     public static function getUnzerPayments()
     {
-        return self::$_aPayments;
+        return self::$paymentDefinitions;
     }
 
+    public static function getStaticContents()
+    {
+        return self::$staticContents;
+    }
 
     /**
      * Execute action on activate event
@@ -416,12 +389,6 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      */
     public static function onActivate()
     {
-        // adding record to oxPayment table
-        self::addUnzerPaymentMethods();
-
-        // adding content for SEPA-Text
-        self::addStaticVCMS();
-
         // execute module migrations
         self::executeModuleMigrations();
 
