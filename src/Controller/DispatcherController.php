@@ -36,6 +36,6 @@ class DispatcherController extends FrontendController
 
         $oUnzerPayment = $paymentLoader->getUnzerPayment($payment);
         $oUnzerPayment->execute();
-        return $oUnzerPayment->checkpaymentstatus();
+        return $oUnzerPayment->checkPaymentstatus();
     }
 }

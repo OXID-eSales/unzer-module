@@ -43,12 +43,12 @@ abstract class UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod;
+    protected $Paymentmethod;
 
     /**
      * @var null|array
      */
-    protected ?array $aPaymentParams = null;
+    protected $aPaymentParams = null;
 
     /**
      * @var array|bool
@@ -268,7 +268,7 @@ abstract class UnzerPayment
     /**
      * @return bool
      */
-    public function checkPaymentstatus($blDoRedirect): bool
+    public function checkPaymentstatus($blDoRedirect = false): bool
     {
         $result = false;
 
