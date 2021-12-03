@@ -28,7 +28,7 @@ use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 class ViewConfig extends ViewConfig_parent
 {
     /** @var UnzerHelper|null \OxidSolutionCatalysts\Unzer\Core\UnzerHelper */
-    protected ?UnzerHelper $UnzerHelper = null;
+    protected $UnzerHelper = null;
 
     /**
      * Returns Unzer config.

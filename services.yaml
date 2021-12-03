@@ -1,0 +1,40 @@
+services:
+
+  _defaults:
+    public: false
+    autowire: true
+
+  OxidEsales\Eshop\Core\Registry:
+    class: OxidEsales\Eshop\Core\Registry
+
+  OxidEsales\Eshop\Core\Config:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getConfig' ]
+
+  OxidSolutionCatalysts\Unzer\Logger:
+    class: Monolog\Logger
+    factory: ['@OxidSolutionCatalysts\Unzer\Logger\Factory', 'create']
+    public: true
+
+  OxidSolutionCatalysts\Unzer\Logger\Factory:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\MonologLoggerFactory
+    public: true
+    arguments:
+      $configuration: '@OxidSolutionCatalysts\Unzer\Logger\Configuration'
+
+  OxidSolutionCatalysts\Unzer\Logger\Configuration:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Logger\Configuration\MonologConfiguration
+    public: true
+    arguments:
+      $loggerName: 'Unzer Payment Logger'
+      $logFilePath: '@=service("OxidSolutionCatalysts\\Unzer\\Utility\\Context").getUnzerLogFilePath()'
+      $logLevel: !php/const Psr\Log\LogLevel::INFO
+
+  OxidSolutionCatalysts\Unzer\Utility\Context:
+    class: OxidSolutionCatalysts\Unzer\Utility\Context
+    public: true
+
+  OxidSolutionCatalysts\Unzer\Utility\DebugHandler:
+    class: OxidSolutionCatalysts\Unzer\Utility\DebugHandler
+    public: true
+    arguments:
+      $moduleLogger: '@OxidSolutionCatalysts\Unzer\Logger'

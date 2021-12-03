@@ -19,7 +19,7 @@ class GiroPay extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'giropay';
+    protected $Paymentmethod = 'giropay';
 
     /**
      * @var array|bool

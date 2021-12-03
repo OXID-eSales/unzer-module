@@ -19,7 +19,7 @@ class Przelewy24 extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'przelewy24';
+    protected $Paymentmethod = 'przelewy24';
 
     /**
      * @var array|bool

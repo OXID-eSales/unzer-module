@@ -33,6 +33,7 @@ class OrderController extends OrderController_parent
     }
 
     /**
+     * @inerhitDoc
      * Checks for order rules confirmation ("ord_agb", "ord_custinfo", "sepaConfirmation" form values)(if no
      * rules agreed - returns to order view), loads basket contents (plus applied
      * price/amount discount if available - checks for stock, checks user data (if no
@@ -43,6 +44,7 @@ class OrderController extends OrderController_parent
      *
      * @return string
      */
+    public function execute(): string
     public function execute()
     {
         $foundIssue = false;
@@ -109,6 +111,10 @@ class OrderController extends OrderController_parent
         }
     }
 
+    /**
+     * @return bool|null
+     */
+    public function isSepaMandateConfirmationError(): ?bool
     public function isSepaMandateConfirmationError()
     {
         return $this->blSepaMandateConfirmError;

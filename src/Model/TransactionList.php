@@ -18,7 +18,7 @@ class TransactionList extends ListModel
     protected $_sCoreTable = "oscunzertransaction";
 
     /**
-     * @return null
+     * @return void
      */
     public function getTransactionList()
     {

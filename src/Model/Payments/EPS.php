@@ -19,7 +19,7 @@ class EPS extends UnzerPayment
     /**
      * @var string
      */
-    protected string $Paymentmethod = 'eps';
+    protected $Paymentmethod = 'eps';
 
     /**
      * @var array|bool

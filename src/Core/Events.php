@@ -22,10 +22,12 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use Exception;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidEsales\Eshop\Application\Model\Payment;
-use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -39,7 +41,10 @@ use Psr\Container\ContainerInterface;
  */
 class Events
 {
-    private static array $_aPayments = [
+    /**
+     * @var array[]
+     */
+    private static $_aPayments = [
         //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
         //Alipay is China’s leading third-party mobile and online payment solution.
@@ -287,40 +292,6 @@ class Events
     ];
 
     /**
-     * Add Unzer payment methods set EN and DE (long) descriptions
-     *
-     * @return void
-     */
-    public static function addUnzerPaymentMethods()
-    {
-        foreach (self::$_aPayments as $paymentid => $aPayment) {
-            $payment = oxNew(Payment::class);
-            if (($aPayment['insert']) && (!$payment->load($paymentid))) {
-                $payment->setId($paymentid);
-                $payment->oxpayments__oxactive = new Field(0);
-                $payment->oxpayments__oxtoamount = new Field(1000000);
-
-                $language = Registry::getLang();
-                $languages = $language->getLanguageIds();
-
-                $paymentDescriptions = [
-                    'en' => ["desc" => $aPayment['en_desc'], "longdesc" => $aPayment['en_longdesc']],
-                    'de' => ["desc" => $aPayment['de_desc'], "longdesc" => $aPayment['de_longdesc']]
-                ];
-                foreach ($paymentDescriptions as $languageAbbreviation => $description) {
-                    $languageId = array_search($languageAbbreviation, $languages);
-                    if ($languageId !== false) {
-                        $payment->setLanguage($languageId);
-                        $payment->oxpayments__oxdesc = new Field($description['desc']);
-                        $payment->oxpayments__oxlongdesc = new Field($description['longdesc']);
-                        $payment->save();
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Check if Unzer is used for sub-shops.
      *
      * @return bool
@@ -345,6 +316,7 @@ class Events
      * Disables Unzer payment methods
      *
      * @return void
+     * @throws Exception
      */
     public static function disableUnzerPaymentMethods()
     {
@@ -357,26 +329,8 @@ class Events
         }
     }
 
-    public static function getStaticVCMS()
     {
-        $arr = [];
-        $arr [] = ['oxloadid' => 'oscunzersepamandatetext', 'oxactive' => 1, 'oxtitle_de' => 'Unzer Sepa', 'oxtitle_en' => 'Unzer Sepa Text',
-            'oxcontent_de' => 'SEPA Lastschrift-Mandat (Bankeinzug)
 
-<p>Ich ermächtige [{$oxcmp_shop->oxshops__oxname->value}], Zahlungen von meinem Konto mittels SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von[{$oxcmp_shop->oxshops__oxname->value}] auf mein Konto gezogenen SEPA Lastschriften einzulösen.</p><p>Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrags verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.
-
-</p><p>Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften weise ich meine Bank unwiderruflich an, [{$oxcmp_shop->oxshops__oxname->value}]oder Dritten auf Anforderung meinen Namen, Adresse und Geburtsdatum vollständig mitzuteilen.</p><br>',
-            'oxcontent_en' => 'By signing this mandate form, you authorise [{$oxcmp_shop->oxshops__oxname->value}] to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from [{$oxcmp_shop->oxshops__oxname->value}].<br><br>Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding this SEPA mandate are explained in a statement that you can obtain from your bank.<br><br>In case of refusal or rejection of direct debit payment I instruct my bank irrevocably to inform [{$oxcmp_shop->oxshops__oxname->value}] or any third party upon request about my name, address and date of birth.<br><br><br>'];
-
-        $arr [] = ['oxloadid' => 'oscunzersepamandateconfirmation', 'oxactive' => 1, 'oxtitle_de' => 'Unzer Sepa', 'oxtitle_en' => 'Unzer Sepa Text',
-            'oxcontent_de' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
-<a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:\'plain=1\'}]\', \'agb_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandat</a> bestätigen.
-[{/oxifcontent}] <br>',
-            'oxcontent_en' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
-Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandate</a>.
-[{/oxifcontent}]'];
-
-        return $arr;
     }
 
     public static function getUnzerPayments()
@@ -389,12 +343,10 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      * Execute action on activate event
      *
      * @return void
+     * @throws Exception
      */
     public static function onActivate()
     {
-        // adding record to oxPayment table
-        self::addUnzerPaymentMethods();
-
         // execute module migrations
         self::executeModuleMigrations();
 
@@ -411,13 +363,15 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      * Execute action on deactivate event
      *
      * @return void
+     * @throws Exception
      */
     public static function onDeactivate()
     {
-//         If Unzer is activated on other sub shops do not remove payment methods
+        // If Unzer is activated on other sub shops do not remove payment methods
         if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
             return;
         }
+
         self::disableUnzerPaymentMethods();
         self::disableUnzerRDFA();
     }
@@ -437,12 +391,13 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      * Disable Unzer RDF
      *
      * @return void
+     * @throws DatabaseConnectionException|DatabaseErrorException
      */
     public static function disableUnzerRDFA()
     {
         foreach (UnzerHelper::getRDFinserts() as $oxid => $aRDF) {
             $query = "DELETE FROM `oxobject2payment` WHERE `OXID` = ?";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query, [$oxid]);
+            DatabaseProvider::getDb()->execute($query, [$oxid]);
         }
     }
 
@@ -462,9 +417,9 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
      *
      * Clears the tmp folder
      *
-     * @return true
+     * @return void
      */
-    private static function clearTmp()
+    private static function clearTmp(): void
     {
         $oConf = Registry::getConfig();
         $sTmpDir = realpath($oConf->getConfigParam('sCompileDir'));
@@ -479,7 +434,5 @@ Cofirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[
                 }
             }
         }
-
-        return true;
     }
 }

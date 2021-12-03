@@ -14,7 +14,7 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20211105112337 extends AbstractMigration
 {
-    private static array $aPayments = ['oscunzer_alipay', 'oscunzer_bancontact', 'oscunzer_card',
+    private static $aPayments = ['oscunzer_alipay', 'oscunzer_bancontact', 'oscunzer_card',
         'oscunzer_cardrecurring', 'oscunzer_eps', 'oscunzer_giropay', 'oscunzer_ideal',
         'oscunzer_installment', 'oscunzer_invoice', 'oscunzer_invoice-secured', 'oscunzer_paypal',
         'oscunzer_pis', 'oscunzer_prepayment', 'oscunzer_przelewy24', 'oscunzer_sepa',
