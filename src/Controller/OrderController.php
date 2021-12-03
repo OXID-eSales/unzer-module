@@ -46,7 +46,6 @@ class OrderController extends OrderController_parent
      *
      * @return string
      */
-    public function execute(): string
     public function execute()
     {
         $foundIssue = false;
@@ -116,7 +115,6 @@ class OrderController extends OrderController_parent
     /**
      * @return bool|null
      */
-    public function isSepaMandateConfirmationError(): ?bool
     public function isSepaMandateConfirmationError()
     {
         return $this->blSepaMandateConfirmError;
