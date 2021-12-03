@@ -100,10 +100,10 @@ final class Version20211129120012 extends AbstractMigration
                 $configFile->getVar('sConfigKey');
 
             if (
-                $results = $this->connection->executeQuery(
+                $results = $this->connection->fetchAllAssociative(
                     'SELECT DECODE(OXVARVALUE, ?) as confValue FROM `oxconfig` WHERE `OXVARNAME` = ?',
                     [$configKey, 'aLanguages']
-                )->fetchAllAssociative()
+                )
             ) {
                 $rawLanguageIds = unserialize($results[0]['confValue']);
 
