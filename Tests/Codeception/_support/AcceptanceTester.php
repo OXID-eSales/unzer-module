@@ -2,6 +2,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception;
 
+use OxidEsales\Codeception\Page\Home;
+
 /**
  * Inherited Methods
  *
@@ -30,5 +32,17 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
         $config->saveShopConfVar($sVarType, $sVarName, $sVarVal, $sShopId, $sModule);
+    }
+
+    /**
+     * Open shop first page.
+     */
+    public function openShop()
+    {
+        $I = $this;
+        $homePage = new Home($I);
+        $I->amOnPage($homePage->URL);
+
+        return $homePage;
     }
 }

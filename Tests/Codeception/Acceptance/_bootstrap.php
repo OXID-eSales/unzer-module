@@ -9,4 +9,4 @@ declare(strict_types=1);
 
 // This is acceptance bootstrap
 $helper = new \OxidEsales\Codeception\Module\FixturesHelper();
-$helper->loadRuntimeFixtures(dirname(__FILE__) . '/../_data/fixtures.php');
+$helper->loadRuntimeFixtures(__DIR__ . '/../_data/fixtures.php');

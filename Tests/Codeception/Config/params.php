@@ -22,6 +22,7 @@ return [
     'DB_HOST' => $facts->getDatabaseHost(),
     'DB_PORT' => $facts->getDatabasePort(),
     'DUMP_PATH' => getTestDataDumpFilePath(),
+    'MODULE_DUMP_PATH' => getModuleTestDataDumpFilePath(),
     'MYSQL_CONFIG_PATH' => getMysqlConfigPath(),
     'SELENIUM_SERVER_PORT' => getenv('SELENIUM_SERVER_PORT') ?: '4444',
     'SELENIUM_SERVER_IP' => getenv('SELENIUM_SERVER_IP') ?: 'selenium',
@@ -33,6 +34,11 @@ return [
 function getTestDataDumpFilePath()
 {
     return getShopTestPath() . '/Codeception/_data/dump.sql';
+}
+
+function getModuleTestDataDumpFilePath()
+{
+    return __DIR__ . '/../_data/dump.sql';
 }
 
 function getShopSuitePath($facts)

@@ -18,9 +18,15 @@ modules:
         password: '%DB_PASSWORD%'
         port: '%DB_PORT%'
         dump: '%DUMP_PATH%'
-        populate: false # run populator before all tests
+        module_dump: '%MODULE_DUMP_PATH%'
+        mysql_config: '%MYSQL_CONFIG_PATH%'
+        test: 'something'
+        populate: true # run populator before all tests
         cleanup: false # run populator before each test
-        populator: '%PHP_BIN% %VENDOR_PATH%/bin/reset-shop'
+        populator: >
+            %PHP_BIN% %VENDOR_PATH%/bin/reset-shop
+            && mysql --defaults-file=$mysql_config --default-character-set=utf8 $dbname < $dump
+            && mysql --defaults-file=$mysql_config --default-character-set=utf8 $dbname < $module_dump
     - \OxidEsales\Codeception\Module\Oxideshop:
         screen_shot_url: '%SCREEN_SHOT_URL%'
         depends:
