@@ -66,17 +66,16 @@ class Order extends Order_parent
                 }
 
                 return (int) $iRet;
-            } else {
-                // payment is canceled
-                $this->delete();
-                return self::ORDER_STATE_PAYMENTERROR;
             }
+
+            // payment is canceled
+            $this->delete();
+            return self::ORDER_STATE_PAYMENTERROR;
         } else {
             $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
-
-            if ($this->oxorder__oxtransstatus->value == "OK" && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false) {
-                UnzerHelper::writeTransactionToDB($this->getId());
-            }
+        }
+        if ($this->oxorder__oxtransstatus->value == "OK" && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false) {
+            UnzerHelper::writeTransactionToDB($this->getId());
         }
         return $iRet;
     }
@@ -92,6 +91,8 @@ class Order extends Order_parent
     protected function checkUnzerPaymentStatus()
     {
         $result = false;
+
+        // TODO raise exception if $payment or $transaction isnull
         $payment = UnzerHelper::getInitialUnzerPayment();
         $transaction = $payment->getInitialTransaction();
 

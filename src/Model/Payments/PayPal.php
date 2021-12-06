@@ -14,6 +14,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class PayPal extends UnzerPayment
 {
     /**
@@ -36,6 +39,27 @@ class PayPal extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        try {
+            $oUnzer = $this->unzerSDK;
+
+            /* @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
+            $uzrPP = $oUnzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal);
+            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
+            $oUser = $this->session->getUser();
+            $oBasket = $this->session->getBasket();
+
+            $customer = $this->getCustomerData($oUser);
+
+            if ($this->isDirectCharge()) {
+                $transaction = $uzrPP->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::PENDING_URL, true), $customer, $orderId);
+            } else {
+                $transaction = $uzrPP->authorize($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::PENDING_URL, true), $customer, $orderId);
+            }
+            // You'll need to remember the shortId to show it on the success or failure page
+            $this->session->setVariable('ShortId', $transaction->getShortId());
+            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
+        } catch (UnzerApiException $e) {
+            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        }
     }
 }
