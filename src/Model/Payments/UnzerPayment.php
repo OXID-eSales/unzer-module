@@ -298,8 +298,6 @@ abstract class UnzerPayment
                     }
                     $result = true;
                 }
-                // TODO Logging
-                //$msg = UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer());
             } elseif ($this->transaction->isError()) {
                 UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer()));
             }
