@@ -15,6 +15,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Exception;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -29,7 +30,7 @@ class Card extends UnzerPayment
     protected $Paymentmethod = 'card';
 
     /**
-     * @var array|bool
+     * @var array
      */
     protected $aCurrencies = [];
 
@@ -41,30 +42,38 @@ class Card extends UnzerPayment
         return true;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        try {
-            $oUnzer = $this->unzerSDK;
+        $sId = $this->getUzrId();
+        /* @var \UnzerSDK\Resources\PaymentTypes\Card $uzrCard */
+        $uzrCard = $this->unzerSDK->fetchPaymentType($sId);
 
-            $sId = $this->getUzrId();
-            /* @var \UnzerSDK\Resources\PaymentTypes\Card $uzrCard */
-            $uzrCard = $oUnzer->fetchPaymentType($sId);
-            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-            $oUser = $this->session->getUser();
-            $oBasket = $this->session->getBasket();
+        $customer = $this->getCustomerData();
 
-            $customer = $this->getCustomerData($oUser);
-
-            if ($this->isDirectCharge()) {
-                $transaction = $uzrCard->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::PENDING_URL, true), $customer, $orderId);
-            } else {
-                $transaction = $uzrCard->authorize($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::PENDING_URL, true), $customer, $orderId);
-            }
-            // You'll need to remember the shortId to show it on the success or failure page
-            $this->session->setVariable('ShortId', $transaction->getShortId());
-            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
-        } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+        if ($this->isDirectCharge()) {
+            $transaction = $uzrCard->charge(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
+        } else {
+            $transaction = $uzrCard->authorize(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
         }
+        $this->setSessionVars($transaction);
     }
 }

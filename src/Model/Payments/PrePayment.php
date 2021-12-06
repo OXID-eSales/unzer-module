@@ -28,7 +28,7 @@ class PrePayment extends UnzerPayment
     protected $Paymentmethod = 'prepayment';
 
     /**
-     * @var array|bool
+     * @var array
      */
     protected $aCurrencies = ['EUR'];
 
@@ -40,34 +40,27 @@ class PrePayment extends UnzerPayment
         return false;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        // Catch API errors, write the message to your log and show the ClientMessage to the client.
-        try {
-            // Create an Unzer object using your private key and register a debug handler if you want to.
-            $unzer = $this->unzerSDK;
+        /** @var \UnzerSDK\Resources\PaymentTypes\Prepayment $prepayment */
+        $prepayment = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Prepayment());
 
-            /** @var \UnzerSDK\Resources\PaymentTypes\Prepayment $prepayment */
-            $prepayment = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Prepayment());
+        $customer = $this->getCustomerData();
 
-            $oUser = $this->session->getUser();
-            $oBasket = $this->session->getBasket();
-            $customer = $this->getCustomerData($oUser);
+        $transaction = $prepayment->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
 
-            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-
-            $transaction = $prepayment->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, UnzerHelper::getMetadata($this));
-
-            // You'll need to remember the shortId to show it on the success or failure page
-            Registry::getSession()->setVariable('ShortId', $transaction->getShortId());
-            Registry::getSession()->setVariable('PaymentId', $transaction->getPaymentId());
-
-            $bankData = UnzerHelper::getBankData($transaction);
-            Registry::getSession()->setVariable('additionalPaymentInformation', $bankData);
-        } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
-        } catch (Exception $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
-        }
+        $this->setSessionVars($transaction);
     }
 }

@@ -23,9 +23,9 @@ class Installment extends UnzerPayment
     protected $Paymentmethod = 'installment-secured';
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool

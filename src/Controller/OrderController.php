@@ -27,7 +27,10 @@ class OrderController extends OrderController_parent
      */
     protected $blSepaMandateConfirmError = null;
 
-    public function getUnzerPubKey()
+    /**
+     * @return string
+     */
+    public function getUnzerPubKey(): string
     {
         /** @var \OxidSolutionCatalysts\Unzer\Service\ModuleSettings $settings */
         $settings = $this->getContainer()->get(\OxidSolutionCatalysts\Unzer\Service\ModuleSettings::class);
@@ -115,7 +118,7 @@ class OrderController extends OrderController_parent
     /**
      * @return bool|null
      */
-    public function isSepaMandateConfirmationError()
+    public function isSepaMandateConfirmationError(): ?bool
     {
         return $this->blSepaMandateConfirmError;
     }

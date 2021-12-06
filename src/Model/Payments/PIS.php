@@ -23,9 +23,9 @@ class PIS extends UnzerPayment
     protected $Paymentmethod = 'pis';
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool
