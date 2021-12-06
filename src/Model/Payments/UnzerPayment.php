@@ -313,13 +313,12 @@ abstract class UnzerPayment
             } elseif ($this->transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $unzerPayment->getPaymentType();
-                if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Sofort || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Giropay || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
-                    if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
-                        Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
-                        exit;
-                    }
-                    $result = true;
+
+                if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
+                    Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
+                    exit;
                 }
+                $result = true;
             } elseif ($this->transaction->isError()) {
                 UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer()));
             }
