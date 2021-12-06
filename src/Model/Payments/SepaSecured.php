@@ -15,8 +15,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Exception;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\SepaDirectDebitSecured;
 use UnzerSDK\Traits\CanDirectChargeWithCustomer;
 
@@ -28,7 +30,7 @@ class SepaSecured extends UnzerPayment
     protected $Paymentmethod = 'sepa-direct-debit-secured';
 
     /**
-     * @var array|bool
+     * @var array
      */
     protected $aCurrencies = ['EUR'];
 
@@ -61,26 +63,30 @@ class SepaSecured extends UnzerPayment
         return false;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        try {
-            $oUnzer = $this->unzerSDK;
+        $sId = $this->getUzrId();
+        /* @var SepaDirectDebitSecured|CanDirectChargeWithCustomer $uzrSepa */
+        $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
-            $sId = $this->getUzrId();
-            /* @var SepaDirectDebitSecured|CanDirectChargeWithCustomer $uzrSepa */
-            $uzrSepa = $oUnzer->fetchPaymentType($sId);
-            $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
-            $oUser = $this->session->getUser();
-            $oBasket = $this->session->getBasket();
-            $customer = $this->getCustomerData($oUser);
+        $customer = $this->getCustomerData();
 
-            $uzrBasket = $this->getUnzerBasket($oBasket, $orderId);
-            $transaction = $uzrSepa->charge($oBasket->getPrice()->getPrice(), $oBasket->getBasketCurrency()->name, UnzerHelper::redirecturl(self::CONTROLLER_URL), $customer, $orderId, null, $uzrBasket);
-//           // You'll need to remember the shortId to show it on the success or failure page
-            $this->session->setVariable('ShortId', $transaction->getShortId());
-            $this->session->setVariable('PaymentId', $transaction->getPaymentId());
-        } catch (\Exception $ex) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $ex->getMessage());
-        }
+        $uzrBasket = $this->getUnzerBasket($this->basket);
+        $transaction = $uzrSepa->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata(),
+            $uzrBasket
+        );
+
+        $this->setSessionVars($transaction);
     }
 }

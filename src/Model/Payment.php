@@ -3,7 +3,6 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
 
 class Payment extends Payment_parent

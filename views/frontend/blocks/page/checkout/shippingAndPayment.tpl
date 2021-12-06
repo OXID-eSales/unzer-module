@@ -55,8 +55,6 @@
                             [{include file="modules/osc/unzer/unzer_card.tpl"}]
                         [{elseif $sPaymentID == "oscunzer_eps"}]
                             [{include file="modules/osc/unzer/unzer_eps_charge.tpl"}]
-                        [{elseif $sPaymentID == "oscunzer_giropay"}]
-                            [{include file="modules/osc/unzer/unzer_giro.tpl"}]
                         [{elseif $sPaymentID == "oscunzer_ideal"}]
                             [{include file="modules/osc/unzer/unzer_ideal.tpl"}]
                         [{elseif $sPaymentID == "oscunzer_installment"}]
@@ -69,8 +67,6 @@
                             [{include file="modules/osc/unzer/unzer_sepa.tpl"}]
                         [{elseif $sPaymentID == "oscunzer_sepa-secured"}]
                             [{include file="modules/osc/unzer/unzer_sepa_secured.tpl"}]
-                        [{elseif $sPaymentID == "oscunzer_sofort"}]
-                            [{include file="modules/osc/unzer/unzer_sofort.tpl"}]
                         [{/if}]
                     </div>
                 </div>

@@ -23,9 +23,9 @@ class AliPay extends UnzerPayment
     protected $Paymentmethod = 'alipay';
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool

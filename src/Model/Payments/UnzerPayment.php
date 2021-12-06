@@ -2,28 +2,33 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
+use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
 
 abstract class UnzerPayment
 {
-    protected const CONTROLLER_URL = "order";
-    protected const RETURN_CONTROLLER_URL = "order";
-    protected const FAILURE_URL = "";
-    protected const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
-    protected const SUCCESS_URL = "thankyou";
+    public const CONTROLLER_URL = "order";
+    public const RETURN_CONTROLLER_URL = "order";
+    public const FAILURE_URL = "";
+    public const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
+    public const SUCCESS_URL = "thankyou";
 
     /**
      * @var Payment
@@ -36,9 +41,24 @@ abstract class UnzerPayment
     protected $session;
 
     /**
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * @var \OxidEsales\Eshop\Application\Model\Basket
+     */
+    protected $basket;
+
+    /**
      * @var Unzer
      */
     protected $unzerSDK;
+
+    /**
+     * @var string
+     */
+    protected $unzerOrderId;
 
     /**
      * @var string
@@ -51,18 +71,21 @@ abstract class UnzerPayment
     protected $aPaymentParams = null;
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies;
 
     public function __construct(
         Payment $payment,
         Session $session,
-        Unzer $unzerSDK
+        Unzer   $unzerSDK
     ) {
         $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
+        $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
+        $this->user = $this->session->getUser();
+        $this->basket = $this->session->getBasket();
     }
 
     /**
@@ -71,14 +94,6 @@ abstract class UnzerPayment
     public function getID(): string
     {
         return $this->payment->getId();
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaymentMethod(): string
-    {
-        return $this->Paymentmethod;
     }
 
     /**
@@ -125,13 +140,15 @@ abstract class UnzerPayment
 
     /**
      * @return mixed|void
+     * @throws Exception
+     * @throws UnzerApiException
      */
     abstract public function execute();
 
     /**
      * @var AbstractTransactionType|null
      */
-    protected ?AbstractTransactionType $transaction;
+    protected $transaction;
 
     /**
      * @return   string|void
@@ -159,9 +176,9 @@ abstract class UnzerPayment
      * @param $orderId
      * @return Basket
      */
-    public function getUnzerBasket(?\OxidEsales\Eshop\Application\Model\Basket $oBasket, $orderId): Basket
+    public function getUnzerBasket(?\OxidEsales\Eshop\Application\Model\Basket $oBasket): Basket
     {
-        $basket = new Basket($orderId, $oBasket->getNettoSum(), $oBasket->getBasketCurrency()->name);
+        $basket = new Basket($this->unzerOrderId, $oBasket->getNettoSum(), $oBasket->getBasketCurrency()->name);
 
         $basketContents = $oBasket->getContents();
 
@@ -189,8 +206,9 @@ abstract class UnzerPayment
      * @param Order|null $oOrder
      * @return Customer
      */
-    public function getCustomerData(User $oUser, Order $oOrder = null): Customer
+    public function getCustomerData(Order $oOrder = null): Customer
     {
+        $oUser = $this->user;
         $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
         if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
             $customer->setBirthDate($oUser->oxuser__oxbirthdate->value);
@@ -291,7 +309,7 @@ abstract class UnzerPayment
             } elseif ($this->transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $unzerPayment->getPaymentType();
-                if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
+                if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Sofort || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Giropay || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
                     if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
                         Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
                         exit;
@@ -307,5 +325,36 @@ abstract class UnzerPayment
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
         return $result;
+    }
+
+    /**
+     * @param Charge $transaction
+     */
+    public function setSessionVars(Charge $transaction)
+    {
+        // You'll need to remember the shortId to show it on the success or failure page
+        $this->session->setVariable('ShortId', $transaction->getShortId());
+        $this->session->setVariable('PaymentId', $transaction->getPaymentId());
+
+        $paymentType = $transaction->getPayment()->getPaymentType();
+        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
+            $this->session->setVariable('additionalPaymentInformation', UnzerHelper::getBankData($transaction));
+        }
+    }
+
+    /**
+     * @return Metadata
+     * @throws Exception
+     */
+    public function getMetadata(): Metadata
+    {
+        $metadata = new Metadata();
+        $metadata->setShopType("Oxid eShop " . (new Facts())->getEdition());
+        $metadata->setShopVersion(ShopVersion::getVersion());
+        $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
+        $metadata->addMetadata('paymentmethod', $this->Paymentmethod);
+        $metadata->addMetadata('paymentprocedure', $this->getPaymentProcedure());
+
+        return $metadata;
     }
 }

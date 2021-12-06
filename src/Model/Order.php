@@ -11,9 +11,6 @@ use UnzerSDK\Resources\TransactionTypes\Authorization;
 class Order extends Order_parent
 {
     /**
-     * @throws UnzerApiException
-     */
-    /**
      * @inerhitDoc
      * @throws UnzerApiException
      */
@@ -65,7 +62,12 @@ class Order extends Order_parent
                     $iRet = self::ORDER_STATE_OK;
                 }
 
-                return (int) $iRet;
+                //redirect payment
+                if ($this->oxorder__oxtransstatus->value == "OK" && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false) {
+                    UnzerHelper::writeTransactionToDB($this->getId(), $oUser);
+                }
+
+                return (int)$iRet;
             } else {
                 // payment is canceled
                 $this->delete();
@@ -74,8 +76,9 @@ class Order extends Order_parent
         } else {
             $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
 
+            //no redirect payment
             if ($this->oxorder__oxtransstatus->value == "OK" && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false) {
-                UnzerHelper::writeTransactionToDB($this->getId());
+                UnzerHelper::writeTransactionToDB($this->getId(), $oUser);
             }
         }
         return $iRet;

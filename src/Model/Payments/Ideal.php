@@ -23,9 +23,9 @@ class Ideal extends UnzerPayment
     protected $Paymentmethod = 'ideal';
 
     /**
-     * @var array|bool
+     * @var array
      */
-    protected $aCurrencies = false;
+    protected $aCurrencies = [];
 
     /**
      * @return bool
