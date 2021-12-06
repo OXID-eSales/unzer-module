@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This Software is the property of OXID eSales and is protected
  * by copyright law - it is NOT Freeware.
@@ -17,7 +18,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Controller;
 
-use \OxidSolutionCatalysts\Unzer\Controller\PaymentController;
+use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
 
 class PaymentControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
@@ -25,7 +26,7 @@ class PaymentControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
     public function setUp(): void
     {
-        $this->SubjectUnderTest = new PaymentController;
+        $this->SubjectUnderTest = new PaymentController();
     }
 
     public function testSomething()

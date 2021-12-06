@@ -40,7 +40,7 @@ class InvoiceSecured extends UnzerPayment
             $unzer = $this->unzerSDK;
 
             /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
-            $inv_secured = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured);
+            $inv_secured = $unzer->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured());
 
             $oUser = $this->session->getUser();
             $oBasket = $this->session->getBasket();
