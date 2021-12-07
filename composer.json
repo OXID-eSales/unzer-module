@@ -26,6 +26,7 @@
         }
     },
     "scripts": {
-        "psalm": "psalm --show-info=true --no-cache"
+        "psalm": "psalm --show-info=true --no-cache",
+        "psalm-errors": "psalm --no-cache"
     }
 }
