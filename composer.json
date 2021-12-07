@@ -24,5 +24,8 @@
             "OxidSolutionCatalysts\\Unzer\\": "src",
             "OxidSolutionCatalysts\\Unzer\\Tests\\": "Tests"
         }
+    },
+    "scripts": {
+        "psalm": "psalm --show-info=true --no-cache"
     }
 }
