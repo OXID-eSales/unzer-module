@@ -41,9 +41,7 @@ class PayPal extends UnzerPayment
     public function execute()
     {
         /* @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
-        $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal);
-        $oUser = $this->session->getUser();
-        $oBasket = $this->session->getBasket();
+        $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal());
 
         $customer = $this->getCustomerData();
 
@@ -65,7 +63,8 @@ class PayPal extends UnzerPayment
                 $this->unzerOrderId,
                 $this->getMetadata()
             );
-            $this->setSessionVars($transaction);
         }
+
+        $this->setSessionVars($transaction);
     }
 }
