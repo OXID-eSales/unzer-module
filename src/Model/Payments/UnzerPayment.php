@@ -82,8 +82,7 @@ abstract class UnzerPayment
         Payment $payment,
         Session $session,
         Unzer   $unzerSDK
-    )
-    {
+    ){
         $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
