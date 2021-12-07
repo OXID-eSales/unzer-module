@@ -173,11 +173,32 @@ class UnzerHelper
     public static function getBankData(Charge $transaction): string
     {
         $amount = Registry::getLang()->formatCurrency($transaction->getAmount());
-        $bankData = sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'), $amount, Registry::getConfig()->getActShopCurrencyObject()->sign);
-        $bankData .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'), $transaction->getHolder());
-        $bankData .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'), $transaction->getIban());
-        $bankData .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'), $transaction->getBic());
-        $bankData .= sprintf(Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'), $transaction->getDescriptor());
+
+        $bankData = sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            $amount,
+            Registry::getConfig()->getActShopCurrencyObject()->sign
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
+            $transaction->getHolder()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
+            $transaction->getIban()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'),
+            $transaction->getBic()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
+            $transaction->getDescriptor()
+        );
 
         return $bankData;
     }
