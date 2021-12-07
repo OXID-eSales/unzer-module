@@ -42,7 +42,6 @@ class PayPal extends UnzerPayment
     {
         /* @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
         $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal);
-        $orderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
         $oUser = $this->session->getUser();
         $oBasket = $this->session->getBasket();
 
