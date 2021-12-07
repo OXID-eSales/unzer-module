@@ -156,6 +156,7 @@ class UnzerHelper
         // redirect to payment-selection page:
         $oSession = Registry::getSession();
         $dstUrl = Registry::getConfig()->getShopCurrentUrl();
+        $destination = str_replace('?', '&', $destination);
         $dstUrl .= 'cl=' . $destination;
 
         if ($blWithSessionId) {

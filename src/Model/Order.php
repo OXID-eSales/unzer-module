@@ -95,6 +95,8 @@ class Order extends Order_parent
     protected function checkUnzerPaymentStatus()
     {
         $result = false;
+
+        // TODO raise exception if $payment or $transaction isnull
         $payment = UnzerHelper::getInitialUnzerPayment();
         $transaction = $payment->getInitialTransaction();
 

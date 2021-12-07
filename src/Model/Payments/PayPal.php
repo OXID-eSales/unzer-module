@@ -15,6 +15,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class PayPal extends UnzerPayment
 {
     /**
@@ -37,6 +40,31 @@ class PayPal extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        /* @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
+        $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal());
+
+        $customer = $this->getCustomerData();
+
+        if ($this->isDirectCharge()) {
+            $transaction = $uzrPP->charge(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
+        } else {
+            $transaction = $uzrPP->authorize(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
+        }
+
+        $this->setSessionVars($transaction);
     }
 }

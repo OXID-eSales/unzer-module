@@ -109,12 +109,16 @@ abstract class UnzerPayment
      */
     public function isPaymentTypeAllowed(): bool
     {
+        if (is_array($this->getPaymentCurrencies()) &&
+        (
+            !count($this->getPaymentCurrencies()) ||
+            in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())
+        )) {
+            return true;
+        }
+
         if (
-            is_array($this->getPaymentCurrencies()) &&
-            (
-                !count($this->getPaymentCurrencies()) ||
-                in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())
-            )
+            !$this->getPaymentCurrencies()
         ) {
             return true;
         }
@@ -157,9 +161,9 @@ abstract class UnzerPayment
     {
         if (array_key_exists('id', $this->getPaymentParams())) {
             return $this->getPaymentParams()['id'];
-        } else {
-            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
         }
+
+        UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
     }
 
     public function getPaymentParams()
@@ -309,13 +313,12 @@ abstract class UnzerPayment
             } elseif ($this->transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $unzerPayment->getPaymentType();
-                if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Sofort || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Giropay || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
-                    if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
-                        Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
-                        exit;
-                    }
-                    $result = true;
+
+                if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
+                    Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
+                    exit;
                 }
+                $result = true;
             } elseif ($this->transaction->isError()) {
                 UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer()));
             }
