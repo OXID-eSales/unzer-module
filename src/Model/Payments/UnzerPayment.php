@@ -10,8 +10,11 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use Psr\Container\ContainerInterface;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -79,7 +82,8 @@ abstract class UnzerPayment
         Payment $payment,
         Session $session,
         Unzer   $unzerSDK
-    ) {
+    )
+    {
         $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
@@ -127,7 +131,16 @@ abstract class UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->payment->oxpayments__oxpaymentprocedure->value;
+        /** @var ModuleSettings $settings */
+        $settings = $this->getContainer()->get(ModuleSettings::class);
+
+        $paymentid = $this->payment->getId();
+
+        if ($paymentid == "oscunzer_paypal" || $paymentid == "oscunzer_card") {
+            return $settings->getPaymentProcedureSetting($paymentid);
+        }
+
+        return $settings::PAYMENT_DIRECT;
     }
 
     /**
@@ -356,5 +369,14 @@ abstract class UnzerPayment
         $metadata->addMetadata('paymentprocedure', $this->getPaymentProcedure());
 
         return $metadata;
+    }
+
+    /**
+     *
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return ContainerFactory::getInstance()->getContainer();
     }
 }
