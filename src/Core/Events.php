@@ -409,13 +409,7 @@ class Events
      */
     public static function onDeactivate()
     {
-        // If Unzer is activated on other sub shops do not remove payment methods
-        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
-            return;
-        }
-
-        self::disableUnzerPaymentMethods();
-        self::disableUnzerRDFA();
+        //TODO
     }
 
     /**
