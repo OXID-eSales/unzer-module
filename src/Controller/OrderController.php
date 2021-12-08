@@ -16,6 +16,7 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
 class OrderController extends OrderController_parent
@@ -33,7 +34,9 @@ class OrderController extends OrderController_parent
     public function getUnzerPubKey(): string
     {
         /** @var \OxidSolutionCatalysts\Unzer\Service\ModuleSettings $settings */
-        $settings = $this->getContainer()->get(\OxidSolutionCatalysts\Unzer\Service\ModuleSettings::class);
+        $settings = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(\OxidSolutionCatalysts\Unzer\Service\ModuleSettings::class);
         return $settings->getShopPublicKey();
     }
 
@@ -46,8 +49,6 @@ class OrderController extends OrderController_parent
      * (\OxidEsales\Eshop\Application\Model\Order::finalizeOrder()). According to sum for items automatically assigns
      * user to special user group ( \OxidEsales\Eshop\Application\Model\User::onOrderExecute(); if this option is not
      * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
-     *
-     * @return string
      */
     public function execute()
     {

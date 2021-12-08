@@ -14,7 +14,7 @@ class DebugHandler implements \UnzerSDK\Interfaces\DebugHandlerInterface
         $this->logger = $moduleLogger;
     }
 
-    public function log(string $message)
+    public function log(string $message): void
     {
         $this->logger->info($message);
     }
