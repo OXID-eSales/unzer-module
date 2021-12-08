@@ -23,14 +23,13 @@ final class SEPADirectDebitCest extends BaseCest
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
 
-        $basketSteps = new BasketSteps($I);
         $basketItem = Fixtures::get('product');
-        $clientData = Fixtures::get('client');
+        $basketSteps = new BasketSteps($I);
+        $basketSteps->addProductToBasket($basketItem['id'], 1);
 
         $homePage = $I->openShop();
+        $clientData = Fixtures::get('client');
         $homePage->loginUser($clientData['username'], $clientData['password']);
-
-        $basketSteps->addProductToBasket($basketItem['id'], 1);
 
         $paymentSelection = $homePage->openMiniBasket()->openCheckout();
 

@@ -27,14 +27,13 @@ final class PaymentsAvailableCest extends BaseCest
     {
         $I->wantToTest('Test payment methods are available');
 
-        $basketSteps = new BasketSteps($I);
         $basketItem = Fixtures::get('product');
-        $clientData = Fixtures::get('client');
+        $basketSteps = new BasketSteps($I);
+        $basketSteps->addProductToBasket($basketItem['id'], 1);
 
         $homePage = $I->openShop();
+        $clientData = Fixtures::get('client');
         $homePage->loginUser($clientData['username'], $clientData['password']);
-
-        $basketSteps->addProductToBasket($basketItem['id'], 1);
 
         $homePage->openMiniBasket()->openCheckout();
 
