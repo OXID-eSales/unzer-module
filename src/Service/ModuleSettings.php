@@ -47,7 +47,10 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
-    private function getSettingValue($key)
+    /**
+     * @return mixed
+     */
+    private function getSettingValue(string $key)
     {
         return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
     }
