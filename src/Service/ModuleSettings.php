@@ -9,6 +9,8 @@ class ModuleSettings
 {
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
     public const SYSTEM_MODE_PRODUCTION = 'production';
+    public const PAYMENT_DIRECT = 'direct Capture';
+    public const PAYMENT_AUTHORIZE = 'Authorize & later Capture';
 
     /** @var ModuleSettingBridgeInterface */
     private $moduleSettingBridge;
@@ -45,6 +47,14 @@ class ModuleSettings
     public function getAPIKey(): string
     {
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
+    }
+
+    public function getPaymentProcedureSetting($id): string
+    {
+        if ($this->getSettingValue('UnzerOption_' . $id)) {
+            return self::PAYMENT_AUTHORIZE;
+        }
+        return self::PAYMENT_DIRECT;
     }
 
     /**
