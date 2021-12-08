@@ -27,7 +27,8 @@ class Order extends Order_parent
                 if (!$this->oxorder__oxordernr->value) {
                     $this->_setNumber();
                 } else {
-                    oxNew(\OxidEsales\Eshop\Core\Counter::class)->update($this->_getCounterIdent(), $this->oxorder__oxordernr->value);
+                    oxNew(\OxidEsales\Eshop\Core\Counter::class)
+                        ->update($this->_getCounterIdent(), $this->oxorder__oxordernr->value);
                 }
 
                 $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
@@ -63,7 +64,10 @@ class Order extends Order_parent
                 }
 
                 //redirect payment
-                if ($this->oxorder__oxtransstatus->value == "OK" && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false) {
+                if (
+                    $this->oxorder__oxtransstatus->value == "OK"
+                    && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
+                ) {
                     UnzerHelper::writeTransactionToDB($this->getId(), $oUser);
                 }
 
@@ -77,7 +81,10 @@ class Order extends Order_parent
             $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
 
             //no redirect payment
-            if ($this->oxorder__oxtransstatus->value == "OK" && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false) {
+            if (
+                $this->oxorder__oxtransstatus->value == "OK"
+                && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
+            ) {
                 UnzerHelper::writeTransactionToDB($this->getId(), $oUser);
             }
         }
@@ -95,6 +102,8 @@ class Order extends Order_parent
     protected function checkUnzerPaymentStatus()
     {
         $result = false;
+
+        // TODO raise exception if $payment or $transaction isnull
         $payment = UnzerHelper::getInitialUnzerPayment();
         $transaction = $payment->getInitialTransaction();
 
@@ -124,11 +133,13 @@ class Order extends Order_parent
                     // Goods can be shipped immediately except for Prepayment type.
                 }
 
-                // In cases of a redirect to an external service (e.g. 3D secure, PayPal, etc) it sometimes takes time for
-                // the payment to update it's status after redirect into shop.
-                // In this case the payment and the transaction are pending at first and change to cancel or success later.
+                // In cases of a redirect to an external service (e.g. 3D secure, PayPal, etc) it
+                // sometimes takes time for the payment to update it's status after redirect into shop.
+                // In this case the payment and the transaction are pending at first and change to cancel
+                // or success later.
 
-                // Use the webhooks feature to stay informed about changes of payment and transaction (e.g. cancel, success)
+                // Use the webhooks feature to stay informed about changes of payment
+                // and transaction (e.g. cancel, success)
                 // then you can handle the states as shown above in transaction->isSuccess() branch.
                 $this->_setOrderStatus('NOT_FINISHED');
                 $result = true;

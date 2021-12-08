@@ -81,7 +81,7 @@ abstract class UnzerPayment
     public function __construct(
         Payment $payment,
         Session $session,
-        Unzer   $unzerSDK
+        Unzer $unzerSDK
     ) {
         $this->payment = $payment;
         $this->session = $session;
@@ -118,6 +118,12 @@ abstract class UnzerPayment
                 !count($this->getPaymentCurrencies()) ||
                 in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())
             )
+        ) {
+            return true;
+        }
+
+        if (
+            !$this->getPaymentCurrencies()
         ) {
             return true;
         }
@@ -169,9 +175,9 @@ abstract class UnzerPayment
     {
         if (array_key_exists('id', $this->getPaymentParams())) {
             return $this->getPaymentParams()['id'];
-        } else {
-            UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
         }
+
+        UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
     }
 
     public function getPaymentParams()
@@ -254,7 +260,10 @@ abstract class UnzerPayment
             $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
         }
         if ($oUser->oxuser__oxstreet->value) {
-            $billingAddress->setStreet($oUser->oxuser__oxstreet->value . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : ''));
+            $billingAddress->setStreet(
+                $oUser->oxuser__oxstreet->value
+                . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : '')
+            );
         }
         if ($oUser->oxuser__oxzip->value) {
             $billingAddress->setZip($oUser->oxuser__oxzip->value);
@@ -269,11 +278,19 @@ abstract class UnzerPayment
             if ($oDelAddress->oxaddress__oxcompany->value) {
                 $shippingAddress->setName($oDelAddress->oxaddress__oxcompany->value);
             } else {
-                $shippingAddress->setName($oDelAddress->oxaddress__oxfname->value . ' ' . $oDelAddress->oxaddress__oxlname->value);
+                $shippingAddress->setName(
+                    $oDelAddress->oxaddress__oxfname->value . ' ' . $oDelAddress->oxaddress__oxlname->value
+                );
             }
 
             if ($oDelAddress->oxaddress__oxstreet->value) {
-                $shippingAddress->setStreet($oDelAddress->oxaddress__oxstreet->value . ($oDelAddress->oxaddress__oxstreetnr->value !== '' ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value : ''));
+                $shippingAddress->setStreet(
+                    $oDelAddress->oxaddress__oxstreet->value
+                    . ($oDelAddress->oxaddress__oxstreetnr->value !== ''
+                        ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value
+                        : ''
+                    )
+                );
             }
 
             if ($oDelAddress->oxaddress__oxstreet->value) {
@@ -316,23 +333,34 @@ abstract class UnzerPayment
             $this->transaction = $unzerPayment->getInitialTransaction();
             if ($this->transaction->isSuccess()) {
                 // TODO log success
-                //$msg = UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer());
+                //$msg = UnzerHelper::translatedMsg(
+                //  $this->transaction->getMessage()->getCode(),
+                //  $this->transaction->getMessage()->getCustomer()
+                //);
                 $result = true;
             } elseif ($this->transaction->isPending()) {
                 // TODO Handle Pending...
                 $paymentType = $unzerPayment->getPaymentType();
-                if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Sofort || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Giropay || $paymentType->isInvoiceType() || $paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Card) {
-                    if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
-                        Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
-                        exit;
-                    }
-                    $result = true;
+
+                if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
+                    Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
+                    exit;
                 }
+                $result = true;
             } elseif ($this->transaction->isError()) {
-                UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer()));
+                UnzerHelper::redirectOnError(
+                    self::CONTROLLER_URL,
+                    UnzerHelper::translatedMsg(
+                        $this->transaction->getMessage()->getCode(),
+                        $this->transaction->getMessage()->getCustomer()
+                    )
+                );
             }
         } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+            UnzerHelper::redirectOnError(
+                self::CONTROLLER_URL,
+                UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage())
+            );
         } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }

@@ -38,7 +38,7 @@ class InvoiceSecured extends UnzerPayment
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
-        $inv_secured = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured);
+        $inv_secured = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured());
 
         if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
             $this->user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);

@@ -10,12 +10,12 @@ class TransactionList extends ListModel
     /**
      * @var string
      */
-    protected $_sObjectsInListName = TransactionList::class;
+    protected $_sObjectsInListName = TransactionList::class; // phpcs:ignore
 
     /**
      * @var string
      */
-    protected $_sCoreTable = "oscunzertransaction";
+    protected $_sCoreTable = "oscunzertransaction"; // phpcs:ignore
 
     /**
      * @return void
@@ -30,7 +30,8 @@ class TransactionList extends ListModel
 
         $params = [$iShopId];
 
-        $sQ = "select $sFieldList from " . $oListObject->getViewName() . " where oxshopid = ? order by {$oListObject->getViewName()}.OXTIMESTAMP desc";
+        $sQ = "select $sFieldList from " . $oListObject->getViewName() . " 
+            where oxshopid = ? order by {$oListObject->getViewName()}.OXTIMESTAMP desc";
 
         $this->selectString($sQ, $params);
     }
