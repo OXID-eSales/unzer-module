@@ -286,7 +286,8 @@ abstract class UnzerPayment
             if ($oDelAddress->oxaddress__oxstreet->value) {
                 $shippingAddress->setStreet(
                     $oDelAddress->oxaddress__oxstreet->value
-                    . ($oDelAddress->oxaddress__oxstreetnr->value !== ''
+                    . (
+                        $oDelAddress->oxaddress__oxstreetnr->value !== ''
                         ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value
                         : ''
                     )
