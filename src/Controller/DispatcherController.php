@@ -42,7 +42,10 @@ class DispatcherController extends FrontendController
         try {
             $oUnzerPayment->execute();
         } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError($oUnzerPayment::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+            UnzerHelper::redirectOnError(
+                $oUnzerPayment::CONTROLLER_URL,
+                UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage())
+            );
         } catch (Exception $e) {
             UnzerHelper::redirectOnError($oUnzerPayment::CONTROLLER_URL, $e->getMessage());
         }

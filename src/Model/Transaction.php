@@ -14,14 +14,14 @@ class Transaction extends BaseModel
      *
      * @var string
      */
-    protected $_sClassName = Transaction::class;
+    protected $_sClassName = Transaction::class; // phpcs:ignore
 
     /**
      * Core table name
      *
      * @var string
      */
-    protected $_sCoreTable = "oscunzertransaction";
+    protected $_sCoreTable = "oscunzertransaction"; // phpcs:ignore
 
     public function __construct()
     {
@@ -35,7 +35,10 @@ class Transaction extends BaseModel
     public static function getTransactionByOxidOrderId($oxorderid)
     {
         if ($oxorderid) {
-            $oxid = DatabaseProvider::getDb()->getOne("SELECT OXID FROM oscunzertransaction WHERE OXORDERID=?", [(string)$oxorderid]);
+            $oxid = DatabaseProvider::getDb()->getOne(
+                "SELECT OXID FROM oscunzertransaction WHERE OXORDERID=?",
+                [(string)$oxorderid]
+            );
 
             if ($oxid) {
                 /** @var Transaction $uzTransaction */
