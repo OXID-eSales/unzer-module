@@ -37,6 +37,31 @@ class WeChatPay extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        /* @var \UnzerSDK\Resources\PaymentTypes\Wechatpay $uzrWechat */
+        $uzrWechat = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Wechatpay());
+
+        $customer = $this->getCustomerData();
+
+        if ($this->isDirectCharge()) {
+            $transaction = $uzrWechat->charge(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
+        } else {
+            $transaction = $uzrWechat->authorize(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
+        }
+
+        $this->setSessionVars($transaction);
     }
 }

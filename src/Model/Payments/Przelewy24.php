@@ -37,6 +37,31 @@ class Przelewy24 extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        /* @var \UnzerSDK\Resources\PaymentTypes\Przelewy24 $uzrPrzelewy */
+        $uzrPrzelewy = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Przelewy24());
+
+        $customer = $this->getCustomerData();
+
+        if ($this->isDirectCharge()) {
+            $transaction = $uzrPrzelewy->charge(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
+        } else {
+            $transaction = $uzrPrzelewy->authorize(
+                $this->basket->getPrice()->getPrice(),
+                $this->basket->getBasketCurrency()->name,
+                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $customer,
+                $this->unzerOrderId,
+                $this->getMetadata()
+            );
+        }
+
+        $this->setSessionVars($transaction);
     }
 }
