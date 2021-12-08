@@ -16,7 +16,6 @@
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Exceptions\UnzerApiException;
 
 class PayPal extends UnzerPayment
 {
@@ -40,7 +39,7 @@ class PayPal extends UnzerPayment
 
     public function execute()
     {
-        /* @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
+        /** @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
         $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal());
 
         $customer = $this->getCustomerData();

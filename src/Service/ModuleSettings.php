@@ -57,7 +57,10 @@ class ModuleSettings
         return self::PAYMENT_DIRECT;
     }
 
-    private function getSettingValue($key)
+    /**
+     * @return mixed
+     */
+    private function getSettingValue(string $key)
     {
         return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
     }
