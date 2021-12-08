@@ -49,17 +49,18 @@ final class Version20211028091954 extends AbstractMigration
         $transaction->setPrimaryKey(['OXID']);
         $transaction->addindex(['OXSHOPID', 'OXORDERID']);
 
-        //adding new oxpayment column
-        $oxpayment = $schema->getTable('oxpayments');
-        $oxpayment->addColumn('OXPAYMENTPROCEDURE', Types::STRING, ['default' => 'direct Capture']);
-
-        //adding new oxpayment column
+        //adding new column 'customerid' in oxuser table
         $oxuser = $schema->getTable('oxuser');
         $oxuser->addColumn('CUSTOMERID', Types::STRING, ['default' => "", 'comment' => 'unzer customerid']);
     }
 
     public function down(Schema $schema): void
     {
-        //tbd
+        //dropping column 'customerid' in oxuser table
+        $oxuser = $schema->getTable('oxuser');
+        $oxuser->dropColumn('CUSTOMERID');
+
+        // dropping table 'oscunzertransaction'
+        $schema->dropTable('oscunzertransaction');
     }
 }
