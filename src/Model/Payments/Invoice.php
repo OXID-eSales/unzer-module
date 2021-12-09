@@ -36,7 +36,7 @@ class Invoice extends UnzerPayment
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
-        $invoice = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice);
+        $invoice = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice());
 
         $customer = $this->getCustomerData();
 

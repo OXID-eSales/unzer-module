@@ -1,1 +1,6 @@
 .phpunit.result.cache
+
+/source/
+/var/
+/vendor/
+/composer.lock

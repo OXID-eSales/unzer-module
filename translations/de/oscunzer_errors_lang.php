@@ -5,7 +5,7 @@ $iLangNr   = 0;
 // -------------------------------
 // RESOURCE IDENTITFIER = STRING
 // -------------------------------
-$aLang = array(
+$aLang = [
 
     'charset'                   => 'UTF-8',
     "oscunzer_000.000.000"   => "Transaktion erfolgreich",
@@ -626,4 +626,4 @@ $aLang = array(
     'oscunzer_800.400.159'   => 'Der Webshop ist nicht produktiv.',
     'oscunzer_800.400.160'   => 'Es wurde kein (gültiger) Vorgang zur TB-Vorgangskennung gefunden.',
     'oscunzer_WRONGPAYMENTID'     => 'Keine Payment-Id gesetzt. Bitte eine andere Zahlmethode verwenden.',
-);
+];

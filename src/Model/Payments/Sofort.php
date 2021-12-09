@@ -47,7 +47,7 @@ class Sofort extends UnzerPayment
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Sofort $sofort */
-        $sofort = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Sofort);
+        $sofort = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Sofort());
 
         $customer = $this->getCustomerData();
 

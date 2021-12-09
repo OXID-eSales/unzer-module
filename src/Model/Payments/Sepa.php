@@ -15,11 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
-use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
-use UnzerSDK\Traits\CanDirectCharge;
 use Exception;
 
 class Sepa extends UnzerPayment
@@ -71,7 +68,8 @@ class Sepa extends UnzerPayment
     public function execute()
     {
         $sId = $this->getUzrId();
-        /* @var SepaDirectDebit|CanDirectCharge $uzrSepa */
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebit $uzrSepa */
         $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->getCustomerData();

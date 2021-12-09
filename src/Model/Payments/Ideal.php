@@ -15,6 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class Ideal extends UnzerPayment
 {
     /**
@@ -37,6 +39,22 @@ class Ideal extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        $sId = $this->getUzrId();
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrIdeal */
+        $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
+
+        $customer = $this->getCustomerData();
+
+        $transaction = $uzrIdeal->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
     }
 }
