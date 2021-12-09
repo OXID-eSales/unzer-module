@@ -13,6 +13,9 @@ services:
   OxidEsales\Eshop\Core\Session:
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getSession' ]
 
+  OxidEsales\Eshop\Core\Language:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getLang' ]
+
   OxidSolutionCatalysts\Unzer\Logger:
     class: Monolog\Logger
     factory: ['@OxidSolutionCatalysts\Unzer\Logger\Factory', 'create']
