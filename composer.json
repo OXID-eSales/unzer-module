@@ -11,7 +11,7 @@
         }
     },
     "require": {
-        "unzerdev/php-sdk": "v1.1",
+        "unzerdev/php-sdk": "^v1.1",
         "webmozart/path-util": "^2.3.0"
     },
     "require-dev": {
