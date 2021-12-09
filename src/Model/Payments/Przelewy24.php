@@ -15,6 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class Przelewy24 extends UnzerPayment
 {
     /**
@@ -37,6 +39,22 @@ class Przelewy24 extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        $sId = $this->getUzrId();
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrPrzelewy */
+        $uzrPrzelewy = $this->unzerSDK->fetchPaymentType($sId);
+
+        $customer = $this->getCustomerData();
+
+        $transaction = $uzrPrzelewy->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
     }
 }

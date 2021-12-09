@@ -15,6 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class WeChatPay extends UnzerPayment
 {
     /**
@@ -37,6 +39,22 @@ class WeChatPay extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        $sId = $this->getUzrId();
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrWechat */
+        $uzrWechat = $this->unzerSDK->fetchPaymentType($sId);
+
+        $customer = $this->getCustomerData();
+
+        $transaction = $uzrWechat->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
     }
 }
