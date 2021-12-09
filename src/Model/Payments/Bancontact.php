@@ -37,6 +37,20 @@ class Bancontact extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        /** @var \UnzerSDK\Resources\PaymentTypes\Bancontact $uzrBancontact */
+        $uzrBancontact = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Bancontact());
+
+        $customer = $this->getCustomerData();
+
+        $transaction = $uzrBancontact->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
     }
 }
