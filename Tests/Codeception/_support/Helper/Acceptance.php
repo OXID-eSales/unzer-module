@@ -7,5 +7,4 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Helper;
 
 class Acceptance extends \Codeception\Module
 {
-
 }

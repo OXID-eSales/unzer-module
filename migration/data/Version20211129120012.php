@@ -24,7 +24,14 @@ final class Version20211129120012 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
+        //deleting all unzer related entries from oxpayments table
+        $this->addSql("DELETE FROM `oxpayments` where `OXID` like 'oscunzer_%'");
+
+        //deleting all unzer related entries from oxcontents table
+        $this->addSql("DELETE FROM `oxcontents` where `OXLOADID` like 'oscunzer%'");
+
+        //deleting all unzer related oxcountry entries from oxobject2payment table
+        $this->addSql("DELETE FROM `oxobject2payment` where `OXPAYMENTID` like 'oscunzer_%' and `OXTYPE` = 'oxcountry'");
     }
 
     protected $aIsoCountries;

@@ -47,6 +47,10 @@ final class Version20211105112337 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
+        //deleting all unzer related rdfapayment entries from oxobject2payment table
+        $this->addSql("DELETE FROM `oxobject2payment` where `OXPAYMENTID` like 'oscunzer_%' and `OXTYPE` = 'rdfapayment'");
+
+        //deleting all unzer related oxdelset entries from oxobject2payment table
+        $this->addSql("DELETE FROM `oxobject2payment` where `OXPAYMENTID` like 'oscunzer_%' and `OXTYPE` = 'oxdelset'");
     }
 }

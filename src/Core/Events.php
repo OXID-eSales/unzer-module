@@ -333,44 +333,6 @@ class Events
         ]
     ];
 
-    /**
-     * Check if Unzer is used for sub-shops.
-     *
-     * @return bool
-     */
-    public static function isUnzerActiveOnSubShops(): bool
-    {
-        $config = Registry::getConfig();
-        $shops = $config->getShopIds();
-        $activeShopId = $config->getShopId();
-        $moduleActivationBridge = self::getContainer()->get(ModuleActivationBridgeInterface::class);
-
-        foreach ($shops as $shopId) {
-            if (($shopId != $activeShopId) && ($moduleActivationBridge->isActive("osc-unzer", $shopId))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Disables Unzer payment methods
-     *
-     * @return void
-     * @throws Exception
-     */
-    public static function disableUnzerPaymentMethods()
-    {
-        $payment = oxNew(Payment::class);
-        foreach (self::getUnzerPayments() as $paymentid => $aPayment) {
-            if ($payment->load($paymentid)) {
-                $payment->oxpayments__oxactive = new Field(0);
-                $payment->save();
-            }
-        }
-    }
-
     public static function getUnzerPayments()
     {
         return self::$paymentDefinitions;
@@ -409,13 +371,6 @@ class Events
      */
     public static function onDeactivate()
     {
-        // If Unzer is activated on other sub shops do not remove payment methods
-        if ('EE' == (new Facts())->getEdition() && self::isUnzerActiveOnSubShops()) {
-            return;
-        }
-
-        self::disableUnzerPaymentMethods();
-        self::disableUnzerRDFA();
     }
 
     /**
@@ -427,20 +382,6 @@ class Events
     protected static function getContainer(): ContainerInterface
     {
         return ContainerFactory::getInstance()->getContainer();
-    }
-
-    /**
-     * Disable Unzer RDF
-     *
-     * @return void
-     * @throws DatabaseConnectionException|DatabaseErrorException
-     */
-    public static function disableUnzerRDFA()
-    {
-        foreach (UnzerHelper::getRDFinserts() as $oxid => $aRDF) {
-            $query = "DELETE FROM `oxobject2payment` WHERE `OXID` = ?";
-            DatabaseProvider::getDb()->execute($query, [$oxid]);
-        }
     }
 
     /**
