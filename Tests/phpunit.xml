@@ -15,6 +15,7 @@
          verbose="false">
     <testsuites>
         <testsuite name="UnitTests">
+            <directory>Unit/</directory>
             <directory>Integration/</directory>
         </testsuite>
     </testsuites>
