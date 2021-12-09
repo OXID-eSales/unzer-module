@@ -1,1 +1,5 @@
 .phpunit.result.cache
+
+/source/
+/var/
+/vendor/

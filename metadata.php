@@ -62,12 +62,6 @@ $aModule = [
         'modules/osc/unzer/unzer_ideal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_ideal.tpl',
     ],
     'blocks' => [
-        //admin
-        [
-            'template' => 'payment_main.tpl',
-            'block'    => 'admin_payment_main_form',
-            'file'     => 'views/admin/blocks/admin_payment_main_form.tpl',
-        ],
         //frontend
         [
             'template' => 'page/checkout/order.tpl',
@@ -140,6 +134,20 @@ $aModule = [
             'type' => 'bool',
             'value' => '0',
         ],
+        [
+            'group' => 'paymentoptions',
+            'name' => 'UnzerOption_oscunzer_card',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1'
+        ],
+        [
+            'group' => 'paymentoptions',
+            'name' => 'UnzerOption_oscunzer_paypal',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1'
+        ]
     ],
     'events' => [
         'onActivate'    => '\OxidSolutionCatalysts\Unzer\Core\Events::onActivate',

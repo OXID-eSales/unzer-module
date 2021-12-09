@@ -10,8 +10,11 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use Psr\Container\ContainerInterface;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -78,7 +81,7 @@ abstract class UnzerPayment
     public function __construct(
         Payment $payment,
         Session $session,
-        Unzer   $unzerSDK
+        Unzer $unzerSDK
     ) {
         $this->payment = $payment;
         $this->session = $session;
@@ -109,11 +112,13 @@ abstract class UnzerPayment
      */
     public function isPaymentTypeAllowed(): bool
     {
-        if (is_array($this->getPaymentCurrencies()) &&
-        (
-            !count($this->getPaymentCurrencies()) ||
-            in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())
-        )) {
+        if (
+            is_array($this->getPaymentCurrencies()) &&
+            (
+                !count($this->getPaymentCurrencies()) ||
+                in_array(Registry::getConfig()->getActShopCurrencyObject()->name, $this->getPaymentCurrencies())
+            )
+        ) {
             return true;
         }
 
@@ -131,7 +136,16 @@ abstract class UnzerPayment
      */
     public function getPaymentProcedure(): string
     {
-        return $this->payment->oxpayments__oxpaymentprocedure->value;
+        /** @var ModuleSettings $settings */
+        $settings = $this->getContainer()->get(ModuleSettings::class);
+
+        $paymentid = $this->payment->getId();
+
+        if ($paymentid == "oscunzer_paypal" || $paymentid == "oscunzer_card") {
+            return $settings->getPaymentProcedureSetting($paymentid);
+        }
+
+        return $settings::PAYMENT_DIRECT;
     }
 
     /**
@@ -246,7 +260,10 @@ abstract class UnzerPayment
             $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
         }
         if ($oUser->oxuser__oxstreet->value) {
-            $billingAddress->setStreet($oUser->oxuser__oxstreet->value . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : ''));
+            $billingAddress->setStreet(
+                $oUser->oxuser__oxstreet->value
+                . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : '')
+            );
         }
         if ($oUser->oxuser__oxzip->value) {
             $billingAddress->setZip($oUser->oxuser__oxzip->value);
@@ -261,11 +278,20 @@ abstract class UnzerPayment
             if ($oDelAddress->oxaddress__oxcompany->value) {
                 $shippingAddress->setName($oDelAddress->oxaddress__oxcompany->value);
             } else {
-                $shippingAddress->setName($oDelAddress->oxaddress__oxfname->value . ' ' . $oDelAddress->oxaddress__oxlname->value);
+                $shippingAddress->setName(
+                    $oDelAddress->oxaddress__oxfname->value . ' ' . $oDelAddress->oxaddress__oxlname->value
+                );
             }
 
             if ($oDelAddress->oxaddress__oxstreet->value) {
-                $shippingAddress->setStreet($oDelAddress->oxaddress__oxstreet->value . ($oDelAddress->oxaddress__oxstreetnr->value !== '' ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value : ''));
+                $shippingAddress->setStreet(
+                    $oDelAddress->oxaddress__oxstreet->value
+                    . (
+                        $oDelAddress->oxaddress__oxstreetnr->value !== ''
+                        ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value
+                        : ''
+                    )
+                );
             }
 
             if ($oDelAddress->oxaddress__oxstreet->value) {
@@ -308,7 +334,10 @@ abstract class UnzerPayment
             $this->transaction = $unzerPayment->getInitialTransaction();
             if ($this->transaction->isSuccess()) {
                 // TODO log success
-                //$msg = UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer());
+                //$msg = UnzerHelper::translatedMsg(
+                //  $this->transaction->getMessage()->getCode(),
+                //  $this->transaction->getMessage()->getCustomer()
+                //);
                 $result = true;
             } elseif ($this->transaction->isPending()) {
                 // TODO Handle Pending...
@@ -320,10 +349,19 @@ abstract class UnzerPayment
                 }
                 $result = true;
             } elseif ($this->transaction->isError()) {
-                UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($this->transaction->getMessage()->getCode(), $this->transaction->getMessage()->getCustomer()));
+                UnzerHelper::redirectOnError(
+                    self::CONTROLLER_URL,
+                    UnzerHelper::translatedMsg(
+                        $this->transaction->getMessage()->getCode(),
+                        $this->transaction->getMessage()->getCustomer()
+                    )
+                );
             }
         } catch (UnzerApiException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage()));
+            UnzerHelper::redirectOnError(
+                self::CONTROLLER_URL,
+                UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage())
+            );
         } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
@@ -359,5 +397,14 @@ abstract class UnzerPayment
         $metadata->addMetadata('paymentprocedure', $this->getPaymentProcedure());
 
         return $metadata;
+    }
+
+    /**
+     *
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return ContainerFactory::getInstance()->getContainer();
     }
 }

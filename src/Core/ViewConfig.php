@@ -24,13 +24,16 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 
 class ViewConfig extends ViewConfig_parent
 {
     private function getUnzerModuleSettings(): ModuleSettings
     {
-        return $this->getContainer()->get(ModuleSettings::class);
+        return ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(ModuleSettings::class);
     }
 
     /**

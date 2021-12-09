@@ -5,7 +5,7 @@ $iLangNr   = 1;
 // -------------------------------
 // RESOURCE IDENTITFIER = STRING
 // -------------------------------
-$aLang = array(
+$aLang = [
 
     'charset'                   => 'UTF-8',
     "oscunzer_000.000.000"   => "Transaction succeeded",
@@ -626,4 +626,4 @@ $aLang = array(
     'oscunzer_800.400.159'   => 'Merchant not live at partner system.',
     'oscunzer_800.400.160'   => 'Invalid reference at partner system.',
     'oscunzer_WRONGPAYMENTID'     => 'Invalid Payment-ID. Please choose another payment method.',
-);
+];
