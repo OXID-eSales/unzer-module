@@ -318,11 +318,8 @@ abstract class UnzerPayment
 
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
-            $unzer = $this->unzerSDK;
-            // Create an Unzer object using your private key and register a debug handler if you want to.
-
             // Redirect to success if the payment has been successfully completed.
-            $unzerPayment = $unzer->fetchPayment($paymentId);
+            $unzerPayment = $this->unzerSDK->fetchPayment($paymentId);
             $this->transaction = $unzerPayment->getInitialTransaction();
             if ($this->transaction->isSuccess()) {
                 // TODO log success
