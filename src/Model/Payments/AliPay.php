@@ -46,25 +46,14 @@ class AliPay extends UnzerPayment
 
         $customer = $this->getCustomerData();
 
-        if ($this->isDirectCharge()) {
-            $transaction = $uzrAliPay->charge(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        } else {
-            $transaction = $uzrAliPay->authorize(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        }
+        $transaction = $uzrAliPay->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
 
         $this->setSessionVars($transaction);
     }

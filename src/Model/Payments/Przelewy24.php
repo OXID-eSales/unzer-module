@@ -46,25 +46,14 @@ class Przelewy24 extends UnzerPayment
 
         $customer = $this->getCustomerData();
 
-        if ($this->isDirectCharge()) {
-            $transaction = $uzrPrzelewy->charge(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        } else {
-            $transaction = $uzrPrzelewy->authorize(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        }
+        $transaction = $uzrPrzelewy->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
 
         $this->setSessionVars($transaction);
     }
