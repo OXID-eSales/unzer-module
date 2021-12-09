@@ -42,15 +42,6 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class UnzerHelper
 {
-
-    /**
-     * @return string
-     */
-    public static function getModuleId(): string
-    {
-        return \OxidSolutionCatalysts\Unzer\Module::MODULE_ID;
-    }
-
     public static function addErrorToDisplay($errorMsg)
     {
         // TODO Translate Errors
