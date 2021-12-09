@@ -39,6 +39,8 @@ class Ideal extends UnzerPayment
 
     public function execute()
     {
+        $sId = $this->getUzrId();
+
         /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $ideal */
         $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
 
