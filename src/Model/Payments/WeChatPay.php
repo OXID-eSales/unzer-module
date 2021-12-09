@@ -15,6 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class WeChatPay extends UnzerPayment
 {
     /**
@@ -37,8 +39,10 @@ class WeChatPay extends UnzerPayment
 
     public function execute()
     {
-        /* @var \UnzerSDK\Resources\PaymentTypes\Wechatpay $uzrWechat */
-        $uzrWechat = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Wechatpay());
+        $sId = $this->getUzrId();
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrWechat */
+        $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->getCustomerData();
 
