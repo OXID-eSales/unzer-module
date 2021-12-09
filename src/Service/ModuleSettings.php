@@ -49,7 +49,7 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
-    public function getPaymentProcedureSetting($id): string
+    public function getPaymentProcedureSetting(string $id): string
     {
         if ($this->getSettingValue('UnzerOption_' . $id)) {
             return self::PAYMENT_AUTHORIZE;
