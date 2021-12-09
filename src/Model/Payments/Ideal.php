@@ -40,11 +40,11 @@ class Ideal extends UnzerPayment
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $ideal */
-        $invoice = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Ideal);
+        $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->getCustomerData();
 
-        $transaction = $invoice->charge(
+        $transaction = $uzrIdeal->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::CONTROLLER_URL),
