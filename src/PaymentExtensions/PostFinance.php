@@ -13,14 +13,16 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+// TODO: PostFinance is not yet part of the SDK, so the payment will come later. As of November 16, 2021
 
-class CardRecurring extends UnzerPayment
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
+
+class PostFinance extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'card-recurring';
+    protected $Paymentmethod = 'post-finance-efinance';
 
     /**
      * @var array
@@ -32,7 +34,7 @@ class CardRecurring extends UnzerPayment
      */
     public function isRecurringPaymentType(): bool
     {
-        return true;
+        return false;
     }
 
     public function execute()

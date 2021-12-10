@@ -13,16 +13,16 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
-class AliPay extends UnzerPayment
+class Ideal extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'alipay';
+    protected $Paymentmethod = 'ideal';
 
     /**
      * @var array
@@ -39,15 +39,17 @@ class AliPay extends UnzerPayment
 
     public function execute()
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Alipay $uzrAP */
-        $uzrAP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Alipay());
+        $sId = $this->getUzrId();
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrIdeal */
+        $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->getCustomerData();
 
-        $transaction = $uzrAP->charge(
+        $transaction = $uzrIdeal->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

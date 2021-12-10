@@ -13,16 +13,16 @@
  * @link      https://www.oxid-esales.com
  */
 
-// TODO: PostFinance is not yet part of the SDK, so the payment will come later. As of November 16, 2021
+// TODO: ApplePay is not yet part of the SDK, so the payment will come later. As of November 16, 2021
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-class PostFinance extends UnzerPayment
+class ApplePay extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'post-finance-efinance';
+    protected $Paymentmethod = 'applepay';
 
     /**
      * @var array

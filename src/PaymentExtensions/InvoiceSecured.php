@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
 use OxidEsales\Eshop\Core\Field;

@@ -13,21 +13,24 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
 
-class Installment extends UnzerPayment
+class PrePayment extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'installment-secured';
+    protected $Paymentmethod = 'prepayment';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $aCurrencies = ['EUR'];
 
     /**
      * @return bool
@@ -37,18 +40,22 @@ class Installment extends UnzerPayment
         return false;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        $sId = $this->getUzrId();
-        /** @var \UnzerSDK\Resources\PaymentTypes\InstallmentSecured $uzrInstall */
-        $uzrInstall = $this->unzerSDK->fetchPaymentType($sId);
+        /** @var \UnzerSDK\Resources\PaymentTypes\Prepayment $prepayment */
+        $prepayment = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Prepayment());
 
         $customer = $this->getCustomerData();
 
-        $transaction = $uzrInstall->authorize(
+        $transaction = $prepayment->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

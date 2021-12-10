@@ -13,16 +13,16 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 
-class Przelewy24 extends UnzerPayment
+class WeChatPay extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'przelewy24';
+    protected $Paymentmethod = 'wechatpay';
 
     /**
      * @var array
@@ -39,12 +39,12 @@ class Przelewy24 extends UnzerPayment
 
     public function execute()
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Przelewy24 $uzrPrzelewy */
-        $uzrPrzelewy = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Przelewy24());
+        /** @var \UnzerSDK\Resources\PaymentTypes\Wechatpay $uzrWechat */
+        $uzrWechat = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Wechatpay());
 
         $customer = $this->getCustomerData();
 
-        $transaction = $uzrPrzelewy->charge(
+        $transaction = $uzrWechat->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),

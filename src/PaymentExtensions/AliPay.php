@@ -13,23 +13,21 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Exceptions\UnzerApiException;
 
-class Sofort extends UnzerPayment
+class AliPay extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'sofort';
+    protected $Paymentmethod = 'alipay';
 
     /**
      * @var array
      */
-    protected $aCurrencies = ['EUR'];
+    protected $aCurrencies = [];
 
     /**
      * @return bool
@@ -39,22 +37,17 @@ class Sofort extends UnzerPayment
         return false;
     }
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
     public function execute()
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Sofort $sofort */
-        $sofort = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Sofort());
+        /** @var \UnzerSDK\Resources\PaymentTypes\Alipay $uzrAP */
+        $uzrAP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Alipay());
 
         $customer = $this->getCustomerData();
 
-        $transaction = $sofort->charge(
+        $transaction = $uzrAP->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL),
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

@@ -4,25 +4,25 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Session;
-use OxidSolutionCatalysts\Unzer\Model\Payments\AliPay;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Bancontact;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Card;
-use OxidSolutionCatalysts\Unzer\Model\Payments\CardRecurring;
-use OxidSolutionCatalysts\Unzer\Model\Payments\EPS;
-use OxidSolutionCatalysts\Unzer\Model\Payments\GiroPay;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Ideal;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Installment;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Invoice;
-use OxidSolutionCatalysts\Unzer\Model\Payments\InvoiceSecured;
-use OxidSolutionCatalysts\Unzer\Model\Payments\PayPal;
-use OxidSolutionCatalysts\Unzer\Model\Payments\PIS;
-use OxidSolutionCatalysts\Unzer\Model\Payments\PrePayment;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Przelewy24;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Sepa;
-use OxidSolutionCatalysts\Unzer\Model\Payments\SepaSecured;
-use OxidSolutionCatalysts\Unzer\Model\Payments\Sofort;
-use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment as AbstractUnzerPayment;
-use OxidSolutionCatalysts\Unzer\Model\Payments\WeChatPay;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\AliPay;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Bancontact;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\CardRecurring;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\EPS;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\GiroPay;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Ideal;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Installment;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\InvoiceSecured;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\PayPal;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\PIS;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\PrePayment;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Przelewy24;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Sepa;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\SepaSecured;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Sofort;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\WeChatPay;
 
 class PaymentExtensionLoader
 {

@@ -13,21 +13,44 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
 
-class Ideal extends UnzerPayment
+class SepaSecured extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'ideal';
+    protected $Paymentmethod = 'sepa-direct-debit-secured';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $aCurrencies = ['EUR'];
+
+    /**
+     * @var string
+     */
+    protected $sIban;
+
+    /**
+     * @return string
+     */
+    public function getSIban(): string
+    {
+        return $this->sIban;
+    }
+
+    /**
+     * @param string $sIban
+     */
+    public function setSIban(string $sIban): void
+    {
+        $this->sIban = $sIban;
+    }
 
     /**
      * @return bool
@@ -37,22 +60,28 @@ class Ideal extends UnzerPayment
         return false;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         $sId = $this->getUzrId();
-
-        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrIdeal */
-        $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
+        /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebitSecured $uzrSepa */
+        $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->getCustomerData();
 
-        $transaction = $uzrIdeal->charge(
+        $uzrBasket = $this->getUnzerBasket($this->basket);
+        $transaction = $uzrSepa->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
-            $this->getMetadata()
+            $this->getMetadata(),
+            $uzrBasket
         );
 
         $this->setSessionVars($transaction);

@@ -13,14 +13,14 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-class PIS extends UnzerPayment
+class CardRecurring extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'pis';
+    protected $Paymentmethod = 'card-recurring';
 
     /**
      * @var array
@@ -32,7 +32,7 @@ class PIS extends UnzerPayment
      */
     public function isRecurringPaymentType(): bool
     {
-        return false;
+        return true;
     }
 
     public function execute()

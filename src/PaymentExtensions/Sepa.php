@@ -13,41 +13,71 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
+use Exception;
 
-class WeChatPay extends UnzerPayment
+class Sepa extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'wechatpay';
+    protected $Paymentmethod = 'sepa-direct-debit';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $aCurrencies = ['EUR'];
+
+    /**
+     * @var string
+     */
+    protected $sIban;
+
+    /**
+     * @return string
+     */
+    public function getSIban(): string
+    {
+        return $this->sIban;
+    }
+
+    /**
+     * @param string $sIban
+     */
+    public function setSIban(string $sIban): void
+    {
+        $this->sIban = $sIban;
+    }
 
     /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool
     {
-        return false;
+        return true;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Wechatpay $uzrWechat */
-        $uzrWechat = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Wechatpay());
+        $sId = $this->getUzrId();
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebit $uzrSepa */
+        $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->getCustomerData();
 
-        $transaction = $uzrWechat->charge(
+        $transaction = $uzrSepa->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

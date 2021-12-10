@@ -1,31 +1,19 @@
 <?php
 
-/**
- * This Software is the property of OXID eSales and is protected
- * by copyright law - it is NOT Freeware.
- *
- * Any unauthorized use of this software without a valid license key
- * is a violation of the license agreement and will be prosecuted by
- * civil and criminal law.
- *
- * @copyright 2003-2021 OXID eSales AG
- * @author    OXID Solution Catalysts
- * @link      https://www.oxid-esales.com
- */
-
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 
-class PrePayment extends UnzerPayment
+class Invoice extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'prepayment';
+    protected $Paymentmethod = 'invoice';
 
     /**
      * @var array
@@ -47,12 +35,12 @@ class PrePayment extends UnzerPayment
      */
     public function execute()
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Prepayment $prepayment */
-        $prepayment = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Prepayment());
+        /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
+        $invoice = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice());
 
         $customer = $this->getCustomerData();
 
-        $transaction = $prepayment->charge(
+        $transaction = $invoice->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::CONTROLLER_URL),

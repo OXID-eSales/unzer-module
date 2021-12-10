@@ -13,21 +13,23 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
 
-class Bancontact extends UnzerPayment
+class Sofort extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'bancontact';
+    protected $Paymentmethod = 'sofort';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $aCurrencies = ['EUR'];
 
     /**
      * @return bool
@@ -37,17 +39,22 @@ class Bancontact extends UnzerPayment
         return false;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Bancontact $uzrBancontact */
-        $uzrBancontact = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Bancontact());
+        /** @var \UnzerSDK\Resources\PaymentTypes\Sofort $sofort */
+        $sofort = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Sofort());
 
         $customer = $this->getCustomerData();
 
-        $transaction = $uzrBancontact->charge(
+        $transaction = $sofort->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            UnzerHelper::redirecturl(self::PENDING_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

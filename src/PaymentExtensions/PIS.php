@@ -13,16 +13,14 @@
  * @link      https://www.oxid-esales.com
  */
 
-// TODO: ApplePay is not yet part of the SDK, so the payment will come later. As of November 16, 2021
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
-
-class ApplePay extends UnzerPayment
+class PIS extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'applepay';
+    protected $Paymentmethod = 'pis';
 
     /**
      * @var array

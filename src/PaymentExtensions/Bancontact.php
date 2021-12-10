@@ -13,18 +13,16 @@
  * @link      https://www.oxid-esales.com
  */
 
-namespace OxidSolutionCatalysts\Unzer\Model\Payments;
+namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Exceptions\UnzerApiException;
 
-class GiroPay extends UnzerPayment
+class Bancontact extends UnzerPayment
 {
     /**
      * @var string
      */
-    protected $Paymentmethod = 'giropay';
+    protected $Paymentmethod = 'bancontact';
 
     /**
      * @var array
@@ -39,22 +37,17 @@ class GiroPay extends UnzerPayment
         return false;
     }
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
     public function execute()
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Giropay $giro */
-        $giro = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Giropay());
+        /** @var \UnzerSDK\Resources\PaymentTypes\Bancontact $uzrBancontact */
+        $uzrBancontact = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Bancontact());
 
         $customer = $this->getCustomerData();
 
-        $transaction = $giro->charge(
+        $transaction = $uzrBancontact->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL),
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()
