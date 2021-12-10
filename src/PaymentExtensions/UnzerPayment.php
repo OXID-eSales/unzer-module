@@ -188,36 +188,6 @@ abstract class UnzerPayment
     }
 
     /**
-     * @param \OxidEsales\Eshop\Application\Model\Basket|null $oBasket
-     * @param $orderId
-     * @return Basket
-     */
-    public function getUnzerBasket(?\OxidEsales\Eshop\Application\Model\Basket $oBasket): Basket
-    {
-        $basket = new Basket($this->unzerOrderId, $oBasket->getNettoSum(), $oBasket->getBasketCurrency()->name);
-
-        $basketContents = $oBasket->getContents();
-
-        $aBasketItems = $basket->getBasketItems();
-        /**
-         * @var string $sBasketItemKey
-         * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
-         */
-        foreach ($basketContents as $oBasketItem) {
-            $aBasketItems[] = new BasketItem(
-                $oBasketItem->getTitle(),
-                $oBasketItem->getPrice()->getNettoPrice(),
-                $oBasketItem->getUnitPrice()->getNettoPrice(),
-                (int)$oBasketItem->getAmount()
-            );
-        }
-
-        $basket->setBasketItems($aBasketItems);
-
-        return $basket;
-    }
-
-    /**
      * @return bool
      */
     public function checkPaymentstatus($blDoRedirect = false): bool

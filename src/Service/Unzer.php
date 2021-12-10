@@ -2,12 +2,14 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Session;
+use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
+use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 
 class Unzer
 {
@@ -107,5 +109,34 @@ class Unzer
         }
 
         return $customer;
+    }
+
+    public function getUnzerBasket($unzerOrderId, BasketModel $oBasket): Basket
+    {
+        $basket = new Basket(
+            $unzerOrderId,
+            $oBasket->getNettoSum(),
+            $oBasket->getBasketCurrency()->name
+        );
+
+        $basketContents = $oBasket->getContents();
+
+        $aBasketItems = $basket->getBasketItems();
+        /**
+         * @var string $sBasketItemKey
+         * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
+         */
+        foreach ($basketContents as $oBasketItem) {
+            $aBasketItems[] = new BasketItem(
+                $oBasketItem->getTitle(),
+                $oBasketItem->getPrice()->getNettoPrice(),
+                $oBasketItem->getUnitPrice()->getNettoPrice(),
+                (int)$oBasketItem->getAmount()
+            );
+        }
+
+        $basket->setBasketItems($aBasketItems);
+
+        return $basket;
     }
 }
