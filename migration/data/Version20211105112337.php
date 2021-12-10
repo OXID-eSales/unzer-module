@@ -39,7 +39,7 @@ final class Version20211105112337 extends AbstractMigration
                             from oxdeliveryset where oxid = 'oxidstandard' ");
         }
 
-        foreach (UnzerHelper::getRDFinserts() as $oxid => $aRDF) {
+        foreach ($this->getRDFinserts() as $oxid => $aRDF) {
             $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                             VALUES(?, ?, ?, ?)", [$oxid, $aRDF['oxpaymentid'], $aRDF['oxobjectid'], 'rdfapayment']);
         }
@@ -52,5 +52,71 @@ final class Version20211105112337 extends AbstractMigration
 
         //deleting all unzer related oxdelset entries from oxobject2payment table
         $this->addSql("DELETE FROM `oxobject2payment` where `OXPAYMENTID` like 'oscunzer_%' and `OXTYPE` = 'oxdelset'");
+    }
+
+    protected function getRDFinserts(): array
+    {
+        return [
+            'oscunzer_card_mastercard' => [
+                'oxpaymentid' => 'oscunzer_card',
+                'oxobjectid' => 'MasterCard',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_card_visa' => [
+                'oxpaymentid' => 'oscunzer_card',
+                'oxobjectid' => 'VISA',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_card_americanexpress' => [
+                'oxpaymentid' => 'oscunzer_card',
+                'oxobjectid' => 'AmericanExpress',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_card_dinersclub' => [
+                'oxpaymentid' => 'oscunzer_card',
+                'oxobjectid' => 'DinersClub',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_card_jcb' => [
+                'oxpaymentid' => 'oscunzer_card',
+                'oxobjectid' => 'JCB',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_prepayment' => [
+                'oxpaymentid' => 'oscunzer_prepayment',
+                'oxobjectid' => 'ByBankTransferInAdvance',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_pis' => [
+                'oxpaymentid' => 'oscunzer_pis',
+                'oxobjectid' => 'ByBankTransferInAdvance',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_invoice' => [
+                'oxpaymentid' => 'oscunzer_invoice',
+                'oxobjectid' => 'ByInvoice',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_invoice-secured' => [
+                'oxpaymentid' => 'oscunzer_invoice-secured',
+                'oxobjectid' => 'ByInvoice',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_sepa' => [
+                'oxpaymentid' => 'oscunzer_sepa',
+                'oxobjectid' => 'DirectDebit',
+                'oxtype' => 'rdfapayment',
+            ],
+            'ooscunzer_sepa-secured' => [
+                'oxpaymentid' => 'oscunzer_sepa-secured',
+                'oxobjectid' => 'DirectDebit',
+                'oxtype' => 'rdfapayment',
+            ],
+            'oscunzer_paypal' => [
+                'oxpaymentid' => 'oscunzer_paypal',
+                'oxobjectid' => 'PayPal',
+                'oxtype' => 'rdfapayment',
+            ],
+        ];
     }
 }

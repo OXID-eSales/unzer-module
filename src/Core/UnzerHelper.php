@@ -42,83 +42,6 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class UnzerHelper
 {
-    /**
-     * @return array
-     */
-    public static function getRDFinserts(): array
-    {
-        return [
-            'oscunzer_card_mastercard' => [
-                'oxpaymentid' => 'oscunzer_card',
-                'oxobjectid' => 'MasterCard',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_card_visa' => [
-                'oxpaymentid' => 'oscunzer_card',
-                'oxobjectid' => 'VISA',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_card_americanexpress' => [
-                'oxpaymentid' => 'oscunzer_card',
-                'oxobjectid' => 'AmericanExpress',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_card_dinersclub' => [
-                'oxpaymentid' => 'oscunzer_card',
-                'oxobjectid' => 'DinersClub',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_card_jcb' => [
-                'oxpaymentid' => 'oscunzer_card',
-                'oxobjectid' => 'JCB',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_prepayment' => [
-                'oxpaymentid' => 'oscunzer_prepayment',
-                'oxobjectid' => 'ByBankTransferInAdvance',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_pis' => [
-                'oxpaymentid' => 'oscunzer_pis',
-                'oxobjectid' => 'ByBankTransferInAdvance',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_invoice' => [
-                'oxpaymentid' => 'oscunzer_invoice',
-                'oxobjectid' => 'ByInvoice',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_invoice-secured' => [
-                'oxpaymentid' => 'oscunzer_invoice-secured',
-                'oxobjectid' => 'ByInvoice',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_sepa' => [
-                'oxpaymentid' => 'oscunzer_sepa',
-                'oxobjectid' => 'DirectDebit',
-                'oxtype' => 'rdfapayment',
-            ],
-            'ooscunzer_sepa-secured' => [
-                'oxpaymentid' => 'oscunzer_sepa-secured',
-                'oxobjectid' => 'DirectDebit',
-                'oxtype' => 'rdfapayment',
-            ],
-            'oscunzer_paypal' => [
-                'oxpaymentid' => 'oscunzer_paypal',
-                'oxobjectid' => 'PayPal',
-                'oxtype' => 'rdfapayment',
-            ],
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    public static function getModuleId(): string
-    {
-        return \OxidSolutionCatalysts\Unzer\Module::MODULE_ID;
-    }
-
     public static function addErrorToDisplay($errorMsg)
     {
         // TODO Translate Errors
@@ -228,29 +151,29 @@ class UnzerHelper
     public static function writeTransactionToDB(string $orderid, User $oUser)
     {
         $oTrans = oxNew(Transaction::class);
-
         $unzerPayment = self::getInitialUnzerPayment();
-        $unzerCustomer = $unzerPayment->getCustomer();
 
-        $metadata = $unzerPayment->getMetadata();
+        $params = [
+            'oxorderid' => $orderid,
+            'oxshopid' => Registry::getConfig()->getShopId(),
+            'oxuserid' => $oUser->getId(),
+            'amount' => $unzerPayment->getAmount()->getTotal(),
+            'currency' => $unzerPayment->getCurrency(),
+            'typeid' => $unzerPayment->getId(),
+            'oxactiondate' => date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()),
+            'oxaction' => $unzerPayment->getStateName(),
+        ];
 
-        $aParams['oscunzertransaction__oxorderid'] = $orderid;
-        $aParams['oscunzertransaction__oxshopid'] = Registry::getConfig()->getShopId();
-        $aParams['oscunzertransaction__oxuserid'] = $oUser->getId();
-        $aParams['oscunzertransaction__amount'] = $unzerPayment->getAmount()->getTotal();
-        $aParams['oscunzertransaction__currency'] = $unzerPayment->getCurrency();
-        $aParams['oscunzertransaction__typeid'] = $unzerPayment->getId();
-        if ($metadata) {
-            $aParams['oscunzertransaction__metadataid'] = $metadata->getId();
-            $aParams['oscunzertransaction__metadata'] = $metadata->jsonSerialize();
+        if ($metadata = $unzerPayment->getMetadata()) {
+            $params['metadataid'] = $metadata->getId();
+            $params['metadata'] = $metadata->jsonSerialize();
         }
-        if ($unzerCustomer) {
-            $aParams['oscunzertransaction__customerid'] = $unzerCustomer->getId();
-        }
-        $aParams['oscunzertransaction__oxactiondate'] = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
-        $aParams['oscunzertransaction__oxaction'] = $unzerPayment->getStateName();
 
-        $oTrans->assign($aParams);
+        if ($unzerCustomer = $unzerPayment->getCustomer()) {
+            $params['customerid'] = $unzerCustomer->getId();
+        }
+
+        $oTrans->assign($params);
         $oTrans->save();
     }
 

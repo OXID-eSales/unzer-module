@@ -3,7 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
+use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 
 class Payment extends Payment_parent
 {
@@ -30,10 +30,12 @@ class Payment extends Payment_parent
      */
     public function isUnzerPaymentTypeAllowed(): bool
     {
-        /** @var UnzerPaymentLoader $paymentLoader */
-        $paymentLoader = ContainerFactory::getInstance()->getContainer()->get(UnzerPaymentLoader::class);
+        /** @var PaymentExtensionLoader $paymentLoader */
+        $paymentLoader = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(PaymentExtensionLoader::class);
 
-        if ($this->isUnzerPayment() && $paymentLoader->getUnzerPayment($this)->isPaymentTypeAllowed()) {
+        if ($this->isUnzerPayment() && $paymentLoader->getPaymentExtension($this)->isPaymentTypeAllowed()) {
             return true;
         }
         return false;

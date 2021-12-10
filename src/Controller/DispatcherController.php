@@ -20,7 +20,7 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
+use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class DispatcherController extends FrontendController
@@ -31,24 +31,26 @@ class DispatcherController extends FrontendController
      */
     public function executePayment(string $paymentid): bool
     {
-        $payment = oxNew(Payment::class);
-        $payment->load($paymentid);
+        $paymentModel = oxNew(Payment::class);
+        $paymentModel->load($paymentid);
 
-        /** @var UnzerPaymentLoader $paymentLoader */
-        $paymentLoader = ContainerFactory::getInstance()->getContainer()->get(UnzerPaymentLoader::class);
+        /** @var PaymentExtensionLoader $paymentLoader */
+        $paymentLoader = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(PaymentExtensionLoader::class);
 
-        $oUnzerPayment = $paymentLoader->getUnzerPayment($payment);
+        $paymentExtension = $paymentLoader->getPaymentExtension($paymentModel);
 
         try {
-            $oUnzerPayment->execute();
+            $paymentExtension->execute();
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(
-                $oUnzerPayment::CONTROLLER_URL,
+                $paymentExtension::CONTROLLER_URL,
                 UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage())
             );
         } catch (Exception $e) {
-            UnzerHelper::redirectOnError($oUnzerPayment::CONTROLLER_URL, $e->getMessage());
+            UnzerHelper::redirectOnError($paymentExtension::CONTROLLER_URL, $e->getMessage());
         }
-        return $oUnzerPayment->checkPaymentstatus();
+        return $paymentExtension->checkPaymentstatus();
     }
 }
