@@ -121,23 +121,4 @@ class UnzerHelper
         $oTrans->assign($params);
         $oTrans->save();
     }
-
-    /**
-     * @return Payment|null
-     * @throws UnzerApiException
-     */
-    public static function getInitialUnzerPayment(): ?Payment
-    {
-        if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
-            /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
-            $unzerSDKLoader = ContainerFactory::getInstance()
-                ->getContainer()
-                ->get(\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class);
-            $unzer = $unzerSDKLoader->getUnzerSDK();
-
-            return $unzer->fetchPayment($paymentId);
-        }
-
-        return null;
-    }
 }

@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
@@ -23,7 +24,7 @@ class Order extends Order_parent
                 // order not saved TODO
             }
 
-            $payment = UnzerHelper::getInitialUnzerPayment();
+            $payment = $this->getInitialUnzerPayment();
             if ($this->checkUnzerPaymentStatus($payment)) {
                 if (!$this->oxorder__oxordernr->value) {
                     $this->_setNumber();
@@ -72,7 +73,7 @@ class Order extends Order_parent
                     UnzerHelper::writeTransactionToDB(
                         $this->getId(),
                         $oUser,
-                        UnzerHelper::getInitialUnzerPayment()
+                        $this->getInitialUnzerPayment()
                     );
                 }
 
@@ -93,7 +94,7 @@ class Order extends Order_parent
                 UnzerHelper::writeTransactionToDB(
                     $this->getId(),
                     $oUser,
-                    UnzerHelper::getInitialUnzerPayment()
+                    $this->getInitialUnzerPayment()
                 );
             }
         }
@@ -154,5 +155,23 @@ class Order extends Order_parent
             }
         }
         return $result;
+    }
+
+    /**
+     * @throws UnzerApiException
+     */
+    protected function getInitialUnzerPayment(): ?\UnzerSDK\Resources\Payment
+    {
+        if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
+            /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
+            $unzerSDKLoader = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class);
+            $unzer = $unzerSDKLoader->getUnzerSDK();
+
+            return $unzer->fetchPayment($paymentId);
+        }
+
+        return null;
     }
 }
