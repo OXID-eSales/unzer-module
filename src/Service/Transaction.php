@@ -2,8 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsDate;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
 use UnzerSDK\Resources\Payment;
 
@@ -12,40 +11,58 @@ class Transaction
     /** @var Context */
     protected $context;
 
+    /** @var UtilsDate */
+    protected $utilsDate;
+
     public function __construct(
-        Context $context
+        Context $context,
+        UtilsDate $utilsDate
     ) {
         $this->context = $context;
+        $this->utilsDate = $utilsDate;
     }
 
     public function writeTransactionToDB(string $orderid, string $userId, ?Payment $unzerPayment)
     {
-        $oTrans = oxNew(TransactionModel::class);
+        $transaction = $this->getNewTransactionObject();
 
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
-            'oxactiondate' => date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()),
+            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
         if ($unzerPayment) {
-            $params['amount'] = $unzerPayment->getAmount()->getTotal();
-            $params['currency'] = $unzerPayment->getCurrency();
-            $params['typeid'] = $unzerPayment->getId();
-            $params['oxaction'] = $unzerPayment->getStateName();
-
-            if ($metadata = $unzerPayment->getMetadata()) {
-                $params['metadataid'] = $metadata->getId();
-                $params['metadata'] = $metadata->jsonSerialize();
-            }
-
-            if ($unzerCustomer = $unzerPayment->getCustomer()) {
-                $params['customerid'] = $unzerCustomer->getId();
-            }
+            $params += array_merge($params, $this->getUnzerPaymentData($unzerPayment));
         }
 
-        $oTrans->assign($params);
-        $oTrans->save();
+        $transaction->assign($params);
+        $transaction->save();
+    }
+
+    protected function getUnzerPaymentData(Payment $unzerPayment): array
+    {
+        $params = [];
+        $params['amount'] = $unzerPayment->getAmount()->getTotal();
+        $params['currency'] = $unzerPayment->getCurrency();
+        $params['typeid'] = $unzerPayment->getId();
+        $params['oxaction'] = $unzerPayment->getStateName();
+
+        if ($metadata = $unzerPayment->getMetadata()) {
+            $params['metadataid'] = $metadata->getId();
+            $params['metadata'] = $metadata->jsonSerialize();
+        }
+
+        if ($unzerCustomer = $unzerPayment->getCustomer()) {
+            $params['customerid'] = $unzerCustomer->getId();
+        }
+
+        return $params;
+    }
+
+    protected function getNewTransactionObject()
+    {
+        return oxNew(TransactionModel::class);
     }
 }
