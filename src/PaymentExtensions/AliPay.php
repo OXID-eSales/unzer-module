@@ -42,7 +42,7 @@ class AliPay extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Alipay $uzrAP */
         $uzrAP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Alipay());
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $uzrAP->charge(
             $this->basket->getPrice()->getPrice(),

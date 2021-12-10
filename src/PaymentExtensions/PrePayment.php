@@ -50,7 +50,7 @@ class PrePayment extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Prepayment $prepayment */
         $prepayment = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Prepayment());
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $prepayment->charge(
             $this->basket->getPrice()->getPrice(),

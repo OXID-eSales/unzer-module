@@ -44,7 +44,7 @@ class Ideal extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrIdeal */
         $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $uzrIdeal->charge(
             $this->basket->getPrice()->getPrice(),

@@ -42,7 +42,7 @@ class WeChatPay extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Wechatpay $uzrWechat */
         $uzrWechat = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Wechatpay());
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $uzrWechat->charge(
             $this->basket->getPrice()->getPrice(),

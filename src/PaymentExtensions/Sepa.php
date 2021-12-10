@@ -72,7 +72,7 @@ class Sepa extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebit $uzrSepa */
         $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $uzrSepa->charge(
             $this->basket->getPrice()->getPrice(),

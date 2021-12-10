@@ -71,7 +71,7 @@ class SepaSecured extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebitSecured $uzrSepa */
         $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $uzrBasket = $this->getUnzerBasket($this->basket);
         $transaction = $uzrSepa->charge(

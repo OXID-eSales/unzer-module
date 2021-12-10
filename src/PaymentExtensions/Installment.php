@@ -43,7 +43,7 @@ class Installment extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\InstallmentSecured $uzrInstall */
         $uzrInstall = $this->unzerSDK->fetchPaymentType($sId);
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $uzrInstall->authorize(
             $this->basket->getPrice()->getPrice(),
