@@ -94,10 +94,9 @@ class UnzerHelper
      * @param User $oUser
      * @throws UnzerApiException
      */
-    public static function writeTransactionToDB(string $orderid, User $oUser)
+    public static function writeTransactionToDB(string $orderid, User $oUser, Payment $unzerPayment)
     {
         $oTrans = oxNew(Transaction::class);
-        $unzerPayment = self::getInitialUnzerPayment();
 
         $params = [
             'oxorderid' => $orderid,

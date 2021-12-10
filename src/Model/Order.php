@@ -23,7 +23,8 @@ class Order extends Order_parent
                 // order not saved TODO
             }
 
-            if ($this->checkUnzerPaymentStatus()) {
+            $payment = UnzerHelper::getInitialUnzerPayment();
+            if ($this->checkUnzerPaymentStatus($payment)) {
                 if (!$this->oxorder__oxordernr->value) {
                     $this->_setNumber();
                 } else {
@@ -68,7 +69,11 @@ class Order extends Order_parent
                     $this->oxorder__oxtransstatus->value == "OK"
                     && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
                 ) {
-                    UnzerHelper::writeTransactionToDB($this->getId(), $oUser);
+                    UnzerHelper::writeTransactionToDB(
+                        $this->getId(),
+                        $oUser,
+                        UnzerHelper::getInitialUnzerPayment()
+                    );
                 }
 
                 return (int)$iRet;
@@ -85,7 +90,11 @@ class Order extends Order_parent
                 $this->oxorder__oxtransstatus->value == "OK"
                 && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
             ) {
-                UnzerHelper::writeTransactionToDB($this->getId(), $oUser);
+                UnzerHelper::writeTransactionToDB(
+                    $this->getId(),
+                    $oUser,
+                    UnzerHelper::getInitialUnzerPayment()
+                );
             }
         }
         return $iRet;
@@ -99,12 +108,11 @@ class Order extends Order_parent
         $this->save();
     }
 
-    protected function checkUnzerPaymentStatus()
+    protected function checkUnzerPaymentStatus(?Payment $payment)
     {
         $result = false;
 
         // TODO raise exception if $payment or $transaction isnull
-        $payment = UnzerHelper::getInitialUnzerPayment();
         $transaction = $payment->getInitialTransaction();
 
         if ($payment->isCompleted()) {
