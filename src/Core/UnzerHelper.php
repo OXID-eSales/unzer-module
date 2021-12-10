@@ -88,37 +88,4 @@ class UnzerHelper
 
         return $oSession->processUrl($dstUrl);
     }
-
-    /**
-     * @param string $orderid
-     * @param User $oUser
-     * @throws UnzerApiException
-     */
-    public static function writeTransactionToDB(string $orderid, User $oUser, Payment $unzerPayment)
-    {
-        $oTrans = oxNew(Transaction::class);
-
-        $params = [
-            'oxorderid' => $orderid,
-            'oxshopid' => Registry::getConfig()->getShopId(),
-            'oxuserid' => $oUser->getId(),
-            'amount' => $unzerPayment->getAmount()->getTotal(),
-            'currency' => $unzerPayment->getCurrency(),
-            'typeid' => $unzerPayment->getId(),
-            'oxactiondate' => date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()),
-            'oxaction' => $unzerPayment->getStateName(),
-        ];
-
-        if ($metadata = $unzerPayment->getMetadata()) {
-            $params['metadataid'] = $metadata->getId();
-            $params['metadata'] = $metadata->jsonSerialize();
-        }
-
-        if ($unzerCustomer = $unzerPayment->getCustomer()) {
-            $params['customerid'] = $unzerCustomer->getId();
-        }
-
-        $oTrans->assign($params);
-        $oTrans->save();
-    }
 }

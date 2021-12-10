@@ -5,6 +5,8 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -70,7 +72,9 @@ class Order extends Order_parent
                     $this->oxorder__oxtransstatus->value == "OK"
                     && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
                 ) {
-                    UnzerHelper::writeTransactionToDB(
+                    /** @var TransactionService $transactionService */
+                    $transactionService = $this->getServiceFromContainer(TransactionService::class);
+                    $transactionService->writeTransactionToDB(
                         $this->getId(),
                         $oUser,
                         $this->getSessionUnzerPayment()
@@ -91,7 +95,9 @@ class Order extends Order_parent
                 $this->oxorder__oxtransstatus->value == "OK"
                 && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
             ) {
-                UnzerHelper::writeTransactionToDB(
+                /** @var TransactionService $transactionService */
+                $transactionService = $this->getServiceFromContainer(TransactionService::class);
+                $transactionService->writeTransactionToDB(
                     $this->getId(),
                     $oUser,
                     $this->getSessionUnzerPayment()
@@ -163,15 +169,20 @@ class Order extends Order_parent
     protected function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
     {
         if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
-            /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
-            $unzerSDKLoader = ContainerFactory::getInstance()
-                ->getContainer()
-                ->get(\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class);
+            /** @var UnzerSDKLoader $unzerSDKLoader */
+            $unzerSDKLoader = $this->getServiceFromContainer(UnzerSDKLoader::class);
             $unzer = $unzerSDKLoader->getUnzerSDK();
 
             return $unzer->fetchPayment($paymentId);
         }
 
         return null;
+    }
+
+    protected function getServiceFromContainer($serviceName)
+    {
+        return ContainerFactory::getInstance()
+            ->getContainer()
+            ->get($serviceName);
     }
 }
