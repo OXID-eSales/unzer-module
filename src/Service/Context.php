@@ -29,4 +29,9 @@ class Context extends BasicContext
     {
         return "unzer_" . date("Y-m-d") . ".log";
     }
+
+    public function getCurrentShopId(): int
+    {
+        return $this->shopConfig->getShopId();
+    }
 }

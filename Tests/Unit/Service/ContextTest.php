@@ -31,4 +31,14 @@ class ContextTest extends TestCase
             ['logsDir']
         ];
     }
+
+    public function testGetCurrentShopId(): void
+    {
+        $configStub = $this->createConfiguredMock(Config::class, [
+            'getShopId' => 10
+        ]);
+
+        $sut = new Context($configStub);
+        $this->assertSame(10, $sut->getCurrentShopId());
+    }
 }
