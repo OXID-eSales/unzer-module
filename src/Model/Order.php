@@ -24,8 +24,8 @@ class Order extends Order_parent
                 // order not saved TODO
             }
 
-            $payment = $this->getInitialUnzerPayment();
-            if ($this->checkUnzerPaymentStatus($payment)) {
+            $sessionUnzerPayment = $this->getSessionUnzerPayment();
+            if ($this->checkUnzerPaymentStatus($sessionUnzerPayment)) {
                 if (!$this->oxorder__oxordernr->value) {
                     $this->_setNumber();
                 } else {
@@ -73,7 +73,7 @@ class Order extends Order_parent
                     UnzerHelper::writeTransactionToDB(
                         $this->getId(),
                         $oUser,
-                        $this->getInitialUnzerPayment()
+                        $this->getSessionUnzerPayment()
                     );
                 }
 
@@ -94,7 +94,7 @@ class Order extends Order_parent
                 UnzerHelper::writeTransactionToDB(
                     $this->getId(),
                     $oUser,
-                    $this->getInitialUnzerPayment()
+                    $this->getSessionUnzerPayment()
                 );
             }
         }
@@ -160,7 +160,7 @@ class Order extends Order_parent
     /**
      * @throws UnzerApiException
      */
-    protected function getInitialUnzerPayment(): ?\UnzerSDK\Resources\Payment
+    protected function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
     {
         if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
             /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
