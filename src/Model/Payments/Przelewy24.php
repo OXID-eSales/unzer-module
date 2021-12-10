@@ -39,10 +39,8 @@ class Przelewy24 extends UnzerPayment
 
     public function execute()
     {
-        $sId = $this->getUzrId();
-
-        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrPrzelewy */
-        $uzrPrzelewy = $this->unzerSDK->fetchPaymentType($sId);
+        /** @var \UnzerSDK\Resources\PaymentTypes\Przelewy24 $uzrPrzelewy */
+        $uzrPrzelewy = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Przelewy24());
 
         $customer = $this->getCustomerData();
 

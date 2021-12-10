@@ -1,5 +1,12 @@
-<form id="payment-form-installmentsecured" class="unzerUI form unzerUI-installmentsecured__form" novalidate>
-    <div id="example-installment-secured">
+[{block name="unzer_installment_css"}]
+    [{oxscript include="https://static.unzer.com/v1/unzer.js"}]
+    [{/block}]
+[{block name="unzer_installment_css"}]
+    [{oxstyle include="https://static.unzer.com/v1/unzer.css"}]
+    [{/block}]
+
+<form id="payment-form-installment" class="unzerUI form unzerUI-installmentsecured__form" novalidate>
+    <div id="unzer-installment">
         <!-- The Installment Secured field UI Element will be inserted here -->
     </div>
     <div class="field" id="error-holder" style="color: #9f3a38"> </div>
@@ -7,21 +14,30 @@
         Continue
     </button>
 </form>
-
+[{assign var=totalgross value=$oxcmp_basket->getBruttoSum()}]
+[{assign var=uzrcurrency value='EUR'}]
 [{capture assign="unzerInstallmentJS"}]
-    <script type="text/javascript">
-        [{capture name="javaScript"}]
+
+        var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
+        var divHidden = submitBasketForm.querySelector('.hidden');
+
+        let hiddenInputPaymentTypeId = divHidden.querySelector('paymentData');
+        hiddenInputPaymentTypeId = document.createElement('input');
+        hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
+        hiddenInputPaymentTypeId.setAttribute('name', 'paymentData');
+        divHidden.appendChild(hiddenInputPaymentTypeId);
+
         // Create an Unzer instance with your public key
-        let unzerInstance = new unzer('<?php echo UNZER_PAPI_PUBLIC_KEY; ?>');
+        let unzerInstance = new unzer('[{$unzerpub}]');
 
         let InstallmentSecured = unzerInstance.InstallmentSecured();
 
         InstallmentSecured.create({
-            containerId: 'example-installment-secured', // required
-            amount: 119.0, // required
-            currency: 'EUR', // required
-            effectiveInterest: 4.5, // required
-            orderDate: '2019-04-18', // optional
+            containerId: 'unzer-installment', // required
+            amount: [{$totalgross}], // required
+            currency: '[{$uzrcurrency}]', // required
+            effectiveInterest: 4.5, // required TODO
+           // orderDate: '2019-04-18', // optional
         })
             .then(function(data){
                 // if successful, notify the user that the list of installments was fetched successfully
@@ -55,26 +71,16 @@
         });
 
         // Handling the form's submission.
-        let form = document.getElementById('payment-form-installmentsecured');
+        let form = document.getElementById('payment-form-installment');
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             InstallmentSecured.createResource()
                 .then(function(data) {
-                    let hiddenInput = document.createElement('input');
-                    hiddenInput.setAttribute('type', 'hidden');
-                    hiddenInput.setAttribute('name', 'paymentTypeId');
-                    hiddenInput.setAttribute('value', data.id);
-                    form.appendChild(hiddenInput);
-                    form.setAttribute('method', 'POST');
-                    form.setAttribute('action', '<?php echo CONTROLLER_URL; ?>');
-
                     form.submit();
                 })
                 .catch(function(error) {
                     $('#error-holder').html(error.message)
                 });
         });
-        [{/capture}]
-    </script>
     [{/capture}]
 [{oxscript add=$unzerInstallmentJS}]

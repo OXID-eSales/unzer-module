@@ -39,14 +39,12 @@ class AliPay extends UnzerPayment
 
     public function execute()
     {
-        $sId = $this->getUzrId();
-
-        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrAliPay */
-        $uzrAliPay = $this->unzerSDK->fetchPaymentType($sId);
+        /** @var \UnzerSDK\Resources\PaymentTypes\Alipay $uzrAP */
+        $uzrAP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Alipay());
 
         $customer = $this->getCustomerData();
 
-        $transaction = $uzrAliPay->charge(
+        $transaction = $uzrAP->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),

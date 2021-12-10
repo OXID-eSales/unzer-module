@@ -15,6 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class Installment extends UnzerPayment
 {
     /**
@@ -37,6 +39,21 @@ class Installment extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        $sId = $this->getUzrId();
+        /** @var \UnzerSDK\Resources\PaymentTypes\InstallmentSecured $uzrInstall */
+        $uzrInstall = $this->unzerSDK->fetchPaymentType($sId);
+
+        $customer = $this->getCustomerData();
+
+        $transaction = $uzrInstall->authorize(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
     }
 }

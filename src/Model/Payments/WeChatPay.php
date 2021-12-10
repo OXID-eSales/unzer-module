@@ -39,10 +39,8 @@ class WeChatPay extends UnzerPayment
 
     public function execute()
     {
-        $sId = $this->getUzrId();
-
-        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrWechat */
-        $uzrWechat = $this->unzerSDK->fetchPaymentType($sId);
+        /** @var \UnzerSDK\Resources\PaymentTypes\Wechatpay $uzrWechat */
+        $uzrWechat = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Wechatpay());
 
         $customer = $this->getCustomerData();
 
