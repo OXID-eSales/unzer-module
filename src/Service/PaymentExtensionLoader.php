@@ -24,7 +24,7 @@ use OxidSolutionCatalysts\Unzer\Model\Payments\Sofort;
 use OxidSolutionCatalysts\Unzer\Model\Payments\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Model\Payments\WeChatPay;
 
-class UnzerPaymentLoader
+class PaymentExtensionLoader
 {
     public const UNZERCLASSNAMEMAPPING = [
         'oscunzer_alipay' => AliPay::class,
@@ -48,24 +48,27 @@ class UnzerPaymentLoader
     ];
 
     private $session;
-
     private $unzerSdkLoader;
+    private $translator;
 
     public function __construct(
         Session $session,
-        UnzerSDKLoader $unzerSDKLoader
+        UnzerSDKLoader $unzerSDKLoader,
+        Translator $translator
     ) {
         $this->session = $session;
         $this->unzerSdkLoader = $unzerSDKLoader;
+        $this->translator = $translator;
     }
 
-    public function getUnzerPayment(PaymentModel $payment): AbstractUnzerPayment
+    public function getPaymentExtension(PaymentModel $payment): AbstractUnzerPayment
     {
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $payment,
             $this->session,
-            $this->unzerSdkLoader->getUnzerSDK()
+            $this->unzerSdkLoader->getUnzerSDK(),
+            $this->translator
         );
     }
 }

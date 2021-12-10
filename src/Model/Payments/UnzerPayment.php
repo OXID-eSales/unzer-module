@@ -14,6 +14,7 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\Translator;
 use Psr\Container\ContainerInterface;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
@@ -33,59 +34,47 @@ abstract class UnzerPayment
     public const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
     public const SUCCESS_URL = "thankyou";
 
-    /**
-     * @var Payment
-     */
+    /** @var Payment */
     protected $payment;
 
-    /**
-     * @var Session
-     */
+    /** @var Session */
     protected $session;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     protected $user;
 
-    /**
-     * @var \OxidEsales\Eshop\Application\Model\Basket
-     */
+    /** @var \OxidEsales\Eshop\Application\Model\Basket */
     protected $basket;
 
-    /**
-     * @var Unzer
-     */
+    /** @var Unzer */
     protected $unzerSDK;
 
-    /**
-     * @var string
-     */
+    /** @var Translator */
+    protected $translator;
+
+    /** @var string */
     protected $unzerOrderId;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $Paymentmethod;
 
-    /**
-     * @var null|array
-     */
+    /** @var null|array */
     protected $aPaymentParams = null;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $aCurrencies;
 
     public function __construct(
         Payment $payment,
         Session $session,
-        Unzer $unzerSDK
+        Unzer $unzerSDK,
+        Translator $translator
     ) {
         $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
+        $this->translator = $translator;
+
         $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
         $this->user = $this->session->getUser();
         $this->basket = $this->session->getBasket();
@@ -177,7 +166,10 @@ abstract class UnzerPayment
             return $this->getPaymentParams()['id'];
         }
 
-        UnzerHelper::redirectOnError('order', UnzerHelper::translatedMsg('WRONGPAYMENTID', 'Ungültige ID'));
+        UnzerHelper::redirectOnError(
+            'order',
+            $this->translator->translate('WRONGPAYMENTID', 'Ungültige ID')
+        );
     }
 
     public function getPaymentParams()
@@ -326,11 +318,8 @@ abstract class UnzerPayment
 
         // Catch API errors, write the message to your log and show the ClientMessage to the client.
         try {
-            $unzer = $this->unzerSDK;
-            // Create an Unzer object using your private key and register a debug handler if you want to.
-
             // Redirect to success if the payment has been successfully completed.
-            $unzerPayment = $unzer->fetchPayment($paymentId);
+            $unzerPayment = $this->unzerSDK->fetchPayment($paymentId);
             $this->transaction = $unzerPayment->getInitialTransaction();
             if ($this->transaction->isSuccess()) {
                 // TODO log success
@@ -351,7 +340,7 @@ abstract class UnzerPayment
             } elseif ($this->transaction->isError()) {
                 UnzerHelper::redirectOnError(
                     self::CONTROLLER_URL,
-                    UnzerHelper::translatedMsg(
+                    $this->translator->translate(
                         $this->transaction->getMessage()->getCode(),
                         $this->transaction->getMessage()->getCustomer()
                     )
@@ -360,7 +349,7 @@ abstract class UnzerPayment
         } catch (UnzerApiException $e) {
             UnzerHelper::redirectOnError(
                 self::CONTROLLER_URL,
-                UnzerHelper::translatedMsg($e->getCode(), $e->getClientMessage())
+                $this->translator->translate((string)$e->getCode(), $e->getClientMessage())
             );
         } catch (\RuntimeException $e) {
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());

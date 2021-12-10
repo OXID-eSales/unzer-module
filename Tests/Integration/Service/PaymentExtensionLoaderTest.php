@@ -4,11 +4,12 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Session;
-use OxidSolutionCatalysts\Unzer\Service\UnzerPaymentLoader;
+use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
+use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use PHPUnit\Framework\TestCase;
 
-class UnzerPaymentLoaderTest extends TestCase
+class PaymentExtensionLoaderTest extends TestCase
 {
     /**
      * @dataProvider checkPaymentTypeCanBeLoadedDataProvider
@@ -23,10 +24,11 @@ class UnzerPaymentLoaderTest extends TestCase
         $sdkLoaderMock->method('getUnzerSDK')->willReturn(
             $this->createPartialMock(\UnzerSDK\Unzer::class, [])
         );
+        $translatorStub = $this->createPartialMock(Translator::class, []);
 
-        $sut = new UnzerPaymentLoader($sessionStub, $sdkLoaderMock);
+        $sut = new PaymentExtensionLoader($sessionStub, $sdkLoaderMock, $translatorStub);
 
-        $loadedPaymentType = $sut->getUnzerPayment($paymentStub);
+        $loadedPaymentType = $sut->getPaymentExtension($paymentStub);
         $this->assertInstanceOf($paymentClass, $loadedPaymentType);
         $this->assertSame($paymentId, $loadedPaymentType->getID());
     }
@@ -35,7 +37,7 @@ class UnzerPaymentLoaderTest extends TestCase
     {
         $testCases = [];
 
-        foreach (UnzerPaymentLoader::UNZERCLASSNAMEMAPPING as $key => $className) {
+        foreach (PaymentExtensionLoader::UNZERCLASSNAMEMAPPING as $key => $className) {
             $testCases[] = [
                 'paymentId' => $key,
                 'paymentClass' => $className
