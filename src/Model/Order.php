@@ -115,7 +115,7 @@ class Order extends Order_parent
         $this->save();
     }
 
-    protected function checkUnzerPaymentStatus(?Payment $payment)
+    protected function checkUnzerPaymentStatus(?\UnzerSDK\Resources\Payment $payment)
     {
         $result = false;
 
