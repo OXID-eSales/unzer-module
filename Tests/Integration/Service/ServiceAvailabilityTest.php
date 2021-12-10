@@ -23,6 +23,7 @@ class ServiceAvailabilityTest extends TestCase
             [\OxidSolutionCatalysts\Unzer\Service\ModuleSettings::class],
             [\OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader::class],
             [\OxidSolutionCatalysts\Unzer\Service\Translator::class],
+            [\OxidSolutionCatalysts\Unzer\Service\Transaction::class],
         ];
     }
 }
