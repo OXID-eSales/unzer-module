@@ -15,6 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model\Payments;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class Bancontact extends UnzerPayment
 {
     /**
