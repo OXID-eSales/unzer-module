@@ -76,7 +76,7 @@ class Order extends Order_parent
                     $transactionService = $this->getServiceFromContainer(TransactionService::class);
                     $transactionService->writeTransactionToDB(
                         $this->getId(),
-                        $oUser,
+                        $oUser->getId() ?: '',
                         $this->getSessionUnzerPayment()
                     );
                 }
@@ -99,7 +99,7 @@ class Order extends Order_parent
                 $transactionService = $this->getServiceFromContainer(TransactionService::class);
                 $transactionService->writeTransactionToDB(
                     $this->getId(),
-                    $oUser,
+                    $oUser->getId() ?: '',
                     $this->getSessionUnzerPayment()
                 );
             }
