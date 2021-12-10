@@ -127,23 +127,6 @@ class UnzerHelper
     }
 
     /**
-     * @param int|string $code
-     * @param string $callback
-     * @return array|string
-     */
-    public static function translatedMsg($code, string $callback)
-    {
-        $string = 'oscunzer_' . substr((string)$code, 4);
-        $oLang = Registry::getLang();
-        $translation = $oLang->translateString($string);
-        if (!$oLang->isTranslated()) {
-            $translation = $callback;
-        }
-
-        return $translation;
-    }
-
-    /**
      * @param string $orderid
      * @param User $oUser
      * @throws UnzerApiException

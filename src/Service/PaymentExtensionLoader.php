@@ -48,15 +48,17 @@ class PaymentExtensionLoader
     ];
 
     private $session;
-
     private $unzerSdkLoader;
+    private $translator;
 
     public function __construct(
         Session $session,
-        UnzerSDKLoader $unzerSDKLoader
+        UnzerSDKLoader $unzerSDKLoader,
+        Translator $translator
     ) {
         $this->session = $session;
         $this->unzerSdkLoader = $unzerSDKLoader;
+        $this->translator = $translator;
     }
 
     public function getPaymentExtension(PaymentModel $payment): AbstractUnzerPayment
@@ -65,7 +67,8 @@ class PaymentExtensionLoader
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $payment,
             $this->session,
-            $this->unzerSdkLoader->getUnzerSDK()
+            $this->unzerSdkLoader->getUnzerSDK(),
+            $this->translator
         );
     }
 }
