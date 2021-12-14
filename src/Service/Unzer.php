@@ -26,7 +26,7 @@ class Unzer
         $oUser = $this->session->getUser();
 
         $customer = CustomerFactory::createCustomer($oUser->getFieldData('oxfname'), $oUser->getFieldData('oxlname'));
-        $customer->setBirthDate($oUser->getFieldData('oxbirthdate') != "0000-00-00" ?? '');
+        $customer->setBirthDate($oUser->getFieldData('oxbirthdate') != "0000-00-00" ? $oUser->getFieldData('oxbirthdate') : '');
         $customer->setCompany($oUser->getFieldData('oxcompany'));
         $customer->setSalutation($oUser->getFieldData('oxsal'));
         $customer->setEmail($oUser->getFieldData('oxusername'));
