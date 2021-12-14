@@ -14,6 +14,11 @@ class Translator
         $this->language = $language;
     }
 
+    /**
+     * @param string $languageCode
+     * @param string $defaultMessage
+     * @return array|string
+     */
     public function translate(string $languageCode, string $defaultMessage)
     {
         $string = 'oscunzer_' . substr($languageCode, 4);
