@@ -76,10 +76,7 @@ class TransactionTest extends TestCase
 
     public function testGetNewTransactionObject(): void
     {
-        $transactionService = new class (
-            $this->createPartialMock(Context::class, []),
-            $this->createConfiguredMock(UtilsDate::class, [])
-        ) extends \OxidSolutionCatalysts\Unzer\Service\Transaction {
+        $transactionService = new class($this->createPartialMock(Context::class, []), $this->createConfiguredMock(UtilsDate::class, [])) extends \OxidSolutionCatalysts\Unzer\Service\Transaction {
             public function testGetNewTransactionObject()
             {
                 return $this->getNewTransactionObject();
