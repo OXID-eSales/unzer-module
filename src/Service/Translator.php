@@ -25,8 +25,9 @@ class Translator
     public function translate(string $languageCode, string $defaultMessage)
     {
         if (substr_compare($languageCode, "API.", 0, 4) == 0 || substr_compare($languageCode, "COR.", 0, 4) == 0 || substr_compare($languageCode, "SDM.", 0, 4) == 0) {
-            $languageCode = 'oscunzer_' . substr($languageCode, 4);
+            $languageCode = substr($languageCode, 4);
         }
+        $languageCode = 'oscunzer_' . $languageCode;
         $translation = $this->language->translateString($languageCode);
         if (!$this->language->isTranslated()) {
             $translation = $defaultMessage;
