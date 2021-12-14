@@ -25,87 +25,51 @@ class Unzer
     {
         $oUser = $this->session->getUser();
 
-        $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-        if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
-            $customer->setBirthDate($oUser->oxuser__oxbirthdate->value);
-        }
-        if ($oUser->oxuser__oxcompany->value) {
-            $customer->setCompany($oUser->oxuser__oxcompany->value);
-        }
-        if ($oUser->oxuser__oxsal->value) {
-            $customer->setSalutation($oUser->oxuser__oxsal->value);
-        }
-        if ($oUser->oxuser__oxusername->value) {
-            $customer->setEmail($oUser->oxuser__oxusername->value);
-        }
-        if ($oUser->oxuser__oxfon->value) {
-            $customer->setPhone($oUser->oxuser__oxfon->value);
-        }
+        $customer = CustomerFactory::createCustomer($oUser->getFieldData('oxfname'), $oUser->getFieldData('oxlname'));
+        $customer->setBirthDate($oUser->getFieldData('oxbirthdate') != "0000-00-00" ?? '');
+        $customer->setCompany($oUser->getFieldData('oxcompany'));
+        $customer->setSalutation($oUser->getFieldData('oxsal'));
+        $customer->setEmail($oUser->getFieldData('oxusername'));
+        $customer->setPhone($oUser->getFieldData('oxfon'));
+        $customer->setMobile($oUser->getFieldData('oxmobfon'));
 
         $billingAddress = $customer->getBillingAddress();
 
         $oCountry = oxNew(Country::class);
-        if ($oCountry->load($oUser->oxuser__oxcountryid->value)) {
-            $billingAddress->setCountry($oCountry->oxcountry__oxisoalpha2->value);
-        }
-        if ($oUser->oxuser__oxcompany->value) {
-            $billingAddress->setName($oUser->oxuser__oxcompany->value);
-        } else {
-            $billingAddress->setName($oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value);
-        }
+        $billingCountryIso = $oCountry->load($oUser->getFieldData('oxcountryid')) ? $oCountry->getFieldData('oxisoalpha2') : '';
 
-        if ($oUser->oxuser__oxcity->value) {
-            $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
-        }
-        if ($oUser->oxuser__oxstreet->value) {
-            $billingAddress->setStreet(
-                $oUser->oxuser__oxstreet->value
-                . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : '')
-            );
-        }
-        if ($oUser->oxuser__oxzip->value) {
-            $billingAddress->setZip($oUser->oxuser__oxzip->value);
-        }
-        if ($oUser->oxuser__oxmobfon->value) {
-            $customer->setMobile($oUser->oxuser__oxmobfon->value);
-        }
+        $billingAddress->setName(
+            $oUser->getFieldData('oxcompany') ??
+            $oUser->getFieldData('oxfname') . ' ' . $oUser->getFieldData('oxlname')
+        );
+        $billingAddress->setStreet(trim(
+            $oUser->getFieldData('oxstreet') .
+            ' ' .
+            $oUser->getFieldData('oxstreetnr')
+        ));
+
+        $billingAddress->setZip($oUser->getFieldData('oxzip'));
+        $billingAddress->setCity(trim($oUser->getFieldData('oxcity')));
+        $billingAddress->setCountry($billingCountryIso);
+
         if ($oOrder !== null) {
             $oDelAddress = $oOrder->getDelAddressInfo();
             $shippingAddress = $customer->getShippingAddress();
+            $deliveryCountryIso = $oCountry->load($oDelAddress->getFieldData('oxcountryid')) ? $oDelAddress->getFieldData('oxisoalpha2') : '';
 
-            if ($oDelAddress->oxaddress__oxcompany->value) {
-                $shippingAddress->setName($oDelAddress->oxaddress__oxcompany->value);
-            } else {
-                $shippingAddress->setName(
-                    $oDelAddress->oxaddress__oxfname->value . ' ' . $oDelAddress->oxaddress__oxlname->value
-                );
-            }
+            $shippingAddress->setName(
+                $oDelAddress->getFieldData('oxcompany') ??
+                $oDelAddress->getFieldData('oxfname') . ' ' . $oDelAddress->getFieldData('oxlname')
+            );
+            $shippingAddress->setStreet(trim(
+                $oDelAddress->getFieldData('oxstreet') .
+                ' ' .
+                $oDelAddress->getFieldData('oxstreetnr')
+            ));
 
-            if ($oDelAddress->oxaddress__oxstreet->value) {
-                $shippingAddress->setStreet(
-                    $oDelAddress->oxaddress__oxstreet->value
-                    . (
-                    $oDelAddress->oxaddress__oxstreetnr->value !== ''
-                        ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value
-                        : ''
-                    )
-                );
-            }
-
-            if ($oDelAddress->oxaddress__oxstreet->value) {
-                $shippingAddress->setCity($oDelAddress->oxaddress__oxstreet->value);
-            }
-
-            if ($oDelAddress->oxaddress__oxzip->value) {
-                $shippingAddress->setZip($oDelAddress->oxaddress__oxzip->value);
-            }
-
-            $oCountry = oxNew(Country::class);
-            if ($oCountry->load($oDelAddress->oxaddress__oxcountryid->value)) {
-                $oCountry->load($oDelAddress->oxaddress__oxcountryid->value);
-
-                $billingAddress->setCountry($oCountry->oxcountry__oxisoalpha2->value);
-            }
+            $shippingAddress->setZip($oDelAddress->getFieldData('oxzip'));
+            $shippingAddress->setCity($oDelAddress->getFieldData('oxstreet'));
+            $shippingAddress->setCountry($deliveryCountryIso);
         }
 
         return $customer;
