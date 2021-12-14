@@ -49,7 +49,7 @@ class GiroPay extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Giropay $giro */
         $giro = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Giropay());
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $giro->charge(
             $this->basket->getPrice()->getPrice(),

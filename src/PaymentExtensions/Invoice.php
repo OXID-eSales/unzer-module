@@ -38,7 +38,7 @@ class Invoice extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Invoice $invoice */
         $invoice = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice());
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $invoice->charge(
             $this->basket->getPrice()->getPrice(),

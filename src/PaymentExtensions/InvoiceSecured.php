@@ -44,9 +44,8 @@ class InvoiceSecured extends UnzerPayment
             $this->user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
         }
 
-        $customer = $this->getCustomerData();
-
-        $uzrBasket = $this->getUnzerBasket($this->basket);
+        $customer = $this->unzerService->getSessionCustomerData();
+        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $this->basket);
 
         $transaction = $inv_secured->charge(
             $this->basket->getPrice()->getPrice(),

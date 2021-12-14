@@ -42,7 +42,7 @@ class Bancontact extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Bancontact $uzrBancontact */
         $uzrBancontact = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Bancontact());
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         $transaction = $uzrBancontact->charge(
             $this->basket->getPrice()->getPrice(),

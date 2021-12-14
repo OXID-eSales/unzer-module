@@ -42,7 +42,7 @@ class PayPal extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
         $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal());
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         if ($this->isDirectCharge()) {
             $transaction = $uzrPP->charge(

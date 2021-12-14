@@ -50,7 +50,7 @@ class Card extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\Card $uzrCard */
         $uzrCard = $this->unzerSDK->fetchPaymentType($sId);
 
-        $customer = $this->getCustomerData();
+        $customer = $this->unzerService->getSessionCustomerData();
 
         if ($this->isDirectCharge()) {
             $transaction = $uzrCard->charge(

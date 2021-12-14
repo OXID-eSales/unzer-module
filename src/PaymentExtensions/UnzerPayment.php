@@ -15,6 +15,7 @@ use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
+use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use Psr\Container\ContainerInterface;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
@@ -52,6 +53,9 @@ abstract class UnzerPayment
     /** @var Translator */
     protected $translator;
 
+    /** @var UnzerService */
+    protected $unzerService;
+
     /** @var string */
     protected $unzerOrderId;
 
@@ -64,16 +68,30 @@ abstract class UnzerPayment
     /** @var array */
     protected $aCurrencies;
 
+    /**
+     * @return mixed|void
+     * @throws Exception
+     * @throws UnzerApiException
+     */
+    abstract public function execute();
+
+    /**
+     * @var AbstractTransactionType|null
+     */
+    protected $transaction;
+
     public function __construct(
         Payment $payment,
         Session $session,
         Unzer $unzerSDK,
-        Translator $translator
+        Translator $translator,
+        UnzerService $unzerService
     ) {
         $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
         $this->translator = $translator;
+        $this->unzerService = $unzerService;
 
         $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
         $this->user = $this->session->getUser();
@@ -146,18 +164,6 @@ abstract class UnzerPayment
     }
 
     /**
-     * @return mixed|void
-     * @throws Exception
-     * @throws UnzerApiException
-     */
-    abstract public function execute();
-
-    /**
-     * @var AbstractTransactionType|null
-     */
-    protected $transaction;
-
-    /**
      * @return   string|void
      */
     public function getUzrId()
@@ -179,130 +185,6 @@ abstract class UnzerPayment
             $this->aPaymentParams = json_decode($jsonobj, true);
         }
         return $this->aPaymentParams;
-    }
-
-    /**
-     * @param \OxidEsales\Eshop\Application\Model\Basket|null $oBasket
-     * @param $orderId
-     * @return Basket
-     */
-    public function getUnzerBasket(?\OxidEsales\Eshop\Application\Model\Basket $oBasket): Basket
-    {
-        $basket = new Basket($this->unzerOrderId, $oBasket->getNettoSum(), $oBasket->getBasketCurrency()->name);
-
-        $basketContents = $oBasket->getContents();
-
-        $aBasketItems = $basket->getBasketItems();
-        /**
-         * @var string $sBasketItemKey
-         * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
-         */
-        foreach ($basketContents as $oBasketItem) {
-            $aBasketItems[] = new BasketItem(
-                $oBasketItem->getTitle(),
-                $oBasketItem->getPrice()->getNettoPrice(),
-                $oBasketItem->getUnitPrice()->getNettoPrice(),
-                (int)$oBasketItem->getAmount()
-            );
-        }
-
-        $basket->setBasketItems($aBasketItems);
-
-        return $basket;
-    }
-
-    /**
-     * @param User $oUser
-     * @param Order|null $oOrder
-     * @return Customer
-     */
-    public function getCustomerData(Order $oOrder = null): Customer
-    {
-        $oUser = $this->user;
-        $customer = CustomerFactory::createCustomer($oUser->oxuser__oxfname->value, $oUser->oxuser__oxlname->value);
-        if ($oUser->oxuser__oxbirthdate->value != "0000-00-00") {
-            $customer->setBirthDate($oUser->oxuser__oxbirthdate->value);
-        }
-        if ($oUser->oxuser__oxcompany->value) {
-            $customer->setCompany($oUser->oxuser__oxcompany->value);
-        }
-        if ($oUser->oxuser__oxsal->value) {
-            $customer->setSalutation($oUser->oxuser__oxsal->value);
-        }
-        if ($oUser->oxuser__oxusername->value) {
-            $customer->setEmail($oUser->oxuser__oxusername->value);
-        }
-        if ($oUser->oxuser__oxfon->value) {
-            $customer->setPhone($oUser->oxuser__oxfon->value);
-        }
-
-        $billingAddress = $customer->getBillingAddress();
-
-        $oCountry = oxNew(Country::class);
-        if ($oCountry->load($oUser->oxuser__oxcountryid->value)) {
-            $billingAddress->setCountry($oCountry->oxcountry__oxisoalpha2->value);
-        }
-        if ($oUser->oxuser__oxcompany->value) {
-            $billingAddress->setName($oUser->oxuser__oxcompany->value);
-        } else {
-            $billingAddress->setName($oUser->oxuser__oxfname->value . ' ' . $oUser->oxuser__oxlname->value);
-        }
-
-        if ($oUser->oxuser__oxcity->value) {
-            $billingAddress->setCity(trim($oUser->oxuser__oxcity->value));
-        }
-        if ($oUser->oxuser__oxstreet->value) {
-            $billingAddress->setStreet(
-                $oUser->oxuser__oxstreet->value
-                . ($oUser->oxuser__oxstreetnr->value !== '' ? ' ' . $oUser->oxuser__oxstreetnr->value : '')
-            );
-        }
-        if ($oUser->oxuser__oxzip->value) {
-            $billingAddress->setZip($oUser->oxuser__oxzip->value);
-        }
-        if ($oUser->oxuser__oxmobfon->value) {
-            $customer->setMobile($oUser->oxuser__oxmobfon->value);
-        }
-        if ($oOrder !== null) {
-            $oDelAddress = $oOrder->getDelAddressInfo();
-            $shippingAddress = $customer->getShippingAddress();
-
-            if ($oDelAddress->oxaddress__oxcompany->value) {
-                $shippingAddress->setName($oDelAddress->oxaddress__oxcompany->value);
-            } else {
-                $shippingAddress->setName(
-                    $oDelAddress->oxaddress__oxfname->value . ' ' . $oDelAddress->oxaddress__oxlname->value
-                );
-            }
-
-            if ($oDelAddress->oxaddress__oxstreet->value) {
-                $shippingAddress->setStreet(
-                    $oDelAddress->oxaddress__oxstreet->value
-                    . (
-                        $oDelAddress->oxaddress__oxstreetnr->value !== ''
-                        ? ' ' . $oDelAddress->oxaddress__oxstreetnr->value
-                        : ''
-                    )
-                );
-            }
-
-            if ($oDelAddress->oxaddress__oxstreet->value) {
-                $shippingAddress->setCity($oDelAddress->oxaddress__oxstreet->value);
-            }
-
-            if ($oDelAddress->oxaddress__oxzip->value) {
-                $shippingAddress->setZip($oDelAddress->oxaddress__oxzip->value);
-            }
-
-            $oCountry = oxNew(Country::class);
-            if ($oCountry->load($oDelAddress->oxaddress__oxcountryid->value)) {
-                $oCountry->load($oDelAddress->oxaddress__oxcountryid->value);
-
-                $billingAddress->setCountry($oCountry->oxcountry__oxisoalpha2->value);
-            }
-        }
-
-        return $customer;
     }
 
     /**
@@ -368,8 +250,45 @@ abstract class UnzerPayment
 
         $paymentType = $transaction->getPayment()->getPaymentType();
         if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
-            $this->session->setVariable('additionalPaymentInformation', UnzerHelper::getBankData($transaction));
+            $this->session->setVariable('additionalPaymentInformation', $this->getBankData($transaction));
         }
+    }
+
+    /**
+     * @param Charge $transaction
+     * @return string
+     */
+    protected function getBankData(Charge $transaction): string
+    {
+        $amount = Registry::getLang()->formatCurrency($transaction->getAmount());
+
+        $bankData = sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            $amount,
+            Registry::getConfig()->getActShopCurrencyObject()->sign
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
+            $transaction->getHolder()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
+            $transaction->getIban()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'),
+            $transaction->getBic()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
+            $transaction->getDescriptor()
+        );
+
+        return $bankData;
     }
 
     /**
