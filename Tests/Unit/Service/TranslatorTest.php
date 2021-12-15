@@ -13,7 +13,7 @@ class TranslatorTest extends TestCase
         $languageMock = $this->createPartialMock(Language::class, ['translateString']);
         $languageMock->expects($this->once())
             ->method('translateString')
-            ->with('oscunzer_MESSAGEKEY')
+            ->with('oscunzer_testMESSAGEKEY')
             ->willReturn('translation');
 
         $sut = new Translator($languageMock);
