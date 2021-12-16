@@ -611,7 +611,6 @@ final class Version20211216100154 extends AbstractMigration
     protected function getLanguageIds(): array
     {
         if (!count($this->languageIds)) {
-
             $facts = new Facts();
             $configFile = new ConfigFile($facts->getSourcePath() . '/config.inc.php');
             $configKey = is_null($configFile->getVar('sConfigKey')) ?
