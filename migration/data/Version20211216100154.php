@@ -18,7 +18,10 @@ use OxidEsales\Facts\Facts;
 final class Version20211216100154 extends AbstractMigration
 {
     /** @var array[] */
-    private $defaultLanguageAbbr = ['de', 'en'];
+    private $defaultLanguageAbbr = [
+        'de' => 'Deutsch',
+        'en' => 'English'
+    ];
 
     /** @var array[] */
     private $paymentDefinitions = [
@@ -627,15 +630,12 @@ final class Version20211216100154 extends AbstractMigration
                 )
             ) {
                 $rawLanguageIds = unserialize($results[0]['confValue']);
-
-                foreach ($rawLanguageIds as $langAbbr => $langName) {
-                    $this->languageIds[] = $langAbbr;
-                }
             } else {
                 // fallback OXID-Standard
-                foreach ($this->defaultLanguageAbbr as $langAbbr) {
-                    $this->languageIds[] = $langAbbr;
-                }
+                $rawLanguageIds = $this->defaultLanguageAbbr;
+            }
+            foreach ($rawLanguageIds as $langAbbr => $langName) {
+                $this->languageIds[] = $langAbbr;
             }
         }
         return $this->languageIds;
