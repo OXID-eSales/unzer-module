@@ -46,7 +46,7 @@ class Transaction
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = md5($params);
+        $oxid = md5(json_encode($params));
         if (!$transaction->load($oxid)) {
             $transaction->setId($oxid);
             $transaction->assign($params);
@@ -74,7 +74,7 @@ class Transaction
         return $params;
     }
 
-    protected function getNewTransactionObject()
+    protected function getNewTransactionObject(): TransactionModel
     {
         return oxNew(TransactionModel::class);
     }

@@ -75,7 +75,7 @@ class Unzer
         return $customer;
     }
 
-    public function getUnzerBasket($unzerOrderId, BasketModel $oBasket): Basket
+    public function getUnzerBasket(string $unzerOrderId, BasketModel $oBasket): Basket
     {
         $basket = new Basket(
             $unzerOrderId,

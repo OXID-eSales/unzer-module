@@ -42,7 +42,7 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class UnzerHelper
 {
-    public static function addErrorToDisplay($errorMsg)
+    public static function addErrorToDisplay($errorMsg): void
     {
         // TODO Translate Errors
         $oDisplayError = oxNew(DisplayError::class);
@@ -50,7 +50,14 @@ class UnzerHelper
         Registry::getUtilsView()->addErrorToDisplay($oDisplayError);
     }
 
-    public static function redirectOnError($destination, $unzerErrorMessage = null)
+    /**
+     * @param array|null|string $unzerErrorMessage
+     *
+     * @psalm-param 'order' $destination
+     *
+     * @return never
+     */
+    public static function redirectOnError(string $destination, $unzerErrorMessage = null)
     {
         self::addErrorToDisplay($unzerErrorMessage);
         // redirect to payment-selection page:
@@ -74,7 +81,7 @@ class UnzerHelper
      * @param $destination
      * @return string
      */
-    public static function redirecturl($destination, $blWithSessionId = false): string
+    public static function redirecturl(string $destination, bool $blWithSessionId = false): string
     {
         // redirect to payment-selection page:
         $oSession = Registry::getSession();
