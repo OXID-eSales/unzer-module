@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Migrations;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\ConfigFile;
@@ -13,7 +15,7 @@ use OxidEsales\Facts\Facts;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20211129120012 extends AbstractMigration
+final class Version20211216100154 extends AbstractMigration
 {
     /** @var array[] */
     private $paymentDefinitions = [
@@ -302,14 +304,114 @@ final class Version20211129120012 extends AbstractMigration
         ]
     ];
 
+    /** @var array[] */
+    private $rdfaDefinitions = [
+        'oscunzer_card_mastercard' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'MasterCard',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_visa' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'VISA',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_americanexpress' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'AmericanExpress',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_dinersclub' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'DinersClub',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_card_jcb' => [
+            'oxpaymentid' => 'oscunzer_card',
+            'oxobjectid' => 'JCB',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_prepayment' => [
+            'oxpaymentid' => 'oscunzer_prepayment',
+            'oxobjectid' => 'ByBankTransferInAdvance',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_pis' => [
+            'oxpaymentid' => 'oscunzer_pis',
+            'oxobjectid' => 'ByBankTransferInAdvance',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_invoice' => [
+            'oxpaymentid' => 'oscunzer_invoice',
+            'oxobjectid' => 'ByInvoice',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_invoice-secured' => [
+            'oxpaymentid' => 'oscunzer_invoice-secured',
+            'oxobjectid' => 'ByInvoice',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_sepa' => [
+            'oxpaymentid' => 'oscunzer_sepa',
+            'oxobjectid' => 'DirectDebit',
+            'oxtype' => 'rdfapayment',
+        ],
+        'ooscunzer_sepa-secured' => [
+            'oxpaymentid' => 'oscunzer_sepa-secured',
+            'oxobjectid' => 'DirectDebit',
+            'oxtype' => 'rdfapayment',
+        ],
+        'oscunzer_paypal' => [
+            'oxpaymentid' => 'oscunzer_paypal',
+            'oxobjectid' => 'PayPal',
+            'oxtype' => 'rdfapayment',
+        ],
+    ];
+
+    /** @var array[] */
+    protected $isoCountries;
+
+    /** @var array[] */
+    protected $languageIds;
+
+    /** @throws Exception */
+    public function __construct($version)
+    {
+        parent::__construct($version);
+
+        $this->platform->registerDoctrineTypeMapping('enum', 'string');
+    }
+
+    public function getDescription(): string
+    {
+        return '';
+    }
+
     public function up(Schema $schema): void
     {
+        $this->createTransactionTable($schema);
         $this->createPayments();
         $this->createStaticContent();
+        $this->changeUserTable($schema);
+        $this->createDeliverySets();
+        $this->createRdfa();
     }
 
     public function down(Schema $schema): void
     {
+        //dropping column 'customerid' in oxuser table
+        $oxuser = $schema->getTable('oxuser');
+        $oxuser->dropColumn('CUSTOMERID');
+
+        // dropping table 'oscunzertransaction'
+        $schema->dropTable('oscunzertransaction');
+
+        //deleting all unzer related rdfapayment entries from oxobject2payment table
+        $this->addSql("DELETE FROM `oxobject2payment` where `OXPAYMENTID` like 'oscunzer_%' and `OXTYPE` = 'rdfapayment'");
+
+        //deleting all unzer related oxdelset entries from oxobject2payment table
+        $this->addSql("DELETE FROM `oxobject2payment` where `OXPAYMENTID` like 'oscunzer_%' and `OXTYPE` = 'oxdelset'");
+
         //deleting all unzer related entries from oxpayments table
         $this->addSql("DELETE FROM `oxpayments` where `OXID` like 'oscunzer_%'");
 
@@ -320,22 +422,62 @@ final class Version20211129120012 extends AbstractMigration
         $this->addSql("DELETE FROM `oxobject2payment` where `OXPAYMENTID` like 'oscunzer_%' and `OXTYPE` = 'oxcountry'");
     }
 
-    protected $aIsoCountries;
-
-    protected $languageIds;
-
-    private function getIsoCountries(): array
+    /**
+     * create Transaction Table
+     */
+    protected function createTransactionTable(Schema $schema): void
     {
-        if (!$this->aIsoCountries) {
-            $sSql = "SELECT OXID, OXISOALPHA2 FROM oxcountry";
-            $this->aIsoCountries = [];
-
-            foreach ($this->connection->fetchAllAssociative($sSql) as $row) {
-                $this->aIsoCountries [$row['OXISOALPHA2']] = $row['OXID'];
-            }
+        if (!$schema->hasTable('oscunzertransaction')) {
+            $transaction = $schema->createTable('oscunzertransaction');
+        } else {
+            $transaction = $schema->getTable('oscunzertransaction');
         }
 
-        return $this->aIsoCountries;
+        if (!$transaction->hasColumn('OXID')) {
+            $transaction->addColumn('OXID', Types::STRING, ['columnDefinition' => 'char(32) collate latin1_general_ci']);
+        }
+        if (!$transaction->hasColumn('OXORDERID')) {
+            $transaction->addColumn('OXORDERID', Types::STRING, ['columnDefinition' => 'char(32) collate latin1_general_ci', 'comment' => 'OXID (oxorder)']);
+        }
+        if (!$transaction->hasColumn('OXSHOPID')) {
+            $transaction->addColumn('OXSHOPID', Types::INTEGER, ['columnDefinition' => 'int(11)', 'default' => 1, 'comment' => 'Shop ID (oxshops)']);
+        }
+        if (!$transaction->hasColumn('OXUSERID')) {
+            $transaction->addColumn('OXUSERID', Types::STRING, ['columnDefinition' => 'char(32) collate latin1_general_ci', 'comment' => 'OXID (oxuser)']);
+        }
+        if (!$transaction->hasColumn('AMOUNT')) {
+            $transaction->addColumn('AMOUNT', Types::FLOAT, ['columnDefinition' => 'DOUBLE', 'default' => 0]);
+        }
+        if (!$transaction->hasColumn('CURRENCY')) {
+            $transaction->addColumn('CURRENCY', Types::STRING, ['default' => ""]);
+        }
+        if (!$transaction->hasColumn('TYPEID')) {
+            $transaction->addColumn('TYPEID', Types::STRING, ['default' => ""]);
+        }
+        if (!$transaction->hasColumn('METADATAID')) {
+            $transaction->addColumn('METADATAID', Types::STRING, ['default' => ""]);
+        }
+        if (!$transaction->hasColumn('METADATA')) {
+            $transaction->addColumn('METADATA', Types::JSON, ['default' => ""]);
+        }
+        if (!$transaction->hasColumn('CUSTOMERID')) {
+            $transaction->addColumn('CUSTOMERID', Types::STRING, ['default' => ""]);
+        }
+        if (!$transaction->hasColumn('OXACTIONDATE')) {
+            $transaction->addColumn('OXACTIONDATE', Types::DATETIME_MUTABLE, ['columnDefinition' => 'timestamp default "0000-00-00 00:00:00"']);
+        }
+        if (!$transaction->hasColumn('OXACTION')) {
+            $transaction->addColumn('OXACTION', Types::STRING, ['default' => ""]);
+        }
+        if (!$transaction->hasColumn('OXTIMESTAMP')) {
+            $transaction->addColumn('OXTIMESTAMP', Types::DATETIME_MUTABLE, ['columnDefinition' => 'timestamp default current_timestamp on update current_timestamp']);
+        }
+        if (!$transaction->hasPrimaryKey('OXID')) {
+            $transaction->setPrimaryKey(['OXID']);
+        }
+        if (!$transaction->hasIndex('TRANSACTIONUNIQUE')) {
+            $transaction->addUniqueIndex(['OXSHOPID', 'OXORDERID', 'OXUSERID', 'AMOUNT', 'METADATAID', 'CUSTOMERID', 'OXACTION'], 'TRANSACTIONUNIQUE');
+        }
     }
 
     /**
@@ -358,17 +500,40 @@ final class Version20211129120012 extends AbstractMigration
                 $sqlValues[] = $paymentDefinitions[$langAbbr . '_longdesc'];
             }
 
-            $this->setCountriesToPayment($paymentDefinitions, $paymentId);
-
             $this->addSql(
                 "INSERT IGNORE INTO `oxpayments` (`OXID`, `OXACTIVE`, `OXFROMAMOUNT`, `OXTOAMOUNT`, `OXADDSUMTYPE`
                 " . $langRows . ")
                 VALUES (" . $sqlPlaceHolder . ")",
                 $sqlValues
             );
+
+            // set Payment to Countries
+            foreach ($paymentDefinitions['countries'] as $country) {
+                if (array_key_exists($country, $this->getIsoCountries())) {
+                    $this->addSql(
+                        "INSERT IGNORE INTO `oxobject2payment`
+                        (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                        VALUES(?, ?, ?, ?)",
+                        [
+                            md5($paymentId . $this->getIsoCountries()[$country] . ".oxcountry"),
+                            $paymentId,
+                            $this->getIsoCountries()[$country],
+                            'oxcountry'
+                        ]
+                    );
+                }
+            }
         }
+
+        $this->addSql("UPDATE `oxpayments`
+          SET `OXFROMAMOUNT` = 10,`OXTOAMOUNT` = 1000
+         WHERE (`OXID` = 'oscunzer_sepa-secured' || `OXID` = 'oscunzer_invoice-secured')
+          ;");
     }
 
+    /**
+     * create static contents
+     */
     protected function createStaticContent(): void
     {
         foreach ($this->staticContents as $content) {
@@ -394,35 +559,49 @@ final class Version20211129120012 extends AbstractMigration
             );
         }
 
+        $langRowsWithPrefix = str_replace(', ', ', c.', $langRows);
+
         $this->addSql("INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
                 " . $langRows . ")
         SELECT md5(CONCAT(OXLOADID, s.OXID)), OXLOADID, s.OXID " .
-        $this->getPrefixColumns($langRows, 'c') .
-        " FROM oxcontents c, oxshops s
+            $langRowsWithPrefix .
+            " FROM oxcontents c, oxshops s
         WHERE OXLOADID IN ('oscunzersepamandatetext', 'oscunzersepamandateconfirmation') AND c.OXSHOPID=1");
     }
 
-    protected function getPrefixColumns($langRows, $tablePrefix): string
+    /**
+     * change User Table
+     */
+    protected function changeUserTable(Schema $schema): void
     {
-        return str_replace(', ', ', ' . $tablePrefix . '.', $langRows);
+        //adding new column 'customerid' in oxuser table
+        $oxuser = $schema->getTable('oxuser');
+        if (!$oxuser->hasColumn('CUSTOMERID')) {
+            $oxuser->addColumn('CUSTOMERID', Types::STRING, ['default' => "", 'comment' => 'unzer customerid']);
+        }
     }
 
-    protected function setCountriesToPayment($paymentDefinitions, $paymentId): void
+    /**
+     * create DeliverySets
+     */
+    protected function createDeliverySets(): void
     {
-        foreach ($paymentDefinitions['countries'] as $country) {
-            if (array_key_exists($country, $this->getIsoCountries())) {
-                $this->addSql(
-                    "INSERT IGNORE INTO `oxobject2payment`
-                    (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
-                    VALUES(?, ?, ?, ?)",
-                    [
-                        md5($paymentId . $this->getIsoCountries()[$country] . ".oxcountry"),
-                        $paymentId,
-                        $this->getIsoCountries()[$country],
-                        'oxcountry'
-                    ]
-                );
-            }
+        foreach ($this->paymentDefinitions as $paymentId => $paymentDefinitions) {
+            $oxid = md5($paymentId . "oxidstandard.oxdelset");
+            $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                            select '" . $oxid . "', '" . $paymentId . "', 'oxidstandard', 'oxdelset'
+                            from oxdeliveryset where oxid = 'oxidstandard' ");
+        }
+    }
+
+    /**
+     * create DeliverySets
+     */
+    protected function createRdfa(): void
+    {
+        foreach ($this->rdfaDefinitions as $oxid => $aRDF) {
+            $this->addSql("INSERT IGNORE INTO `oxobject2payment` (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
+                            VALUES(?, ?, ?, ?)", [$oxid, $aRDF['oxpaymentid'], $aRDF['oxobjectid'], 'rdfapayment']);
         }
     }
 
@@ -446,7 +625,7 @@ final class Version20211129120012 extends AbstractMigration
                     [$configKey, 'aLanguages']
                 )
             ) {
-                $rawLanguageIds = unserialize($results[0]['confValue']);
+                $rawLanguageIds = unserialize($results[0]['confValue'], []);
 
                 foreach ($rawLanguageIds as $langAbbr => $langName) {
                     $this->languageIds[] = $langAbbr;
@@ -459,5 +638,22 @@ final class Version20211129120012 extends AbstractMigration
             }
         }
         return $this->languageIds;
+    }
+
+    /**
+     * get the ISO-Codes of active Countries
+     */
+    protected function getIsoCountries(): array
+    {
+        if (!$this->isoCountries) {
+            $sSql = "SELECT OXID, OXISOALPHA2 FROM oxcountry";
+            $this->isoCountries = [];
+
+            foreach ($this->connection->fetchAllAssociative($sSql) as $row) {
+                $this->isoCountries [$row['OXISOALPHA2']] = $row['OXID'];
+            }
+        }
+
+        return $this->isoCountries;
     }
 }
