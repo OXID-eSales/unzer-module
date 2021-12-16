@@ -15,6 +15,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class PIS extends UnzerPayment
 {
     /**
@@ -35,8 +39,25 @@ class PIS extends UnzerPayment
         return false;
     }
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        //TODO
+        /** @var \UnzerSDK\Resources\PaymentTypes\PIS $pis */
+        $pis = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\PIS());
+
+        $transaction = $pis->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL),
+            null,
+            null,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
     }
 }

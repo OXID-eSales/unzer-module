@@ -47,7 +47,7 @@ final class Version20211028091954 extends AbstractMigration
         $transaction->addColumn('OXACTION', Types::STRING, ['default' => ""]);
         $transaction->addColumn('OXTIMESTAMP', Types::DATETIME_MUTABLE, ['columnDefinition' => 'timestamp default current_timestamp on update current_timestamp']);
         $transaction->setPrimaryKey(['OXID']);
-        $transaction->addindex(['OXSHOPID', 'OXORDERID']);
+        $transaction->addUniqueIndex(['OXSHOPID', 'OXORDERID', 'OXUSERID', 'AMOUNT', 'METADATAID', 'CUSTOMERID', 'OXACTION']);
 
         //adding new column 'customerid' in oxuser table
         $oxuser = $schema->getTable('oxuser');

@@ -49,9 +49,7 @@
                     </form>
                     <div class="card-body">
                         [{$payment->oxpayments__oxdesc->value}]
-                        [{if $sPaymentID == "oscunzer_pis"}]
-                            [{include file="modules/osc/unzer/unzer_pis.tpl"}]
-                        [{elseif $sPaymentID == "oscunzer_card"}]
+                        [{if $sPaymentID == "oscunzer_card"}]
                             [{include file="modules/osc/unzer/unzer_card.tpl"}]
                         [{elseif $sPaymentID == "oscunzer_eps"}]
                             [{include file="modules/osc/unzer/unzer_eps_charge.tpl"}]
