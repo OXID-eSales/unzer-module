@@ -42,6 +42,9 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class UnzerHelper
 {
+    /**
+     * @param array|null|string $errorMsg
+     */
     public static function addErrorToDisplay($errorMsg): void
     {
         // TODO Translate Errors
