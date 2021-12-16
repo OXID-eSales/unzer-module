@@ -27,6 +27,7 @@
     },
     "scripts": {
         "psalm": "psalm --show-info=true --no-cache",
-        "psalm-errors": "psalm --no-cache"
+        "psalm-errors": "psalm --no-cache",
+        "psalm-automatic": "psalm --alter --issues=MissingReturnType,MissingParamType"
     }
 }

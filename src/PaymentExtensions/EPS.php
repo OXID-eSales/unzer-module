@@ -15,6 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+
 class EPS extends UnzerPayment
 {
     /**
@@ -37,6 +39,22 @@ class EPS extends UnzerPayment
 
     public function execute()
     {
-        //TODO
+        $sId = $this->getUzrId();
+
+        /** @var \UnzerSDK\Resources\PaymentTypes\EPS $uzrEPS */
+        $uzrEPS = $this->unzerSDK->fetchPaymentType($sId);
+
+        $customer = $this->unzerService->getSessionCustomerData();
+
+        $transaction = $uzrEPS->charge(
+            $this->basket->getPrice()->getPrice(),
+            $this->basket->getBasketCurrency()->name,
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $customer,
+            null,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
     }
 }

@@ -31,13 +31,15 @@ class Transaction extends BaseModel
 
     /**
      * @throws DatabaseConnectionException
+     *
+     * @return false|self
      */
-    public static function getTransactionByOxidOrderId($oxorderid)
+    public static function getTransactionByOxidOrderId(string $oxorderid)
     {
         if ($oxorderid) {
             $oxid = DatabaseProvider::getDb()->getOne(
                 "SELECT OXID FROM oscunzertransaction WHERE OXORDERID=?",
-                [(string)$oxorderid]
+                [$oxorderid]
             );
 
             if ($oxid) {
@@ -82,7 +84,7 @@ class Transaction extends BaseModel
         return [];
     }
 
-    private function getRawField($sFieldName)
+    private function getRawField(string $sFieldName): ?string
     {
         $sLongFieldName = $this->_getFieldLongName($sFieldName);
 

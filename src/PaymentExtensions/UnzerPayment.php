@@ -242,7 +242,7 @@ abstract class UnzerPayment
     /**
      * @param Charge $transaction
      */
-    public function setSessionVars(Charge $transaction)
+    public function setSessionVars(Charge $transaction): void
     {
         // You'll need to remember the shortId to show it on the success or failure page
         $this->session->setVariable('ShortId', $transaction->getShortId());

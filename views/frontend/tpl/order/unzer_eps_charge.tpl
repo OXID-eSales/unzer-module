@@ -1,45 +1,54 @@
+[{block name="unzer_cardjs"}]
+    [{oxscript include="https://static.unzer.com/v1/unzer.js"}]
+[{/block}]
+[{block name="unzer_card_css"}]
+    [{oxstyle include="https://static.unzer.com/v1/unzer.css"}]
+[{/block}]
+
 <form id="payment-form" class="unzerUI form" novalidate>
-    <div id="example-eps" class="field"></div>
-    <div class="field" id="error-holder" style="color: #9f3a38"> </div>
-    <button class="unzerUI primary button fluid" id="submit-button" type="submit">[{oxmultilang ident="PAY"}]</button>
+    <div id="unzer-eps" class="field"></div>
+    <div class="field" id="error-holder" style="color: #9f3a38"></div>
 </form>
 
-
 [{capture assign="unzerEPSJS"}]
-    <script type="text/javascript">
-        [{capture name="javaScript"}]
-        // Create an Unzer instance with your public key
-        let unzerInstance = new unzer([{$unzerPublicKey}]);
 
-        // Create an EPS instance and render the EPS form
-        let EPS = unzerInstance.EPS();
-        EPS.create('eps', {
-            containerId: 'example-eps'
-        });
-
-        // Handling payment form submission
-        let form = document.getElementById('payment-form');
-        form.addEventListener('submit', function(event) {
+    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
             event.preventDefault();
-            // Creating a EPS resource
-            EPS.createResource()
-                .then(function(result) {
-                    let hiddenInput = document.createElement('input');
-                    hiddenInput.setAttribute('type', 'hidden');
-                    hiddenInput.setAttribute('name', 'resourceId');
-                    hiddenInput.setAttribute('value', result.id);
-                    form.appendChild(hiddenInput);
-                    form.setAttribute('method', 'POST');
-                    form.setAttribute('action', [{$sClUrl}]);
+            $( '#payment-form' ).submit();
+        }
+    });
 
-                    // Submitting the form
-                    form.submit();
-                })
-                .catch(function(error) {
-                    $('#error-holder').html(error.message)
-                })
-        });
-        [{/capture}]
-    </script>
-    [{/capture}]
+    // Create an Unzer instance with your public key
+    let unzerInstance = new unzer('[{$unzerpub}]');
+
+    // Create an EPS instance and render the EPS form
+    let EPS = unzerInstance.EPS();
+    EPS.create('eps', {
+        containerId: 'unzer-eps'
+    });
+
+    // Handling payment form submission
+    $( "#payment-form" ).submit(function( event ) {
+        event.preventDefault();
+        // Creating a EPS resource
+        EPS.createResource()
+        .then(function(result) {
+            let hiddenInput = $(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'paymentData')
+            .val(JSON.stringify(result));
+            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+
+            $( '#orderConfirmAgbBottom' ).addClass("submitable");
+            $( "#orderConfirmAgbBottom" ).submit();
+        })
+        .catch(function(error) {
+            $('#error-holder').html(error.message)
+            $('html, body').animate({
+            scrollTop: $("#orderPayment").offset().top - 150
+            }, 350);
+        })
+    });
+[{/capture}]
 [{oxscript add=$unzerEPSJS}]

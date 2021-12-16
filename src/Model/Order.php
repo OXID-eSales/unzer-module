@@ -107,7 +107,7 @@ class Order extends Order_parent
         return $iRet;
     }
 
-    private function markUnzerOrderAsPaid()
+    private function markUnzerOrderAsPaid(): void
     {
         $utilsDate = \OxidEsales\Eshop\Core\Registry::getUtilsDate();
         $date = date('Y-m-d H:i:s', $utilsDate->getTime());
@@ -115,7 +115,7 @@ class Order extends Order_parent
         $this->save();
     }
 
-    protected function checkUnzerPaymentStatus(?\UnzerSDK\Resources\Payment $payment)
+    protected function checkUnzerPaymentStatus(?\UnzerSDK\Resources\Payment $payment): bool
     {
         $result = false;
 
@@ -179,7 +179,10 @@ class Order extends Order_parent
         return null;
     }
 
-    protected function getServiceFromContainer($serviceName)
+    /**
+     * @psalm-param TransactionService::class|UnzerSDKLoader::class $serviceName
+     */
+    protected function getServiceFromContainer(string $serviceName)
     {
         return ContainerFactory::getInstance()
             ->getContainer()

@@ -86,7 +86,7 @@ class OrderController extends OrderController_parent
         return $result;
     }
 
-    public function unzerExecuteAfterRedirect()
+    public function unzerExecuteAfterRedirect(): void
     {
         // get basket contents
         $oUser = $this->getUser();
