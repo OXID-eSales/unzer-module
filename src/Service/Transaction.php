@@ -41,12 +41,12 @@ class Transaction
         ];
 
         if ($unzerPayment) {
-            $params += array_merge($params, $this->getUnzerPaymentData($unzerPayment));
+            $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
         }
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = md5($params['oxorderid'] . $params['oxshopid'] . $params['oxuserid'] . $params['amount'] . $params['metadataid'] . $params['customerid'] . $params['oxaction']);
+        $oxid = md5(json_encode($params));
         if (!$transaction->load($oxid)) {
             $transaction->setId($oxid);
             $transaction->assign($params);
@@ -74,7 +74,7 @@ class Transaction
         return $params;
     }
 
-    protected function getNewTransactionObject()
+    protected function getNewTransactionObject(): TransactionModel
     {
         return oxNew(TransactionModel::class);
     }

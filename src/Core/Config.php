@@ -30,6 +30,8 @@ class Config extends Config_parent
 {
     /**
      * @inerhitDoc
+     *
+     * @return void
      */
     public function setActShopCurrency($cur)
     {
