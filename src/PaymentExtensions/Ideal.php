@@ -49,9 +49,9 @@ class Ideal extends UnzerPayment
         $transaction = $uzrIdeal->charge(
             $this->basket->getPrice()->getPrice(),
             $this->basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
-            $this->unzerOrderId,
+            null,
             $this->getMetadata()
         );
 
