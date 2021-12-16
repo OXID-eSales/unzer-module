@@ -39,7 +39,7 @@ class Transaction extends BaseModel
         if ($oxorderid) {
             $oxid = DatabaseProvider::getDb()->getOne(
                 "SELECT OXID FROM oscunzertransaction WHERE OXORDERID=?",
-                [(string)$oxorderid]
+                [$oxorderid]
             );
 
             if ($oxid) {
