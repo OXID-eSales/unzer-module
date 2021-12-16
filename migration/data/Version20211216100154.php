@@ -18,6 +18,9 @@ use OxidEsales\Facts\Facts;
 final class Version20211216100154 extends AbstractMigration
 {
     /** @var array[] */
+    private $defaultLanguageAbbr = ['de', 'en'];
+
+    /** @var array[] */
     private $paymentDefinitions = [
         //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
@@ -630,7 +633,9 @@ final class Version20211216100154 extends AbstractMigration
                 }
             } else {
                 // fallback OXID-Standard
-                $this->languageIds = ['de', 'en'];
+                foreach ($this->defaultLanguageAbbr as $langAbbr) {
+                    $this->languageIds[] = $langAbbr;
+                }
             }
         }
         return $this->languageIds;
