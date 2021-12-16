@@ -17,14 +17,14 @@ use OxidEsales\Facts\Facts;
  */
 final class Version20211216100154 extends AbstractMigration
 {
-    /** @var array[] */
-    private $defaultLanguageAbbr = [
+    /** @var array[]|string[] */
+    private array $defaultLanguageAbbr = [
         'de' => 'Deutsch',
         'en' => 'English'
     ];
 
     /** @var array[] */
-    private $paymentDefinitions = [
+    private array $paymentDefinitions = [
         //set insert = 1 to write payment into oxpayments table, install = 0 for no db insert
 
         //Alipay is China’s leading third-party mobile and online payment solution.
@@ -272,7 +272,7 @@ final class Version20211216100154 extends AbstractMigration
     ];
 
     /** @var array[] */
-    private $staticContents = [
+    private array $staticContents = [
         [
             'oxloadid' => 'oscunzersepamandatetext',
             'oxactive' => 1,
