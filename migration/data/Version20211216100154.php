@@ -372,7 +372,7 @@ final class Version20211216100154 extends AbstractMigration
     protected $isoCountries;
 
     /** @var array[] */
-    protected $languageIds;
+    protected $languageIds = [];
 
     /** @throws Exception */
     public function __construct($version)
@@ -472,7 +472,7 @@ final class Version20211216100154 extends AbstractMigration
         if (!$transaction->hasColumn('OXTIMESTAMP')) {
             $transaction->addColumn('OXTIMESTAMP', Types::DATETIME_MUTABLE, ['columnDefinition' => 'timestamp default current_timestamp on update current_timestamp']);
         }
-        if (!$transaction->hasPrimaryKey('OXID')) {
+        if (!$transaction->hasPrimaryKey()) {
             $transaction->setPrimaryKey(['OXID']);
         }
         if (!$transaction->hasIndex('TRANSACTIONUNIQUE')) {
@@ -610,8 +610,7 @@ final class Version20211216100154 extends AbstractMigration
      */
     protected function getLanguageIds(): array
     {
-        if (is_null($this->languageIds)) {
-            $this->languageIds = [];
+        if (!count($this->languageIds)) {
 
             $facts = new Facts();
             $configFile = new ConfigFile($facts->getSourcePath() . '/config.inc.php');
@@ -625,15 +624,13 @@ final class Version20211216100154 extends AbstractMigration
                     [$configKey, 'aLanguages']
                 )
             ) {
-                $rawLanguageIds = unserialize($results[0]['confValue'], []);
+                $rawLanguageIds = unserialize($results[0]['confValue']);
 
                 foreach ($rawLanguageIds as $langAbbr => $langName) {
                     $this->languageIds[] = $langAbbr;
                 }
-            }
-
-            // fallback OXID-Standard
-            if (!count($this->languageIds)) {
+            } else {
+                // fallback OXID-Standard
                 $this->languageIds = ['de', 'en'];
             }
         }

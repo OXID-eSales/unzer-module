@@ -54,22 +54,22 @@ class Transaction extends BaseModel
         return false;
     }
 
-    public function getUnzerCreated()
+    public function getUnzerCreated(): ?string
     {
         return $this->getRawField('OXACTIONDATE');
     }
 
-    public function getUnzerCustomerId()
+    public function getUnzerCustomerId(): ?string
     {
         return $this->getRawField('CUSTOMERID');
     }
 
-    public function getUnzerAction()
+    public function getUnzerAction(): ?string
     {
         return $this->getRawField('OXACTION');
     }
 
-    public function getUnzerTypeId()
+    public function getUnzerTypeId(): ?string
     {
         return $this->getRawField('TYPEID');
     }
