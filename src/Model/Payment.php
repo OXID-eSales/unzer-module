@@ -2,6 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\PaymentValidator;
 
 class Payment extends Payment_parent
@@ -30,6 +31,8 @@ class Payment extends Payment_parent
 
     private function getUnzerPaymentValidator(): PaymentValidator
     {
-        return $this->getContainer()->get(PaymentValidator::class);
+        return ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(PaymentValidator::class);
     }
 }
