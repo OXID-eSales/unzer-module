@@ -29,31 +29,6 @@ class Transaction extends BaseModel
         $this->init($this->_sCoreTable);
     }
 
-    /**
-     * @throws DatabaseConnectionException
-     *
-     * @return false|self
-     */
-    public static function getTransactionByOxidOrderId(string $oxorderid)
-    {
-        if ($oxorderid) {
-            $oxid = DatabaseProvider::getDb()->getOne(
-                "SELECT OXID FROM oscunzertransaction WHERE OXORDERID=?",
-                [$oxorderid]
-            );
-
-            if ($oxid) {
-                /** @var Transaction $uzTransaction */
-                $uzTransaction = oxNew(__CLASS__);
-                if ($uzTransaction->load($oxid)) {
-                    return $uzTransaction;
-                }
-            }
-        }
-
-        return false;
-    }
-
     public function getUnzerCreated(): ?string
     {
         return $this->getRawField('OXACTIONDATE');
