@@ -2,8 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\PaymentValidator;
 
 class Payment extends Payment_parent
@@ -13,9 +11,7 @@ class Payment extends Payment_parent
      */
     public function isUnzerPayment(): bool
     {
-        /** @var PaymentValidator $paymentValidator */
-        $paymentValidator = $this->getContainer()->get(PaymentValidator::class);
-        return $paymentValidator->isUnzerPayment($this);
+        return $this->getUnzerPaymentValidator()->isUnzerPayment($this);
     }
 
     /**
@@ -25,14 +21,15 @@ class Payment extends Payment_parent
      */
     public function isUnzerPaymentTypeAllowed(): bool
     {
-        /** @var PaymentExtensionLoader $paymentLoader */
-        $paymentLoader = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(PaymentExtensionLoader::class);
-
-        if ($this->isUnzerPayment() && $paymentLoader->getPaymentExtension($this)->isPaymentTypeAllowed()) {
-            return true;
+        if (!$this->isUnzerPayment()) {
+            return false;
         }
-        return false;
+
+        return $this->getUnzerPaymentValidator()->isPaymentCurrencyAllowed($this);
+    }
+
+    private function getUnzerPaymentValidator(): PaymentValidator
+    {
+        return $this->getContainer()->get(PaymentValidator::class);
     }
 }
