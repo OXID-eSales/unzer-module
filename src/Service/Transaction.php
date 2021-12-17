@@ -3,6 +3,8 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\UtilsDate;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
 use UnzerSDK\Resources\Payment;
@@ -84,7 +86,10 @@ class Transaction
     }
 
     /**
+     * @param $paymentid
+     * @return array|false
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public static function getTransactionDataByPaymentId($paymentid)
     {
