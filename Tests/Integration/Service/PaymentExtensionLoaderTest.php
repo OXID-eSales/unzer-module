@@ -6,6 +6,7 @@ use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +31,8 @@ class PaymentExtensionLoaderTest extends TestCase
             $sessionStub,
             $sdkLoaderMock,
             $this->createPartialMock(Translator::class, []),
-            $this->createPartialMock(Unzer::class, [])
+            $this->createPartialMock(Unzer::class, []),
+            $this->createPartialMock(DebugHandler::class, [])
         );
 
         $loadedPaymentType = $sut->getPaymentExtension($paymentStub);
