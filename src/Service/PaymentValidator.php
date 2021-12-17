@@ -38,9 +38,9 @@ class PaymentValidator
         );
     }
 
-    public function isSelectedCurrencyAllowed(?array $allowedCurrencies): bool
+    public function isSelectedCurrencyAllowed(array $allowedCurrencies): bool
     {
-        return $allowedCurrencies === null
+        return !count($allowedCurrencies)
             || in_array($this->moduleContext->getActiveCurrencyName(), $allowedCurrencies);
     }
 }

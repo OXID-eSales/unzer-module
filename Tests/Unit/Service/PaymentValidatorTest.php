@@ -59,7 +59,7 @@ class PaymentValidatorTest extends TestCase
     public function isSelectedCurrencyAllowedDataProvider(): array
     {
         return [
-            [null, true],
+            [[], true],
             [['EUR', 'USD'], false],
             [['EUR', 'USD', 'someCurrencyName'], true],
         ];
