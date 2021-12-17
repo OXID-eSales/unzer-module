@@ -214,6 +214,9 @@ abstract class UnzerPayment
                 // TODO Handle Pending...
                 $paymentType = $unzerPayment->getPaymentType();
 
+                //creating webhook
+                //$this->unzerSDK->createWebhook(Registry::getConfig()->getShopUrl().'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus&paymentid='.$paymentId,'payment');
+
                 if (!$blDoRedirect && $this->transaction->getRedirectUrl()) {
                     Registry::getUtils()->redirect($this->transaction->getRedirectUrl(), false);
                     exit;

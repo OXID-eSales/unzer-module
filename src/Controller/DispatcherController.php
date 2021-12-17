@@ -17,11 +17,16 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use Exception;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
+use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class DispatcherController extends FrontendController
@@ -54,5 +59,31 @@ class DispatcherController extends FrontendController
             UnzerHelper::redirectOnError($paymentExtension::CONTROLLER_URL, $e->getMessage());
         }
         return $paymentExtension->checkPaymentstatus();
+    }
+
+    public function updatePaymentTransStatus()
+    {
+        if ($paymentId = Registry::getRequest()->getRequestParameter('paymentid')) {
+            $container = ContainerFactory::getInstance()->getContainer();
+            /** @var Transaction $transaction */
+            $transaction = $container->get(Transaction::class);
+            $order = oxNew(Order::class);
+            $data = $transaction->getTransactionDataByPaymentId($paymentId);
+            /** @var \UnzerSDK\Resources\Payment $unzerPayment */
+            $unzerPayment = $container->get(UnzerSDKLoader::class)->getUnzerSDK()->fetchPayment($paymentId);
+            if ($order->load($data[0]['OXORDERID']) && $unzerPayment->getState() == 1) {
+                $utilsDate = Registry::getUtilsDate();
+                $date = date('Y-m-d H:i:s', $utilsDate->getTime());
+                $order->oxorder__oxpaid = new Field($date);
+                $order->save();
+            }
+            if ($transaction->writeTransactionToDB($data[0]['OXORDERID'], $data[0]['OXUSERID'], $unzerPayment)) {
+                echo "State " . $unzerPayment->getStateName() . " was written to database for payment " . $paymentId;
+                exit;
+            } else {
+                echo "No update needed. There was no new state for payment " . $paymentId;
+                exit;
+            }
+        }
     }
 }
