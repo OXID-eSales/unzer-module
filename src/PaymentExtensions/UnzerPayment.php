@@ -45,9 +45,6 @@ abstract class UnzerPayment
     /** @var string */
     protected $paymentMethod;
 
-    /** @var null|array */
-    protected $aPaymentParams = null;
-
     /** @var array */
     protected $allowedCurrencies = [];
 
@@ -95,23 +92,17 @@ abstract class UnzerPayment
      */
     public function getUzrId()
     {
-        if (array_key_exists('id', $this->getPaymentParams())) {
-            return $this->getPaymentParams()['id'];
+        $jsonPaymentData = Registry::getRequest()->getRequestParameter('paymentData');
+        $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
+
+        if (array_key_exists('id', $paymentData)) {
+            return $paymentData['id'];
         }
 
         UnzerHelper::redirectOnError(
             'order',
             $this->translator->translate('WRONGPAYMENTID', 'Ungültige ID')
         );
-    }
-
-    public function getPaymentParams()
-    {
-        if ($this->aPaymentParams == null) {
-            $jsonobj = Registry::getRequest()->getRequestParameter('paymentData');
-            $this->aPaymentParams = json_decode($jsonobj, true);
-        }
-        return $this->aPaymentParams;
     }
 
     /**
