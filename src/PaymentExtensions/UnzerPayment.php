@@ -216,55 +216,18 @@ abstract class UnzerPayment
     }
 
     /**
-     * @param Charge $transaction
+     * @param Charge $charge
      */
-    public function setSessionVars(Charge $transaction): void
+    public function setSessionVars(Charge $charge): void
     {
         // You'll need to remember the shortId to show it on the success or failure page
-        $this->session->setVariable('ShortId', $transaction->getShortId());
-        $this->session->setVariable('PaymentId', $transaction->getPaymentId());
+        $this->session->setVariable('ShortId', $charge->getShortId());
+        $this->session->setVariable('PaymentId', $charge->getPaymentId());
 
-        $paymentType = $transaction->getPayment()->getPaymentType();
+        $paymentType = $charge->getPayment()->getPaymentType();
         if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
-            $this->session->setVariable('additionalPaymentInformation', $this->getBankData($transaction));
+            $this->session->setVariable('additionalPaymentInformation', $this->unzerService->getChargeBankData($charge));
         }
-    }
-
-    /**
-     * @param Charge $transaction
-     * @return string
-     */
-    protected function getBankData(Charge $transaction): string
-    {
-        $amount = Registry::getLang()->formatCurrency($transaction->getAmount());
-
-        $bankData = sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $amount,
-            Registry::getConfig()->getActShopCurrencyObject()->sign
-        );
-
-        $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
-            $transaction->getHolder()
-        );
-
-        $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
-            $transaction->getIban()
-        );
-
-        $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'),
-            $transaction->getBic()
-        );
-
-        $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
-            $transaction->getDescriptor()
-        );
-
-        return $bankData;
     }
 
     /**

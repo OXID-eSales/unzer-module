@@ -5,11 +5,13 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class Unzer
 {
@@ -102,5 +104,38 @@ class Unzer
         $basket->setBasketItems($aBasketItems);
 
         return $basket;
+    }
+
+    public function getChargeBankData(Charge $charge): string
+    {
+        $amount = Registry::getLang()->formatCurrency($charge->getAmount());
+
+        $bankData = sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            $amount,
+            Registry::getConfig()->getActShopCurrencyObject()->sign
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
+            $charge->getHolder()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
+            $charge->getIban()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'),
+            $charge->getBic()
+        );
+
+        $bankData .= sprintf(
+            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
+            $charge->getDescriptor()
+        );
+
+        return $bankData;
     }
 }
