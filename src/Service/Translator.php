@@ -24,7 +24,11 @@ class Translator
      */
     public function translate(string $languageCode, string $defaultMessage)
     {
-        if (substr_compare($languageCode, "API.", 0, 4) == 0 || substr_compare($languageCode, "COR.", 0, 4) == 0 || substr_compare($languageCode, "SDM.", 0, 4) == 0) {
+        if (
+            substr_compare($languageCode, "API.", 0, 4) == 0
+            || substr_compare($languageCode, "COR.", 0, 4) == 0
+            || substr_compare($languageCode, "SDM.", 0, 4) == 0
+        ) {
             $languageCode = substr($languageCode, 4);
         }
         $languageCode = 'oscunzer_' . $languageCode;
