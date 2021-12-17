@@ -22,12 +22,12 @@ class Bancontact extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'bancontact';
+    protected $paymentMethod = 'bancontact';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $allowedCurrencies = [];
 
     /**
      * @return bool
@@ -43,10 +43,11 @@ class Bancontact extends UnzerPayment
         $uzrBancontact = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Bancontact());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $uzrBancontact->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,

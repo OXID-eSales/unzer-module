@@ -24,12 +24,12 @@ class Card extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'card';
+    protected $paymentMethod = 'card';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $allowedCurrencies = [];
 
     /**
      * @return bool
@@ -51,11 +51,12 @@ class Card extends UnzerPayment
         $uzrCard = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         if ($this->isDirectCharge()) {
             $transaction = $uzrCard->charge(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
+                $basket->getPrice()->getPrice(),
+                $basket->getBasketCurrency()->name,
                 UnzerHelper::redirecturl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
@@ -63,8 +64,8 @@ class Card extends UnzerPayment
             );
         } else {
             $transaction = $uzrCard->authorize(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
+                $basket->getPrice()->getPrice(),
+                $basket->getBasketCurrency()->name,
                 UnzerHelper::redirecturl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,

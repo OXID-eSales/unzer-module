@@ -13,12 +13,12 @@ class Invoice extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'invoice';
+    protected $paymentMethod = 'invoice';
 
     /**
      * @var array
      */
-    protected $aCurrencies = ['EUR'];
+    protected $allowedCurrencies = ['EUR'];
 
     /**
      * @return bool
@@ -39,10 +39,11 @@ class Invoice extends UnzerPayment
         $invoice = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Invoice());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $invoice->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,

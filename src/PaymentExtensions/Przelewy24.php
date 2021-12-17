@@ -22,12 +22,12 @@ class Przelewy24 extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'przelewy24';
+    protected $paymentMethod = 'przelewy24';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $allowedCurrencies = [];
 
     /**
      * @return bool
@@ -43,10 +43,11 @@ class Przelewy24 extends UnzerPayment
         $uzrPrzelewy = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Przelewy24());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $uzrPrzelewy->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,

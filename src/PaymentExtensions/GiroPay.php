@@ -24,12 +24,12 @@ class GiroPay extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'giropay';
+    protected $paymentMethod = 'giropay';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $allowedCurrencies = [];
 
     /**
      * @return bool
@@ -50,10 +50,11 @@ class GiroPay extends UnzerPayment
         $giro = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Giropay());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $giro->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL),
             $customer,
             $this->unzerOrderId,

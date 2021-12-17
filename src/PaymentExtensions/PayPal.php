@@ -22,12 +22,12 @@ class PayPal extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'paypal';
+    protected $paymentMethod = 'paypal';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $allowedCurrencies = [];
 
     /**
      * @return bool
@@ -43,11 +43,12 @@ class PayPal extends UnzerPayment
         $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         if ($this->isDirectCharge()) {
             $transaction = $uzrPP->charge(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
+                $basket->getPrice()->getPrice(),
+                $basket->getBasketCurrency()->name,
                 UnzerHelper::redirecturl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
@@ -55,8 +56,8 @@ class PayPal extends UnzerPayment
             );
         } else {
             $transaction = $uzrPP->authorize(
-                $this->basket->getPrice()->getPrice(),
-                $this->basket->getBasketCurrency()->name,
+                $basket->getPrice()->getPrice(),
+                $basket->getBasketCurrency()->name,
                 UnzerHelper::redirecturl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,

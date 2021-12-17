@@ -22,12 +22,12 @@ class WeChatPay extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'wechatpay';
+    protected $paymentMethod = 'wechatpay';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $allowedCurrencies = [];
 
     /**
      * @return bool
@@ -43,10 +43,11 @@ class WeChatPay extends UnzerPayment
         $uzrWechat = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Wechatpay());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $uzrWechat->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,

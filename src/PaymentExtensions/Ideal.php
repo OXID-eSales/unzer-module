@@ -22,12 +22,12 @@ class Ideal extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'ideal';
+    protected $paymentMethod = 'ideal';
 
     /**
      * @var array
      */
-    protected $aCurrencies = [];
+    protected $allowedCurrencies = [];
 
     /**
      * @return bool
@@ -45,10 +45,11 @@ class Ideal extends UnzerPayment
         $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $uzrIdeal->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             null,

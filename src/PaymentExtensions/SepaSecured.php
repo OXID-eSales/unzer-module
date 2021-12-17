@@ -24,12 +24,12 @@ class SepaSecured extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'sepa-direct-debit-secured';
+    protected $paymentMethod = 'sepa-direct-debit-secured';
 
     /**
      * @var array
      */
-    protected $aCurrencies = ['EUR'];
+    protected $allowedCurrencies = ['EUR'];
 
     /**
      * @var string
@@ -72,11 +72,12 @@ class SepaSecured extends UnzerPayment
         $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->unzerService->getSessionCustomerData();
-        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $this->basket);
+        $basket = $this->session->getBasket();
+        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basket);
 
         $transaction = $uzrSepa->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
