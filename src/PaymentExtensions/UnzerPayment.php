@@ -69,16 +69,16 @@ abstract class UnzerPayment
     protected $aCurrencies;
 
     /**
+     * @var AbstractTransactionType|null
+     */
+    protected $transaction;
+
+    /**
      * @return mixed|void
      * @throws Exception
      * @throws UnzerApiException
      */
     abstract public function execute();
-
-    /**
-     * @var AbstractTransactionType|null
-     */
-    protected $transaction;
 
     public function __construct(
         Payment $payment,
@@ -226,7 +226,7 @@ abstract class UnzerPayment
 
         $paymentType = $charge->getPayment()->getPaymentType();
         if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
-            $this->session->setVariable('additionalPaymentInformation', $this->unzerService->getChargeBankData($charge));
+            $this->session->setVariable('additionalPaymentInformation', $this->unzerService->getBankDataFromCharge($charge));
         }
     }
 

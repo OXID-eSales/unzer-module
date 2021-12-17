@@ -5,22 +5,32 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Facts\Facts;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class Unzer
 {
     protected $session;
+    protected $language;
+    protected $context;
 
     public function __construct(
-        Session $session
+        Session $session,
+        Language $language,
+        Context $context
     ) {
         $this->session = $session;
+        $this->language = $language;
+        $this->context = $context;
     }
 
     public function getSessionCustomerData(?Order $oOrder = null): Customer
@@ -106,33 +116,31 @@ class Unzer
         return $basket;
     }
 
-    public function getChargeBankData(Charge $charge): string
+    public function getBankDataFromCharge(Charge $charge): string
     {
-        $amount = Registry::getLang()->formatCurrency($charge->getAmount());
-
         $bankData = sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $amount,
-            Registry::getConfig()->getActShopCurrencyObject()->sign
+            $this->language->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            $this->language->formatCurrency($charge->getAmount()),
+            $this->context->getActiveCurrencySign()
         );
 
         $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
+            $this->language->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
             $charge->getHolder()
         );
 
         $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
+            $this->language->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
             $charge->getIban()
         );
 
         $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_BIC'),
+            $this->language->translateString('OSCUNZER_BANK_DETAILS_BIC'),
             $charge->getBic()
         );
 
         $bankData .= sprintf(
-            Registry::getLang()->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
+            $this->language->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
             $charge->getDescriptor()
         );
 
