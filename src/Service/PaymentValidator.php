@@ -31,6 +31,13 @@ class PaymentValidator
         return $isUnzer;
     }
 
+    public function isPaymentCurrencyAllowed(Payment $payment): bool
+    {
+        return $this->isSelectedCurrencyAllowed(
+            $this->paymentExtensionLoader->getPaymentExtension($payment)->getPaymentCurrencies()
+        );
+    }
+
     public function isSelectedCurrencyAllowed(?array $allowedCurrencies): bool
     {
         return $allowedCurrencies === null

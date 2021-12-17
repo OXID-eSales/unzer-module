@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\PaymentValidator;
 use PHPUnit\Framework\TestCase;
 
@@ -30,6 +31,20 @@ class PaymentValidatorTest extends TestCase
             ['otherPlaceoscunzer', true],
             ['OSCUnzerOtherCase', true]
         ];
+    }
+
+    public function testIsPaymentCurrencyAllowed(): void
+    {
+        $extension = $this->createConfiguredMock(UnzerPayment::class, [
+            'getPaymentCurrencies' => ['EUR', 'USD', 'RUB']
+        ]);
+        $sut = $this->getSut(
+            ['getPaymentExtension' => $extension],
+            ['getActiveCurrencyName' => 'RUB']
+        );
+        $paymentStub = $this->createConfiguredMock(Payment::class, []);
+
+        $this->assertTrue($sut->isPaymentCurrencyAllowed($paymentStub));
     }
 
     /**
