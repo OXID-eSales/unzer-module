@@ -19,18 +19,28 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class Unzer
 {
+    /** @var Session */
     protected $session;
+
+    /** @var Language */
     protected $language;
+
+    /** @var Context */
     protected $context;
+
+    /** @var ModuleSettings */
+    protected $moduleSettings;
 
     public function __construct(
         Session $session,
         Language $language,
-        Context $context
+        Context $context,
+        ModuleSettings $moduleSettings
     ) {
         $this->session = $session;
         $this->language = $language;
         $this->context = $context;
+        $this->moduleSettings = $moduleSettings;
     }
 
     public function getSessionCustomerData(?Order $oOrder = null): Customer
@@ -145,5 +155,17 @@ class Unzer
         );
 
         return $bankData;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentProcedure(string $paymentId): string
+    {
+        if (in_array($paymentId, ['oscunzer_paypal', 'oscunzer_card'])) {
+            return $this->moduleSettings->getPaymentProcedureSetting($paymentId);
+        }
+
+        return $this->moduleSettings::PAYMENT_DIRECT;
     }
 }

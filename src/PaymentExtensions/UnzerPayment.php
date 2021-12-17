@@ -115,23 +115,6 @@ abstract class UnzerPayment
     }
 
     /**
-     * @return string
-     */
-    public function getPaymentProcedure(): string
-    {
-        /** @var ModuleSettings $settings */
-        $settings = $this->getContainer()->get(ModuleSettings::class);
-
-        $paymentid = $this->payment->getId();
-
-        if ($paymentid == "oscunzer_paypal" || $paymentid == "oscunzer_card") {
-            return $settings->getPaymentProcedureSetting($paymentid);
-        }
-
-        return $settings::PAYMENT_DIRECT;
-    }
-
-    /**
      * @return bool
      */
     public function isDirectCharge()
@@ -241,17 +224,8 @@ abstract class UnzerPayment
         $metadata->setShopVersion(ShopVersion::getVersion());
         $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $this->Paymentmethod);
-        $metadata->addMetadata('paymentprocedure', $this->getPaymentProcedure());
+        $metadata->addMetadata('paymentprocedure', $this->unzerService->getPaymentProcedure($this->payment->getId()));
 
         return $metadata;
-    }
-
-    /**
-     *
-     * @return ContainerInterface
-     */
-    protected function getContainer(): ContainerInterface
-    {
-        return ContainerFactory::getInstance()->getContainer();
     }
 }
