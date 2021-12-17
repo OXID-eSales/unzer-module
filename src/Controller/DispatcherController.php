@@ -31,6 +31,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class DispatcherController extends FrontendController
 {
+
     /**
      * @param string $paymentid
      * @return bool
@@ -61,8 +62,14 @@ class DispatcherController extends FrontendController
         return $paymentExtension->checkPaymentstatus();
     }
 
-    public function updatePaymentTransStatus()
+    /**
+     * @param string $paymentid
+     * @return void
+     */
+    public function updatePaymentTransStatus(): void
     {
+        $result = '';
+
         if ($paymentId = Registry::getRequest()->getRequestParameter('paymentid')) {
             $container = ContainerFactory::getInstance()->getContainer();
             /** @var Transaction $transaction */
@@ -77,13 +84,26 @@ class DispatcherController extends FrontendController
                 $order->oxorder__oxpaid = new Field($date);
                 $order->save();
             }
+
+            /** @var Translator $translator */
+            $translator = $container->get(Translator::class);
+
             if ($transaction->writeTransactionToDB($data[0]['OXORDERID'], $data[0]['OXUSERID'], $unzerPayment)) {
-                echo "State " . $unzerPayment->getStateName() . " was written to database for payment " . $paymentId;
-                exit;
+                $result = sprintf(
+                    $translator->translate(
+                        'oscunzer_TRANSACTION_CHANGE',
+                        'State %s was written to database for payment %s'
+                    ),
+                    $unzerPayment->getStateName(),
+                    $paymentId
+                );
             } else {
-                echo "No update needed. There was no new state for payment " . $paymentId;
-                exit;
+                $result = $translator->translate(
+                    'oscunzer_TRANSACTION_NOTHINGTODO',
+                    'No update needed. There was no new state for payment: '
+                ) . $paymentId;
             }
         }
+        Registry::getUtils()->showMessageAndExit($result);
     }
 }

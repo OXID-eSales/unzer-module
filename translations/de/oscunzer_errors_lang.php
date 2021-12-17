@@ -626,4 +626,7 @@ $aLang = [
     'oscunzer_800.400.159'   => 'Der Webshop ist nicht produktiv.',
     'oscunzer_800.400.160'   => 'Es wurde kein (gültiger) Vorgang zur TB-Vorgangskennung gefunden.',
     'oscunzer_WRONGPAYMENTID'     => 'Keine Payment-Id gesetzt. Bitte eine andere Zahlmethode verwenden.',
+    'oscunzer_SETWEBHOOK_ERROR'   => 'Fehler beim erstellen dieses Webhooks: ',
+    'oscunzer_TRANSACTION_CHANGE' => 'Status %s für Payment %s wurde in die DB geschrieben',
+    'oscunzer_TRANSACTION_NOTHINGTODO' => 'Kein Update erforderlich. Es gab keinen neuen Zahlungsstatus: ',
 ];
