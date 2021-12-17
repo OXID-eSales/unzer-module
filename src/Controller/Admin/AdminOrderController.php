@@ -6,7 +6,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Model\Transaction;
+use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 
 /**
  * Order class wrapper for Unzer module
@@ -33,7 +33,11 @@ class AdminOrderController extends AdminDetailsController
         $this->_aViewData["sOxid"] = $this->getEditObjectId();
         if ($this->isUnzerOrder()) {
             $this->_aViewData['oOrder'] = $this->getEditObject();
-            $this->_aViewData['oUnzerTransaction'] = Transaction::getTransactionByOxidOrderId($this->getEditObjectId());
+            $transactionList = oxNew(TransactionList::class);
+            $transactionList->getTransactionList($this->getEditObjectId());
+            if ($transactionList->count()) {
+                $this->_aViewData['oUnzerTransactions'] = $transactionList;
+            }
         } else {
             $this->_aViewData['sMessage'] = Registry::getLang()->translateString("OSCUNZER_NO_UNZER_ORDER");
         }

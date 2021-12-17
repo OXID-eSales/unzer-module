@@ -8,30 +8,26 @@ use OxidEsales\Eshop\Core\Registry;
 class TransactionList extends ListModel
 {
     /**
-     * @var string
-     */
-    protected $_sObjectsInListName = TransactionList::class; // phpcs:ignore
-
-    /**
-     * @var string
-     */
-    protected $_sCoreTable = "oscunzertransaction"; // phpcs:ignore
+    * List Object class name
+    *
+    * @var string
+    */
+    protected $_sObjectsInListName = 'OxidSolutionCatalysts\Unzer\Model\Transaction'; // phpcs:ignore
 
     /**
      * @return void
      */
-    public function getTransactionList()
+    public function getTransactionList(string $orderId)
     {
         $oListObject = $this->getBaseObject();
         $sFieldList = $oListObject->getSelectFields();
 
-        $oxConf = Registry::getConfig();
-        $iShopId = $oxConf->getShopId();
+        $shopId = Registry::getConfig()->getShopId();
 
-        $params = [$iShopId];
+        $params = [':shopid' => $shopId, ':orderid' => $orderId];
 
-        $sQ = "select $sFieldList from " . $oListObject->getViewName() . " 
-            where oxshopid = ? order by {$oListObject->getViewName()}.OXTIMESTAMP desc";
+        $sQ = "select $sFieldList from " . $oListObject->getViewName() . "
+            where oxshopid = :shopid and oxorderid = :orderid order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
 
         $this->selectString($sQ, $params);
     }

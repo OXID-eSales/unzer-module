@@ -12,32 +12,24 @@
     <input type="hidden" name="cl" value="order_main">
 </form>
 
-[{if !$oUnzerTransaction}]
+[{if !$oUnzerTransactions}]
     [{oxmultilang ident="OSCUNZER_NO_UNZER_ORDER"}]
 [{else}]
     <table>
         <tr>
-            <td>[{oxmultilang ident="OSCUNZER_TRANSACTION_CREATED" suffix="COLON"}]</td>
-            <td>&nbsp;</td>
-            <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CREATED" suffix="COLON"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</th>
         </tr>
-        <tr>
-            <td>[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID"}]</td>
-            <td>&nbsp;</td>
-            <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
-        </tr>
-        <tr>
-            <td>[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</td>
-            <td>&nbsp;</td>
-            <td>
-                [{$oUnzerTransaction->getUnzerAction()|escape}]
-            </td>
-        </tr>
-        <tr>
-            <td>[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</td>
-            <td>&nbsp;</td>
-            <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
-        </tr>
+        [{foreach from=$oUnzerTransactions item="oUnzerTransaction"}]
+            <tr>
+                <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerAction()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
+            </tr>
+        [{/foreach}]
     </table>
 
     <div>&nbsp;</div>
