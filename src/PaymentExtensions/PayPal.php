@@ -25,11 +25,6 @@ class PayPal extends UnzerPayment
     protected $paymentMethod = 'paypal';
 
     /**
-     * @var array
-     */
-    protected $allowedCurrencies = [];
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

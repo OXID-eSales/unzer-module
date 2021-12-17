@@ -25,11 +25,6 @@ class Installment extends UnzerPayment
     protected $paymentMethod = 'installment-secured';
 
     /**
-     * @var array
-     */
-    protected $allowedCurrencies = [];
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

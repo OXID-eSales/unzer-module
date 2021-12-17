@@ -27,11 +27,6 @@ class GiroPay extends UnzerPayment
     protected $paymentMethod = 'giropay';
 
     /**
-     * @var array
-     */
-    protected $allowedCurrencies = [];
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

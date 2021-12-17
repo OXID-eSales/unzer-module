@@ -25,11 +25,6 @@ class Ideal extends UnzerPayment
     protected $paymentMethod = 'ideal';
 
     /**
-     * @var array
-     */
-    protected $allowedCurrencies = [];
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

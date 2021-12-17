@@ -25,11 +25,6 @@ class ApplePay extends UnzerPayment
     protected $paymentMethod = 'applepay';
 
     /**
-     * @var array
-     */
-    protected $allowedCurrencies = [];
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool

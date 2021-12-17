@@ -49,7 +49,7 @@ abstract class UnzerPayment
     protected $aPaymentParams = null;
 
     /** @var array */
-    protected $allowedCurrencies;
+    protected $allowedCurrencies = [];
 
     /**
      * @return mixed|void

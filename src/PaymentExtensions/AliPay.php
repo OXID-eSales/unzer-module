@@ -25,11 +25,6 @@ class AliPay extends UnzerPayment
     protected $paymentMethod = 'alipay';
 
     /**
-     * @var array
-     */
-    protected $allowedCurrencies = [];
-
-    /**
      * @return bool
      */
     public function isRecurringPaymentType(): bool
