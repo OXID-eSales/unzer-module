@@ -34,4 +34,9 @@ class Context extends BasicContext
     {
         return $this->shopConfig->getShopId();
     }
+
+    public function getActiveCurrencyName(): string
+    {
+        return $this->shopConfig->getActShopCurrencyObject()->name;
+    }
 }
