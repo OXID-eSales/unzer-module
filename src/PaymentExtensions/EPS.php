@@ -22,12 +22,7 @@ class EPS extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'eps';
-
-    /**
-     * @var array
-     */
-    protected $aCurrencies = [];
+    protected $paymentMethod = 'eps';
 
     /**
      * @return bool
@@ -45,10 +40,11 @@ class EPS extends UnzerPayment
         $uzrEPS = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $uzrEPS->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             null,

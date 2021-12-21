@@ -15,12 +15,12 @@ class InvoiceSecured extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'invoice-secured';
+    protected $paymentMethod = 'invoice-secured';
 
     /**
      * @var array
      */
-    protected $aCurrencies = ['EUR'];
+    protected $allowedCurrencies = ['EUR'];
 
     /**
      * @return bool
@@ -40,16 +40,19 @@ class InvoiceSecured extends UnzerPayment
         /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
         $inv_secured = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured());
 
+        $user = $this->session->getUser();
         if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
-            $this->user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
+            $user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
         }
 
         $customer = $this->unzerService->getSessionCustomerData();
-        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $this->basket);
+        $basket = $this->session->getBasket();
+
+        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basket);
 
         $transaction = $inv_secured->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
@@ -58,6 +61,7 @@ class InvoiceSecured extends UnzerPayment
         );
 
         $this->setSessionVars($transaction);
-        $this->user->save();
+
+        $user->save();
     }
 }

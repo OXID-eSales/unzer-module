@@ -41,4 +41,34 @@ class ContextTest extends TestCase
         $sut = new Context($configStub);
         $this->assertSame(10, $sut->getCurrentShopId());
     }
+
+    public function testGetActiveCurrencyName(): void
+    {
+        $currencyName = 'exampleCurrencyName';
+
+        $currency = new \stdClass();
+        $currency->name = $currencyName;
+
+        $configStub = $this->createConfiguredMock(Config::class, [
+            'getActShopCurrencyObject' => $currency
+        ]);
+
+        $sut = new Context($configStub);
+        $this->assertSame($currencyName, $sut->getActiveCurrencyName());
+    }
+
+    public function testGetActiveCurrencySign(): void
+    {
+        $currencySign = '$';
+
+        $currency = new \stdClass();
+        $currency->sign = $currencySign;
+
+        $configStub = $this->createConfiguredMock(Config::class, [
+            'getActShopCurrencyObject' => $currency
+        ]);
+
+        $sut = new Context($configStub);
+        $this->assertSame($currencySign, $sut->getActiveCurrencySign());
+    }
 }

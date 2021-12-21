@@ -22,12 +22,7 @@ class AliPay extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'alipay';
-
-    /**
-     * @var array
-     */
-    protected $aCurrencies = [];
+    protected $paymentMethod = 'alipay';
 
     /**
      * @return bool
@@ -43,10 +38,11 @@ class AliPay extends UnzerPayment
         $uzrAP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Alipay());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $uzrAP->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,

@@ -24,12 +24,12 @@ class Sofort extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'sofort';
+    protected $paymentMethod = 'sofort';
 
     /**
      * @var array
      */
-    protected $aCurrencies = ['EUR'];
+    protected $allowedCurrencies = ['EUR'];
 
     /**
      * @return bool
@@ -50,10 +50,11 @@ class Sofort extends UnzerPayment
         $sofort = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Sofort());
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $sofort->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL),
             $customer,
             $this->unzerOrderId,

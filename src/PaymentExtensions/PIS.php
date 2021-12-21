@@ -24,12 +24,7 @@ class PIS extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'pis';
-
-    /**
-     * @var array
-     */
-    protected $aCurrencies = [];
+    protected $paymentMethod = 'pis';
 
     /**
      * @return bool
@@ -48,10 +43,11 @@ class PIS extends UnzerPayment
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\PIS $pis */
         $pis = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\PIS());
+        $basket = $this->session->getBasket();
 
         $transaction = $pis->charge(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL),
             null,
             null,

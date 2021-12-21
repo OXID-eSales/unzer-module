@@ -22,12 +22,7 @@ class Installment extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'installment-secured';
-
-    /**
-     * @var array
-     */
-    protected $aCurrencies = [];
+    protected $paymentMethod = 'installment-secured';
 
     /**
      * @return bool
@@ -44,10 +39,11 @@ class Installment extends UnzerPayment
         $uzrInstall = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
 
         $transaction = $uzrInstall->authorize(
-            $this->basket->getPrice()->getPrice(),
-            $this->basket->getBasketCurrency()->name,
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
             UnzerHelper::redirecturl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,

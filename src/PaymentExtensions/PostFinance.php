@@ -22,12 +22,7 @@ class PostFinance extends UnzerPayment
     /**
      * @var string
      */
-    protected $Paymentmethod = 'post-finance-efinance';
-
-    /**
-     * @var array
-     */
-    protected $aCurrencies = [];
+    protected $paymentMethod = 'post-finance-efinance';
 
     /**
      * @return bool

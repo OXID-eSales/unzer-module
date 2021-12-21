@@ -37,7 +37,6 @@ class PaymentExtensionLoaderTest extends TestCase
 
         $loadedPaymentType = $sut->getPaymentExtension($paymentStub);
         $this->assertInstanceOf($paymentClass, $loadedPaymentType);
-        $this->assertSame($paymentId, $loadedPaymentType->getID());
     }
 
     public function checkPaymentTypeCanBeLoadedDataProvider(): array
