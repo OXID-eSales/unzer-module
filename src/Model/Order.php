@@ -77,7 +77,7 @@ class Order extends Order_parent
                     $transactionService->writeTransactionToDB(
                         $this->getId(),
                         $oUser->getId() ?: '',
-                        $this->getSessionUnzerPayment()
+                        $sessionUnzerPayment
                     );
                 }
 
