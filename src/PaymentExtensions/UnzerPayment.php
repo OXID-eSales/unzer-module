@@ -122,38 +122,29 @@ abstract class UnzerPayment
             UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
         }
 
-        // Catch API errors, write the message to your log and show the ClientMessage to the client.
-        try {
-            // Redirect to success if the payment has been successfully completed.
-            $unzerPayment = $this->unzerSDK->fetchPayment($paymentId);
-            $transaction = $unzerPayment->getInitialTransaction();
-            if ($transaction->isSuccess()) {
-                $result = true;
-            } elseif ($transaction->isPending()) {
-                $this->createPaymentStatusWebhook($paymentId);
+        // Redirect to success if the payment has been successfully completed.
+        $unzerPayment = $this->unzerSDK->fetchPayment($paymentId);
+        $transaction = $unzerPayment->getInitialTransaction();
+        if ($transaction->isSuccess()) {
+            $result = true;
+        } elseif ($transaction->isPending()) {
+            $this->createPaymentStatusWebhook($paymentId);
 
-                if (!$blDoRedirect && $transaction->getRedirectUrl()) {
-                    Registry::getUtils()->redirect($transaction->getRedirectUrl(), false);
-                    exit;
-                }
-                $result = true;
-            } elseif ($transaction->isError()) {
-                UnzerHelper::redirectOnError(
-                    self::CONTROLLER_URL,
-                    $this->translator->translate(
-                        $transaction->getMessage()->getCode(),
-                        $transaction->getMessage()->getCustomer()
-                    )
-                );
+            if (!$blDoRedirect && $transaction->getRedirectUrl()) {
+                Registry::getUtils()->redirect($transaction->getRedirectUrl(), false);
+                exit;
             }
-        } catch (UnzerApiException $e) {
+            $result = true;
+        } elseif ($transaction->isError()) {
             UnzerHelper::redirectOnError(
                 self::CONTROLLER_URL,
-                $this->translator->translate((string)$e->getCode(), $e->getClientMessage())
+                $this->translator->translate(
+                    $transaction->getMessage()->getCode(),
+                    $transaction->getMessage()->getCustomer()
+                )
             );
-        } catch (\RuntimeException $e) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, $e->getMessage());
         }
+
         return $result;
     }
 

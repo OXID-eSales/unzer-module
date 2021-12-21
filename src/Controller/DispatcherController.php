@@ -41,14 +41,15 @@ class DispatcherController extends FrontendController
         $paymentModel = oxNew(Payment::class);
         $paymentModel->load($paymentid);
 
+        $paymentStatus = false;
         $container = ContainerFactory::getInstance()->getContainer();
 
-        /** @var PaymentExtensionLoader $paymentLoader */
-        $paymentLoader = $container->get(PaymentExtensionLoader::class);
-        $paymentExtension = $paymentLoader->getPaymentExtension($paymentModel);
-
         try {
+            /** @var PaymentExtensionLoader $paymentLoader */
+            $paymentLoader = $container->get(PaymentExtensionLoader::class);
+            $paymentExtension = $paymentLoader->getPaymentExtension($paymentModel);
             $paymentExtension->execute();
+            $paymentStatus = $paymentExtension->checkPaymentstatus();
         } catch (UnzerApiException $e) {
             /** @var Translator $translator */
             $translator = $container->get(Translator::class);
@@ -59,7 +60,8 @@ class DispatcherController extends FrontendController
         } catch (Exception $e) {
             UnzerHelper::redirectOnError($paymentExtension::CONTROLLER_URL, $e->getMessage());
         }
-        return $paymentExtension->checkPaymentstatus();
+
+        return $paymentStatus;
     }
 
     /**
