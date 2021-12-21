@@ -10,6 +10,7 @@ use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Metadata;
@@ -39,6 +40,9 @@ abstract class UnzerPayment
     /** @var UnzerService */
     protected $unzerService;
 
+    /** @var DebugHandler */
+    protected $debugHandler;
+
     /** @var string */
     protected $unzerOrderId;
 
@@ -60,13 +64,15 @@ abstract class UnzerPayment
         Session $session,
         Unzer $unzerSDK,
         Translator $translator,
-        UnzerService $unzerService
+        UnzerService $unzerService,
+        DebugHandler $debugHandler
     ) {
         $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
         $this->translator = $translator;
         $this->unzerService = $unzerService;
+        $this->debugHandler = $debugHandler;
 
         $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
     }
@@ -122,15 +128,9 @@ abstract class UnzerPayment
             $unzerPayment = $this->unzerSDK->fetchPayment($paymentId);
             $transaction = $unzerPayment->getInitialTransaction();
             if ($transaction->isSuccess()) {
-                // TODO log success
-                //$msg = UnzerHelper::translatedMsg(
-                //  $transaction->getMessage()->getCode(),
-                //  $transaction->getMessage()->getCustomer()
-                //);
                 $result = true;
             } elseif ($transaction->isPending()) {
-                // TODO Handle Pending...
-                $paymentType = $unzerPayment->getPaymentType();
+                $this->createPaymentStatusWebhook($paymentId);
 
                 if (!$blDoRedirect && $transaction->getRedirectUrl()) {
                     Registry::getUtils()->redirect($transaction->getRedirectUrl(), false);
@@ -158,6 +158,30 @@ abstract class UnzerPayment
     }
 
     /**
+     * @param string $paymentId
+     */
+    public function createPaymentStatusWebhook(string $paymentId): void
+    {
+        $webhookUrl = Registry::getConfig()->getShopUrl()
+            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus&paymentid='
+            . $paymentId;
+
+        try {
+            $this->unzerSDK->createWebhook(
+                $webhookUrl,
+                'payment'
+            );
+        } catch (UnzerApiException $e) {
+            $this->debugHandler->log(
+                $this->translator->translate(
+                    'oscunzer_SETWEBHOOK_ERROR',
+                    'Error creating this webhook: '
+                ) . $webhookUrl
+            );
+        }
+    }
+
+    /**
      * @param Charge $charge
      */
     public function setSessionVars(Charge $charge): void
@@ -168,7 +192,10 @@ abstract class UnzerPayment
 
         $paymentType = $charge->getPayment()->getPaymentType();
         if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
-            $this->session->setVariable('additionalPaymentInformation', $this->unzerService->getBankDataFromCharge($charge));
+            $this->session->setVariable(
+                'additionalPaymentInformation',
+                $this->unzerService->getBankDataFromCharge($charge)
+            );
         }
     }
 

@@ -626,4 +626,6 @@ $aLang = [
     'oscunzer_800.400.159'   => 'Merchant not live at partner system.',
     'oscunzer_800.400.160'   => 'Invalid reference at partner system.',
     'oscunzer_WRONGPAYMENTID'     => 'Invalid Payment-ID. Please choose another payment method.',
+    'oscunzer_TRANSACTION_CHANGE' => 'State %s was written to database for payment %s',
+    'oscunzer_TRANSACTION_NOTHINGTODO' => 'No update needed. There was no new state for payment: ',
 ];
