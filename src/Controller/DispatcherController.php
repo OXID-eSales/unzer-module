@@ -18,7 +18,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use Exception;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
@@ -32,15 +32,8 @@ use UnzerSDK\Exceptions\UnzerApiException;
 class DispatcherController extends FrontendController
 {
 
-    /**
-     * @param string $paymentid
-     * @return bool
-     */
-    public function executePayment(string $paymentid): bool
+    public function executePayment(PaymentModel $paymentModel): bool
     {
-        $paymentModel = oxNew(Payment::class);
-        $paymentModel->load($paymentid);
-
         $paymentStatus = false;
         $container = ContainerFactory::getInstance()->getContainer();
 

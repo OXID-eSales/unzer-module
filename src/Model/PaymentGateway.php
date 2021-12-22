@@ -16,7 +16,7 @@ class PaymentGateway extends PaymentGateway_parent
         if ($oPayment->load($oOrder->oxorder__oxpaymenttype->value)) {
             if ($oPayment->isUnzerPayment()) {
                 $Dispatcher = oxNew(DispatcherController::class);
-                return $Dispatcher->executePayment($oPayment->getId());
+                return $Dispatcher->executePayment($oPayment);
             }
         }
         return parent::executePayment($dAmount, $oOrder);
