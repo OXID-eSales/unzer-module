@@ -1,7 +1,7 @@
 [{assign var="payment" value=$oView->getPayment()}]
 [{if $payment->isUnzerPayment()}]
     [{assign var="sPaymentID" value=$payment->getId()}]
-    [{assign var="unzerpub" value=$oView->getUnzerPubKey()}]
+    [{assign var="unzerpub" value=$oViewConf->getUnzerPubKey()}]
     <div class="row">
         <div class="col-12 col-md-6" id="orderShipping">
             <form action="[{$oViewConf->getSslSelfLink()}]" method="post">
