@@ -27,7 +27,7 @@ class Order extends Order_parent
             }
 
             $sessionUnzerPayment = $this->getSessionUnzerPayment();
-            if ($this->checkUnzerPaymentStatus($sessionUnzerPayment)) {
+            if ($sessionUnzerPayment && $this->checkUnzerPaymentStatus($sessionUnzerPayment)) {
                 if (!$this->oxorder__oxordernr->value) {
                     $this->_setNumber();
                 } else {
@@ -115,11 +115,9 @@ class Order extends Order_parent
         $this->save();
     }
 
-    protected function checkUnzerPaymentStatus(?\UnzerSDK\Resources\Payment $payment): bool
+    protected function checkUnzerPaymentStatus(\UnzerSDK\Resources\Payment $payment): bool
     {
         $result = false;
-
-        // TODO raise exception if $payment or $transaction isnull
         $transaction = $payment->getInitialTransaction();
 
         if ($payment->isCompleted()) {
