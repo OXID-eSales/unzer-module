@@ -2,9 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Exception;
 
-use Exception;
-
-class Redirect extends Exception
+class Redirect extends UnzerException
 {
     /** @var string */
     private $destination;
