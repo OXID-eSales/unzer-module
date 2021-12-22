@@ -119,7 +119,7 @@ abstract class UnzerPayment
         $result = false;
 
         if (!$paymentId = $this->session->getVariable('PaymentId')) {
-            UnzerHelper::redirectOnError(self::CONTROLLER_URL, "Something went wrong. Please try again later.");
+            throw new Exception("Something went wrong. Please try again later.");
         }
 
         // Redirect to success if the payment has been successfully completed.
@@ -136,13 +136,10 @@ abstract class UnzerPayment
             }
             $result = true;
         } elseif ($transaction->isError()) {
-            UnzerHelper::redirectOnError(
-                self::CONTROLLER_URL,
-                $this->translator->translate(
-                    $transaction->getMessage()->getCode(),
-                    $transaction->getMessage()->getCustomer()
-                )
-            );
+            throw new Exception($this->translator->translate(
+                $transaction->getMessage()->getCode(),
+                "Error in transaction for customer " . $transaction->getMessage()->getCustomer()
+            ));
         }
 
         return $result;
@@ -157,19 +154,7 @@ abstract class UnzerPayment
             . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus&paymentid='
             . $paymentId;
 
-        try {
-            $this->unzerSDK->createWebhook(
-                $webhookUrl,
-                'payment'
-            );
-        } catch (UnzerApiException $e) {
-            $this->debugHandler->log(
-                $this->translator->translate(
-                    'oscunzer_SETWEBHOOK_ERROR',
-                    'Error creating this webhook: '
-                ) . $webhookUrl
-            );
-        }
+        $this->unzerSDK->createWebhook($webhookUrl, 'payment');
     }
 
     /**
