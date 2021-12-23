@@ -52,7 +52,7 @@ class Card extends UnzerPayment
             $transaction = $uzrCard->charge(
                 $basket->getPrice()->getPrice(),
                 $basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
                 $this->getMetadata()
@@ -61,7 +61,7 @@ class Card extends UnzerPayment
             $transaction = $uzrCard->authorize(
                 $basket->getPrice()->getPrice(),
                 $basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
                 $this->getMetadata()

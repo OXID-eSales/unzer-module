@@ -90,8 +90,13 @@ class OrderController extends OrderController_parent
                 // performing special actions after user finishes order (assignment to special user groups)
                 $oUser->onOrderExecute($oBasket, $iSuccess);
 
+                $nextStep = $this->_getNextStep($iSuccess);
+
                 // proceeding to next view
-                throw new Redirect(UnzerHelper::redirecturl($this->_getNextStep($iSuccess), false));
+                $container = ContainerFactory::getInstance()->getContainer();
+                /** @var \OxidSolutionCatalysts\Unzer\Service\Unzer $unzerService */
+                $unzerService = $container->get(\OxidSolutionCatalysts\Unzer\Service\Unzer::class);
+                throw new Redirect($unzerService->prepareRedirectUrl($nextStep, false));
             } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');

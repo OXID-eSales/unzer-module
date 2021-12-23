@@ -56,7 +56,7 @@ class PrePayment extends UnzerPayment
         $transaction = $prepayment->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

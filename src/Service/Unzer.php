@@ -168,4 +168,20 @@ class Unzer
 
         return $this->moduleSettings::PAYMENT_DIRECT;
     }
+
+    /**
+     * @TODO: fix this method and add tests
+     */
+    public function prepareRedirectUrl(string $destination, bool $addSessionId = false): string
+    {
+        $dstUrl = Registry::getConfig()->getShopCurrentUrl();
+        $destination = str_replace('?', '&', $destination);
+        $dstUrl .= 'cl=' . $destination;
+
+        if ($addSessionId) {
+            $dstUrl .= '&force_sid=' . $this->session->getId();
+        }
+
+        return $this->session->processUrl($dstUrl);
+    }
 }

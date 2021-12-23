@@ -48,7 +48,7 @@ class PIS extends UnzerPayment
         $transaction = $pis->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL),
             null,
             null,
             $this->getMetadata()

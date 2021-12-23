@@ -44,7 +44,7 @@ class Installment extends UnzerPayment
         $transaction = $uzrInstall->authorize(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

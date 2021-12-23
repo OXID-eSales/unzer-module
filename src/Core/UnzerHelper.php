@@ -79,23 +79,4 @@ class UnzerHelper
         Registry::getUtils()->redirect($dstUrl);
         exit;
     }
-
-    /**
-     * @param $destination
-     * @return string
-     */
-    public static function redirecturl(string $destination, bool $blWithSessionId = false): string
-    {
-        // redirect to payment-selection page:
-        $oSession = Registry::getSession();
-        $dstUrl = Registry::getConfig()->getShopCurrentUrl();
-        $destination = str_replace('?', '&', $destination);
-        $dstUrl .= 'cl=' . $destination;
-
-        if ($blWithSessionId) {
-            $dstUrl .= '&force_sid=' . $oSession->getId();
-        }
-
-        return $oSession->processUrl($dstUrl);
-    }
 }
