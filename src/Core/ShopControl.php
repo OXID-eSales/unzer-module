@@ -16,12 +16,12 @@ class ShopControl extends ShopControl_parent
     {
         if ($exception instanceof UnzerException) {
             $this->handleCustomUnzerException($exception);
-        } else {
-            parent::_handleBaseException($exception);
         }
-    }
 
-    public function handleCustomUnzerException($exception)
+        parent::_handleBaseException($exception);
+    } // @codeCoverageIgnore
+
+    public function handleCustomUnzerException(UnzerException $exception)
     {
         throw $exception;
     }
