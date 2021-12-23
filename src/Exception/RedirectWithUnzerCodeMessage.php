@@ -2,25 +2,25 @@
 
 namespace OxidSolutionCatalysts\Unzer\Exception;
 
-class MessageRedirect extends Redirect
+class RedirectWithUnzerCodeMessage extends Redirect
 {
     /** @var string */
-    private $messageKey;
+    private $unzerErrorCode;
 
     /** @var string */
     private $defaultMessage;
 
-    public function __construct(string $destination, string $messageKey, string $defaultMessage = '')
+    public function __construct(string $destination, string $unzerCode, string $defaultMessage = '')
     {
         parent::__construct($destination);
 
-        $this->messageKey = $messageKey;
+        $this->unzerErrorCode = $unzerCode;
         $this->defaultMessage = $defaultMessage;
     }
 
-    public function getMessageKey(): string
+    public function getUnzerErrorCode(): string
     {
-        return $this->messageKey;
+        return $this->unzerErrorCode;
     }
 
     public function getDefaultMessage(): string

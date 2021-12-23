@@ -2,32 +2,32 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Exception;
 
-use OxidSolutionCatalysts\Unzer\Exception\MessageRedirect;
+use OxidSolutionCatalysts\Unzer\Exception\RedirectWithUnzerCodeMessage;
 use PHPUnit\Framework\TestCase;
 
-class MessageRedirectTest extends TestCase
+class RedirectWithUnzerCodeMessageTest extends TestCase
 {
     public function testIsThrowable(): void
     {
-        $sut = new MessageRedirect('x', 'y');
+        $sut = new RedirectWithUnzerCodeMessage('x', 'y');
         $this->assertInstanceOf(\Throwable::class, $sut);
     }
 
     public function testBasicGetters(): void
     {
         $destination = 'redirectDirection';
-        $messageKey = 'messageKey';
-        $sut = new MessageRedirect($destination, $messageKey);
+        $unzerCode = 'unzerErrorCode';
+        $sut = new RedirectWithUnzerCodeMessage($destination, $unzerCode);
 
         $this->assertSame($destination, $sut->getDestination());
-        $this->assertSame($messageKey, $sut->getMessageKey());
+        $this->assertSame($unzerCode, $sut->getUnzerErrorCode());
         $this->assertSame('', $sut->getDefaultMessage());
     }
 
     public function testGetDefaultMessage(): void
     {
         $message = 'customMessage';
-        $sut = new MessageRedirect('x', 'y', $message);
+        $sut = new RedirectWithUnzerCodeMessage('x', 'y', $message);
 
         $this->assertSame($message, $sut->getDefaultMessage());
     }
