@@ -97,31 +97,28 @@ class Unzer
         return $customer;
     }
 
-    public function getUnzerBasket(string $unzerOrderId, BasketModel $oBasket): Basket
+    public function getUnzerBasket(string $unzerOrderId, BasketModel $basketModel): Basket
     {
         $basket = new Basket(
             $unzerOrderId,
-            $oBasket->getNettoSum(),
-            $oBasket->getBasketCurrency()->name
+            $basketModel->getNettoSum(),
+            $basketModel->getBasketCurrency()->name
         );
 
-        $basketContents = $oBasket->getContents();
+        $shopBasketContents = $basketModel->getContents();
 
-        $aBasketItems = $basket->getBasketItems();
-        /**
-         * @var string $sBasketItemKey
-         * @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem
-         */
-        foreach ($basketContents as $oBasketItem) {
-            $aBasketItems[] = new BasketItem(
-                $oBasketItem->getTitle(),
-                $oBasketItem->getPrice()->getNettoPrice(),
-                $oBasketItem->getUnitPrice()->getNettoPrice(),
-                (int)$oBasketItem->getAmount()
+        $unzerBasketItems = $basket->getBasketItems();
+        /** @var \OxidEsales\Eshop\Application\Model\BasketItem $basketItem */
+        foreach ($shopBasketContents as $basketItem) {
+            $unzerBasketItems[] = new BasketItem(
+                $basketItem->getTitle(),
+                $basketItem->getPrice()->getNettoPrice(),
+                $basketItem->getUnitPrice()->getNettoPrice(),
+                (int)$basketItem->getAmount()
             );
         }
 
-        $basket->setBasketItems($aBasketItems);
+        $basket->setBasketItems($unzerBasketItems);
 
         return $basket;
     }
