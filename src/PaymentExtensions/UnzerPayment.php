@@ -114,7 +114,7 @@ abstract class UnzerPayment
     /**
      * @return bool
      */
-    public function checkPaymentstatus($blDoRedirect = false): bool
+    public function checkPaymentstatus(): bool
     {
         $result = false;
 
@@ -130,7 +130,7 @@ abstract class UnzerPayment
         } elseif ($transaction->isPending()) {
             $this->createPaymentStatusWebhook($paymentId);
 
-            if (!$blDoRedirect && $transaction->getRedirectUrl()) {
+            if ($transaction->getRedirectUrl()) {
                 Registry::getUtils()->redirect($transaction->getRedirectUrl(), false);
                 exit;
             }
