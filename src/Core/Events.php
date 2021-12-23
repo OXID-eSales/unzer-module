@@ -73,17 +73,6 @@ class Events
     }
 
     /**
-     * ContainerFactory, ContainerInterface
-     *
-     * @return ContainerInterface
-     * @internal
-     */
-    protected static function getContainer(): ContainerInterface
-    {
-        return ContainerFactory::getInstance()->getContainer();
-    }
-
-    /**
      * Execute necessary module migrations on activate event
      *
      * @return void
