@@ -18,6 +18,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 
 class OrderController extends OrderController_parent
 {
@@ -90,9 +91,7 @@ class OrderController extends OrderController_parent
                 $oUser->onOrderExecute($oBasket, $iSuccess);
 
                 // proceeding to next view
-
-                Registry::getUtils()->redirect(UnzerHelper::redirecturl($this->_getNextStep($iSuccess), false));
-                exit;
+                throw new Redirect(UnzerHelper::redirecturl($this->_getNextStep($iSuccess), false));
             } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');

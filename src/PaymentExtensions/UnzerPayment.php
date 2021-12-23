@@ -9,6 +9,7 @@ use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
@@ -130,9 +131,8 @@ abstract class UnzerPayment
         } elseif ($transaction->isPending()) {
             $this->createPaymentStatusWebhook($paymentId);
 
-            if ($transaction->getRedirectUrl()) {
-                Registry::getUtils()->redirect($transaction->getRedirectUrl(), false);
-                exit;
+            if ($redirectUrl = $transaction->getRedirectUrl()) {
+                throw new Redirect($redirectUrl);
             }
             $result = true;
         } elseif ($transaction->isError()) {
