@@ -26,12 +26,8 @@ class ShopControlTest extends UnitTestCase
         $mock = $this->createPartialMock(ShopControl::class, ['isAdmin']);
         $mock->method('isAdmin')->willThrowException(new $expectedException());
 
-        try {
-            $mock->start();
-        } catch (\Exception $exception){
-            $this->assertInstanceOf($expectedException, $exception);
-            $this->assertLoggedException($expectedException);
-        }
+        $mock->start();
+        $this->assertLoggedException($expectedException);
     }
 
     public function customStandardExceptionTestDataProvider(): array
