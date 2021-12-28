@@ -3,9 +3,6 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class Invoice extends UnzerPayment

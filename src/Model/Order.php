@@ -4,7 +4,6 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use UnzerSDK\Exceptions\UnzerApiException;

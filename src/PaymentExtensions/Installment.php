@@ -15,8 +15,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-
 class Installment extends UnzerPayment
 {
     /**

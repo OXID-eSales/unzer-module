@@ -17,7 +17,6 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 
 class OrderController extends OrderController_parent

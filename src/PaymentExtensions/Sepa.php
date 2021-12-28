@@ -15,9 +15,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Exceptions\UnzerApiException;
 use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 class Sepa extends UnzerPayment
 {

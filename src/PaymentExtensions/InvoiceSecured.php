@@ -6,8 +6,6 @@ use Exception;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class InvoiceSecured extends UnzerPayment

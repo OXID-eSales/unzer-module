@@ -16,7 +16,6 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class Sofort extends UnzerPayment
