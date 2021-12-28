@@ -106,10 +106,10 @@ abstract class UnzerPayment
             return $paymentData['id'];
         }
 
-        UnzerHelper::redirectOnError(
-            'order',
-            $this->translator->translate('WRONGPAYMENTID', 'Ungültige ID')
-        );
+        throw new Exception($this->translator->translate(
+            'WRONGPAYMENTID',
+            'Ungültige ID'
+        ));
     }
 
     /**
