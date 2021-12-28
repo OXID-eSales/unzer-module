@@ -3,8 +3,8 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -38,16 +38,42 @@ class PaymentGateway extends PaymentGateway_parent
             $paymentExtension->execute();
             $paymentStatus = $paymentExtension->checkPaymentstatus();
         } catch (UnzerApiException $e) {
+            $this->removeTemporaryOrder();
+
             /** @var Translator $translator */
             $translator = $container->get(Translator::class);
-            UnzerHelper::redirectOnError(
-                $paymentExtension::CONTROLLER_URL,
+
+            /** @var \OxidSolutionCatalysts\Unzer\Service\Unzer $unzerService */
+            $unzerService = $container->get(\OxidSolutionCatalysts\Unzer\Service\Unzer::class);
+
+            throw new \OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage(
+                $unzerService->prepareRedirectUrl($paymentExtension::CONTROLLER_URL),
                 $translator->translate((string)$e->getCode(), $e->getClientMessage())
             );
         } catch (\Exception $e) {
-            UnzerHelper::redirectOnError($paymentExtension::CONTROLLER_URL, $e->getMessage());
+            $this->removeTemporaryOrder();
+
+            /** @var \OxidSolutionCatalysts\Unzer\Service\Unzer $unzerService */
+            $unzerService = $container->get(\OxidSolutionCatalysts\Unzer\Service\Unzer::class);
+
+            throw new \OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage(
+                $unzerService->prepareRedirectUrl($paymentExtension::CONTROLLER_URL),
+                $e->getMessage()
+            );
         }
 
         return $paymentStatus;
+    }
+
+    public function removeTemporaryOrder(): void
+    {
+        // redirect to payment-selection page:
+        $oSession = Registry::getSession();
+
+        //Remove temporary order
+        $oOrder = oxNew(Order::class);
+        if ($oOrder->load($oSession->getVariable('sess_challenge'))) {
+            $oOrder->delete();
+        }
     }
 }
