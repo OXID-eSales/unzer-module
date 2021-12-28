@@ -12,38 +12,45 @@ use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 
 class ShopControlTest extends UnitTestCase
 {
-    public function testHandleCustomException(): void
+    /**
+     * @dataProvider customStandardExceptionTestDataProvider
+     */
+    public function testHandleCustomException($expectedException): void
     {
-        $exMock = $this->createPartialMock(UnzerException::class, ['debugOut']);
-        $exMock->expects($this->once())->method('debugOut');
+        class_alias(
+            \OxidEsales\Eshop\Core\ShopControl::class,
+            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
+        );
+        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin']);
+        $mock->method('isAdmin')->willThrowException(new $expectedException());
 
-        $this->expectException(get_class($exMock));
-
-        $mock = $this->createPartialMock(ShopControl::class, ['getConfig']);
-        $mock->method('getConfig')->willThrowException($exMock);
-
-        $mock->start('someClass', 'getTitleSuffix');
+        try {
+            $mock->start();
+        } catch (\Exception $exception){
+            $this->assertInstanceOf($expectedException, $exception);
+            $this->assertLoggedException($expectedException);
+        }
     }
 
-    public function testHandleCustomStandardException(): void
+    public function customStandardExceptionTestDataProvider(): array
     {
-        $exMock = $this->createPartialMock(StandardException::class, ['debugOut']);
-        $exMock->expects($this->once())->method('debugOut');
-
-        $this->expectException(get_class($exMock));
-
-        $mock = $this->createPartialMock(ShopControl::class, ['getConfig']);
-        $mock->method('getConfig')->willThrowException($exMock);
-
-        $mock->start('someClass', 'getTitleSuffix');
+        return [
+            [UnzerException::class],
+            [StandardException::class]
+        ];
     }
+
 
     public function testHandleRedirectException(): void
     {
         $redirectDestination = 'someDestination';
 
-        $mock = $this->createPartialMock(ShopControl::class, ['getConfig',]);
-        $mock->method('getConfig')->willThrowException(new Redirect($redirectDestination));
+        class_alias(
+            \OxidEsales\Eshop\Core\ShopControl::class,
+            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
+        );
+        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin']);
+        $mock->method('isAdmin')->willThrowException(new Redirect($redirectDestination));
 
         $utilsMock = $this->createPartialMock(Utils::class, ['redirect']);
         $utilsMock->expects($this->once())
@@ -52,6 +59,6 @@ class ShopControlTest extends UnitTestCase
             ->willReturn('ok');
         Registry::set(Utils::class, $utilsMock);
 
-        $mock->start('someClass', 'getTitleSuffix');
+        $mock->start();
     }
 }
