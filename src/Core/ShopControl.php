@@ -2,8 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
+use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 
 /**
@@ -25,7 +27,9 @@ class ShopControl extends ShopControl_parent
 
     public function handleCustomUnzerException(UnzerException $exception): void
     {
-        if ($exception instanceof Redirect) {
+        if ($exception instanceof RedirectWithMessage) {
+            $this->handleRedirectWithMessageException($exception);
+        } elseif ($exception instanceof Redirect) {
             $this->handleRedirectException($exception);
         } else {
             parent::_handleBaseException($exception);
@@ -35,5 +39,16 @@ class ShopControl extends ShopControl_parent
     protected function handleRedirectException(Redirect $redirectException): void
     {
         Registry::getUtils()->redirect($redirectException->getDestination());
+    }
+
+    protected function handleRedirectWithMessageException(RedirectWithMessage $redirectException): void
+    {
+        $displayError = oxNew(DisplayError::class);
+        $displayError->setMessage($redirectException->getMessageKey());
+        $displayError->setFormatParameters($redirectException->getMessageParams());
+
+        Registry::getUtilsView()->addErrorToDisplay($displayError);
+
+        $this->handleRedirectException($redirectException);
     }
 }
