@@ -114,7 +114,7 @@ abstract class UnzerPayment
     /**
      * @return bool
      */
-    public function checkPaymentstatus(): bool
+    public function checkPaymentStatus(): bool
     {
         $result = false;
 
