@@ -81,14 +81,17 @@ class PaymentTest extends TestCase
             ->with("specialCode", "clientMessage")
             ->willReturn("specialTranslation");
 
+        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareRedirectUrl']);
+        $unzerServiceMock->method('prepareRedirectUrl')
+            ->with(UnzerPayment::CONTROLLER_URL)
+            ->willReturn('someUrl');
+
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
                 $this->createPartialMock(Session::class, []),
                 $extensionLoader,
                 $translatorMock,
-                $this->createConfiguredMock(UnzerService::class, [
-                    'prepareRedirectUrl' => 'someUrl'
-                ])
+                $unzerServiceMock
             ])
             ->onlyMethods(['removeTemporaryOrder'])
             ->getMock();
@@ -121,14 +124,17 @@ class PaymentTest extends TestCase
             ->with($paymentModel)
             ->willReturn($paymentExtension);
 
+        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareRedirectUrl']);
+        $unzerServiceMock->method('prepareRedirectUrl')
+            ->with(UnzerPayment::CONTROLLER_URL)
+            ->willReturn('someUrl');
+
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
                 $this->createPartialMock(Session::class, []),
                 $extensionLoader,
                 $this->createPartialMock(Translator::class, []),
-                $this->createConfiguredMock(UnzerService::class, [
-                    'prepareRedirectUrl' => 'someUrl'
-                ])
+                $unzerServiceMock
             ])
             ->onlyMethods(['removeTemporaryOrder'])
             ->getMock();
