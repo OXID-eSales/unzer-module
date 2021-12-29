@@ -47,7 +47,7 @@ class TransactionTest extends TestCase
             ])
         ]);
 
-        $model->expects($this->once())->method('assign')->with([
+        $model->expects($this->at(0))->method('assign')->with([
             'oxorderid' => 'orderId',
             'oxshopid' => 5,
             'oxuserid' => 'userId',
@@ -61,7 +61,8 @@ class TransactionTest extends TestCase
             'customerid' => 'unzerCustomerId',
         ]);
 
-        $sut->writeTransactionToDB("orderId", "userId", $payment);
+        $this->assertTrue($sut->writeTransactionToDB("orderId", "userId", $payment));
+        $this->assertFalse($sut->writeTransactionToDB("orderId", "userId", $payment));
     }
 
     private function getTransactionServiceMock($model): TransactionService
