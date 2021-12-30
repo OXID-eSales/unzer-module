@@ -159,8 +159,9 @@ abstract class UnzerPayment
 
         $paymentType = $charge->getPayment()->getPaymentType();
 
-        if (!$paymentType)
+        if (!$paymentType) {
             return;
+        }
 
         if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
             $this->session->setVariable(
