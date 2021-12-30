@@ -10,7 +10,6 @@ use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 
-
 class PaymentTest extends UnitTestCase
 {
     /**
