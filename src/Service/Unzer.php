@@ -8,13 +8,10 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
-use OxidEsales\Eshop\Core\ShopVersion;
-use OxidEsales\Facts\Facts;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
-use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class Unzer
@@ -74,8 +71,7 @@ class Unzer
         $billingAddress->setCity(trim($oUser->getFieldData('oxcity')));
         $billingAddress->setCountry($billingCountryIso);
 
-        if ($oOrder !== null) {
-            $oDelAddress = $oOrder->getDelAddressInfo();
+        if ($oOrder && $oDelAddress = $oOrder->getDelAddressInfo()) {
             $shippingAddress = $customer->getShippingAddress();
             $deliveryCountryIso = $oCountry->load($oDelAddress->getFieldData('oxcountryid')) ? $oDelAddress->getFieldData('oxisoalpha2') : '';
 
@@ -127,28 +123,28 @@ class Unzer
     {
         $bankData = sprintf(
             $this->language->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->language->formatCurrency($charge->getAmount()),
+            $this->language->formatCurrency($charge->getAmount() ?: 0),
             $this->context->getActiveCurrencySign()
         );
 
         $bankData .= sprintf(
             $this->language->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
-            $charge->getHolder()
+            $charge->getHolder() ?: ''
         );
 
         $bankData .= sprintf(
             $this->language->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
-            $charge->getIban()
+            $charge->getIban() ?: ''
         );
 
         $bankData .= sprintf(
             $this->language->translateString('OSCUNZER_BANK_DETAILS_BIC'),
-            $charge->getBic()
+            $charge->getBic() ?: ''
         );
 
         $bankData .= sprintf(
             $this->language->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
-            $charge->getDescriptor()
+            $charge->getDescriptor() ?: ''
         );
 
         return $bankData;

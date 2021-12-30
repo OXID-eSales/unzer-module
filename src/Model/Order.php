@@ -14,6 +14,7 @@ class Order extends Order_parent
 {
     /**
      * @inerhitDoc
+     * @param \OxidEsales\Eshop\Application\Model\User $oUser
      * @throws UnzerApiException
      */
     public function finalizeOrder($oBasket, $oUser, $blRecalculatingOrder = false)
@@ -124,7 +125,7 @@ class Order extends Order_parent
             $this->_setOrderStatus('OK');
             $this->markUnzerOrderAsPaid();
             $result = true;
-        } elseif ($payment->isPending()) {
+        } elseif ($payment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
                     $payment->getAuthorization()->charge();

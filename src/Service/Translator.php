@@ -17,12 +17,7 @@ class Translator
         $this->language = $language;
     }
 
-    /**
-     * @param string $languageCode
-     * @param string $defaultMessage
-     * @return array|string
-     */
-    public function translate(string $languageCode, string $defaultMessage)
+    public function translate(string $languageCode, string $defaultMessage): string
     {
         if (
             substr_compare($languageCode, "API.", 0, 4) == 0

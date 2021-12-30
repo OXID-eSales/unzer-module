@@ -6,6 +6,7 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class Payment
@@ -47,14 +48,18 @@ class Payment
             $this->removeTemporaryOrder();
 
             throw new RedirectWithMessage(
-                $this->unzerService->prepareRedirectUrl($paymentExtension::CONTROLLER_URL),
+                $this->unzerService->prepareRedirectUrl(
+                    isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
+                ),
                 $this->translator->translate((string)$e->getCode(), $e->getClientMessage())
             );
         } catch (\Exception $e) {
             $this->removeTemporaryOrder();
 
             throw new RedirectWithMessage(
-                $this->unzerService->prepareRedirectUrl($paymentExtension::CONTROLLER_URL),
+                $this->unzerService->prepareRedirectUrl(
+                    isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
+                ),
                 $e->getMessage()
             );
         }

@@ -77,10 +77,7 @@ abstract class UnzerPayment
         $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
     }
 
-    /**
-     * @return array|bool
-     */
-    public function getPaymentCurrencies()
+    public function getPaymentCurrencies(): array
     {
         return $this->allowedCurrencies;
     }
@@ -93,10 +90,7 @@ abstract class UnzerPayment
         return (strpos($this->payment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
     }
 
-    /**
-     * @return   string|void
-     */
-    public function getUzrId()
+    public function getUzrId(): string
     {
         $jsonPaymentData = Registry::getRequest()->getRequestParameter('paymentData');
         $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
@@ -124,21 +118,22 @@ abstract class UnzerPayment
 
         // Redirect to success if the payment has been successfully completed.
         $unzerPayment = $this->unzerSDK->fetchPayment($paymentId);
-        $transaction = $unzerPayment->getInitialTransaction();
-        if ($transaction->isSuccess()) {
-            $result = true;
-        } elseif ($transaction->isPending()) {
-            $this->createPaymentStatusWebhook($paymentId);
+        if ($transaction = $unzerPayment->getInitialTransaction()) {
+            if ($transaction->isSuccess()) {
+                $result = true;
+            } elseif ($transaction->isPending()) {
+                $this->createPaymentStatusWebhook($paymentId);
 
-            if ($redirectUrl = $transaction->getRedirectUrl()) {
-                throw new Redirect($redirectUrl);
+                if ($redirectUrl = $transaction->getRedirectUrl()) {
+                    throw new Redirect($redirectUrl);
+                }
+                $result = true;
+            } elseif ($transaction->isError()) {
+                throw new Exception($this->translator->translate(
+                    $transaction->getMessage()->getCode(),
+                    "Error in transaction for customer " . $transaction->getMessage()->getCustomer()
+                ));
             }
-            $result = true;
-        } elseif ($transaction->isError()) {
-            throw new Exception($this->translator->translate(
-                $transaction->getMessage()->getCode(),
-                "Error in transaction for customer " . $transaction->getMessage()->getCustomer()
-            ));
         }
 
         return $result;
@@ -163,6 +158,10 @@ abstract class UnzerPayment
         $this->session->setVariable('PaymentId', $charge->getPaymentId());
 
         $paymentType = $charge->getPayment()->getPaymentType();
+
+        if (!$paymentType)
+            return;
+
         if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
             $this->session->setVariable(
                 'additionalPaymentInformation',
