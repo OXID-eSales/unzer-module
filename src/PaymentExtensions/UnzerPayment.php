@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Metadata;
-use UnzerSDK\Resources\TransactionTypes\Charge;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Unzer;
 
 abstract class UnzerPayment
@@ -156,10 +156,7 @@ abstract class UnzerPayment
         $this->unzerSDK->createWebhook($webhookUrl, 'payment');
     }
 
-    /**
-     * @param Charge $charge
-     */
-    public function setSessionVars(Charge $charge): void
+    public function setSessionVars(AbstractTransactionType $charge): void
     {
         // You'll need to remember the shortId to show it on the success or failure page
         $this->session->setVariable('ShortId', $charge->getShortId());

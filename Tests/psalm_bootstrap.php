@@ -38,3 +38,8 @@ class_alias(
     \OxidEsales\Eshop\Application\Controller\PaymentController::class,
     \OxidSolutionCatalysts\Unzer\Controller\PaymentController_parent::class
 );
+
+class_alias(
+    \OxidEsales\Eshop\Core\ShopControl::class,
+    \OxidSolutionCatalysts\Unzer\Core\ShopControl_parent::class
+);
