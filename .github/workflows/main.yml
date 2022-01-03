@@ -3,24 +3,6 @@ name: oxid module tests
 on: [push]
 
 jobs:
-  codestyle_checks:
-    strategy:
-      matrix:
-        php: [ 7.4 ]
-        oxid: [ 6.3 ]
-    runs-on: ubuntu-latest
-    container:
-      image: oxidprojects/oxid-apache-php:oxid${{ matrix.oxid }}-php${{ matrix.php }}
-    steps:
-      - uses: actions/checkout@v1
-      - name: Validate composer.json
-        run: composer validate
-      - name: validate php syntax
-        run: find . -not -path "./vendor/*" -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
-      - name: install php-cs-fixer
-        run: phive install php-cs-fixer:2.18.5 --trust-gpg-keys E82B2FB314E9906E
-      - name: run code checks
-        run: tools/php-cs-fixer fix --dry-run --diff-format=udiff .
   install:
     strategy:
       matrix:
@@ -92,6 +74,33 @@ jobs:
         run: composer psalm-errors
         working-directory: /build/oxid/source/modules/osc/unzer/
 
+  codestyle_checks:
+    strategy:
+      matrix:
+        php: [ 7.4 ]
+        oxid: [ 6.3 ]
+    runs-on: ubuntu-latest
+    needs: install
+    container:
+      image: oxidprojects/oxid-apache-php:oxid${{ matrix.oxid }}-php${{ matrix.php }}
+    steps:
+      - name: Download oxid installation
+        uses: actions/download-artifact@v2
+        with:
+          name: oxid${{ matrix.oxid }}-php${{ matrix.php }}-with-deps
+          path: /build
+      - name: extract oxid installation
+        run: |
+          tar xzf oxid.tar.gz
+        working-directory: /build/
+
+      - name: prepare autoload
+        run: composer update
+        working-directory: /build/oxid/source/modules/osc/unzer/
+
+      - name: run phpcs
+        run: composer phpcs
+        working-directory: /build/oxid/source/modules/osc/unzer/
 
   oxid_unit_tests:
     strategy:
