@@ -44,8 +44,17 @@ class Unzer
     {
         $oUser = $this->session->getUser();
 
-        $customer = CustomerFactory::createCustomer($oUser->getFieldData('oxfname'), $oUser->getFieldData('oxlname'));
-        $customer->setBirthDate($oUser->getFieldData('oxbirthdate') != "0000-00-00" ? $oUser->getFieldData('oxbirthdate') : '');
+        $customer = CustomerFactory::createCustomer(
+            $oUser->getFieldData('oxfname'),
+            $oUser->getFieldData('oxlname')
+        );
+
+        $customer->setBirthDate(
+            $oUser->getFieldData('oxbirthdate') != "0000-00-00"
+                ? $oUser->getFieldData('oxbirthdate')
+                : ''
+        );
+
         $customer->setCompany($oUser->getFieldData('oxcompany'));
         $customer->setSalutation($oUser->getFieldData('oxsal'));
         $customer->setEmail($oUser->getFieldData('oxusername'));
@@ -55,7 +64,9 @@ class Unzer
         $billingAddress = $customer->getBillingAddress();
 
         $oCountry = oxNew(Country::class);
-        $billingCountryIso = $oCountry->load($oUser->getFieldData('oxcountryid')) ? $oCountry->getFieldData('oxisoalpha2') : '';
+        $billingCountryIso = $oCountry->load($oUser->getFieldData('oxcountryid'))
+            ? $oCountry->getFieldData('oxisoalpha2')
+            : '';
 
         $billingAddress->setName(
             $oUser->getFieldData('oxcompany') ??
@@ -73,7 +84,9 @@ class Unzer
 
         if ($oOrder && $oDelAddress = $oOrder->getDelAddressInfo()) {
             $shippingAddress = $customer->getShippingAddress();
-            $deliveryCountryIso = $oCountry->load($oDelAddress->getFieldData('oxcountryid')) ? $oDelAddress->getFieldData('oxisoalpha2') : '';
+            $deliveryCountryIso = $oCountry->load($oDelAddress->getFieldData('oxcountryid'))
+                ? $oDelAddress->getFieldData('oxisoalpha2')
+                : '';
 
             $shippingAddress->setName(
                 $oDelAddress->getFieldData('oxcompany') ??

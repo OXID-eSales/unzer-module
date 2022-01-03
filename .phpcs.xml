@@ -29,4 +29,14 @@
         <exclude-pattern>migration</exclude-pattern>
         <exclude-pattern>src/Core/Events.php</exclude-pattern>
     </rule>
+
+    <!-- code coverage ignore comment breaks the rule -->
+    <rule ref="PSR12.Classes.ClosingBrace">
+        <exclude-pattern>src/Core/ShopControl.php</exclude-pattern>
+    </rule>
+
+    <!-- ignore method declaration rules for tests -->
+    <rule ref="PSR2.Methods.MethodDeclaration">
+        <exclude-pattern>Tests/</exclude-pattern>
+    </rule>
 </ruleset>
