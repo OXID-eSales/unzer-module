@@ -9,7 +9,6 @@ use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
-use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -40,9 +39,6 @@ abstract class UnzerPayment
     /** @var UnzerService */
     protected $unzerService;
 
-    /** @var DebugHandler */
-    protected $debugHandler;
-
     /** @var string */
     protected $unzerOrderId;
 
@@ -67,15 +63,13 @@ abstract class UnzerPayment
         Session $session,
         Unzer $unzerSDK,
         Translator $translator,
-        UnzerService $unzerService,
-        DebugHandler $debugHandler
+        UnzerService $unzerService
     ) {
         $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
         $this->translator = $translator;
         $this->unzerService = $unzerService;
-        $this->debugHandler = $debugHandler;
 
         $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
     }
