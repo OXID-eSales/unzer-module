@@ -17,18 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class Przelewy24 extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'przelewy24';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {

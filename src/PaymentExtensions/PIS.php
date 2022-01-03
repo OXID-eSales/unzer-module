@@ -20,18 +20,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class PIS extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'pis';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void

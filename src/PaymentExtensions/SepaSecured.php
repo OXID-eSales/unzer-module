@@ -31,35 +31,6 @@ class SepaSecured extends UnzerPayment
     protected $allowedCurrencies = ['EUR'];
 
     /**
-     * @var string
-     */
-    protected $sIban;
-
-    /**
-     * @return string
-     */
-    public function getSIban(): string
-    {
-        return $this->sIban;
-    }
-
-    /**
-     * @param string $sIban
-     */
-    public function setSIban(string $sIban): void
-    {
-        $this->sIban = $sIban;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
-
-    /**
      * @return void
      * @throws UnzerApiException
      * @throws Exception

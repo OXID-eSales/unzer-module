@@ -17,18 +17,9 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class PayPal extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'paypal';
 
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return true;
-    }
+    protected $isRecurring = true;
 
     public function execute()
     {

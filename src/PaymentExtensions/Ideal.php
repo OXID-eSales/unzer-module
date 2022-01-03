@@ -17,18 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class Ideal extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'ideal';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {

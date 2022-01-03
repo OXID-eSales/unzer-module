@@ -20,23 +20,9 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class Sofort extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'sofort';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void

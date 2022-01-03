@@ -19,18 +19,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class PostFinance extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'post-finance-efinance';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {

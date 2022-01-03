@@ -17,18 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class WeChatPay extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'wechatpay';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {

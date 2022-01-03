@@ -17,18 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class AliPay extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'alipay';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {

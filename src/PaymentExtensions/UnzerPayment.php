@@ -49,6 +49,9 @@ abstract class UnzerPayment
     /** @var string */
     protected $paymentMethod;
 
+    /** @var bool */
+    protected $isRecurring = false;
+
     /** @var array */
     protected $allowedCurrencies = [];
 
@@ -80,6 +83,11 @@ abstract class UnzerPayment
     public function getPaymentCurrencies(): array
     {
         return $this->allowedCurrencies;
+    }
+
+    public function isRecurringPaymentType(): bool
+    {
+        return $this->isRecurring;
     }
 
     /**
@@ -163,6 +171,7 @@ abstract class UnzerPayment
             return;
         }
 
+        // TODO: $charge is not only class of Charge possible here. Investigate and fix.
         if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
             $this->session->setVariable(
                 'additionalPaymentInformation',

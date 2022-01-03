@@ -20,18 +20,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class GiroPay extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'giropay';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void

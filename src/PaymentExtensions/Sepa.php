@@ -20,44 +20,11 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class Sepa extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'sepa-direct-debit';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
 
-    /**
-     * @var string
-     */
-    protected $sIban;
-
-    /**
-     * @return string
-     */
-    public function getSIban(): string
-    {
-        return $this->sIban;
-    }
-
-    /**
-     * @param string $sIban
-     */
-    public function setSIban(string $sIban): void
-    {
-        $this->sIban = $sIban;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return true;
-    }
+    protected $isRecurring = true;
 
     /**
      * @return void

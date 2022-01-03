@@ -10,23 +10,9 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class InvoiceSecured extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'invoice-secured';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void

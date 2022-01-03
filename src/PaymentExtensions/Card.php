@@ -20,18 +20,9 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class Card extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'card';
 
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return true;
-    }
+    protected $isRecurring = true;
 
     /**
      * @return void

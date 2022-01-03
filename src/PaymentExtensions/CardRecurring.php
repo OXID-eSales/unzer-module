@@ -17,18 +17,9 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class CardRecurring extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'card-recurring';
 
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return true;
-    }
+    protected $isRecurring = true;
 
     public function execute()
     {

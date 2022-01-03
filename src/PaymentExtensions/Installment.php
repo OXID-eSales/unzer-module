@@ -17,18 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class Installment extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'installment-secured';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {

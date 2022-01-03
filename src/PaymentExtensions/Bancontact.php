@@ -17,18 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class Bancontact extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'bancontact';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {
