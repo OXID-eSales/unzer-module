@@ -85,12 +85,12 @@ jobs:
         working-directory: /build/
 
       - name: prepare autoload
-        run: bin/createModuleAutoload.sh
-        working-directory: /build/oxid
+        run: composer update
+        working-directory: /build/oxid/source/modules/osc/unzer/
 
       - name: run psalm
-        run: php tools/psalm --no-progress --no-cache
-        working-directory: /build/oxid
+        run: composer psalm-errors
+        working-directory: /build/oxid/source/modules/osc/unzer/
 
 
   oxid_unit_tests:
