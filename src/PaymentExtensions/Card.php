@@ -40,7 +40,7 @@ class Card extends UnzerPayment
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
 
-        $transaction = $uzrPP->{$paymentProcedure}(
+        $transaction = $uzrCard->{$paymentProcedure}(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
             $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
