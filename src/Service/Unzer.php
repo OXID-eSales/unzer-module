@@ -166,13 +166,13 @@ class Unzer
     /**
      * @return string
      */
-    public function getPaymentProcedure(string $paymentId): string
+    public function getPaymentProcedure(string $paymentMethod): string
     {
-        if (in_array($paymentId, ['oscunzer_paypal', 'oscunzer_card'])) {
-            return $this->moduleSettings->getPaymentProcedureSetting($paymentId);
+        if (in_array($paymentMethod, ['paypal', 'card'])) {
+            return $this->moduleSettings->getPaymentProcedureSetting($paymentMethod);
         }
 
-        return $this->moduleSettings::PAYMENT_DIRECT;
+        return $this->moduleSettings::PAYMENT_CHARGE;
     }
 
     /**

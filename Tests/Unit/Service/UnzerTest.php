@@ -28,9 +28,9 @@ class UnzerTest extends TestCase
     public function getPaymentProcedureDataProvider(): array
     {
         return [
-            ['oscunzer_paypal', 'special'],
-            ['oscunzer_card', 'special'],
-            ['oscunzer_other', ModuleSettings::PAYMENT_DIRECT],
+            ['paypal', 'special'],
+            ['card', 'special'],
+            ['other', ModuleSettings::PAYMENT_CHARGE],
         ];
     }
 
