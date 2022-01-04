@@ -19,6 +19,11 @@ class Installment extends UnzerPayment
 {
     protected $paymentMethod = 'installment-secured';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         $sId = $this->getUzrId();

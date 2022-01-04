@@ -19,6 +19,11 @@ class Bancontact extends UnzerPayment
 {
     protected $paymentMethod = 'bancontact';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Bancontact $uzrBancontact */

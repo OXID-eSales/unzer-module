@@ -19,6 +19,11 @@ class AliPay extends UnzerPayment
 {
     protected $paymentMethod = 'alipay';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Alipay $uzrAP */

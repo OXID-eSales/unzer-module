@@ -19,6 +19,11 @@ class Przelewy24 extends UnzerPayment
 {
     protected $paymentMethod = 'przelewy24';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Przelewy24 $uzrPrzelewy */

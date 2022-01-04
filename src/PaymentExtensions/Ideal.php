@@ -19,6 +19,11 @@ class Ideal extends UnzerPayment
 {
     protected $paymentMethod = 'ideal';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         $sId = $this->getUzrId();

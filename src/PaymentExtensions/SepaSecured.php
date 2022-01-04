@@ -20,14 +20,8 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class SepaSecured extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'sepa-direct-debit-secured';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
 
     /**

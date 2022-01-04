@@ -19,6 +19,11 @@ class WeChatPay extends UnzerPayment
 {
     protected $paymentMethod = 'wechatpay';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Wechatpay $uzrWechat */
