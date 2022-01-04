@@ -84,7 +84,7 @@ class PaymentTest extends TestCase
 
         try {
             $sut->executeUnzerPayment($paymentModel);
-        } catch (Redirct $exception) {
+        } catch (Redirect $exception) {
             $this->assertSame("someDestination", $exception->getDestination());
 
             throw $exception;
