@@ -15,6 +15,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class AliPay extends UnzerPayment
 {
     protected $paymentMethod = 'alipay';

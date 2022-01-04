@@ -15,6 +15,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class Przelewy24 extends UnzerPayment
 {
     protected $paymentMethod = 'przelewy24';
