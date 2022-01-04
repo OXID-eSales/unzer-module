@@ -11,7 +11,7 @@ class TranslatorTest extends TestCase
     /**
      * @dataProvider translateDataProvider
      */
-    public function testTranslate($expectedKey, $key): void
+    public function testTranslate($expectedKey): void
     {
         $languageMock = $this->createPartialMock(Language::class, ['translateString']);
         $languageMock->expects($this->once())
@@ -22,7 +22,25 @@ class TranslatorTest extends TestCase
         $sut = new Translator($languageMock);
         $this->assertSame(
             'translation',
-            $sut->translate($key, 'default message')
+            $sut->translate($key)
+        );
+    }
+
+    /**
+     * @dataProvider translateDataProvider
+     */
+    public function testTranslateCode($expectedKey, $key): void
+    {
+        $languageMock = $this->createPartialMock(Language::class, ['translateString']);
+        $languageMock->expects($this->once())
+            ->method('translateString')
+            ->with($expectedKey)
+            ->willReturn('translation');
+
+        $sut = new Translator($languageMock);
+        $this->assertSame(
+            'translation',
+            $sut->translateCode($key, 'default message')
         );
     }
 

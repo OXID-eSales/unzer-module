@@ -101,10 +101,7 @@ abstract class UnzerPayment
             return $paymentData['id'];
         }
 
-        throw new Exception($this->translator->translate(
-            'WRONGPAYMENTID',
-            'Ungültige ID'
-        ));
+        throw new Exception($this->translator->translate('WRONGPAYMENTID'));
     }
 
     /**
@@ -131,7 +128,7 @@ abstract class UnzerPayment
                 }
                 $result = true;
             } elseif ($transaction->isError()) {
-                throw new Exception($this->translator->translate(
+                throw new Exception($this->translator->translateCode(
                     $transaction->getMessage()->getCode(),
                     "Error in transaction for customer " . $transaction->getMessage()->getCustomer()
                 ));

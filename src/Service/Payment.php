@@ -54,7 +54,10 @@ class Payment
                 $this->unzerService->prepareRedirectUrl(
                     isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
                 ),
-                $this->translator->translate((string)$e->getCode(), $e->getClientMessage())
+                $this->translator->translateCode(
+                    (string)$e->getCode(),
+                    $e->getClientMessage()
+                )
             );
         } catch (\Exception $e) {
             $this->removeTemporaryOrder();
