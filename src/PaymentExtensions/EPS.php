@@ -24,7 +24,7 @@ class EPS extends UnzerPayment
 
     public function execute()
     {
-        $sId = $this->getUzrId();
+        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
 
         /** @var \UnzerSDK\Resources\PaymentTypes\EPS $uzrEPS */
         $uzrEPS = $this->unzerSDK->fetchPaymentType($sId);

@@ -33,7 +33,7 @@ class Sepa extends UnzerPayment
      */
     public function execute()
     {
-        $sId = $this->getUzrId();
+        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
 
         /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebit $uzrSepa */
         $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);

@@ -7,6 +7,7 @@ use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
@@ -28,16 +29,21 @@ class Unzer
     /** @var ModuleSettings */
     protected $moduleSettings;
 
+    /** @var Request */
+    protected $request;
+
     public function __construct(
         Session $session,
         Language $language,
         Context $context,
-        ModuleSettings $moduleSettings
+        ModuleSettings $moduleSettings,
+        Request $request
     ) {
         $this->session = $session;
         $this->language = $language;
         $this->context = $context;
         $this->moduleSettings = $moduleSettings;
+        $this->request = $request;
     }
 
     public function getSessionCustomerData(?Order $oOrder = null): Customer
@@ -163,9 +169,6 @@ class Unzer
         return $bankData;
     }
 
-    /**
-     * @return string
-     */
     public function getPaymentProcedure(string $paymentId): string
     {
         if (in_array($paymentId, ['oscunzer_paypal', 'oscunzer_card'])) {
@@ -189,5 +192,17 @@ class Unzer
         }
 
         return $this->session->processUrl($dstUrl);
+    }
+
+    public function getUnzerPaymentIdFromRequest(): string
+    {
+        $jsonPaymentData = $this->request->getRequestParameter('paymentData');
+        $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
+
+        if (array_key_exists('id', $paymentData)) {
+            return $paymentData['id'];
+        }
+
+        throw new \Exception('oscunzer_WRONGPAYMENTID');
     }
 }

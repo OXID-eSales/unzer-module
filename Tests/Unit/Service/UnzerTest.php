@@ -5,6 +5,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 use OxidEsales\Eshop\Application\Model\Basket as ShopBasketModel;
 use OxidEsales\Eshop\Application\Model\BasketItem;
 use OxidEsales\Eshop\Core\Language;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\Context;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
@@ -19,7 +20,9 @@ class UnzerTest extends TestCase
     public function testGetPaymentProcedure($paymentId, $expectedProcedure)
     {
         $sut = $this->getSut([
-            'getPaymentProcedureSetting' => 'special'
+            ModuleSettings::class => $this->createConfiguredMock(ModuleSettings::class, [
+                'getPaymentProcedureSetting' => 'special'
+            ])
         ]);
 
         $this->assertSame($expectedProcedure, $sut->getPaymentProcedure($paymentId));
@@ -34,13 +37,16 @@ class UnzerTest extends TestCase
         ];
     }
 
-    private function getSut(array $settings): Unzer
+    private function getSut(array $settings = []): Unzer
     {
         return new Unzer(
             $this->createPartialMock(Session::class, []),
             $this->createPartialMock(Language::class, []),
             $this->createPartialMock(Context::class, []),
-            $this->createConfiguredMock(ModuleSettings::class, $settings)
+            $settings[ModuleSettings::class] ?:
+                $this->createPartialMock(ModuleSettings::class, []),
+            $settings[Request::class] ?:
+                $this->createPartialMock(Request::class, []),
         );
     }
 
@@ -54,7 +60,7 @@ class UnzerTest extends TestCase
             'getBasketCurrency' => $currency
         ]);
 
-        $sut = $this->getSut([]);
+        $sut = $this->getSut();
         $result = $sut->getUnzerBasket('someOrderId', $shopBasketModel);
 
         $this->assertInstanceOf(\UnzerSDK\Resources\Basket::class, $result);
@@ -88,7 +94,7 @@ class UnzerTest extends TestCase
             'getContents' => [$basketItem1, $basketItem2],
         ]);
 
-        $sut = $this->getSut([]);
+        $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);
 
         $this->assertSame(2, $result->getItemCount());
@@ -100,5 +106,29 @@ class UnzerTest extends TestCase
         $this->assertSame(20.0, $items[0]->getAmountPerUnit());
         $this->assertSame(100.0, $items[0]->getAmountNet());
         $this->assertSame(5, $items[0]->getQuantity());
+    }
+
+    public function testGetUnzerPaymentIdFromRequest(): void
+    {
+        $requestStub = $this->createPartialMock(Request::class, ['getRequestParameter']);
+        $requestStub->method('getRequestParameter')->with('paymentData')->willReturn(
+            json_encode(['id' => 'someId'])
+        );
+
+        $sut = $this->getSut([
+            Request::class => $requestStub
+        ]);
+
+        $this->assertSame('someId', $sut->getUnzerPaymentIdFromRequest());
+    }
+
+    public function testGetUnzerPaymentIdFromRequestFailure(): void
+    {
+        $sut = $this->getSut();
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('oscunzer_WRONGPAYMENTID');
+
+        $sut->getUnzerPaymentIdFromRequest();
     }
 }
