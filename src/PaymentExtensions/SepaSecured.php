@@ -16,7 +16,6 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class SepaSecured extends UnzerPayment
@@ -30,35 +29,6 @@ class SepaSecured extends UnzerPayment
      * @var array
      */
     protected $allowedCurrencies = ['EUR'];
-
-    /**
-     * @var string
-     */
-    protected $sIban;
-
-    /**
-     * @return string
-     */
-    public function getSIban(): string
-    {
-        return $this->sIban;
-    }
-
-    /**
-     * @param string $sIban
-     */
-    public function setSIban(string $sIban): void
-    {
-        $this->sIban = $sIban;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void
@@ -78,7 +48,7 @@ class SepaSecured extends UnzerPayment
         $transaction = $uzrSepa->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata(),

@@ -2,7 +2,7 @@
 <psalm
     errorLevel="4"
     resolveFromConfigFile="true"
-    autoloader="Tests/psalm_bootstrap.php"
+    autoloader="source/bootstrap.php"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
@@ -10,4 +10,8 @@
     <projectFiles>
         <directory name="src" />
     </projectFiles>
+
+    <stubs>
+        <file name="Tests/Psalm/Stubs.php" preloadClasses="true" />
+    </stubs>
 </psalm>

@@ -15,22 +15,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-
 class Przelewy24 extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'przelewy24';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {
@@ -43,7 +30,7 @@ class Przelewy24 extends UnzerPayment
         $transaction = $uzrPrzelewy->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

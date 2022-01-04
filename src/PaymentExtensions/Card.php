@@ -16,23 +16,13 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class Card extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'card';
 
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return true;
-    }
+    protected $isRecurring = true;
 
     /**
      * @return void
@@ -52,7 +42,7 @@ class Card extends UnzerPayment
             $transaction = $uzrCard->charge(
                 $basket->getPrice()->getPrice(),
                 $basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
                 $this->getMetadata()
@@ -61,7 +51,7 @@ class Card extends UnzerPayment
             $transaction = $uzrCard->authorize(
                 $basket->getPrice()->getPrice(),
                 $basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
                 $this->getMetadata()

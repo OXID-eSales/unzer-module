@@ -3,10 +3,10 @@
     <description>Oxid Coding Standard</description>
 
     <!-- Paths to check -->
-    <file>src/</file>
-    <file>Tests</file>
-    <file>translations</file>
-    <file>migration</file>
+    <file>../src/</file>
+    <file>./</file>
+    <file>../translations</file>
+    <file>../migration</file>
 
     <!-- display progress -->
     <arg value="p"/>
@@ -25,8 +25,18 @@
 
     <!-- some of the files can have longer lines, at least temporary -->
     <rule ref="Generic.Files.LineLength">
-        <exclude-pattern>translations</exclude-pattern>
-        <exclude-pattern>migration</exclude-pattern>
-        <exclude-pattern>src/Core/Events.php</exclude-pattern>
+        <exclude-pattern>../translations</exclude-pattern>
+        <exclude-pattern>../migration</exclude-pattern>
+        <exclude-pattern>../src/Core/Events.php</exclude-pattern>
+    </rule>
+
+    <!-- code coverage ignore comment breaks the rule -->
+    <rule ref="PSR12.Classes.ClosingBrace">
+        <exclude-pattern>src/Core/ShopControl.php</exclude-pattern>
+    </rule>
+
+    <!-- ignore method declaration rules for tests -->
+    <rule ref="PSR2.Methods.MethodDeclaration">
+        <exclude-pattern>./</exclude-pattern>
     </rule>
 </ruleset>

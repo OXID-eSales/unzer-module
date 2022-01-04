@@ -3,30 +3,13 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class Invoice extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'invoice';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void
@@ -44,7 +27,7 @@ class Invoice extends UnzerPayment
         $transaction = $invoice->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

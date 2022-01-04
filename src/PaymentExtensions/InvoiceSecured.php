@@ -6,29 +6,13 @@ use Exception;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\examples\ExampleDebugHandler;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class InvoiceSecured extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'invoice-secured';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void
@@ -53,7 +37,7 @@ class InvoiceSecured extends UnzerPayment
         $transaction = $inv_secured->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata(),

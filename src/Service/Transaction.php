@@ -49,15 +49,22 @@ class Transaction
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $transaction->assign($params);
-        unset($params['oxactiondate']);
-        $oxid = md5(json_encode($params));
+        $oxid = $this->prepareTransactionOxid($params);
         if (!$transaction->load($oxid)) {
+            $transaction->assign($params);
             $transaction->setId($oxid);
             $transaction->save();
+
             return true;
         }
+
         return false;
+    }
+
+    protected function prepareTransactionOxid(array $params): string
+    {
+        unset($params['oxactiondate']);
+        return md5(json_encode($params));
     }
 
     protected function getUnzerPaymentData(Payment $unzerPayment): array

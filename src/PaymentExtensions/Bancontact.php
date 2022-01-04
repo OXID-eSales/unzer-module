@@ -15,22 +15,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-
 class Bancontact extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'bancontact';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {
@@ -43,7 +30,7 @@ class Bancontact extends UnzerPayment
         $transaction = $uzrBancontact->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

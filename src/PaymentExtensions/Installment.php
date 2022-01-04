@@ -15,22 +15,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-
 class Installment extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'installment-secured';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {
@@ -44,7 +31,7 @@ class Installment extends UnzerPayment
         $transaction = $uzrInstall->authorize(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

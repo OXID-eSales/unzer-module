@@ -4,7 +4,6 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -15,6 +14,7 @@ class Order extends Order_parent
 {
     /**
      * @inerhitDoc
+     * @param \OxidEsales\Eshop\Application\Model\User $oUser
      * @throws UnzerApiException
      */
     public function finalizeOrder($oBasket, $oUser, $blRecalculatingOrder = false)
@@ -27,7 +27,7 @@ class Order extends Order_parent
             }
 
             $sessionUnzerPayment = $this->getSessionUnzerPayment();
-            if ($this->checkUnzerPaymentStatus($sessionUnzerPayment)) {
+            if ($sessionUnzerPayment && $this->checkUnzerPaymentStatus($sessionUnzerPayment)) {
                 if (!$this->oxorder__oxordernr->value) {
                     $this->_setNumber();
                 } else {
@@ -77,7 +77,7 @@ class Order extends Order_parent
                     $transactionService->writeTransactionToDB(
                         $this->getId(),
                         $oUser->getId() ?: '',
-                        $this->getSessionUnzerPayment()
+                        $sessionUnzerPayment
                     );
                 }
 
@@ -115,11 +115,9 @@ class Order extends Order_parent
         $this->save();
     }
 
-    protected function checkUnzerPaymentStatus(?\UnzerSDK\Resources\Payment $payment): bool
+    protected function checkUnzerPaymentStatus(\UnzerSDK\Resources\Payment $payment): bool
     {
         $result = false;
-
-        // TODO raise exception if $payment or $transaction isnull
         $transaction = $payment->getInitialTransaction();
 
         if ($payment->isCompleted()) {
@@ -127,7 +125,7 @@ class Order extends Order_parent
             $this->_setOrderStatus('OK');
             $this->markUnzerOrderAsPaid();
             $result = true;
-        } elseif ($payment->isPending()) {
+        } elseif ($payment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
                     $payment->getAuthorization()->charge();

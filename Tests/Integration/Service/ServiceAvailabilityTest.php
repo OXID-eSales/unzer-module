@@ -26,6 +26,7 @@ class ServiceAvailabilityTest extends TestCase
             [\OxidSolutionCatalysts\Unzer\Service\Transaction::class],
             [\OxidSolutionCatalysts\Unzer\Service\Unzer::class],
             [\OxidSolutionCatalysts\Unzer\Service\PaymentValidator::class],
+            [\OxidSolutionCatalysts\Unzer\Service\Payment::class],
         ];
     }
 }

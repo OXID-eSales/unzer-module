@@ -15,53 +15,17 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
-use Exception;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
-use UnzerSDK\Exceptions\UnzerApiException;
 
 class DispatcherController extends FrontendController
 {
-
-    /**
-     * @param string $paymentid
-     * @return bool
-     */
-    public function executePayment(string $paymentid): bool
-    {
-        $paymentModel = oxNew(Payment::class);
-        $paymentModel->load($paymentid);
-
-        $container = ContainerFactory::getInstance()->getContainer();
-
-        /** @var PaymentExtensionLoader $paymentLoader */
-        $paymentLoader = $container->get(PaymentExtensionLoader::class);
-        $paymentExtension = $paymentLoader->getPaymentExtension($paymentModel);
-
-        try {
-            $paymentExtension->execute();
-        } catch (UnzerApiException $e) {
-            /** @var Translator $translator */
-            $translator = $container->get(Translator::class);
-            UnzerHelper::redirectOnError(
-                $paymentExtension::CONTROLLER_URL,
-                $translator->translate((string)$e->getCode(), $e->getClientMessage())
-            );
-        } catch (Exception $e) {
-            UnzerHelper::redirectOnError($paymentExtension::CONTROLLER_URL, $e->getMessage());
-        }
-        return $paymentExtension->checkPaymentstatus();
-    }
-
     /**
      * @param string $paymentid
      * @return void

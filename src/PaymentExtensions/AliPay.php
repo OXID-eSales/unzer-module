@@ -15,22 +15,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-
 class AliPay extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'alipay';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     public function execute()
     {
@@ -43,7 +30,7 @@ class AliPay extends UnzerPayment
         $transaction = $uzrAP->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL, true),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

@@ -17,7 +17,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
+use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 
 class OrderController extends OrderController_parent
 {
@@ -27,18 +27,6 @@ class OrderController extends OrderController_parent
      * @var bool
      */
     protected $blSepaMandateConfirmError = null;
-
-    /**
-     * @return string
-     */
-    public function getUnzerPubKey(): string
-    {
-        /** @var \OxidSolutionCatalysts\Unzer\Service\ModuleSettings $settings */
-        $settings = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(\OxidSolutionCatalysts\Unzer\Service\ModuleSettings::class);
-        return $settings->getShopPublicKey();
-    }
 
     /**
      * @inerhitDoc
@@ -101,10 +89,13 @@ class OrderController extends OrderController_parent
                 // performing special actions after user finishes order (assignment to special user groups)
                 $oUser->onOrderExecute($oBasket, $iSuccess);
 
-                // proceeding to next view
+                $nextStep = $this->_getNextStep($iSuccess);
 
-                Registry::getUtils()->redirect(UnzerHelper::redirecturl($this->_getNextStep($iSuccess), false));
-                exit;
+                // proceeding to next view
+                $container = ContainerFactory::getInstance()->getContainer();
+                /** @var \OxidSolutionCatalysts\Unzer\Service\Unzer $unzerService */
+                $unzerService = $container->get(\OxidSolutionCatalysts\Unzer\Service\Unzer::class);
+                throw new Redirect($unzerService->prepareRedirectUrl($nextStep, false));
             } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');

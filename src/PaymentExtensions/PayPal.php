@@ -15,22 +15,11 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-
 class PayPal extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'paypal';
 
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return true;
-    }
+    protected $isRecurring = true;
 
     public function execute()
     {
@@ -44,7 +33,7 @@ class PayPal extends UnzerPayment
             $transaction = $uzrPP->charge(
                 $basket->getPrice()->getPrice(),
                 $basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
                 $this->getMetadata()
@@ -53,7 +42,7 @@ class PayPal extends UnzerPayment
             $transaction = $uzrPP->authorize(
                 $basket->getPrice()->getPrice(),
                 $basket->getBasketCurrency()->name,
-                UnzerHelper::redirecturl(self::PENDING_URL, true),
+                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
                 $customer,
                 $this->unzerOrderId,
                 $this->getMetadata()

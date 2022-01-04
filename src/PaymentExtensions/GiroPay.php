@@ -16,23 +16,11 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class GiroPay extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'giropay';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void
@@ -50,7 +38,7 @@ class GiroPay extends UnzerPayment
         $transaction = $giro->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

@@ -7,6 +7,10 @@ gateway of Unzer. The module contains the files for all OXID Versions > v6.2
 
 * b-6.3.x module branch is compatible with OXID eShop compilations 6.3 and 6.4
 
+## Limitations
+
+* Float amount values are not supported.
+
 ## Running tests
 
 Warning: Running tests will reset the shop.

@@ -16,29 +16,13 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class PrePayment extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'prepayment';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void
@@ -56,7 +40,7 @@ class PrePayment extends UnzerPayment
         $transaction = $prepayment->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()

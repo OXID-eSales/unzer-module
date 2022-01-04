@@ -16,23 +16,11 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class PIS extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'pis';
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return false;
-    }
 
     /**
      * @return void
@@ -48,7 +36,7 @@ class PIS extends UnzerPayment
         $transaction = $pis->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::PENDING_URL),
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL),
             null,
             null,
             $this->getMetadata()

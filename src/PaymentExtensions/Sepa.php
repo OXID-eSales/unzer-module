@@ -15,50 +15,16 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Core\UnzerHelper;
-use UnzerSDK\Exceptions\UnzerApiException;
 use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 class Sepa extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'sepa-direct-debit';
 
-    /**
-     * @var array
-     */
     protected $allowedCurrencies = ['EUR'];
 
-    /**
-     * @var string
-     */
-    protected $sIban;
-
-    /**
-     * @return string
-     */
-    public function getSIban(): string
-    {
-        return $this->sIban;
-    }
-
-    /**
-     * @param string $sIban
-     */
-    public function setSIban(string $sIban): void
-    {
-        $this->sIban = $sIban;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRecurringPaymentType(): bool
-    {
-        return true;
-    }
+    protected $isRecurring = true;
 
     /**
      * @return void
@@ -78,7 +44,7 @@ class Sepa extends UnzerPayment
         $transaction = $uzrSepa->charge(
             $basket->getPrice()->getPrice(),
             $basket->getBasketCurrency()->name,
-            UnzerHelper::redirecturl(self::CONTROLLER_URL),
+            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
             $this->getMetadata()
