@@ -59,9 +59,8 @@ class PaymentTest extends TestCase
     public function testUnzerRedirectReThrownFlow(): void
     {
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createConfiguredMock(UnzerPayment::class, [
-            'execute' => $this->throwException(new Redirect("someDestination"))
-        ]);
+        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute']);
+        $paymentExtension->method('execute')->willThrowException(new Redirect("someDestination"));
 
         $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
             'getPaymentExtension'
@@ -98,9 +97,8 @@ class PaymentTest extends TestCase
         );
 
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createConfiguredMock(UnzerPayment::class, [
-            'execute' => $this->throwException($unzerException)
-        ]);
+        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute']);
+        $paymentExtension->method('execute')->willThrowException($unzerException);
 
         $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
             'getPaymentExtension'
@@ -146,9 +144,8 @@ class PaymentTest extends TestCase
     public function testRegularExceptionCaseConvertedToRedirectWithMessage(): void
     {
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createConfiguredMock(UnzerPayment::class, [
-            'execute' => $this->throwException(new \Exception("clientMessage"))
-        ]);
+        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute']);
+        $paymentExtension->method('execute')->willThrowException(new \Exception("clientMessage"));
 
         $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
             'getPaymentExtension'

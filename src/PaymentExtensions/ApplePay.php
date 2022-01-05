@@ -14,15 +14,11 @@
  */
 
 // TODO: ApplePay is not yet part of the SDK, so the payment will come later. As of November 16, 2021
+// TODO: Not implemented yet
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class ApplePay extends UnzerPayment
 {
     protected $paymentMethod = 'applepay';
-
-    public function execute()
-    {
-        //TODO
-    }
 }

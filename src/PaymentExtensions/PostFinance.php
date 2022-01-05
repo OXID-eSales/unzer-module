@@ -14,15 +14,11 @@
  */
 
 // TODO: PostFinance is not yet part of the SDK, so the payment will come later. As of November 16, 2021
+// TODO: Not implemented yet
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class PostFinance extends UnzerPayment
 {
     protected $paymentMethod = 'post-finance-efinance';
-
-    public function execute()
-    {
-        //TODO
-    }
 }

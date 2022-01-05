@@ -13,6 +13,7 @@ use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Metadata;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Unzer;
 
@@ -51,13 +52,6 @@ abstract class UnzerPayment
     /** @var array */
     protected $allowedCurrencies = [];
 
-    /**
-     * @return mixed|void
-     * @throws Exception
-     * @throws UnzerApiException
-     */
-    abstract public function execute();
-
     public function __construct(
         PaymentModel $payment,
         Session $session,
@@ -82,6 +76,38 @@ abstract class UnzerPayment
     public function isRecurringPaymentType(): bool
     {
         return $this->isRecurring;
+    }
+
+    public function getUnzerPaymentTypeObject(): BasePaymentType
+    {
+        throw new \Exception('Payment method not implemented yet');
+    }
+
+    /**
+     * @throws UnzerApiException
+     * @throws Exception
+     */
+    public function execute(): bool
+    {
+        $paymentType = $this->getUnzerPaymentTypeObject();
+
+        $customer = $this->unzerService->getSessionCustomerData();
+        $basket = $this->session->getBasket();
+
+        $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
+
+        $transaction = $paymentType->{$paymentProcedure}(
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
+        $this->setSessionVars($transaction);
+
+        return true;
     }
 
     /**

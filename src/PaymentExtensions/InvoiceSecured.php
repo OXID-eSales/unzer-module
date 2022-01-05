@@ -2,11 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class InvoiceSecured extends UnzerPayment
 {
@@ -14,20 +13,14 @@ class InvoiceSecured extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
-    public function execute()
+    public function execute(): bool
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
-        $inv_secured = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured());
-
         $user = $this->session->getUser();
         if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
             $user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
         }
+
+        $inv_secured = $this->getUnzerPaymentTypeObject();
 
         $customer = $this->unzerService->getSessionCustomerData();
         $basket = $this->session->getBasket();
@@ -47,5 +40,17 @@ class InvoiceSecured extends UnzerPayment
         $this->setSessionVars($transaction);
 
         $user->save();
+
+        return true;
+    }
+
+    /**
+     * @return \UnzerSDK\Resources\PaymentTypes\InvoiceSecured
+     */
+    public function getUnzerPaymentTypeObject(): BasePaymentType
+    {
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured()
+        );
     }
 }

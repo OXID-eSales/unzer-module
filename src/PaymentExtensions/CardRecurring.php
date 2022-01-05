@@ -13,6 +13,8 @@
  * @link      https://www.oxid-esales.com
  */
 
+// TODO: Not implemented yet
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 class CardRecurring extends UnzerPayment
@@ -20,9 +22,4 @@ class CardRecurring extends UnzerPayment
     protected $paymentMethod = 'card-recurring';
 
     protected $isRecurring = true;
-
-    public function execute()
-    {
-        //TODO
-    }
 }

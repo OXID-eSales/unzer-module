@@ -15,8 +15,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Sepa extends UnzerPayment
 {
@@ -27,29 +26,12 @@ class Sepa extends UnzerPayment
     protected $isRecurring = true;
 
     /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
+     * @return \UnzerSDK\Resources\PaymentTypes\SepaDirectDebit
      */
-    public function execute()
+    public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
-
-        /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebit $uzrSepa */
-        $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
-
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
-
-        $transaction = $uzrSepa->charge(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
-            $customer,
-            $this->unzerOrderId,
-            $this->getMetadata()
+        return $this->unzerSDK->fetchPaymentType(
+            $this->unzerService->getUnzerPaymentIdFromRequest()
         );
-
-        $this->setSessionVars($transaction);
     }
 }

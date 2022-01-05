@@ -15,37 +15,16 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Ideal extends UnzerPayment
 {
     protected $paymentMethod = 'ideal';
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
-    public function execute()
+    public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
-
-        /** @var \UnzerSDK\Resources\PaymentTypes\Ideal $uzrIdeal */
-        $uzrIdeal = $this->unzerSDK->fetchPaymentType($sId);
-
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
-
-        $transaction = $uzrIdeal->charge(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-            $customer,
-            null,
-            $this->getMetadata()
+        return $this->unzerSDK->fetchPaymentType(
+            $this->unzerService->getUnzerPaymentIdFromRequest()
         );
-
-        $this->setSessionVars($transaction);
     }
 }

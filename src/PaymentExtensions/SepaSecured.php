@@ -15,8 +15,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class SepaSecured extends UnzerPayment
 {
@@ -24,16 +23,9 @@ class SepaSecured extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
-    public function execute()
+    public function execute(): bool
     {
-        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
-        /** @var \UnzerSDK\Resources\PaymentTypes\SepaDirectDebitSecured $uzrSepa */
-        $uzrSepa = $this->unzerSDK->fetchPaymentType($sId);
+        $uzrSepa = $this->getUnzerPaymentTypeObject();
 
         $customer = $this->unzerService->getSessionCustomerData();
         $basket = $this->session->getBasket();
@@ -50,5 +42,17 @@ class SepaSecured extends UnzerPayment
         );
 
         $this->setSessionVars($transaction);
+
+        return true;
+    }
+
+    /**
+     * @return \UnzerSDK\Resources\PaymentTypes\SepaDirectDebitSecured
+     */
+    public function getUnzerPaymentTypeObject(): BasePaymentType
+    {
+        return $this->unzerSDK->fetchPaymentType(
+            $this->unzerService->getUnzerPaymentIdFromRequest()
+        );
     }
 }
