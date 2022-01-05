@@ -48,4 +48,17 @@ class TranslatorTest extends TestCase
             $sut->translateCode('testmessagekey', 'default message')
         );
     }
+
+    public function testFormatCurrency(): void
+    {
+        $languageMock = $this->createConfiguredMock(Language::class, [
+            'formatCurrency' => '123,45'
+        ]);
+
+        $sut = new Translator($languageMock);
+        $this->assertSame(
+            '123,45',
+            $sut->formatCurrency(123.45)
+        );
+    }
 }

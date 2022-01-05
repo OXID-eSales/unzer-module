@@ -40,4 +40,9 @@ class Translator
     {
         return (string)$this->language->translateString($message);
     }
+
+    public function formatCurrency(float $amount): string
+    {
+        return $this->language->formatCurrency($amount);
+    }
 }
