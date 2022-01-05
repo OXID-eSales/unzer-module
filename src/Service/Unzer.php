@@ -5,7 +5,6 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
@@ -20,8 +19,8 @@ class Unzer
     /** @var Session */
     protected $session;
 
-    /** @var Language */
-    protected $language;
+    /** @var Translator */
+    protected $translator;
 
     /** @var Context */
     protected $context;
@@ -34,13 +33,13 @@ class Unzer
 
     public function __construct(
         Session $session,
-        Language $language,
+        Translator $translator,
         Context $context,
         ModuleSettings $moduleSettings,
         Request $request
     ) {
         $this->session = $session;
-        $this->language = $language;
+        $this->translator = $translator;
         $this->context = $context;
         $this->moduleSettings = $moduleSettings;
         $this->request = $request;
@@ -141,28 +140,28 @@ class Unzer
     public function getBankDataFromCharge(Charge $charge): string
     {
         $bankData = sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->language->formatCurrency($charge->getAmount() ?: 0),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            $this->translator->formatCurrency($charge->getAmount() ?: 0),
             $this->context->getActiveCurrencySign()
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_HOLDER'),
             $charge->getHolder() ?: ''
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_IBAN'),
             $charge->getIban() ?: ''
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_BIC'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_BIC'),
             $charge->getBic() ?: ''
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
             $charge->getDescriptor() ?: ''
         );
 

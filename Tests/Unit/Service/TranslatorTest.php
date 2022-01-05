@@ -39,7 +39,8 @@ class TranslatorTest extends TestCase
     public function testTranslateCodeNotFound(): void
     {
         $languageMock = $this->createConfiguredMock(Language::class, [
-            'isTranslated' => false
+            'isTranslated' => false,
+            'translateString' => 'testmessagekey'
         ]);
 
         $sut = new Translator($languageMock);

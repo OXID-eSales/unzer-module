@@ -9,6 +9,7 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\Context;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use PHPUnit\Framework\TestCase;
 
@@ -41,7 +42,7 @@ class UnzerTest extends TestCase
     {
         return new Unzer(
             $this->createPartialMock(Session::class, []),
-            $this->createPartialMock(Language::class, []),
+            $this->createPartialMock(Translator::class, []),
             $this->createPartialMock(Context::class, []),
             $settings[ModuleSettings::class] ?:
                 $this->createPartialMock(ModuleSettings::class, []),
