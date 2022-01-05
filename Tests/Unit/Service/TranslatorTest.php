@@ -9,6 +9,34 @@ use PHPUnit\Framework\TestCase;
 class TranslatorTest extends TestCase
 {
     /**
+     * @dataProvider translateDataProvider
+     */
+    public function testTranslate($key): void
+    {
+        $languageMock = $this->createPartialMock(Language::class, ['translateString']);
+        $languageMock->expects($this->once())
+            ->method('translateString')
+            ->with($key)
+            ->willReturn('translation');
+
+        $sut = new Translator($languageMock);
+        $this->assertSame(
+            'translation',
+            $sut->translate($key)
+        );
+    }
+
+    public function translateDataProvider(): array
+    {
+        return [
+            ['oscunzer_testMESSAGEKEY'],
+            ['oscunzer_apiMESSAGEKEY'],
+            ['oscunzer_corMESSAGEKEY'],
+            ['oscunzer_sdmMESSAGEKEY'],
+        ];
+    }
+
+    /**
      * @dataProvider translateCodeDataProvider
      */
     public function testTranslateCode($expectedKey, $key): void
