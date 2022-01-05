@@ -2,10 +2,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 
 class Transaction extends BaseModel
 {

@@ -3,14 +3,13 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
-use OxidSolutionCatalysts\Unzer\Service\Translator;
-use UnzerSDK\Exceptions\UnzerApiException;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class PaymentGateway extends PaymentGateway_parent
 {
+    use ServiceContainer;
+
     /**
      * @inerhitDoc
      */
@@ -19,9 +18,7 @@ class PaymentGateway extends PaymentGateway_parent
         $oPayment = oxNew(PaymentModel::class);
         if ($oPayment->load($oOrder->getFieldData('oxpaymenttype'))) {
             if ($oPayment->isUnzerPayment()) {
-                $container = ContainerFactory::getInstance()->getContainer();
-                /** @var \OxidSolutionCatalysts\Unzer\Service\Payment $paymentService */
-                $paymentService = $container->get(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+                $paymentService = $this->getServiceFromContainer(PaymentService::class);
                 $paymentService->executeUnzerPayment($oPayment);
             }
         }

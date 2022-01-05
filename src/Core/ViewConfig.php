@@ -24,17 +24,12 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class ViewConfig extends ViewConfig_parent
 {
-    private function getUnzerModuleSettings(): ModuleSettings
-    {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(ModuleSettings::class);
-    }
+    use ServiceContainer;
 
     /**
      * Returns System Mode live|sandbox.
@@ -43,7 +38,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerSystemMode(): string
     {
-        return $this->getUnzerModuleSettings()->getSystemMode();
+        return $this->getServiceFromContainer(ModuleSettings::class)->getSystemMode();
     }
 
     /**
@@ -53,7 +48,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPubKey(): string
     {
-        return $this->getUnzerModuleSettings()->getShopPublicKey();
+        return $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
     }
 
     /**
@@ -63,7 +58,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPrivKey(): string
     {
-        return $this->getUnzerModuleSettings()->getShopPrivateKey();
+        return $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
     }
 
     /**

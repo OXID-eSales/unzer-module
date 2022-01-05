@@ -16,11 +16,14 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
+use OxidSolutionCatalysts\Unzer\Service\Unzer;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class OrderController extends OrderController_parent
 {
+    use ServiceContainer;
+
     /**
      * Config option "blConfirmSEPA"
      *
@@ -92,9 +95,7 @@ class OrderController extends OrderController_parent
                 $nextStep = $this->_getNextStep($iSuccess);
 
                 // proceeding to next view
-                $container = ContainerFactory::getInstance()->getContainer();
-                /** @var \OxidSolutionCatalysts\Unzer\Service\Unzer $unzerService */
-                $unzerService = $container->get(\OxidSolutionCatalysts\Unzer\Service\Unzer::class);
+                $unzerService = $this->getServiceFromContainer(Unzer::class);
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep, false));
             } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
