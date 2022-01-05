@@ -170,7 +170,7 @@ abstract class UnzerPayment
         $metadata->setShopVersion(ShopVersion::getVersion());
         $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $this->paymentMethod);
-        $metadata->addMetadata('paymentprocedure', $this->unzerService->getPaymentProcedure($this->payment->getId()));
+        $metadata->addMetadata('paymentprocedure', $this->unzerService->getPaymentProcedure($this->paymentMethod));
 
         return $metadata;
     }

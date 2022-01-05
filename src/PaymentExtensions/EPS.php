@@ -15,13 +15,18 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class EPS extends UnzerPayment
 {
-    /**
-     * @var string
-     */
     protected $paymentMethod = 'eps';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         $sId = $this->unzerService->getUnzerPaymentIdFromRequest();

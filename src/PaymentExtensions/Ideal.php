@@ -15,10 +15,18 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class Ideal extends UnzerPayment
 {
     protected $paymentMethod = 'ideal';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         $sId = $this->unzerService->getUnzerPaymentIdFromRequest();

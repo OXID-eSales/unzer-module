@@ -15,12 +15,20 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class PayPal extends UnzerPayment
 {
     protected $paymentMethod = 'paypal';
 
     protected $isRecurring = true;
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
         /** @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
@@ -29,25 +37,16 @@ class PayPal extends UnzerPayment
         $customer = $this->unzerService->getSessionCustomerData();
         $basket = $this->session->getBasket();
 
-        if ($this->isDirectCharge()) {
-            $transaction = $uzrPP->charge(
-                $basket->getPrice()->getPrice(),
-                $basket->getBasketCurrency()->name,
-                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        } else {
-            $transaction = $uzrPP->authorize(
-                $basket->getPrice()->getPrice(),
-                $basket->getBasketCurrency()->name,
-                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        }
+        $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
+
+        $transaction = $uzrPP->{$paymentProcedure}(
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
 
         $this->setSessionVars($transaction);
     }
