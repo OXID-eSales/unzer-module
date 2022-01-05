@@ -54,18 +54,12 @@ class DispatcherController extends FrontendController
 
             if ($transaction->writeTransactionToDB($data[0]['OXORDERID'], $data[0]['OXUSERID'], $unzerPayment)) {
                 $result = sprintf(
-                    $translator->translate(
-                        'oscunzer_TRANSACTION_CHANGE',
-                        'State %s was written to database for payment %s'
-                    ),
+                    $translator->translate('oscunzer_TRANSACTION_CHANGE'),
                     $unzerPayment->getStateName(),
                     $paymentId
                 );
             } else {
-                $result = $translator->translate(
-                    'oscunzer_TRANSACTION_NOTHINGTODO',
-                    'No update needed. There was no new state for payment: '
-                ) . $paymentId;
+                $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
             }
         }
         Registry::getUtils()->showMessageAndExit($result);

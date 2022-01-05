@@ -76,8 +76,8 @@ class PaymentTest extends TestCase
             ->with($paymentModel)
             ->willReturn($paymentExtension);
 
-        $translatorMock = $this->createPartialMock(Translator::class, ['translate']);
-        $translatorMock->method('translate')
+        $translatorMock = $this->createPartialMock(Translator::class, ['translateCode']);
+        $translatorMock->method('translateCode')
             ->with("specialCode", "clientMessage")
             ->willReturn("specialTranslation");
 
