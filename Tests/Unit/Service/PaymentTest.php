@@ -4,6 +4,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -55,6 +56,39 @@ class PaymentTest extends TestCase
         ];
     }
 
+    public function testUnzerRedirectReThrownFlow(): void
+    {
+        $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
+        $paymentExtension = $this->createConfiguredMock(UnzerPayment::class, [
+            'execute' => $this->throwException(new Redirect("someDestination"))
+        ]);
+
+        $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
+            'getPaymentExtension'
+        ]);
+        $extensionLoader->expects($this->once())
+            ->method('getPaymentExtension')
+            ->with($paymentModel)
+            ->willReturn($paymentExtension);
+
+        $sut = new PaymentService(
+            $this->createPartialMock(Session::class, []),
+            $extensionLoader,
+            $this->createPartialMock(Translator::class, []),
+            $this->createPartialMock(UnzerService::class, [])
+        );
+
+        $this->expectException(Redirect::class);
+
+        try {
+            $sut->executeUnzerPayment($paymentModel);
+        } catch (Redirect $exception) {
+            $this->assertSame("someDestination", $exception->getDestination());
+
+            throw $exception;
+        }
+    }
+
     public function testUnzerApiExceptionCaseConvertedToRedirectWithMessage(): void
     {
         $unzerException = new \UnzerSDK\Exceptions\UnzerApiException(
@@ -76,8 +110,8 @@ class PaymentTest extends TestCase
             ->with($paymentModel)
             ->willReturn($paymentExtension);
 
-        $translatorMock = $this->createPartialMock(Translator::class, ['translate']);
-        $translatorMock->method('translate')
+        $translatorMock = $this->createPartialMock(Translator::class, ['translateCode']);
+        $translatorMock->method('translateCode')
             ->with("specialCode", "clientMessage")
             ->willReturn("specialTranslation");
 

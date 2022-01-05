@@ -3,15 +3,17 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class Order extends Order_parent
 {
+    use ServiceContainer;
+
     /**
      * @inerhitDoc
      * @param \OxidEsales\Eshop\Application\Model\User $oUser
@@ -72,7 +74,6 @@ class Order extends Order_parent
                     $this->oxorder__oxtransstatus->value == "OK"
                     && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
                 ) {
-                    /** @var TransactionService $transactionService */
                     $transactionService = $this->getServiceFromContainer(TransactionService::class);
                     $transactionService->writeTransactionToDB(
                         $this->getId(),
@@ -95,7 +96,6 @@ class Order extends Order_parent
                 $this->oxorder__oxtransstatus->value == "OK"
                 && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
             ) {
-                /** @var TransactionService $transactionService */
                 $transactionService = $this->getServiceFromContainer(TransactionService::class);
                 $transactionService->writeTransactionToDB(
                     $this->getId(),
@@ -167,7 +167,6 @@ class Order extends Order_parent
     protected function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
     {
         if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
-            /** @var UnzerSDKLoader $unzerSDKLoader */
             $unzerSDKLoader = $this->getServiceFromContainer(UnzerSDKLoader::class);
             $unzer = $unzerSDKLoader->getUnzerSDK();
 
@@ -175,15 +174,5 @@ class Order extends Order_parent
         }
 
         return null;
-    }
-
-    /**
-     * @psalm-param TransactionService::class|UnzerSDKLoader::class $serviceName
-     */
-    protected function getServiceFromContainer(string $serviceName)
-    {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->get($serviceName);
     }
 }

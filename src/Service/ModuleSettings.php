@@ -9,8 +9,8 @@ class ModuleSettings
 {
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
     public const SYSTEM_MODE_PRODUCTION = 'production';
-    public const PAYMENT_DIRECT = 'direct Capture';
-    public const PAYMENT_AUTHORIZE = 'Authorize & later Capture';
+    public const PAYMENT_CHARGE = 'charge';
+    public const PAYMENT_AUTHORIZE = 'authorize';
 
     /** @var ModuleSettingBridgeInterface */
     private $moduleSettingBridge;
@@ -49,12 +49,12 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
-    public function getPaymentProcedureSetting(string $id): string
+    public function getPaymentProcedureSetting(string $paymentMethod): string
     {
-        if ($this->getSettingValue('UnzerOption_' . $id)) {
+        if ($this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)) {
             return self::PAYMENT_AUTHORIZE;
         }
-        return self::PAYMENT_DIRECT;
+        return self::PAYMENT_CHARGE;
     }
 
     /**

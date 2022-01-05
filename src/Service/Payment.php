@@ -5,6 +5,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -36,6 +37,7 @@ class Payment
     }
 
     /**
+     * @throws Redirect
      * @throws RedirectWithMessage
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
@@ -44,6 +46,8 @@ class Payment
             $paymentExtension = $this->paymentExtensionLoader->getPaymentExtension($paymentModel);
             $paymentExtension->execute();
             $paymentStatus = $paymentExtension->checkPaymentstatus();
+        } catch (Redirect $e) {
+            throw $e;
         } catch (UnzerApiException $e) {
             $this->removeTemporaryOrder();
 
@@ -51,7 +55,7 @@ class Payment
                 $this->unzerService->prepareRedirectUrl(
                     isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
                 ),
-                $this->translator->translate((string)$e->getCode(), $e->getClientMessage())
+                $this->translator->translateCode((string)$e->getCode(), $e->getClientMessage())
             );
         } catch (\Exception $e) {
             $this->removeTemporaryOrder();

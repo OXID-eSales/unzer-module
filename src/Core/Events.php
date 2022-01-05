@@ -24,18 +24,9 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use Exception;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
-use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
-use OxidEsales\Facts\Facts;
-use Psr\Container\ContainerInterface;
 
 /**
  * Class defines what module does on Shop events.

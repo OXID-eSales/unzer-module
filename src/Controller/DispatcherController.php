@@ -19,13 +19,15 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class DispatcherController extends FrontendController
 {
+    use ServiceContainer;
+
     /**
      * @param string $paymentid
      * @return void
@@ -35,13 +37,14 @@ class DispatcherController extends FrontendController
         $result = '';
 
         if ($paymentId = Registry::getRequest()->getRequestParameter('paymentid')) {
-            $container = ContainerFactory::getInstance()->getContainer();
-            /** @var Transaction $transaction */
-            $transaction = $container->get(Transaction::class);
+            $transaction = $this->getServiceFromContainer(Transaction::class);
             $order = oxNew(Order::class);
             $data = $transaction->getTransactionDataByPaymentId($paymentId);
-            /** @var \UnzerSDK\Resources\Payment $unzerPayment */
-            $unzerPayment = $container->get(UnzerSDKLoader::class)->getUnzerSDK()->fetchPayment($paymentId);
+
+            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                ->getUnzerSDK()
+                ->fetchPayment($paymentId);
+
             if ($order->load($data[0]['OXORDERID']) && $unzerPayment->getState() == 1) {
                 $utilsDate = Registry::getUtilsDate();
                 $date = date('Y-m-d H:i:s', $utilsDate->getTime());
@@ -49,23 +52,16 @@ class DispatcherController extends FrontendController
                 $order->save();
             }
 
-            /** @var Translator $translator */
-            $translator = $container->get(Translator::class);
+            $translator = $this->getServiceFromContainer(Translator::class);
 
             if ($transaction->writeTransactionToDB($data[0]['OXORDERID'], $data[0]['OXUSERID'], $unzerPayment)) {
                 $result = sprintf(
-                    $translator->translate(
-                        'oscunzer_TRANSACTION_CHANGE',
-                        'State %s was written to database for payment %s'
-                    ),
+                    $translator->translate('oscunzer_TRANSACTION_CHANGE'),
                     $unzerPayment->getStateName(),
                     $paymentId
                 );
             } else {
-                $result = $translator->translate(
-                    'oscunzer_TRANSACTION_NOTHINGTODO',
-                    'No update needed. There was no new state for payment: '
-                ) . $paymentId;
+                $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
             }
         }
         Registry::getUtils()->showMessageAndExit($result);

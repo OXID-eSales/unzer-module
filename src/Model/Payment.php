@@ -2,17 +2,19 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\PaymentValidator;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class Payment extends Payment_parent
 {
+    use ServiceContainer;
+
     /**
      * Checks if the payment method is an unzer payment method
      */
     public function isUnzerPayment(): bool
     {
-        return $this->getUnzerPaymentValidator()->isUnzerPayment($this);
+        return $this->getServiceFromContainer(PaymentValidator::class)->isUnzerPayment($this);
     }
 
     /**
@@ -26,13 +28,6 @@ class Payment extends Payment_parent
             return false;
         }
 
-        return $this->getUnzerPaymentValidator()->isPaymentCurrencyAllowed($this);
-    }
-
-    private function getUnzerPaymentValidator(): PaymentValidator
-    {
-        return ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(PaymentValidator::class);
+        return $this->getServiceFromContainer(PaymentValidator::class)->isPaymentCurrencyAllowed($this);
     }
 }

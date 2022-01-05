@@ -31,32 +31,24 @@ class Card extends UnzerPayment
      */
     public function execute()
     {
-        $sId = $this->getUzrId();
+        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
         /** @var \UnzerSDK\Resources\PaymentTypes\Card $uzrCard */
         $uzrCard = $this->unzerSDK->fetchPaymentType($sId);
 
         $customer = $this->unzerService->getSessionCustomerData();
         $basket = $this->session->getBasket();
 
-        if ($this->isDirectCharge()) {
-            $transaction = $uzrCard->charge(
-                $basket->getPrice()->getPrice(),
-                $basket->getBasketCurrency()->name,
-                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        } else {
-            $transaction = $uzrCard->authorize(
-                $basket->getPrice()->getPrice(),
-                $basket->getBasketCurrency()->name,
-                $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-                $customer,
-                $this->unzerOrderId,
-                $this->getMetadata()
-            );
-        }
+        $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
+
+        $transaction = $uzrCard->{$paymentProcedure}(
+            $basket->getPrice()->getPrice(),
+            $basket->getBasketCurrency()->name,
+            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
+            $customer,
+            $this->unzerOrderId,
+            $this->getMetadata()
+        );
+
         $this->setSessionVars($transaction);
     }
 }

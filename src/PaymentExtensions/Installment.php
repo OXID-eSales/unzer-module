@@ -15,13 +15,21 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
+use UnzerSDK\Exceptions\UnzerApiException;
+
 class Installment extends UnzerPayment
 {
     protected $paymentMethod = 'installment-secured';
 
+    /**
+     * @return void
+     * @throws UnzerApiException
+     * @throws Exception
+     */
     public function execute()
     {
-        $sId = $this->getUzrId();
+        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
         /** @var \UnzerSDK\Resources\PaymentTypes\InstallmentSecured $uzrInstall */
         $uzrInstall = $this->unzerSDK->fetchPaymentType($sId);
 

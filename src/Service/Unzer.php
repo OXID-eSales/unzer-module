@@ -5,8 +5,8 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
@@ -19,8 +19,8 @@ class Unzer
     /** @var Session */
     protected $session;
 
-    /** @var Language */
-    protected $language;
+    /** @var Translator */
+    protected $translator;
 
     /** @var Context */
     protected $context;
@@ -28,16 +28,21 @@ class Unzer
     /** @var ModuleSettings */
     protected $moduleSettings;
 
+    /** @var Request */
+    protected $request;
+
     public function __construct(
         Session $session,
-        Language $language,
+        Translator $translator,
         Context $context,
-        ModuleSettings $moduleSettings
+        ModuleSettings $moduleSettings,
+        Request $request
     ) {
         $this->session = $session;
-        $this->language = $language;
+        $this->translator = $translator;
         $this->context = $context;
         $this->moduleSettings = $moduleSettings;
+        $this->request = $request;
     }
 
     public function getSessionCustomerData(?Order $oOrder = null): Customer
@@ -135,44 +140,41 @@ class Unzer
     public function getBankDataFromCharge(Charge $charge): string
     {
         $bankData = sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->language->formatCurrency($charge->getAmount() ?: 0),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            $this->translator->formatCurrency($charge->getAmount() ?: 0),
             $this->context->getActiveCurrencySign()
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_HOLDER'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_HOLDER'),
             $charge->getHolder() ?: ''
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_IBAN'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_IBAN'),
             $charge->getIban() ?: ''
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_BIC'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_BIC'),
             $charge->getBic() ?: ''
         );
 
         $bankData .= sprintf(
-            $this->language->translateString('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
+            $this->translator->translate('OSCUNZER_BANK_DETAILS_DESCRIPTOR'),
             $charge->getDescriptor() ?: ''
         );
 
         return $bankData;
     }
 
-    /**
-     * @return string
-     */
-    public function getPaymentProcedure(string $paymentId): string
+    public function getPaymentProcedure(string $paymentMethod): string
     {
-        if (in_array($paymentId, ['oscunzer_paypal', 'oscunzer_card'])) {
-            return $this->moduleSettings->getPaymentProcedureSetting($paymentId);
+        if (in_array($paymentMethod, ['paypal', 'card'])) {
+            return $this->moduleSettings->getPaymentProcedureSetting($paymentMethod);
         }
 
-        return $this->moduleSettings::PAYMENT_DIRECT;
+        return $this->moduleSettings::PAYMENT_CHARGE;
     }
 
     /**
@@ -189,5 +191,17 @@ class Unzer
         }
 
         return $this->session->processUrl($dstUrl);
+    }
+
+    public function getUnzerPaymentIdFromRequest(): string
+    {
+        $jsonPaymentData = $this->request->getRequestParameter('paymentData');
+        $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
+
+        if (array_key_exists('id', $paymentData)) {
+            return $paymentData['id'];
+        }
+
+        throw new \Exception('oscunzer_WRONGPAYMENTID');
     }
 }

@@ -92,21 +92,6 @@ abstract class UnzerPayment
         return (strpos($this->payment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
     }
 
-    public function getUzrId(): string
-    {
-        $jsonPaymentData = Registry::getRequest()->getRequestParameter('paymentData');
-        $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
-
-        if (array_key_exists('id', $paymentData)) {
-            return $paymentData['id'];
-        }
-
-        throw new Exception($this->translator->translate(
-            'WRONGPAYMENTID',
-            'Ungültige ID'
-        ));
-    }
-
     /**
      * @return bool
      */
@@ -131,7 +116,7 @@ abstract class UnzerPayment
                 }
                 $result = true;
             } elseif ($transaction->isError()) {
-                throw new Exception($this->translator->translate(
+                throw new Exception($this->translator->translateCode(
                     $transaction->getMessage()->getCode(),
                     "Error in transaction for customer " . $transaction->getMessage()->getCustomer()
                 ));
@@ -185,7 +170,7 @@ abstract class UnzerPayment
         $metadata->setShopVersion(ShopVersion::getVersion());
         $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $this->paymentMethod);
-        $metadata->addMetadata('paymentprocedure', $this->unzerService->getPaymentProcedure($this->payment->getId()));
+        $metadata->addMetadata('paymentprocedure', $this->unzerService->getPaymentProcedure($this->paymentMethod));
 
         return $metadata;
     }
