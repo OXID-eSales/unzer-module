@@ -37,6 +37,7 @@ class Payment
     }
 
     /**
+     * @throws Redirect
      * @throws RedirectWithMessage
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool

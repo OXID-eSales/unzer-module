@@ -71,14 +71,12 @@ class PaymentTest extends TestCase
             ->with($paymentModel)
             ->willReturn($paymentExtension);
 
-        $sut = $this->getMockBuilder(PaymentService::class)
-            ->setConstructorArgs([
-                $this->createPartialMock(Session::class, []),
-                $extensionLoader,
-                $this->createPartialMock(Translator::class, []),
-                $this->createPartialMock(UnzerService::class, [])
-            ])
-            ->getMock();
+        $sut = new PaymentService(
+            $this->createPartialMock(Session::class, []),
+            $extensionLoader,
+            $this->createPartialMock(Translator::class, []),
+            $this->createPartialMock(UnzerService::class, [])
+        );
 
         $this->expectException(Redirect::class);
 
