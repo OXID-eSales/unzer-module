@@ -39,5 +39,4 @@ class Translator
 
         return $translation;
     }
-
 }
