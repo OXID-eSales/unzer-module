@@ -139,4 +139,16 @@ class Payment
     {
         return $this->unzerSDKLoader->getUnzerSDK();
     }
+
+    /**
+     * @throws UnzerApiException
+     */
+    public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
+    {
+        if ($paymentId = $this->session->getVariable('PaymentId')) {
+            return $this->getUnzerSDK()->fetchPayment($paymentId);
+        }
+
+        return null;
+    }
 }

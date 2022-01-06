@@ -3,8 +3,8 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
-use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
@@ -28,7 +28,7 @@ class Order extends Order_parent
                 // order not saved TODO
             }
 
-            $sessionUnzerPayment = $this->getSessionUnzerPayment();
+            $sessionUnzerPayment = $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment();
             if ($sessionUnzerPayment && $this->checkUnzerPaymentStatus($sessionUnzerPayment)) {
                 if (!$this->oxorder__oxordernr->value) {
                     $this->_setNumber();
@@ -100,7 +100,7 @@ class Order extends Order_parent
                 $transactionService->writeTransactionToDB(
                     $this->getId(),
                     $oUser->getId() ?: '',
-                    $this->getSessionUnzerPayment()
+                    $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
                 );
             }
         }
@@ -159,20 +159,5 @@ class Order extends Order_parent
             }
         }
         return $result;
-    }
-
-    /**
-     * @throws UnzerApiException
-     */
-    protected function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
-    {
-        if ($paymentId = Registry::getSession()->getVariable('PaymentId')) {
-            $unzerSDKLoader = $this->getServiceFromContainer(UnzerSDKLoader::class);
-            $unzer = $unzerSDKLoader->getUnzerSDK();
-
-            return $unzer->fetchPayment($paymentId);
-        }
-
-        return null;
     }
 }
