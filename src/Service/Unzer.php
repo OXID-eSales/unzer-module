@@ -8,10 +8,13 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Facts\Facts;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
@@ -223,5 +226,17 @@ class Unzer
                 $this->getBankDataFromCharge($charge)
             );
         }
+    }
+
+    public function getShopMetadata(string $paymentMethod): Metadata
+    {
+        $metadata = new Metadata();
+        $metadata->setShopType("Oxid eShop " . (new Facts())->getEdition());
+        $metadata->setShopVersion(ShopVersion::getVersion());
+        $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
+        $metadata->addMetadata('paymentmethod', $paymentMethod);
+        $metadata->addMetadata('paymentprocedure', $this->getPaymentProcedure($paymentMethod));
+
+        return $metadata;
     }
 }

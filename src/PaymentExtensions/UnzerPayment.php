@@ -3,12 +3,8 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\ShopVersion;
-use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Unzer;
 
@@ -81,27 +77,11 @@ abstract class UnzerPayment
             $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,
-            $this->getMetadata()
+            $this->unzerService->getShopMetadata($this->paymentMethod)
         );
 
         $this->unzerService->setSessionVars($transaction);
 
         return true;
-    }
-
-    /**
-     * @return Metadata
-     * @throws Exception
-     */
-    public function getMetadata(): Metadata
-    {
-        $metadata = new Metadata();
-        $metadata->setShopType("Oxid eShop " . (new Facts())->getEdition());
-        $metadata->setShopVersion(ShopVersion::getVersion());
-        $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
-        $metadata->addMetadata('paymentmethod', $this->paymentMethod);
-        $metadata->addMetadata('paymentprocedure', $this->unzerService->getPaymentProcedure($this->paymentMethod));
-
-        return $metadata;
     }
 }

@@ -31,7 +31,7 @@ class PIS extends UnzerPayment
             $this->unzerService->prepareRedirectUrl(self::PENDING_URL),
             null,
             null,
-            $this->getMetadata()
+            $this->unzerService->getShopMetadata($this->paymentMethod)
         );
 
         $this->unzerService->setSessionVars($transaction);

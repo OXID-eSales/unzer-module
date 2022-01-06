@@ -31,7 +31,7 @@ class InvoiceSecured extends UnzerPayment
             $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,
-            $this->getMetadata(),
+            $this->unzerService->getShopMetadata($this->paymentMethod),
             $uzrBasket
         );
 
