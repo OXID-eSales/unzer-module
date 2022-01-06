@@ -21,18 +21,15 @@ class PaymentExtensionLoaderTest extends TestCase
         $paymentStub = $this->createPartialMock(PaymentModel::class, ['getId']);
         $paymentStub->method('getId')->willReturn($paymentId);
 
-        $sessionStub = $this->createPartialMock(Session::class, []);
         $sdkLoaderMock = $this->createPartialMock(UnzerSDKLoader::class, ['getUnzerSDK']);
         $sdkLoaderMock->method('getUnzerSDK')->willReturn(
             $this->createPartialMock(\UnzerSDK\Unzer::class, [])
         );
 
         $sut = new PaymentExtensionLoader(
-            $sessionStub,
             $sdkLoaderMock,
             $this->createPartialMock(Translator::class, []),
-            $this->createPartialMock(Unzer::class, []),
-            $this->createPartialMock(DebugHandler::class, [])
+            $this->createPartialMock(Unzer::class, [])
         );
 
         $loadedPaymentType = $sut->getPaymentExtension($paymentStub);

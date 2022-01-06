@@ -47,18 +47,15 @@ class PaymentExtensionLoader
         'oscunzer_wechatpay' => WeChatPay::class,
     ];
 
-    private $session;
     private $unzerSdkLoader;
     private $translator;
     private $unzerService;
 
     public function __construct(
-        Session $session,
         UnzerSDKLoader $unzerSDKLoader,
         Translator $translator,
         Unzer $unzerService
     ) {
-        $this->session = $session;
         $this->unzerSdkLoader = $unzerSDKLoader;
         $this->translator = $translator;
         $this->unzerService = $unzerService;
@@ -68,7 +65,6 @@ class PaymentExtensionLoader
     {
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
-            $this->session,
             $this->unzerSdkLoader->getUnzerSDK(),
             $this->translator,
             $this->unzerService

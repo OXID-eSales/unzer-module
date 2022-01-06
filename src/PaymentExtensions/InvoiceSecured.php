@@ -13,9 +13,8 @@ class InvoiceSecured extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
-    public function execute(): bool
+    public function execute($userModel, $basketModel): bool
     {
-        $userModel = $this->session->getUser();
         if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
             $userModel->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
         }
@@ -23,13 +22,12 @@ class InvoiceSecured extends UnzerPayment
         $inv_secured = $this->getUnzerPaymentTypeObject();
 
         $customer = $this->unzerService->getUnzerCustomer($userModel);
-        $basket = $this->session->getBasket();
 
-        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basket);
+        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
 
         $transaction = $inv_secured->charge(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
+            $basketModel->getPrice()->getPrice(),
+            $basketModel->getBasketCurrency()->name,
             $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
             $customer,
             $this->unzerOrderId,

@@ -51,7 +51,10 @@ class Payment
     {
         try {
             $paymentExtension = $this->paymentExtensionLoader->getPaymentExtension($paymentModel);
-            $paymentExtension->execute();
+            $paymentExtension->execute(
+                $this->session->getUser(),
+                $this->session->getBasket()
+            );
 
             if (!$paymentId = $this->session->getVariable('PaymentId')) {
                 throw new Exception("Something went wrong. Please try again later.");

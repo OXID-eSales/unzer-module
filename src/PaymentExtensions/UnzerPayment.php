@@ -3,18 +3,14 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
-use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
-use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Unzer;
 
 abstract class UnzerPayment
@@ -24,9 +20,6 @@ abstract class UnzerPayment
     public const FAILURE_URL = "";
     public const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
     public const SUCCESS_URL = "thankyou";
-
-    /** @var Session */
-    protected $session;
 
     /** @var Unzer */
     protected $unzerSDK;
@@ -50,12 +43,10 @@ abstract class UnzerPayment
     protected $allowedCurrencies = [];
 
     public function __construct(
-        Session $session,
         Unzer $unzerSDK,
         Translator $translator,
         UnzerService $unzerService
     ) {
-        $this->session = $session;
         $this->unzerSDK = $unzerSDK;
         $this->translator = $translator;
         $this->unzerService = $unzerService;
@@ -82,18 +73,17 @@ abstract class UnzerPayment
      * @throws UnzerApiException
      * @throws Exception
      */
-    public function execute(): bool
+    public function execute($userModel, $basketModel): bool
     {
         $paymentType = $this->getUnzerPaymentTypeObject();
 
-        $customer = $this->unzerService->getUnzerCustomer($this->session->getUser());
-        $basket = $this->session->getBasket();
+        $customer = $this->unzerService->getUnzerCustomer($userModel);
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
 
         $transaction = $paymentType->{$paymentProcedure}(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
+            $basketModel->getPrice()->getPrice(),
+            $basketModel->getBasketCurrency()->name,
             $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
             $customer,
             $this->unzerOrderId,

@@ -34,7 +34,7 @@ class PaymentTest extends TestCase
             ->with($paymentModel)
             ->willReturn($paymentExtension);
 
-        $sessionStub = $this->createPartialMock(Session::class, ['getVariable']);
+        $sessionStub = $this->createPartialMock(Session::class, ['getVariable', 'getBasket', 'getUser']);
         $sessionStub->method('getVariable')->with('PaymentId')->willReturn('examplePaymentId');
 
         $sut = $this->getMockBuilder(PaymentService::class)
