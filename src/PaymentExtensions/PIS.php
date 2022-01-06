@@ -35,7 +35,7 @@ class PIS extends UnzerPayment
             $this->getMetadata()
         );
 
-        $this->setSessionVars($transaction);
+        $this->unzerService->setSessionVars($transaction);
 
         return true;
     }

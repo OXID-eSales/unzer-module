@@ -41,7 +41,7 @@ class SepaSecured extends UnzerPayment
             $uzrBasket
         );
 
-        $this->setSessionVars($transaction);
+        $this->unzerService->setSessionVars($transaction);
 
         return true;
     }

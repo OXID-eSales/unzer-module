@@ -37,7 +37,7 @@ class InvoiceSecured extends UnzerPayment
             $uzrBasket
         );
 
-        $this->setSessionVars($transaction);
+        $this->unzerService->setSessionVars($transaction);
 
         $userModel->save();
 
