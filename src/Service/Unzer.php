@@ -46,10 +46,8 @@ class Unzer
         $this->request = $request;
     }
 
-    public function getSessionCustomerData(?Order $oOrder = null): Customer
+    public function getUnzerCustomer($oUser, ?Order $oOrder = null): Customer
     {
-        $oUser = $this->session->getUser();
-
         $customer = CustomerFactory::createCustomer(
             $oUser->getFieldData('oxfname'),
             $oUser->getFieldData('oxlname')

@@ -27,7 +27,7 @@ class SepaSecured extends UnzerPayment
     {
         $uzrSepa = $this->getUnzerPaymentTypeObject();
 
-        $customer = $this->unzerService->getSessionCustomerData();
+        $customer = $this->unzerService->getUnzerCustomer($this->session->getUser());
         $basket = $this->session->getBasket();
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basket);
 

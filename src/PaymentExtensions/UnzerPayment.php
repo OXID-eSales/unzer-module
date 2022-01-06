@@ -86,7 +86,7 @@ abstract class UnzerPayment
     {
         $paymentType = $this->getUnzerPaymentTypeObject();
 
-        $customer = $this->unzerService->getSessionCustomerData();
+        $customer = $this->unzerService->getUnzerCustomer($this->session->getUser());
         $basket = $this->session->getBasket();
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);

@@ -15,14 +15,14 @@ class InvoiceSecured extends UnzerPayment
 
     public function execute(): bool
     {
-        $user = $this->session->getUser();
+        $userModel = $this->session->getUser();
         if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
-            $user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
+            $userModel->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
         }
 
         $inv_secured = $this->getUnzerPaymentTypeObject();
 
-        $customer = $this->unzerService->getSessionCustomerData();
+        $customer = $this->unzerService->getUnzerCustomer($userModel);
         $basket = $this->session->getBasket();
 
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basket);
@@ -39,7 +39,7 @@ class InvoiceSecured extends UnzerPayment
 
         $this->setSessionVars($transaction);
 
-        $user->save();
+        $userModel->save();
 
         return true;
     }
