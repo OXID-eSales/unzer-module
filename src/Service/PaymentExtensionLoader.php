@@ -48,16 +48,13 @@ class PaymentExtensionLoader
     ];
 
     private $unzerSdkLoader;
-    private $translator;
     private $unzerService;
 
     public function __construct(
         UnzerSDKLoader $unzerSDKLoader,
-        Translator $translator,
         Unzer $unzerService
     ) {
         $this->unzerSdkLoader = $unzerSDKLoader;
-        $this->translator = $translator;
         $this->unzerService = $unzerService;
     }
 
@@ -66,7 +63,6 @@ class PaymentExtensionLoader
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $this->unzerSdkLoader->getUnzerSDK(),
-            $this->translator,
             $this->unzerService
         );
     }

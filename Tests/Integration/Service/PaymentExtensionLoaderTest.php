@@ -28,7 +28,6 @@ class PaymentExtensionLoaderTest extends TestCase
 
         $sut = new PaymentExtensionLoader(
             $sdkLoaderMock,
-            $this->createPartialMock(Translator::class, []),
             $this->createPartialMock(Unzer::class, [])
         );
 

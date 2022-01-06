@@ -6,7 +6,6 @@ use Exception;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
-use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Metadata;
@@ -23,9 +22,6 @@ abstract class UnzerPayment
 
     /** @var Unzer */
     protected $unzerSDK;
-
-    /** @var Translator */
-    protected $translator;
 
     /** @var UnzerService */
     protected $unzerService;
@@ -44,11 +40,9 @@ abstract class UnzerPayment
 
     public function __construct(
         Unzer $unzerSDK,
-        Translator $translator,
         UnzerService $unzerService
     ) {
         $this->unzerSDK = $unzerSDK;
-        $this->translator = $translator;
         $this->unzerService = $unzerService;
 
         $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
