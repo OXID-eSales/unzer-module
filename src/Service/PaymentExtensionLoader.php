@@ -68,7 +68,6 @@ class PaymentExtensionLoader
     {
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
-            $payment,
             $this->session,
             $this->unzerSdkLoader->getUnzerSDK(),
             $this->translator,

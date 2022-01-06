@@ -25,9 +25,6 @@ abstract class UnzerPayment
     public const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
     public const SUCCESS_URL = "thankyou";
 
-    /** @var PaymentModel */
-    protected $payment;
-
     /** @var Session */
     protected $session;
 
@@ -53,13 +50,11 @@ abstract class UnzerPayment
     protected $allowedCurrencies = [];
 
     public function __construct(
-        PaymentModel $payment,
         Session $session,
         Unzer $unzerSDK,
         Translator $translator,
         UnzerService $unzerService
     ) {
-        $this->payment = $payment;
         $this->session = $session;
         $this->unzerSDK = $unzerSDK;
         $this->translator = $translator;
