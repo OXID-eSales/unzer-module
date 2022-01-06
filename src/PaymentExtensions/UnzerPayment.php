@@ -113,14 +113,6 @@ abstract class UnzerPayment
     /**
      * @return bool
      */
-    public function isDirectCharge()
-    {
-        return (strpos($this->payment->oxpayments__oxpaymentprocedure->value, "direct Capture") !== false);
-    }
-
-    /**
-     * @return bool
-     */
     public function checkPaymentStatus(): bool
     {
         $result = false;
