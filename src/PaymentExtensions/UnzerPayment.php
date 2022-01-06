@@ -105,52 +105,6 @@ abstract class UnzerPayment
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkPaymentStatus(): bool
-    {
-        $result = false;
-
-        if (!$paymentId = $this->session->getVariable('PaymentId')) {
-            throw new Exception("Something went wrong. Please try again later.");
-        }
-
-        // Redirect to success if the payment has been successfully completed.
-        $unzerPayment = $this->unzerSDK->fetchPayment($paymentId);
-        if ($transaction = $unzerPayment->getInitialTransaction()) {
-            if ($transaction->isSuccess()) {
-                $result = true;
-            } elseif ($transaction->isPending()) {
-                $this->createPaymentStatusWebhook($paymentId);
-
-                if ($redirectUrl = $transaction->getRedirectUrl()) {
-                    throw new Redirect($redirectUrl);
-                }
-                $result = true;
-            } elseif ($transaction->isError()) {
-                throw new Exception($this->translator->translateCode(
-                    $transaction->getMessage()->getCode(),
-                    "Error in transaction for customer " . $transaction->getMessage()->getCustomer()
-                ));
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $paymentId
-     */
-    public function createPaymentStatusWebhook(string $paymentId): void
-    {
-        $webhookUrl = Registry::getConfig()->getShopUrl()
-            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus&paymentid='
-            . $paymentId;
-
-        $this->unzerSDK->createWebhook($webhookUrl, 'payment');
-    }
-
     public function setSessionVars(AbstractTransactionType $charge): void
     {
         // You'll need to remember the shortId to show it on the success or failure page
