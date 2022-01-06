@@ -100,30 +100,9 @@ abstract class UnzerPayment
             $this->getMetadata()
         );
 
-        $this->setSessionVars($transaction);
+        $this->unzerService->setSessionVars($transaction);
 
         return true;
-    }
-
-    public function setSessionVars(AbstractTransactionType $charge): void
-    {
-        // You'll need to remember the shortId to show it on the success or failure page
-        $this->session->setVariable('ShortId', $charge->getShortId());
-        $this->session->setVariable('PaymentId', $charge->getPaymentId());
-
-        $paymentType = $charge->getPayment()->getPaymentType();
-
-        if (!$paymentType) {
-            return;
-        }
-
-        // TODO: $charge is not only class of Charge possible here. Investigate and fix.
-        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
-            $this->session->setVariable(
-                'additionalPaymentInformation',
-                $this->unzerService->getBankDataFromCharge($charge)
-            );
-        }
     }
 
     /**

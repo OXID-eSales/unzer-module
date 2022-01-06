@@ -12,6 +12,7 @@ use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class Unzer
@@ -203,5 +204,26 @@ class Unzer
         }
 
         throw new \Exception('oscunzer_WRONGPAYMENTID');
+    }
+
+    public function setSessionVars(AbstractTransactionType $charge): void
+    {
+        // You'll need to remember the shortId to show it on the success or failure page
+        $this->session->setVariable('ShortId', $charge->getShortId());
+        $this->session->setVariable('PaymentId', $charge->getPaymentId());
+
+        $paymentType = $charge->getPayment()->getPaymentType();
+
+        if (!$paymentType) {
+            return;
+        }
+
+        // TODO: $charge is not only class of Charge possible here. Investigate and fix.
+        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
+            $this->session->setVariable(
+                'additionalPaymentInformation',
+                $this->getBankDataFromCharge($charge)
+            );
+        }
     }
 }
