@@ -21,4 +21,11 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 class ApplePay extends UnzerPayment
 {
     protected $paymentMethod = 'applepay';
+
+    public function getUnzerPaymentTypeObject(): BasePaymentType
+    {
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\Applepay()
+        );
+    }
 }
