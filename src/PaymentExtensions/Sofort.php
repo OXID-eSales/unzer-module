@@ -23,6 +23,8 @@ class Sofort extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
+    protected $needPending = true;
+
     /**
      * @return \UnzerSDK\Resources\PaymentTypes\Sofort
      */

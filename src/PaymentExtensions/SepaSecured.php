@@ -23,28 +23,6 @@ class SepaSecured extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
-    public function execute($userModel, $basketModel): bool
-    {
-        $uzrSepa = $this->getUnzerPaymentTypeObject();
-
-        $customer = $this->unzerService->getUnzerCustomer($userModel);
-        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
-
-        $transaction = $uzrSepa->charge(
-            $basketModel->getPrice()->getPrice(),
-            $basketModel->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
-            $customer,
-            $this->unzerOrderId,
-            $this->unzerService->getShopMetadata($this->paymentMethod),
-            $uzrBasket
-        );
-
-        $this->unzerService->setSessionVars($transaction);
-
-        return true;
-    }
-
     /**
      * @return \UnzerSDK\Resources\PaymentTypes\SepaDirectDebitSecured
      */

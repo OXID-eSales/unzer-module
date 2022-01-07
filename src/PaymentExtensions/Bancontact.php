@@ -21,6 +21,8 @@ class Bancontact extends UnzerPayment
 {
     protected $paymentMethod = 'bancontact';
 
+    protected $needPending = true;
+
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(

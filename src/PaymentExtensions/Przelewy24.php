@@ -21,6 +21,8 @@ class Przelewy24 extends UnzerPayment
 {
     protected $paymentMethod = 'przelewy24';
 
+    protected $needPending = true;
+
     /**
      * @return \UnzerSDK\Resources\PaymentTypes\Przelewy24
      */

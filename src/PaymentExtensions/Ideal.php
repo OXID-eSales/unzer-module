@@ -21,6 +21,8 @@ class Ideal extends UnzerPayment
 {
     protected $paymentMethod = 'ideal';
 
+    protected $needPending = true;
+
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->fetchPaymentType(

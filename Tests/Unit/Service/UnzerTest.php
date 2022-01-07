@@ -4,7 +4,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Application\Model\Basket as ShopBasketModel;
 use OxidEsales\Eshop\Application\Model\BasketItem;
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Language;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\Context;
@@ -15,6 +17,32 @@ use PHPUnit\Framework\TestCase;
 
 class UnzerTest extends TestCase
 {
+
+    /**
+     * @dataProvider prepareRedirectUrlDataProvider
+     */
+    public function testPrepareRedirectUrl($shopUrl, $addPending, $expectedShopUrl)
+    {
+        $sut = $this->getSut();
+
+        Registry::set(Config::class, $this->createConfiguredMock(Config::class, ['getSslShopUrl' => $shopUrl]));
+
+        $this->assertSame(
+            $expectedShopUrl,
+            $sut->prepareRedirectUrl($addPending)
+        );
+    }
+
+    public function prepareRedirectUrlDataProvider(): array
+    {
+        return [
+            ['value', false, 'value/index.php?cl=order'],
+            ['value', true, 'value/index.php?cl=order&fnc=unzerExecuteAfterRedirect&uzrredirect=1'],
+            ['value/', false, 'value//index.php?cl=order'],
+            ['value/', true, 'value//index.php?cl=order&fnc=unzerExecuteAfterRedirect&uzrredirect=1'],
+        ];
+    }
+
     /**
      * @dataProvider getPaymentProcedureDataProvider
      */

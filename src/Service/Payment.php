@@ -68,7 +68,7 @@ class Payment
 
             throw new RedirectWithMessage(
                 $this->unzerService->prepareRedirectUrl(
-                    isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
+                    isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
                 ),
                 $this->translator->translateCode((string)$e->getCode(), $e->getClientMessage())
             );
@@ -77,7 +77,7 @@ class Payment
 
             throw new RedirectWithMessage(
                 $this->unzerService->prepareRedirectUrl(
-                    isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
+                    isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
                 ),
                 $e->getMessage()
             );

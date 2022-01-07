@@ -21,6 +21,8 @@ class GiroPay extends UnzerPayment
 {
     protected $paymentMethod = 'giropay';
 
+    protected $needPending = true;
+
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(

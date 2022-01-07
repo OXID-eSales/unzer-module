@@ -21,6 +21,8 @@ class WeChatPay extends UnzerPayment
 {
     protected $paymentMethod = 'wechatpay';
 
+    protected $needPending = true;
+
     /**
      * @return \UnzerSDK\Resources\PaymentTypes\Wechatpay
      */

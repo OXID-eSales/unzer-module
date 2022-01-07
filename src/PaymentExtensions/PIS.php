@@ -21,6 +21,8 @@ class PIS extends UnzerPayment
 {
     protected $paymentMethod = 'pis';
 
+    protected $needPending = true;
+
     /**
      * @return \UnzerSDK\Resources\PaymentTypes\PIS
      */

@@ -10,12 +10,6 @@ use UnzerSDK\Unzer;
 
 abstract class UnzerPayment
 {
-    public const CONTROLLER_URL = "order";
-    public const RETURN_CONTROLLER_URL = "order";
-    public const FAILURE_URL = "";
-    public const PENDING_URL = "order&fnc=unzerExecuteAfterRedirect&uzrredirect=1";
-    public const SUCCESS_URL = "thankyou";
-
     /** @var Unzer */
     protected $unzerSDK;
 
@@ -27,6 +21,9 @@ abstract class UnzerPayment
 
     /** @var string */
     protected $paymentMethod = '';
+
+    /** @var bool */
+    protected $needPending = false;
 
     /** @var array */
     protected $allowedCurrencies = [];
@@ -46,6 +43,10 @@ abstract class UnzerPayment
         return $this->allowedCurrencies;
     }
 
+    public function redirectUrlNeedPending(): bool
+    {
+        return $this->needPending;
+    }
 
     /**
      * @throws UnzerApiException
@@ -60,14 +61,16 @@ abstract class UnzerPayment
         $customer = $this->unzerService->getUnzerCustomer($userModel);
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
+        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
 
         $transaction = $paymentType->{$paymentProcedure}(
             $basketModel->getPrice()->getPrice(),
             $basketModel->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
+            $this->unzerService->prepareRedirectUrl($this->redirectUrlNeedPending()),
             $customer,
             $this->unzerOrderId,
-            $this->unzerService->getShopMetadata($this->paymentMethod)
+            $this->unzerService->getShopMetadata($this->paymentMethod),
+            $uzrBasket
         );
 
         $this->unzerService->setSessionVars($transaction);

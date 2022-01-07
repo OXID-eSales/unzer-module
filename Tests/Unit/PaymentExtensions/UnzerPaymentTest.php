@@ -8,6 +8,7 @@ use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use PHPUnit\Framework\TestCase;
+use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -26,6 +27,7 @@ class UnzerPaymentTest extends TestCase
             'getPrice' => new \OxidEsales\Eshop\Core\Price(123),
             'getBasketCurrency' => $currency
         ]);
+        $unzerBasket = $this->createPartialMock(Basket::class, []);
 
         $unzerServiceMock = $this->createPartialMock(UnzerService::class, [
             'getPaymentProcedure',
@@ -34,6 +36,7 @@ class UnzerPaymentTest extends TestCase
             'getShopMetadata',
             'setSessionVars',
             'generateUnzerOrderId',
+            'getUnzerBasket'
         ]);
 
         $unzerServiceMock->method('getPaymentProcedure')->willReturn('charge');
@@ -41,6 +44,7 @@ class UnzerPaymentTest extends TestCase
         $unzerServiceMock->method('getUnzerCustomer')->with($userModel)->willReturn($customer = new Customer());
         $unzerServiceMock->method('getShopMetadata')->willReturn($metadata = new Metadata());
         $unzerServiceMock->method('generateUnzerOrderId')->willReturn('unzerOrderId');
+        $unzerServiceMock->method('getUnzerBasket')->willReturn($unzerBasket);
 
         $chargeResult = $this->createPartialMock(Charge::class, []);
         $unzerServiceMock->expects($this->once())->method('setSessionVars')->with($chargeResult);
@@ -68,7 +72,8 @@ class UnzerPaymentTest extends TestCase
                 'someRedirectUrl',
                 $customer,
                 'unzerOrderId',
-                $metadata
+                $metadata,
+                $unzerBasket
             )
             ->willReturn($chargeResult);
 

@@ -21,6 +21,8 @@ class EPS extends UnzerPayment
 {
     protected $paymentMethod = 'eps';
 
+    protected $needPending = true;
+
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->fetchPaymentType(

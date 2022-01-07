@@ -21,6 +21,8 @@ class AliPay extends UnzerPayment
 {
     protected $paymentMethod = 'alipay';
 
+    protected $needPending = true;
+
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(

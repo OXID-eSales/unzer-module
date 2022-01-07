@@ -179,20 +179,15 @@ class Unzer
         return $this->moduleSettings::PAYMENT_CHARGE;
     }
 
-    /**
-     * @TODO: fix this method and add tests
-     */
-    public function prepareRedirectUrl(string $destination, bool $addSessionId = false): string
+    public function prepareRedirectUrl(bool $addPending = false): string
     {
-        $dstUrl = Registry::getConfig()->getShopCurrentUrl();
-        $destination = str_replace('?', '&', $destination);
-        $dstUrl .= 'cl=' . $destination;
+        $redirectUrl = Registry::getConfig()->getSslShopUrl() . '/index.php?cl=order';
 
-        if ($addSessionId) {
-            $dstUrl .= '&force_sid=' . $this->session->getId();
+        if ($addPending) {
+            $redirectUrl .= '&fnc=unzerExecuteAfterRedirect&uzrredirect=1';
         }
 
-        return $this->session->processUrl($dstUrl);
+        return $redirectUrl;
     }
 
     public function getUnzerPaymentIdFromRequest(): string

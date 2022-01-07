@@ -24,6 +24,8 @@ class ApplePay extends UnzerPayment
 {
     protected $paymentMethod = 'applepay';
 
+    protected $needPending = true;
+
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         throw new \Exception('Payment method not implemented yet');
