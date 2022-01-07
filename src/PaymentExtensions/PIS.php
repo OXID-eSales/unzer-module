@@ -21,24 +21,6 @@ class PIS extends UnzerPayment
 {
     protected $paymentMethod = 'pis';
 
-    public function execute($userModel, $basketModel): bool
-    {
-        $pis = $this->getUnzerPaymentTypeObject();
-
-        $transaction = $pis->charge(
-            $basketModel->getPrice()->getPrice(),
-            $basketModel->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL),
-            null,
-            null,
-            $this->unzerService->getShopMetadata($this->paymentMethod)
-        );
-
-        $this->unzerService->setSessionVars($transaction);
-
-        return true;
-    }
-
     /**
      * @return \UnzerSDK\Resources\PaymentTypes\PIS
      */
