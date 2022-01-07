@@ -239,4 +239,9 @@ class Unzer
 
         return $metadata;
     }
+
+    public function generateUnzerOrderId(): string
+    {
+        return 'o' . str_replace(['0.', ' '], '', microtime(false));
+    }
 }

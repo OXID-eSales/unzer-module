@@ -26,7 +26,7 @@ abstract class UnzerPayment
     protected $unzerOrderId;
 
     /** @var string */
-    protected $paymentMethod;
+    protected $paymentMethod = '';
 
     /** @var array */
     protected $allowedCurrencies = [];
@@ -38,7 +38,7 @@ abstract class UnzerPayment
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
-        $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
+        $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
     }
 
     public function getPaymentCurrencies(): array
@@ -46,7 +46,6 @@ abstract class UnzerPayment
         return $this->allowedCurrencies;
     }
 
-    abstract public function getUnzerPaymentTypeObject();
 
     /**
      * @throws UnzerApiException
