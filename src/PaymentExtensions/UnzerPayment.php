@@ -52,8 +52,10 @@ abstract class UnzerPayment
      * @throws UnzerApiException
      * @throws Exception
      */
-    public function execute(\OxidEsales\Eshop\Application\Model\User $userModel, \OxidEsales\Eshop\Application\Model\Basket $basketModel): bool
-    {
+    public function execute(
+        \OxidEsales\Eshop\Application\Model\User $userModel,
+        \OxidEsales\Eshop\Application\Model\Basket $basketModel
+    ): bool {
         $paymentType = $this->getUnzerPaymentTypeObject();
 
         $customer = $this->unzerService->getUnzerCustomer($userModel);
