@@ -54,7 +54,7 @@ abstract class UnzerPayment
         return $this->isRecurring;
     }
 
-    public function getUnzerPaymentTypeObject(): BasePaymentType
+    public function getUnzerPaymentTypeObject()
     {
         throw new \Exception('Payment method not implemented yet');
     }
