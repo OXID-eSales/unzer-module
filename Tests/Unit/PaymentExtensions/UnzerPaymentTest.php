@@ -16,18 +16,6 @@ use UnzerSDK\Unzer as UnzerSDK;
 
 class UnzerPaymentTest extends TestCase
 {
-    public function testGetUnzerPaymentTypeObjectForNotImplemented(): void
-    {
-        $sut = $this->getMockForAbstractClass(UnzerPayment::class, [
-            $this->createPartialMock(UnzerSDK::class, []),
-            $this->createPartialMock(UnzerService::class, [])
-        ]);
-
-        $this->expectException(Exception::class);
-
-        $sut->getUnzerPaymentTypeObject();
-    }
-
     public function testDefaultExecute(): void
     {
         $currency = new \stdClass();
