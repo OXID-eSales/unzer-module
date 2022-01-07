@@ -3,6 +3,8 @@
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidEsales\Eshop\Application\Model\User as UserModel;
+use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -36,6 +38,8 @@ class PaymentTest extends TestCase
 
         $sessionStub = $this->createPartialMock(Session::class, ['getVariable', 'getBasket', 'getUser']);
         $sessionStub->method('getVariable')->with('PaymentId')->willReturn('examplePaymentId');
+        $sessionStub->method('getBasket')->willReturn($this->createConfiguredMock(BasketModel::class, []));
+        $sessionStub->method('getUser')->willReturn($this->createConfiguredMock(UserModel::class, []));
 
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
@@ -64,7 +68,7 @@ class PaymentTest extends TestCase
     public function testUnzerRedirectReThrownFlow(): void
     {
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute']);
+        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
         $paymentExtension->method('execute')->willThrowException(new Redirect("someDestination"));
 
         $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
@@ -76,7 +80,10 @@ class PaymentTest extends TestCase
             ->willReturn($paymentExtension);
 
         $sut = new PaymentService(
-            $this->createPartialMock(Session::class, []),
+            $this->createConfiguredMock(Session::class, [
+                'getUser' => $this->createConfiguredMock(UserModel::class, []),
+                'getBasket' => $this->createConfiguredMock(BasketModel::class, [])
+            ]),
             $extensionLoader,
             $this->createPartialMock(Translator::class, []),
             $this->createPartialMock(UnzerService::class, []),
@@ -103,7 +110,7 @@ class PaymentTest extends TestCase
         );
 
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute']);
+        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
         $paymentExtension->method('execute')->willThrowException($unzerException);
 
         $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
@@ -126,7 +133,10 @@ class PaymentTest extends TestCase
 
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
-                $this->createPartialMock(Session::class, []),
+                $this->createConfiguredMock(Session::class, [
+                    'getUser' => $this->createConfiguredMock(UserModel::class, []),
+                    'getBasket' => $this->createConfiguredMock(BasketModel::class, [])
+                ]),
                 $extensionLoader,
                 $translatorMock,
                 $unzerServiceMock,
@@ -151,7 +161,7 @@ class PaymentTest extends TestCase
     public function testRegularExceptionCaseConvertedToRedirectWithMessage(): void
     {
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute']);
+        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
         $paymentExtension->method('execute')->willThrowException(new \Exception("clientMessage"));
 
         $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
@@ -169,7 +179,10 @@ class PaymentTest extends TestCase
 
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
-                $this->createPartialMock(Session::class, []),
+                $this->createConfiguredMock(Session::class, [
+                    'getUser' => $this->createConfiguredMock(UserModel::class, []),
+                    'getBasket' => $this->createConfiguredMock(BasketModel::class, [])
+                ]),
                 $extensionLoader,
                 $this->createPartialMock(Translator::class, []),
                 $unzerServiceMock,
