@@ -29,6 +29,7 @@
         "psalm": "psalm --show-info=true --no-cache",
         "psalm-errors": "psalm --no-cache",
         "psalm-automatic": "psalm --alter --issues=MissingReturnType,MissingParamType",
-        "phpcs": "phpcs --standard=Tests/phpcs.xml"
+        "phpcs": "phpcs --standard=Tests/phpcs.xml",
+        "phpcbf": "phpcbf --standard=Tests/phpcs.xml"
     }
 }
