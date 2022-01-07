@@ -21,8 +21,6 @@ class PayPal extends UnzerPayment
 {
     protected $paymentMethod = 'paypal';
 
-    protected $isRecurring = true;
-
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(

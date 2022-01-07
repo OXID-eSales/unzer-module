@@ -23,8 +23,6 @@ class Sepa extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
-    protected $isRecurring = true;
-
     /**
      * @return \UnzerSDK\Resources\PaymentTypes\SepaDirectDebit
      */

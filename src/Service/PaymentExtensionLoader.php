@@ -7,7 +7,6 @@ use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\AliPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Bancontact;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\CardRecurring;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\EPS;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\GiroPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Ideal;
@@ -30,7 +29,6 @@ class PaymentExtensionLoader
         'oscunzer_alipay' => AliPay::class,
         'oscunzer_bancontact' => Bancontact::class,
         'oscunzer_card' => Card::class,
-        'oscunzer_cardrecurring' => CardRecurring::class,
         'oscunzer_eps' => EPS::class,
         'oscunzer_giropay' => GiroPay::class,
         'oscunzer_ideal' => Ideal::class,

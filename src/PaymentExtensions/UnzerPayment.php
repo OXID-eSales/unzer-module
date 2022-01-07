@@ -28,9 +28,6 @@ abstract class UnzerPayment
     /** @var string */
     protected $paymentMethod;
 
-    /** @var bool */
-    protected $isRecurring = false;
-
     /** @var array */
     protected $allowedCurrencies = [];
 
@@ -49,18 +46,13 @@ abstract class UnzerPayment
         return $this->allowedCurrencies;
     }
 
-    public function isRecurringPaymentType(): bool
-    {
-        return $this->isRecurring;
-    }
-
     abstract public function getUnzerPaymentTypeObject();
 
     /**
      * @throws UnzerApiException
      * @throws Exception
      */
-    public function execute($userModel, $basketModel): bool
+    public function execute(\OxidEsales\Eshop\Application\Model\User $userModel, \OxidEsales\Eshop\Application\Model\Basket $basketModel): bool
     {
         $paymentType = $this->getUnzerPaymentTypeObject();
 

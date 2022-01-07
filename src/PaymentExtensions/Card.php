@@ -21,8 +21,6 @@ class Card extends UnzerPayment
 {
     protected $paymentMethod = 'card';
 
-    protected $isRecurring = true;
-
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->fetchPaymentType(
