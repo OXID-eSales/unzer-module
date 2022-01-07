@@ -26,7 +26,7 @@ abstract class UnzerPayment
     protected $unzerOrderId;
 
     /** @var string */
-    protected $paymentMethod;
+    protected $paymentMethod = 'none';
 
     /** @var bool */
     protected $isRecurring = false;
@@ -41,7 +41,7 @@ abstract class UnzerPayment
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
-        $this->unzerOrderId = 'o' . str_replace(['0.', ' '], '', microtime(false));
+        $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
     }
 
     public function getPaymentCurrencies(): array
@@ -54,7 +54,11 @@ abstract class UnzerPayment
         return $this->isRecurring;
     }
 
-    public function getUnzerPaymentTypeObject(): BasePaymentType
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public function getUnzerPaymentTypeObject()
     {
         throw new \Exception('Payment method not implemented yet');
     }
