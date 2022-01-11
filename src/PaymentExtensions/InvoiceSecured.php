@@ -28,7 +28,7 @@ class InvoiceSecured extends UnzerPayment
         $transaction = $inv_secured->charge(
             $basketModel->getPrice()->getPrice(),
             $basketModel->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(),
+            $this->unzerService->prepareOrderRedirectUrl(),
             $customer,
             $this->unzerOrderId,
             $this->unzerService->getShopMetadata($this->paymentMethod),
