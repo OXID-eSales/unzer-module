@@ -49,7 +49,7 @@ class Unzer
         $this->request = $request;
     }
 
-    public function getUnzerCustomer($oUser, ?Order $oOrder = null): Customer
+    public function getUnzerCustomer(\OxidEsales\Eshop\Application\Model\User $oUser, ?Order $oOrder = null): Customer
     {
         $customer = CustomerFactory::createCustomer(
             $oUser->getFieldData('oxfname'),
@@ -179,15 +179,20 @@ class Unzer
         return $this->moduleSettings::PAYMENT_CHARGE;
     }
 
-    public function prepareRedirectUrl(bool $addPending = false): string
+    public function prepareOrderRedirectUrl(bool $addPending = false): string
     {
-        $redirectUrl = Registry::getConfig()->getSslShopUrl() . '/index.php?cl=order';
+        $redirectUrl = $this->prepareRedirectUrl('order');
 
         if ($addPending) {
             $redirectUrl .= '&fnc=unzerExecuteAfterRedirect&uzrredirect=1';
         }
 
         return $redirectUrl;
+    }
+
+    public function prepareRedirectUrl(string $destination = ''): string
+    {
+        return Registry::getConfig()->getSslShopUrl() . 'index.php?cl=' . $destination;
     }
 
     public function getUnzerPaymentIdFromRequest(): string

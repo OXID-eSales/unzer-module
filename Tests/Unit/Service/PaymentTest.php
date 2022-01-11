@@ -126,8 +126,8 @@ class PaymentTest extends TestCase
             ->with("specialCode", "clientMessage")
             ->willReturn("specialTranslation");
 
-        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareRedirectUrl']);
-        $unzerServiceMock->method('prepareRedirectUrl')
+        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareOrderRedirectUrl']);
+        $unzerServiceMock->method('prepareOrderRedirectUrl')
             ->willReturn('someUrl');
 
         $sut = $this->getMockBuilder(PaymentService::class)
@@ -171,8 +171,8 @@ class PaymentTest extends TestCase
             ->with($paymentModel)
             ->willReturn($paymentExtension);
 
-        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareRedirectUrl']);
-        $unzerServiceMock->method('prepareRedirectUrl')
+        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareOrderRedirectUrl']);
+        $unzerServiceMock->method('prepareOrderRedirectUrl')
             ->willReturn('someUrl');
 
         $sut = $this->getMockBuilder(PaymentService::class)

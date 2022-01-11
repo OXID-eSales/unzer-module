@@ -40,6 +40,8 @@ chmod 444 /var/www/oxideshop/source/.htaccess
 chown -R www-data:www-data /var/www/oxideshop/
 
 echo "Setup done."
+php /var/www/oxideshop/vendor/bin/oe-eshop-doctrine_migration migrations:migrate;
+/var/www/oxideshop/vendor/bin/oe-console oe:module:apply-configuration;
 /var/www/oxideshop/vendor/bin/oe-console oe:module:activate osc-unzer;
 
 exec "$@"

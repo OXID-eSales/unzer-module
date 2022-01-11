@@ -67,7 +67,7 @@ class Payment
             $this->removeTemporaryOrder();
 
             throw new RedirectWithMessage(
-                $this->unzerService->prepareRedirectUrl(
+                $this->unzerService->prepareOrderRedirectUrl(
                     isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
                 ),
                 $this->translator->translateCode((string)$e->getCode(), $e->getClientMessage())
@@ -76,7 +76,7 @@ class Payment
             $this->removeTemporaryOrder();
 
             throw new RedirectWithMessage(
-                $this->unzerService->prepareRedirectUrl(
+                $this->unzerService->prepareOrderRedirectUrl(
                     isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
                 ),
                 $e->getMessage()

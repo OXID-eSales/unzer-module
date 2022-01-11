@@ -17,11 +17,10 @@ use PHPUnit\Framework\TestCase;
 
 class UnzerTest extends TestCase
 {
-
     /**
      * @dataProvider prepareRedirectUrlDataProvider
      */
-    public function testPrepareRedirectUrl($shopUrl, $addPending, $expectedShopUrl)
+    public function testprepareRedirectUrl($shopUrl, $destination, $expectedShopUrl)
     {
         $sut = $this->getSut();
 
@@ -29,17 +28,38 @@ class UnzerTest extends TestCase
 
         $this->assertSame(
             $expectedShopUrl,
-            $sut->prepareRedirectUrl($addPending)
+            $sut->prepareRedirectUrl($destination)
         );
     }
 
     public function prepareRedirectUrlDataProvider(): array
     {
         return [
-            ['value', false, 'value/index.php?cl=order'],
-            ['value', true, 'value/index.php?cl=order&fnc=unzerExecuteAfterRedirect&uzrredirect=1'],
-            ['value/', false, 'value//index.php?cl=order'],
-            ['value/', true, 'value//index.php?cl=order&fnc=unzerExecuteAfterRedirect&uzrredirect=1'],
+            ['value/', 'order', 'value/index.php?cl=order'],
+            ['value/', 'thankyou', 'value/index.php?cl=thankyou']
+        ];
+    }
+
+    /**
+     * @dataProvider prepareOrderRedirectUrlDataProvider
+     */
+    public function testprepareOrderRedirectUrl($shopUrl, $addPending, $expectedShopUrl)
+    {
+        $sut = $this->getSut();
+
+        Registry::set(Config::class, $this->createConfiguredMock(Config::class, ['getSslShopUrl' => $shopUrl]));
+
+        $this->assertSame(
+            $expectedShopUrl,
+            $sut->prepareOrderRedirectUrl($addPending)
+        );
+    }
+
+    public function prepareOrderRedirectUrlDataProvider(): array
+    {
+        return [
+            ['value/', false, 'value/index.php?cl=order'],
+            ['value/', true, 'value/index.php?cl=order&fnc=unzerExecuteAfterRedirect&uzrredirect=1']
         ];
     }
 

@@ -48,6 +48,8 @@ abstract class UnzerPayment
         return $this->needPending;
     }
 
+    abstract public function getUnzerPaymentTypeObject(): BasePaymentType;
+
     /**
      * @throws UnzerApiException
      * @throws Exception
@@ -66,7 +68,7 @@ abstract class UnzerPayment
         $transaction = $paymentType->{$paymentProcedure}(
             $basketModel->getPrice()->getPrice(),
             $basketModel->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl($this->redirectUrlNeedPending()),
+            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
             $customer,
             $this->unzerOrderId,
             $this->unzerService->getShopMetadata($this->paymentMethod),

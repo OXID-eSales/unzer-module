@@ -96,7 +96,7 @@ class OrderController extends OrderController_parent
 
                 // proceeding to next view
                 $unzerService = $this->getServiceFromContainer(Unzer::class);
-                throw new Redirect($unzerService->prepareRedirectUrl($nextStep, false));
+                throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
             } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
