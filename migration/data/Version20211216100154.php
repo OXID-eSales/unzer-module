@@ -29,7 +29,7 @@ final class Version20211216100154 extends AbstractMigration
 
         //Alipay is China’s leading third-party mobile and online payment solution.
         'oscunzer_alipay' => [
-            'insert' => 0,
+            'insert' => 1,
             'de_desc' => "Alipay",
             'en_desc' => "Alipay",
             'de_longdesc' => "Alipay ist Chinas führende Zahlungs- und Lifestyleplattform. Sie wurde 2004 von der Alibaba
@@ -47,7 +47,7 @@ final class Version20211216100154 extends AbstractMigration
 
         //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
         'oscunzer_bancontact' => [
-            'insert' => 0,
+            'insert' => 1,
             'de_desc' => "Bancontact",
             'en_desc' => "Bancontact",
             'de_longdesc' => "Bancontact ist ein belgisches Unternehmen, das benutzerfreundliche Lösungen für ein einfaches tägliches Einkaufserlebnis bietet.",
@@ -180,7 +180,7 @@ final class Version20211216100154 extends AbstractMigration
 
         //Przelewy24 is an online payment method used in Poland.
         'oscunzer_przelewy24' => [
-            'insert' => 0,
+            'insert' => 1,
             'de_desc' => "Przelewy24",
             'en_desc' => "Przelewy24",
             'de_longdesc' => "Przelewy24 ist die beliebteste Online-Zahlungsmethode Polens. Sie ermöglicht Käufern nicht
@@ -241,7 +241,7 @@ final class Version20211216100154 extends AbstractMigration
 
         //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
         'oscunzer_wechatpay' => [
-            'insert' => 0,
+            'insert' => 1,
             'de_desc' => "WeChat Pay",
             'en_desc' => "WeChat Pay",
             'de_longdesc' => "WeChat Pay ist ein von Tencent betriebenes Bezahlsystem aus China. Bei WeChat handelte es
