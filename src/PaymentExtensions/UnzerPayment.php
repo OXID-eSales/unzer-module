@@ -48,6 +48,8 @@ abstract class UnzerPayment
         return $this->needPending;
     }
 
+    abstract public function getUnzerPaymentTypeObject();
+
     /**
      * @throws UnzerApiException
      * @throws Exception

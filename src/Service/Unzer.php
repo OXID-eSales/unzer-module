@@ -49,7 +49,7 @@ class Unzer
         $this->request = $request;
     }
 
-    public function getUnzerCustomer($oUser, ?Order $oOrder = null): Customer
+    public function getUnzerCustomer(\OxidEsales\Eshop\Application\Model\User $oUser, ?Order $oOrder = null): Customer
     {
         $customer = CustomerFactory::createCustomer(
             $oUser->getFieldData('oxfname'),
