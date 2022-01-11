@@ -8,10 +8,14 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Facts\Facts;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use UnzerSDK\Resources\Metadata;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
 class Unzer
@@ -45,10 +49,8 @@ class Unzer
         $this->request = $request;
     }
 
-    public function getSessionCustomerData(?Order $oOrder = null): Customer
+    public function getUnzerCustomer($oUser, ?Order $oOrder = null): Customer
     {
-        $oUser = $this->session->getUser();
-
         $customer = CustomerFactory::createCustomer(
             $oUser->getFieldData('oxfname'),
             $oUser->getFieldData('oxlname')
@@ -177,20 +179,15 @@ class Unzer
         return $this->moduleSettings::PAYMENT_CHARGE;
     }
 
-    /**
-     * @TODO: fix this method and add tests
-     */
-    public function prepareRedirectUrl(string $destination, bool $addSessionId = false): string
+    public function prepareRedirectUrl(bool $addPending = false): string
     {
-        $dstUrl = Registry::getConfig()->getShopCurrentUrl();
-        $destination = str_replace('?', '&', $destination);
-        $dstUrl .= 'cl=' . $destination;
+        $redirectUrl = Registry::getConfig()->getSslShopUrl() . '/index.php?cl=order';
 
-        if ($addSessionId) {
-            $dstUrl .= '&force_sid=' . $this->session->getId();
+        if ($addPending) {
+            $redirectUrl .= '&fnc=unzerExecuteAfterRedirect&uzrredirect=1';
         }
 
-        return $this->session->processUrl($dstUrl);
+        return $redirectUrl;
     }
 
     public function getUnzerPaymentIdFromRequest(): string
@@ -203,5 +200,43 @@ class Unzer
         }
 
         throw new \Exception('oscunzer_WRONGPAYMENTID');
+    }
+
+    public function setSessionVars(AbstractTransactionType $charge): void
+    {
+        // You'll need to remember the shortId to show it on the success or failure page
+        $this->session->setVariable('ShortId', $charge->getShortId());
+        $this->session->setVariable('PaymentId', $charge->getPaymentId());
+
+        $paymentType = $charge->getPayment()->getPaymentType();
+
+        if (!$paymentType) {
+            return;
+        }
+
+        // TODO: $charge is not only class of Charge possible here. Investigate and fix.
+        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
+            $this->session->setVariable(
+                'additionalPaymentInformation',
+                $this->getBankDataFromCharge($charge)
+            );
+        }
+    }
+
+    public function getShopMetadata(string $paymentMethod): Metadata
+    {
+        $metadata = new Metadata();
+        $metadata->setShopType("Oxid eShop " . (new Facts())->getEdition());
+        $metadata->setShopVersion(ShopVersion::getVersion());
+        $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
+        $metadata->addMetadata('paymentmethod', $paymentMethod);
+        $metadata->addMetadata('paymentprocedure', $this->getPaymentProcedure($paymentMethod));
+
+        return $metadata;
+    }
+
+    public function generateUnzerOrderId(): string
+    {
+        return 'o' . str_replace(['0.', ' '], '', microtime(false));
     }
 }

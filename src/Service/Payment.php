@@ -2,8 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -24,16 +26,21 @@ class Payment
     /** @var Unzer */
     protected $unzerService;
 
+    /** @var UnzerSDKLoader */
+    protected $unzerSDKLoader;
+
     public function __construct(
         Session $session,
         PaymentExtensionLoader $paymentExtensionLoader,
         Translator $translator,
-        Unzer $unzerService
+        Unzer $unzerService,
+        UnzerSDKLoader $unzerSDKLoader
     ) {
         $this->session = $session;
         $this->paymentExtensionLoader = $paymentExtensionLoader;
         $this->translator = $translator;
         $this->unzerService = $unzerService;
+        $this->unzerSDKLoader = $unzerSDKLoader;
     }
 
     /**
@@ -44,8 +51,16 @@ class Payment
     {
         try {
             $paymentExtension = $this->paymentExtensionLoader->getPaymentExtension($paymentModel);
-            $paymentExtension->execute();
-            $paymentStatus = $paymentExtension->checkPaymentstatus();
+            $paymentExtension->execute(
+                $this->session->getUser(),
+                $this->session->getBasket()
+            );
+
+            if (!$paymentId = $this->session->getVariable('PaymentId')) {
+                throw new Exception("Something went wrong. Please try again later.");
+            }
+
+            $paymentStatus = $this->checkUnzerPaymentStatus($paymentId);
         } catch (Redirect $e) {
             throw $e;
         } catch (UnzerApiException $e) {
@@ -53,16 +68,16 @@ class Payment
 
             throw new RedirectWithMessage(
                 $this->unzerService->prepareRedirectUrl(
-                    isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
+                    isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
                 ),
                 $this->translator->translateCode((string)$e->getCode(), $e->getClientMessage())
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->removeTemporaryOrder();
 
             throw new RedirectWithMessage(
                 $this->unzerService->prepareRedirectUrl(
-                    isset($paymentExtension) ? $paymentExtension::CONTROLLER_URL : UnzerPayment::CONTROLLER_URL
+                    isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
                 ),
                 $e->getMessage()
             );
@@ -82,5 +97,58 @@ class Payment
         }
 
         return $result;
+    }
+
+    public function checkUnzerPaymentStatus($paymentId): bool
+    {
+        $result = false;
+
+        // Redirect to success if the payment has been successfully completed.
+        $unzerPayment = $this->getUnzerSDK()->fetchPayment($paymentId);
+        if ($transaction = $unzerPayment->getInitialTransaction()) {
+            if ($transaction->isSuccess()) {
+                $result = true;
+            } elseif ($transaction->isPending()) {
+                $this->createPaymentStatusWebhook($paymentId);
+
+                if ($redirectUrl = $transaction->getRedirectUrl()) {
+                    throw new Redirect($redirectUrl);
+                }
+                $result = true;
+            } elseif ($transaction->isError()) {
+                throw new Exception($this->translator->translateCode(
+                    $transaction->getMessage()->getCode(),
+                    "Error in transaction for customer " . $transaction->getMessage()->getCustomer()
+                ));
+            }
+        }
+
+        return $result;
+    }
+
+    public function createPaymentStatusWebhook(string $unzerPaymentId): void
+    {
+        $webhookUrl = Registry::getConfig()->getShopUrl()
+            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus&paymentid='
+            . $unzerPaymentId;
+
+        $this->getUnzerSDK()->createWebhook($webhookUrl, 'payment');
+    }
+
+    protected function getUnzerSDK(): \UnzerSDK\Unzer
+    {
+        return $this->unzerSDKLoader->getUnzerSDK();
+    }
+
+    /**
+     * @throws UnzerApiException
+     */
+    public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
+    {
+        if ($paymentId = $this->session->getVariable('PaymentId')) {
+            return $this->getUnzerSDK()->fetchPayment($paymentId);
+        }
+
+        return null;
     }
 }

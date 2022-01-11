@@ -15,39 +15,18 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class PayPal extends UnzerPayment
 {
     protected $paymentMethod = 'paypal';
 
-    protected $isRecurring = true;
+    protected $needPending = true;
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
-    public function execute()
+    public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Paypal $uzrPP */
-        $uzrPP = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Paypal());
-
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
-
-        $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
-
-        $transaction = $uzrPP->{$paymentProcedure}(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-            $customer,
-            $this->unzerOrderId,
-            $this->getMetadata()
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\Paypal()
         );
-
-        $this->setSessionVars($transaction);
     }
 }

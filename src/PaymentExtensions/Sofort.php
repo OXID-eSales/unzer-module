@@ -15,8 +15,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Sofort extends UnzerPayment
 {
@@ -24,28 +23,15 @@ class Sofort extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
+    protected $needPending = true;
+
     /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
+     * @return \UnzerSDK\Resources\PaymentTypes\Sofort
      */
-    public function execute()
+    public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Sofort $sofort */
-        $sofort = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Sofort());
-
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
-
-        $transaction = $sofort->charge(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL),
-            $customer,
-            $this->unzerOrderId,
-            $this->getMetadata()
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\Sofort()
         );
-
-        $this->setSessionVars($transaction);
     }
 }

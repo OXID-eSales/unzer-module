@@ -69,20 +69,6 @@ final class Version20211216100154 extends AbstractMigration
             'countries' => []
         ],
 
-        //Credit cards and debit cards are the most common payment method in e-commerce.
-        'oscunzer_cardrecurring' => [
-            'insert' => 0,
-            'de_desc' => "Kreditkarte (wiederkehrende Zahlungen)",
-            'en_desc' => "Credit Card (recurring Payment)",
-            'de_longdesc' => "Von Europa, über Nordamerika bis Asien: kartenbasierte Zahlungsmethoden sind international
-            verbreitet. In vielen Teilen der Welt haben sie schon längst das Bargeld abgelöst. Mit Unzer können Sie einfach
-            alle wichtigen Anbieter akzeptieren.",
-            'en_longdesc' => "From Europe to North America to Asia: card-based payment methods are widely used around the
-            world. In many parts of the world they have long since replaced cash. With Unzer you can easily accept all major
-            providers.",
-            'countries' => []
-        ],
-
         //Electronic Payment Standard (EPS) is an online payment system used in Austria.
         'oscunzer_eps' => [
             'insert' => 1,

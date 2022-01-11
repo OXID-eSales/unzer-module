@@ -15,35 +15,21 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Przelewy24 extends UnzerPayment
 {
     protected $paymentMethod = 'przelewy24';
 
+    protected $needPending = true;
+
     /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
+     * @return \UnzerSDK\Resources\PaymentTypes\Przelewy24
      */
-    public function execute()
+    public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Przelewy24 $uzrPrzelewy */
-        $uzrPrzelewy = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Przelewy24());
-
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
-
-        $transaction = $uzrPrzelewy->charge(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-            $customer,
-            $this->unzerOrderId,
-            $this->getMetadata()
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\Przelewy24()
         );
-
-        $this->setSessionVars($transaction);
     }
 }

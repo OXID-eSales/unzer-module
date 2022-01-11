@@ -15,40 +15,18 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Card extends UnzerPayment
 {
     protected $paymentMethod = 'card';
 
-    protected $isRecurring = true;
+    protected $needPending = true;
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
-    public function execute()
+    public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        $sId = $this->unzerService->getUnzerPaymentIdFromRequest();
-        /** @var \UnzerSDK\Resources\PaymentTypes\Card $uzrCard */
-        $uzrCard = $this->unzerSDK->fetchPaymentType($sId);
-
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
-
-        $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
-
-        $transaction = $uzrCard->{$paymentProcedure}(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL, true),
-            $customer,
-            $this->unzerOrderId,
-            $this->getMetadata()
+        return $this->unzerSDK->fetchPaymentType(
+            $this->unzerService->getUnzerPaymentIdFromRequest()
         );
-
-        $this->setSessionVars($transaction);
     }
 }

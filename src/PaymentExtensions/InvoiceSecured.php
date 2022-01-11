@@ -2,11 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class InvoiceSecured extends UnzerPayment
 {
@@ -14,38 +13,42 @@ class InvoiceSecured extends UnzerPayment
 
     protected $allowedCurrencies = ['EUR'];
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
-    public function execute()
+    public function execute($userModel, $basketModel): bool
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\InvoiceSecured $inv_secured */
-        $inv_secured = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured());
-
-        $user = $this->session->getUser();
         if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
-            $user->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
+            $userModel->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
         }
 
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
+        $inv_secured = $this->getUnzerPaymentTypeObject();
 
-        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basket);
+        $customer = $this->unzerService->getUnzerCustomer($userModel);
+
+        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
 
         $transaction = $inv_secured->charge(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::CONTROLLER_URL),
+            $basketModel->getPrice()->getPrice(),
+            $basketModel->getBasketCurrency()->name,
+            $this->unzerService->prepareRedirectUrl(),
             $customer,
             $this->unzerOrderId,
-            $this->getMetadata(),
+            $this->unzerService->getShopMetadata($this->paymentMethod),
             $uzrBasket
         );
 
-        $this->setSessionVars($transaction);
+        $this->unzerService->setSessionVars($transaction);
 
-        $user->save();
+        $userModel->save();
+
+        return true;
+    }
+
+    /**
+     * @return \UnzerSDK\Resources\PaymentTypes\InvoiceSecured
+     */
+    public function getUnzerPaymentTypeObject(): BasePaymentType
+    {
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\InvoiceSecured()
+        );
     }
 }

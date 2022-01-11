@@ -7,7 +7,6 @@ use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\AliPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Bancontact;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\CardRecurring;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\EPS;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\GiroPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Ideal;
@@ -30,7 +29,6 @@ class PaymentExtensionLoader
         'oscunzer_alipay' => AliPay::class,
         'oscunzer_bancontact' => Bancontact::class,
         'oscunzer_card' => Card::class,
-        'oscunzer_cardrecurring' => CardRecurring::class,
         'oscunzer_eps' => EPS::class,
         'oscunzer_giropay' => GiroPay::class,
         'oscunzer_ideal' => Ideal::class,
@@ -47,20 +45,14 @@ class PaymentExtensionLoader
         'oscunzer_wechatpay' => WeChatPay::class,
     ];
 
-    private $session;
     private $unzerSdkLoader;
-    private $translator;
     private $unzerService;
 
     public function __construct(
-        Session $session,
         UnzerSDKLoader $unzerSDKLoader,
-        Translator $translator,
         Unzer $unzerService
     ) {
-        $this->session = $session;
         $this->unzerSdkLoader = $unzerSDKLoader;
-        $this->translator = $translator;
         $this->unzerService = $unzerService;
     }
 
@@ -68,10 +60,7 @@ class PaymentExtensionLoader
     {
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
-            $payment,
-            $this->session,
             $this->unzerSdkLoader->getUnzerSDK(),
-            $this->translator,
             $this->unzerService
         );
     }

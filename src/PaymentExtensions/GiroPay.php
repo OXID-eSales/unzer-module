@@ -15,35 +15,18 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
-use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class GiroPay extends UnzerPayment
 {
     protected $paymentMethod = 'giropay';
 
-    /**
-     * @return void
-     * @throws UnzerApiException
-     * @throws Exception
-     */
-    public function execute()
+    protected $needPending = true;
+
+    public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        /** @var \UnzerSDK\Resources\PaymentTypes\Giropay $giro */
-        $giro = $this->unzerSDK->createPaymentType(new \UnzerSDK\Resources\PaymentTypes\Giropay());
-
-        $customer = $this->unzerService->getSessionCustomerData();
-        $basket = $this->session->getBasket();
-
-        $transaction = $giro->charge(
-            $basket->getPrice()->getPrice(),
-            $basket->getBasketCurrency()->name,
-            $this->unzerService->prepareRedirectUrl(self::PENDING_URL),
-            $customer,
-            $this->unzerOrderId,
-            $this->getMetadata()
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\Giropay()
         );
-
-        $this->setSessionVars($transaction);
     }
 }
