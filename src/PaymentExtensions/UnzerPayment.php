@@ -48,7 +48,7 @@ abstract class UnzerPayment
         return $this->needPending;
     }
 
-    abstract public function getUnzerPaymentTypeObject();
+    abstract public function getUnzerPaymentTypeObject(): BasePaymentType;
 
     /**
      * @throws UnzerApiException
