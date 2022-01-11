@@ -17,7 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 class UnzerTest extends TestCase
 {
-
     /**
      * @dataProvider prepareRedirectUrlDataProvider
      */
