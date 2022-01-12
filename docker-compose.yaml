@@ -22,3 +22,7 @@ services:
       - MYSQL_DATABASE=oxid
       - MYSQL_USER=oxid
       - MYSQL_PASSWORD=oxid
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
