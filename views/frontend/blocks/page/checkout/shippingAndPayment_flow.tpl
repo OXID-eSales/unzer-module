@@ -16,7 +16,7 @@
                         <h3 class="panel-title">
                             [{oxmultilang ident="SHIPPING_CARRIER"}]
                             <button type="submit"
-                                    class="btn btn-sm btn-warning float-right submitButton largeButton edit-button"
+                                    class="btn btn-xs btn-warning pull-right submitButton largeButton"
                                     title="[{oxmultilang ident="EDIT"}]">
                                 <i class="fa fa-pencil"></i>
                             </button>
@@ -32,20 +32,18 @@
         <div class="col-xs-12 col-md-6" id="orderPayment">
             <div>
                 <div class="panel panel-default">
-                    <form action="[{$oViewConf->getSslSelfLink()}]" method="post">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">
-                                [{oxmultilang ident="PAYMENT_METHOD"}]
-                                [{$oViewConf->getHiddenSid()}]
-                                <input type="hidden" name="cl" value="payment">
-                                <input type="hidden" name="fnc" value="">
-                                <button type="submit"
-                                        class="btn btn-sm btn-warning float-right submitButton largeButton edit-button"
-                                        title="[{oxmultilang ident="EDIT"}]">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </button>
-                            </h3>
-                        </div>
+                    <form class="panel-heading" action="[{$oViewConf->getSslSelfLink()}]" method="post">
+                        <h3 class="panel-title">
+                            [{oxmultilang ident="PAYMENT_METHOD"}]
+                            [{$oViewConf->getHiddenSid()}]
+                            <input type="hidden" name="cl" value="payment">
+                            <input type="hidden" name="fnc" value="">
+                            <button type="submit"
+                                    class="btn btn-xs btn-warning pull-right submitButton largeButton"
+                                    title="[{oxmultilang ident="EDIT"}]">
+                                <i class="fa fa-pencil"></i>
+                            </button>
+                        </h3>
                     </form>
                     <div class="panel-body">
                         [{$payment->oxpayments__oxdesc->value}]
