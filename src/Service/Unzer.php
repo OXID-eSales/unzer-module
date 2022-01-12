@@ -117,7 +117,7 @@ class Unzer
     {
         $basket = new Basket(
             $unzerOrderId,
-            $basketModel->getNettoSum(),
+            $basketModel->getBruttoSum(),
             $basketModel->getBasketCurrency()->name
         );
 
@@ -172,7 +172,7 @@ class Unzer
 
     public function getPaymentProcedure(string $paymentMethod): string
     {
-        if (in_array($paymentMethod, ['paypal', 'card'])) {
+        if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured'])) {
             return $this->moduleSettings->getPaymentProcedureSetting($paymentMethod);
         }
 

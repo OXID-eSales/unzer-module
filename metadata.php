@@ -145,6 +145,12 @@ $aModule = [
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
+        ],
+        [
+            'group' => 'paymentoptions',
+            'name' => 'UnzerOption_oscunzer_installment_rate',
+            'type' => 'str',
+            'value' => '4.5'
         ]
     ],
     'events' => [

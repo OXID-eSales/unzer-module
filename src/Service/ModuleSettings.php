@@ -39,6 +39,11 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
     }
 
+    public function getInstallmentRate(): float
+    {
+        return (float) $this->getSettingValue('UnzerOption_oscunzer_installment_rate');
+    }
+
     public function getShopPrivateKey(): string
     {
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKey');
@@ -51,7 +56,7 @@ class ModuleSettings
 
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
-        if ($this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)) {
+        if ($paymentMethod === 'installment-secured' || $this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)) {
             return self::PAYMENT_AUTHORIZE;
         }
         return self::PAYMENT_CHARGE;

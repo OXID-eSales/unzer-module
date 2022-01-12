@@ -16,6 +16,8 @@
 </form>
 [{assign var=totalgross value=$oxcmp_basket->getBruttoSum()}]
 [{assign var=uzrcurrency value='EUR'}]
+[{assign var=installrate value=$oViewConf->getUnzerInstallmentRate()}]
+
 [{capture assign="unzerInstallmentJS"}]
 
         var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
@@ -36,7 +38,7 @@
             containerId: 'unzer-installment', // required
             amount: [{$totalgross}], // required
             currency: '[{$uzrcurrency}]', // required
-            effectiveInterest: 4.5, // required TODO
+            effectiveInterest: [{$installrate}], // required TODO
            // orderDate: '2019-04-18', // optional
         })
             .then(function(data){
@@ -53,33 +55,24 @@
         let continueButton = document.getElementById('continue-button');
 
         InstallmentSecured.addEventListener('installmentSecuredEvent', function(e) {
-            if (e.action === 'validate') {
-                if (e.success) {
-                    continueButton.removeAttribute('disabled')
-                } else {
-                    continueButton.setAttribute('disabled', 'true')
-                }
-            }
 
             if (e.action === 'change-step') {
-                if (e.currentStep === 'plan-list') {
-                    continueButton.setAttribute('style', 'display: none')
-                } else {
-                    continueButton.setAttribute('style', 'display: block')
-                }
+
             }
         });
 
         // Handling the form's submission.
         let form = document.getElementById('payment-form-installment');
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('keyup', function(event) {
             event.preventDefault();
             InstallmentSecured.createResource()
                 .then(function(data) {
-                    form.submit();
+                    hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(data) );
+                    $('#error-holder').html();
                 })
                 .catch(function(error) {
-                    $('#error-holder').html(error.message)
+                     hiddenInputPaymentTypeId.setAttribute('value', 'validatePayment' );
+                    $('#error-holder').html(error.message);
                 });
         });
     [{/capture}]

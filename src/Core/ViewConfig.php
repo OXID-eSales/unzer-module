@@ -70,4 +70,15 @@ class ViewConfig extends ViewConfig_parent
     {
         return Registry::getSession()->getVariable('additionalPaymentInformation');
     }
+
+    /**
+     * Returns unzer Installment Rate.
+     *
+     * @return float
+     */
+    public function getUnzerInstallmentRate(): float
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getInstallmentRate();
+    }
+
 }
