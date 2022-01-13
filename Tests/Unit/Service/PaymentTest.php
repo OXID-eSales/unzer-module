@@ -60,8 +60,9 @@ class PaymentTest extends TestCase
     public function executePaymentStatusDataProvider(): array
     {
         return [
-            [true],
-            [false]
+            ['success'],
+            ['pending'],
+            ['error']
         ];
     }
 
