@@ -24,7 +24,7 @@ class Order extends Order_parent
     public function finalizeUnzerOrderAfterRedirect($oBasket, $oUser): int
     {
         $this->isRedirectOrder = true;
-        $iRet = parent::finalizeOrder($oBasket, $oUser, true);
+        $iRet = $this->finalizeOrder($oBasket, $oUser, true);
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->checkUnzerPaymentStatus();
         $this->updateOrderStatus($unzerPaymentStatus);
         if ($unzerPaymentStatus != "error") {
@@ -32,7 +32,7 @@ class Order extends Order_parent
         } else {
             // payment is canceled
             $this->delete();
-            return self::ORDER_STATE_PAYMENTERROR;
+            $iRet = self::ORDER_STATE_PAYMENTERROR;
         }
 
         return $iRet;
