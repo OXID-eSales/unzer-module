@@ -9,18 +9,17 @@ on:
   schedule:
     - cron: '16 6 * * *'
   push:
-    branches: [ main ]
+    branches: [ b-6.3.x ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ b-6.3.x ]
 
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-
 
 jobs:
   build:
@@ -33,10 +32,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
-        
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -49,7 +48,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
@@ -71,4 +69,3 @@ jobs:
             ${{ env.REGISTRY }}/oxidprojects/unzer-oxid:oxid63php74
           secrets: |
             "github_token=${{ secrets.GITHUB_TOKEN }}"
-    
