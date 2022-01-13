@@ -78,7 +78,9 @@ abstract class UnzerPayment
 
         $this->unzerService->setSessionVars($transaction);
 
-        if (Registry::getRequest()->getRequestParameter('birthdate')) $userModel->save();
+        if (Registry::getRequest()->getRequestParameter('birthdate')) {
+            $userModel->save();
+        }
 
         return true;
     }

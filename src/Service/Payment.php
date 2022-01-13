@@ -63,7 +63,6 @@ class Payment
             if ($this->redirectUrl) {
                 throw new Redirect($this->redirectUrl);
             }
-
         } catch (Redirect $e) {
             throw $e;
         } catch (UnzerApiException $e) {
@@ -128,7 +127,6 @@ class Payment
                 //$this->createPaymentStatusWebhook($sessionUnzerPayment->getId());
 
                 $this->redirectUrl = $transaction->getRedirectUrl();
-
             } elseif ($transaction->isError()) {
                 throw new Exception($this->translator->translateCode(
                     $transaction->getMessage()->getCode(),
