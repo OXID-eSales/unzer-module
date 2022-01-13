@@ -26,7 +26,7 @@ class Order extends Order_parent
         $this->isRedirectOrder = true;
         $iRet = parent::finalizeOrder($oBasket, $oUser, true);
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->checkUnzerPaymentStatus();
-        $this->updatePaymentStatus($unzerPaymentStatus);
+        $this->updateOrderStatus($unzerPaymentStatus);
         if ($unzerPaymentStatus != "error") {
             $this->initWriteTransactionToDB();
         } else {
@@ -80,9 +80,9 @@ class Order extends Order_parent
     }
 
     /**
-     * @param $status
+     * @param string $status
      */
-    public function updateOrderStatus($status): void
+    public function updateOrderStatus(string $status): void
     {
         switch ($status) {
             case 'success':

@@ -21,7 +21,7 @@ class PaymentTest extends TestCase
     /**
      * @dataProvider executePaymentStatusDataProvider
      */
-    public function testRegularExecuteUnzerPaymentFlow(bool $expectedValue): void
+    public function testRegularExecuteUnzerPaymentFlow(string $expectedValue): void
     {
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
         $paymentExtension = $this->createConfiguredMock(UnzerPayment::class, [

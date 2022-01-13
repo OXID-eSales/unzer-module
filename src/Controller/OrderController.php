@@ -47,10 +47,14 @@ class OrderController extends OrderController_parent
      */
     public function execute()
     {
-        if (!$this->isSepaConfirmed()) return;
+        if (!$this->isSepaConfirmed()) {
+            return;
+        }
 
         $ret = parent::execute();
-        if ($ret == 'thankyou') $this->saveUnzerTransaction();
+        if ($ret == 'thankyou') {
+            $this->saveUnzerTransaction();
+        }
 
         return $ret;
     }
@@ -68,7 +72,7 @@ class OrderController extends OrderController_parent
                 $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
 
                 //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
-                $iSuccess = $oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
                 // performing special actions after user finishes order (assignment to special user groups)
                 $oUser->onOrderExecute($oBasket, $iSuccess);
@@ -110,9 +114,10 @@ class OrderController extends OrderController_parent
         return true;
     }
 
-    public function saveUnzerTransaction(): void{
+    public function saveUnzerTransaction(): void
+    {
         $oOrder = oxNew(Order::class);
-        if($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))){
+        if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
             $oOrder->initWriteTransactionToDB();
         }
     }
