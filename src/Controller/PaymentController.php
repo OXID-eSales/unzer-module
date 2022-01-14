@@ -15,13 +15,31 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+
 class PaymentController extends PaymentController_parent
 {
+    use ServiceContainer;
+
     /**
-     * @return bool
+     * @inheritDoc
      */
-    public function doSomething(): bool
+    public function getPaymentList()
     {
-        return true;
+        $aPaymentList = parent::getPaymentList();
+
+        $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
+        $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
+
+        if (!$pubKey && !$privKey) {
+            foreach ($aPaymentList as $key => $oPayment) {
+                if ($oPayment->isUnzerPayment()) {
+                    unset($aPaymentList[$key]);
+                }
+            }
+        }
+
+        return $aPaymentList;
     }
 }
