@@ -54,15 +54,15 @@ class PaymentTest extends TestCase
         $sut->expects($this->never())->method('removeTemporaryOrder');
         $sut->method('getUnzerPaymentStatus')->willReturn($expectedValue);
 
-        $this->assertSame($expectedValue != 'error', $sut->executeUnzerPayment($paymentModel));
+        $this->assertSame($expectedValue != 'ERROR', $sut->executeUnzerPayment($paymentModel));
     }
 
     public function executePaymentStatusDataProvider(): array
     {
         return [
-            ['success'],
-            ['pending'],
-            ['error']
+            ['OK'],
+            ['NOT_FINISHED'],
+            ['ERROR']
         ];
     }
 
