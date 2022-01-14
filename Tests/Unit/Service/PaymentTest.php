@@ -21,7 +21,7 @@ class PaymentTest extends TestCase
     /**
      * @dataProvider executePaymentStatusDataProvider
      */
-    public function testRegularExecuteUnzerPaymentFlow(bool $expectedValue): void
+    public function testRegularExecuteUnzerPaymentFlow(string $expectedValue): void
     {
         $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
         $paymentExtension = $this->createConfiguredMock(UnzerPayment::class, [
@@ -49,19 +49,20 @@ class PaymentTest extends TestCase
                 $this->createConfiguredMock(UnzerService::class, []),
                 $this->createPartialMock(UnzerSDKLoader::class, [])
             ])
-            ->onlyMethods(['removeTemporaryOrder', 'checkUnzerPaymentStatus'])
+            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus'])
             ->getMock();
         $sut->expects($this->never())->method('removeTemporaryOrder');
-        $sut->method('checkUnzerPaymentStatus')->willReturn($expectedValue);
+        $sut->method('getUnzerPaymentStatus')->willReturn($expectedValue);
 
-        $this->assertSame($expectedValue, $sut->executeUnzerPayment($paymentModel));
+        $this->assertSame($expectedValue != 'ERROR', $sut->executeUnzerPayment($paymentModel));
     }
 
     public function executePaymentStatusDataProvider(): array
     {
         return [
-            [true],
-            [false]
+            ['OK'],
+            ['NOT_FINISHED'],
+            ['ERROR']
         ];
     }
 

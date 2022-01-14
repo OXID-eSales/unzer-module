@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
@@ -76,6 +77,10 @@ abstract class UnzerPayment
         );
 
         $this->unzerService->setSessionVars($transaction);
+
+        if (Registry::getRequest()->getRequestParameter('birthdate')) {
+            $userModel->save();
+        }
 
         return true;
     }
