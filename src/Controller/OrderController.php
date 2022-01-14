@@ -44,6 +44,8 @@ class OrderController extends OrderController_parent
      * (\OxidEsales\Eshop\Application\Model\Order::finalizeOrder()). According to sum for items automatically assigns
      * user to special user group ( \OxidEsales\Eshop\Application\Model\User::onOrderExecute(); if this option is not
      * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
+     *
+     * @return null|string
      */
     public function execute()
     {

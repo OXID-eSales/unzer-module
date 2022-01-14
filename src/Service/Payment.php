@@ -118,6 +118,7 @@ class Payment
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
+                    /** @var \UnzerSDK\Resources\TransactionTypes\Authorization $sessionUnzerPayment */
                     $sessionUnzerPayment->getAuthorization()->charge();
                 }
                 $result = "pending";

@@ -16,12 +16,12 @@ class Order extends Order_parent
     protected $isRedirectOrder = false;
 
     /**
-     * @param $oBasket
-     * @param $oUser
+     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket
+     * @param \OxidEsales\Eshop\Application\Model\User $oUser
      * @return int
      * @throws \Exception
      */
-    public function finalizeUnzerOrderAfterRedirect($oBasket, $oUser): int
+    public function finalizeUnzerOrderAfterRedirect(\OxidEsales\Eshop\Application\Model\Basket $oBasket, \OxidEsales\Eshop\Application\Model\User $oUser): int
     {
         $this->isRedirectOrder = true;
         $iRet = $this->finalizeOrder($oBasket, $oUser, true);
