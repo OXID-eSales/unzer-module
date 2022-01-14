@@ -20,62 +20,51 @@
 
 [{capture assign="unzerInstallmentJS"}]
 
-        var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
-        var divHidden = submitBasketForm.querySelector('.hidden');
-
-        let hiddenInputPaymentTypeId = divHidden.querySelector('paymentData');
-        hiddenInputPaymentTypeId = document.createElement('input');
-        hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
-        hiddenInputPaymentTypeId.setAttribute('name', 'paymentData');
-        divHidden.appendChild(hiddenInputPaymentTypeId);
-
         // Create an Unzer instance with your public key
         let unzerInstance = new unzer('[{$unzerpub}]');
 
         let InstallmentSecured = unzerInstance.InstallmentSecured();
 
         InstallmentSecured.create({
-            containerId: 'unzer-installment', // required
-            amount: [{$totalgross}], // required
-            currency: '[{$uzrcurrency}]', // required
-            effectiveInterest: [{$installrate}], // required TODO
-           // orderDate: '2019-04-18', // optional
-        })
-            .then(function(data){
-                // if successful, notify the user that the list of installments was fetched successfully
-                // in case you were using a loading element during the fetching process,
-                // you can remove it inside this callback function
-            })
-            .catch(function(error) {
-                // sent an error message to the user (fetching installment list failed)
-            });
+            containerId: 'unzer-installment',
+            amount: [{$totalgross}],
+            currency: '[{$uzrcurrency}]',
+            effectiveInterest: [{$installrate}]
+        });
 
-
-
-        let continueButton = document.getElementById('continue-button');
-
-        InstallmentSecured.addEventListener('installmentSecuredEvent', function(e) {
-
-            if (e.action === 'change-step') {
-
+        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+            if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+                event.preventDefault();
+                $( '#payment-form-installment' ).submit();
             }
         });
 
-        // Handling the form's submission.
-        let form = document.getElementById('payment-form-installment');
-        form.addEventListener('keyup', function(event) {
+        // Handling payment form submission
+        $( "#payment-form-installment" ).submit(function( event ) {
             event.preventDefault();
-            InstallmentSecured.createResource()
+            if($('.unzerUI-installment-secured__selected-rate').length){
+                InstallmentSecured.createResource()
                 .then(function(data) {
-                    hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(data) );
-                    $('#error-holder').html("");
+                    let hiddenInput = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentData')
+                    .val(JSON.stringify(data));
+
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+                    $( '#orderConfirmAgbBottom' ).addClass("submitable");
+                    $( "#orderConfirmAgbBottom" ).submit();
                 })
                 .catch(function(error) {
-                     hiddenInputPaymentTypeId.setAttribute('value', 'validatePayment' );
                     $('#error-holder').html(error.message);
+                    $('html, body').animate({
+                    scrollTop: $("#orderPayment").offset().top - 150
+                    }, 350);
                 });
-
-
+            }else{
+                $('html, body').animate({
+                scrollTop: $("#orderPayment").offset().top - 150
+                }, 350);
+            }
         });
-    [{/capture}]
+[{/capture}]
 [{oxscript add=$unzerInstallmentJS}]
