@@ -59,7 +59,7 @@ class UnzerTest extends TestCase
     {
         return [
             ['value/', false, 'value/index.php?cl=order'],
-            ['value/', true, 'value/index.php?cl=order&fnc=unzerExecuteAfterRedirect&uzrredirect=1']
+            ['value/', true, 'value/index.php?cl=order&fnc=unzerExecuteAfterRedirect']
         ];
     }
 

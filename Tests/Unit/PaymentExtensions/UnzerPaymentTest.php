@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Exception;
 
-use Exception;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
@@ -11,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
+use UnzerSDK\Resources\PaymentTypes\Invoice as InvoiceAlias;
 use UnzerSDK\Resources\TransactionTypes\Charge;
-use UnzerSDK\Traits\CanDirectCharge;
 use UnzerSDK\Unzer as UnzerSDK;
 
 class UnzerPaymentTest extends TestCase
@@ -54,15 +53,7 @@ class UnzerPaymentTest extends TestCase
             $unzerServiceMock
         ], '', true, true, true, ['getUnzerPaymentTypeObject']);
         $sut->method('getUnzerPaymentTypeObject')->willReturn(
-            $paymentTypeMock = $this->getMockForTrait(
-                CanDirectCharge::class,
-                [],
-                '',
-                true,
-                true,
-                true,
-                ['charge']
-            )
+            $paymentTypeMock = $this->createPartialMock(InvoiceAlias::class, ['charge'])
         );
         $paymentTypeMock->expects($this->atLeastOnce())
             ->method('charge')

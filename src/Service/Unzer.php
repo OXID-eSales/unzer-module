@@ -17,6 +17,8 @@ use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Charge;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 
 class Unzer
 {
@@ -55,6 +57,10 @@ class Unzer
             $oUser->getFieldData('oxfname'),
             $oUser->getFieldData('oxlname')
         );
+
+        if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
+            $oUser->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
+        }
 
         $customer->setBirthDate(
             $oUser->getFieldData('oxbirthdate') != "0000-00-00"
@@ -184,7 +190,7 @@ class Unzer
         $redirectUrl = $this->prepareRedirectUrl('order');
 
         if ($addPending) {
-            $redirectUrl .= '&fnc=unzerExecuteAfterRedirect&uzrredirect=1';
+            $redirectUrl .= '&fnc=unzerExecuteAfterRedirect';
         }
 
         return $redirectUrl;

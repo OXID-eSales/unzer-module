@@ -15,6 +15,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
@@ -40,43 +44,26 @@ class OrderController extends OrderController_parent
      * (\OxidEsales\Eshop\Application\Model\Order::finalizeOrder()). According to sum for items automatically assigns
      * user to special user group ( \OxidEsales\Eshop\Application\Model\User::onOrderExecute(); if this option is not
      * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
+     *
+     * @return null|string
      */
     public function execute()
     {
-        $foundIssue = false;
-        $result = '';
-
-        if (!$this->getSession()->checkSessionChallenge()) {
-            $foundIssue = true;
+        if (!$this->isSepaConfirmed()) {
+            return;
         }
 
-        if (!$this->_validateTermsAndConditions()) {
-            $this->_blConfirmAGBError = true;
-            $foundIssue = true;
+        $ret = parent::execute();
+        if ($ret == 'thankyou') {
+            $this->saveUnzerTransaction();
         }
 
-        // additional check if we really really have a user now
-        $oUser = $this->getUser();
-        if (!$oUser) {
-            $foundIssue = true;
-            $result = 'user';
-        }
-
-        if ($this->getPayment()->getId() === 'oscunzer_sepa') {
-            $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
-            if (!$blSepaMandateConfirm) {
-                $this->blSepaMandateConfirmError = true;
-                $foundIssue = true;
-            }
-        }
-
-        if (!$foundIssue) {
-            $result = parent::execute();
-        }
-
-        return $result;
+        return $ret;
     }
 
+    /**
+     * @throws Redirect
+     */
     public function unzerExecuteAfterRedirect(): void
     {
         // get basket contents
@@ -87,7 +74,7 @@ class OrderController extends OrderController_parent
                 $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
 
                 //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
-                $iSuccess = $oOrder->finalizeOrder($oBasket, $oUser);
+                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
                 // performing special actions after user finishes order (assignment to special user groups)
                 $oUser->onOrderExecute($oBasket, $iSuccess);
@@ -97,12 +84,10 @@ class OrderController extends OrderController_parent
                 // proceeding to next view
                 $unzerService = $this->getServiceFromContainer(Unzer::class);
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
-            } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
+            } catch (OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
-            } catch (\OxidEsales\Eshop\Core\Exception\NoArticleException $oEx) {
-                Registry::getUtilsView()->addErrorToDisplay($oEx);
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
+            } catch (NoArticleException | ArticleInputException $oEx) {
                 Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
@@ -114,5 +99,28 @@ class OrderController extends OrderController_parent
     public function isSepaMandateConfirmationError(): ?bool
     {
         return $this->blSepaMandateConfirmError;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSepaConfirmed(): bool
+    {
+        if ($this->getPayment()->getId() === 'oscunzer_sepa') {
+            $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
+            if (!$blSepaMandateConfirm) {
+                $this->blSepaMandateConfirmError = true;
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function saveUnzerTransaction(): void
+    {
+        $oOrder = oxNew(Order::class);
+        if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
+            $oOrder->initWriteTransactionToDB();
+        }
     }
 }

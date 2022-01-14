@@ -2,6 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Core;
 
+use OxidEsales\Eshop\Core\ConfigFile;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Utils;
@@ -19,6 +20,10 @@ class ShopControlTest extends UnitTestCase
      */
     public function testHandleCustomException($expectedException): void
     {
+        $configFile = $this->createPartialMock(ConfigFile::class, ['getVar']);
+        $configFile->method('getVar')->with('iDebug')->willReturn(0);
+        Registry::set(ConfigFile::class, $configFile);
+
         class_alias(
             \OxidEsales\Eshop\Core\ShopControl::class,
             'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
