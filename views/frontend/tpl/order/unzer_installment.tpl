@@ -68,12 +68,14 @@
             InstallmentSecured.createResource()
                 .then(function(data) {
                     hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(data) );
-                    $('#error-holder').html();
+                    $('#error-holder').html("");
                 })
                 .catch(function(error) {
                      hiddenInputPaymentTypeId.setAttribute('value', 'validatePayment' );
                     $('#error-holder').html(error.message);
                 });
+
+
         });
     [{/capture}]
 [{oxscript add=$unzerInstallmentJS}]
