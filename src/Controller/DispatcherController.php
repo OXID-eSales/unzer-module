@@ -45,23 +45,25 @@ class DispatcherController extends FrontendController
                 ->getUnzerSDK()
                 ->fetchPayment($paymentId);
 
-            if ($order->load($data[0]['OXORDERID']) && $unzerPayment->getState() == 1) {
-                $utilsDate = Registry::getUtilsDate();
-                $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-                $order->oxorder__oxpaid = new Field($date);
-                $order->save();
-            }
+            if ($order->load($data[0]['OXORDERID'])) {
+                if ($unzerPayment->getState() == 1) {
+                    $utilsDate = Registry::getUtilsDate();
+                    $date = date('Y-m-d H:i:s', $utilsDate->getTime());
+                    $order->oxorder__oxpaid = new Field($date);
+                    $order->save();
+                }
 
-            $translator = $this->getServiceFromContainer(Translator::class);
+                $translator = $this->getServiceFromContainer(Translator::class);
 
-            if ($transaction->writeTransactionToDB($data[0]['OXORDERID'], $data[0]['OXUSERID'], $unzerPayment)) {
-                $result = sprintf(
-                    $translator->translate('oscunzer_TRANSACTION_CHANGE'),
-                    $unzerPayment->getStateName(),
-                    $paymentId
-                );
-            } else {
-                $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
+                if ($order->initWriteTransactionToDB()) {
+                    $result = sprintf(
+                        $translator->translate('oscunzer_TRANSACTION_CHANGE'),
+                        $unzerPayment->getStateName(),
+                        $paymentId
+                    );
+                } else {
+                    $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
+                }
             }
         }
         Registry::getUtils()->showMessageAndExit($result);

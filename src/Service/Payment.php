@@ -9,8 +9,8 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class Payment
 {
@@ -28,6 +28,8 @@ class Payment
 
     /** @var UnzerSDKLoader */
     protected $unzerSDKLoader;
+
+    protected $redirectUrl = null;
 
     public function __construct(
         Session $session,
@@ -56,11 +58,11 @@ class Payment
                 $this->session->getBasket()
             );
 
-            if (!$paymentId = $this->session->getVariable('PaymentId')) {
-                throw new Exception("Something went wrong. Please try again later.");
-            }
+            $paymentStatus = ($this->getUnzerPaymentStatus() != "ERROR");
 
-            $paymentStatus = $this->checkUnzerPaymentStatus($paymentId);
+            if ($this->redirectUrl) {
+                throw new Redirect($this->redirectUrl);
+            }
         } catch (Redirect $e) {
             throw $e;
         } catch (UnzerApiException $e) {
@@ -99,22 +101,35 @@ class Payment
         return $result;
     }
 
-    public function checkUnzerPaymentStatus($paymentId): bool
+    /**
+     * @return string
+     * @throws UnzerApiException
+     */
+    public function getUnzerPaymentStatus(): string
     {
-        $result = false;
+        $result = "ERROR";
 
-        // Redirect to success if the payment has been successfully completed.
-        $unzerPayment = $this->getUnzerSDK()->fetchPayment($paymentId);
-        if ($transaction = $unzerPayment->getInitialTransaction()) {
+        /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
+        $sessionUnzerPayment = $this->getSessionUnzerPayment();
+        $transaction = $sessionUnzerPayment->getInitialTransaction();
+
+        if ($sessionUnzerPayment->isCompleted()) {
+            $result = "OK";
+        } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
-                $result = true;
-            } elseif ($transaction->isPending()) {
-                $this->createPaymentStatusWebhook($paymentId);
+                $result = "NOT_FINISHED";
 
-                if ($redirectUrl = $transaction->getRedirectUrl()) {
-                    throw new Redirect($redirectUrl);
+                if ($transaction instanceof Authorization) {
+                    /** @var \UnzerSDK\Resources\TransactionTypes\Authorization $authorization */
+                    $authorization = $sessionUnzerPayment->getAuthorization();
+                    $authorization->charge();
                 }
-                $result = true;
+            } elseif ($transaction->isPending()) {
+                $result = "NOT_FINISHED";
+
+                $this->createPaymentStatusWebhook($sessionUnzerPayment->getId());
+
+                $this->redirectUrl = $transaction->getRedirectUrl();
             } elseif ($transaction->isError()) {
                 throw new Exception($this->translator->translateCode(
                     $transaction->getMessage()->getCode(),
