@@ -76,8 +76,8 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return bool
      */
-    public function getjQueryImport()
+    public function useModuleJQueryInFrontend()
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getjQueryImport();
+        return $this->getServiceFromContainer(ModuleSettings::class)->useModuleJQueryInFrontend();
     }
 }

@@ -49,7 +49,7 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
-    public function getjQueryImport(): bool
+    public function useModuleJQueryInFrontend(): bool
     {
         return (bool) $this->getSettingValue('UnzerjQuery');
     }
