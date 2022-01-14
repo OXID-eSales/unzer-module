@@ -1,3 +1,5 @@
+[{include file="modules/osc/unzer/unzer_assets.tpl"}]
+
 [{block name="unzer_inv_secured_birthdate"}]
     [{if $oxcmp_user->oxuser__oxbirthdate->value == "0000-00-00"}]
         <form id="inv_secured_birthdate" class="js-oxValidate form-horizontal" novalidate="novalidate">

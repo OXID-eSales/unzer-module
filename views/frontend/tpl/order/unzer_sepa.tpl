@@ -1,9 +1,4 @@
-[{block name="unzer_sepajs"}]
-    [{oxscript include="https://static.unzer.com/v1/unzer.js"}]
-    [{/block}]
-[{block name="unzer_sepa_css"}]
-    [{oxstyle include="https://static.unzer.com/v1/unzer.css"}]
-    [{/block}]
+[{include file="modules/osc/unzer/unzer_assets.tpl"}]
 
 <div id="payment-form-sepa">
     <div id="sepa-IBAN" class="field">

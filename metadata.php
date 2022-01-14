@@ -47,6 +47,7 @@ $aModule = [
         'oscunzer_order.tpl' => 'osc/unzer/views/admin/tpl/oscunzer_order.tpl',
 
         // frontend
+        'modules/osc/unzer/unzer_assets.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_assets.tpl',
         'modules/osc/unzer/unzer_alipay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_alipay.tpl',
         'modules/osc/unzer/unzer_bancontact.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_bancontact.tpl',
         'modules/osc/unzer/unzer_card.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_card.tpl',
