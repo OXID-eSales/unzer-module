@@ -58,6 +58,8 @@ $aModule = [
         'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
         'modules/osc/unzer/unzer_wechat.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_wechat.tpl',
         'modules/osc/unzer/unzer_ideal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_ideal.tpl',
+        'modules/osc/unzer/unzer_shippingAndPayment_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
+        'modules/osc/unzer/unzer_shippingAndPayment_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
     ],
     'blocks' => [
         //frontend
@@ -152,6 +154,12 @@ $aModule = [
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
+        ],
+        [
+            'group' => 'other',
+            'name' => 'UnzerjQuery',
+            'type' => 'bool',
+            'value' => '0',
         ]
     ],
     'events' => [

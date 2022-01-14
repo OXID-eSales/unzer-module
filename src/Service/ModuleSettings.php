@@ -49,6 +49,11 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
+    public function getjQueryImport(): bool
+    {
+        return (bool) $this->getSettingValue('UnzerjQuery');
+    }
+
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
         if ($this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)) {
