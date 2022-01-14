@@ -70,4 +70,14 @@ class ViewConfig extends ViewConfig_parent
     {
         return Registry::getSession()->getVariable('additionalPaymentInformation');
     }
+
+    /**
+     * checks if jQuery should be imported
+     *
+     * @return bool
+     */
+    public function useModuleJQueryInFrontend()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->useModuleJQueryInFrontend();
+    }
 }
