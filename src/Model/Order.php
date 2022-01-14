@@ -21,13 +21,21 @@ class Order extends Order_parent
      * @return int
      * @throws \Exception
      */
-    public function finalizeUnzerOrderAfterRedirect(\OxidEsales\Eshop\Application\Model\Basket $oBasket, \OxidEsales\Eshop\Application\Model\User $oUser): int
-    {
+    public function finalizeUnzerOrderAfterRedirect(
+        \OxidEsales\Eshop\Application\Model\Basket $oBasket,
+        \OxidEsales\Eshop\Application\Model\User $oUser
+    ): int {
         $this->isRedirectOrder = true;
         $iRet = $this->finalizeOrder($oBasket, $oUser, true);
-        $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->checkUnzerPaymentStatus();
-        $this->updateOrderStatus($unzerPaymentStatus);
-        if ($unzerPaymentStatus != "error") {
+        $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
+
+        $this->_setOrderStatus($unzerPaymentStatus);
+
+        if ($unzerPaymentStatus == 'OK') {
+            $this->markUnzerOrderAsPaid();
+        }
+
+        if ($unzerPaymentStatus != "ERROR") {
             $this->initWriteTransactionToDB();
         } else {
             // payment is canceled
@@ -77,24 +85,5 @@ class Order extends Order_parent
         }
 
         return false;
-    }
-
-    /**
-     * @param string $status
-     */
-    public function updateOrderStatus(string $status): void
-    {
-        switch ($status) {
-            case 'success':
-                $this->_setOrderStatus('OK');
-                $this->markUnzerOrderAsPaid();
-                break;
-            case 'pending':
-                $this->_setOrderStatus('NOT_FINISHED');
-                break;
-            case 'error':
-                $this->_setOrderStatus('ERROR');
-                break;
-        }
     }
 }

@@ -58,7 +58,7 @@ class Payment
                 $this->session->getBasket()
             );
 
-            $paymentStatus = ($this->checkUnzerPaymentStatus() != "error");
+            $paymentStatus = ($this->getUnzerPaymentStatus() != "ERROR");
 
             if ($this->redirectUrl) {
                 throw new Redirect($this->redirectUrl);
@@ -105,27 +105,29 @@ class Payment
      * @return string
      * @throws UnzerApiException
      */
-    public function checkUnzerPaymentStatus(): string
+    public function getUnzerPaymentStatus(): string
     {
-        $result = "error";
+        $result = "ERROR";
 
         /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {
-            $result = "success";
+            $result = "OK";
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
-                if ($transaction instanceof Authorization) {
-                    /** @var \UnzerSDK\Resources\TransactionTypes\Authorization $sessionUnzerPayment */
-                    $sessionUnzerPayment->getAuthorization()->charge();
-                }
-                $result = "pending";
-            } elseif ($transaction->isPending()) {
-                $result = "pending";
+                $result = "NOT_FINISHED";
 
-                //$this->createPaymentStatusWebhook($sessionUnzerPayment->getId());
+                if ($transaction instanceof Authorization) {
+                    /** @var \UnzerSDK\Resources\TransactionTypes\Authorization $authorization */
+                    $authorization = $sessionUnzerPayment->getAuthorization();
+                    $authorization->charge();
+                }
+            } elseif ($transaction->isPending()) {
+                $result = "NOT_FINISHED";
+
+                $this->createPaymentStatusWebhook($sessionUnzerPayment->getId());
 
                 $this->redirectUrl = $transaction->getRedirectUrl();
             } elseif ($transaction->isError()) {

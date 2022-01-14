@@ -49,10 +49,10 @@ class PaymentTest extends TestCase
                 $this->createConfiguredMock(UnzerService::class, []),
                 $this->createPartialMock(UnzerSDKLoader::class, [])
             ])
-            ->onlyMethods(['removeTemporaryOrder', 'checkUnzerPaymentStatus'])
+            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus'])
             ->getMock();
         $sut->expects($this->never())->method('removeTemporaryOrder');
-        $sut->method('checkUnzerPaymentStatus')->willReturn($expectedValue);
+        $sut->method('getUnzerPaymentStatus')->willReturn($expectedValue);
 
         $this->assertSame($expectedValue != 'error', $sut->executeUnzerPayment($paymentModel));
     }
