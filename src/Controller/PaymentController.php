@@ -23,6 +23,14 @@ class PaymentController extends PaymentController_parent
     use ServiceContainer;
 
     /**
+     * @return bool
+     */
+    public function doSomething(): bool
+    {
+        return true;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getPaymentList()
