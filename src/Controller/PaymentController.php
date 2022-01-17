@@ -40,7 +40,7 @@ class PaymentController extends PaymentController_parent
         $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
         $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
 
-        if (!$pubKey && !$privKey) {
+        if (!$pubKey || !$privKey) {
             foreach ($aPaymentList as $key => $oPayment) {
                 if ($oPayment->isUnzerPayment()) {
                     unset($aPaymentList[$key]);
