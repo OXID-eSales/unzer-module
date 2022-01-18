@@ -54,6 +54,11 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
+    public function useModuleJQueryInFrontend(): bool
+    {
+        return (bool) $this->getSettingValue('UnzerjQuery');
+    }
+
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
         if ($paymentMethod === 'installment-secured' || $this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)) {

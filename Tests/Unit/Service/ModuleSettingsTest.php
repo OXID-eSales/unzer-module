@@ -37,6 +37,20 @@ class ModuleSettingsTest extends TestCase
             ],
             [
                 'values' => [
+                    ['UnzerjQuery', Module::MODULE_ID, true],
+                ],
+                'settingMethod' => 'useModuleJQueryInFrontend',
+                'settingValue' => true
+            ],
+            [
+                'values' => [
+                    ['UnzerjQuery', Module::MODULE_ID, false],
+                ],
+                'settingMethod' => 'useModuleJQueryInFrontend',
+                'settingValue' => false
+            ],
+            [
+                'values' => [
                     ['UnzerSystemMode', Module::MODULE_ID, 1],
                 ],
                 'settingMethod' => 'getSystemMode',

@@ -1,9 +1,4 @@
-[{block name="unzer_installment_css"}]
-    [{oxscript include="https://static.unzer.com/v1/unzer.js"}]
-    [{/block}]
-[{block name="unzer_installment_css"}]
-    [{oxstyle include="https://static.unzer.com/v1/unzer.css"}]
-    [{/block}]
+[{include file="modules/osc/unzer/unzer_assets.tpl"}]
 
 <form id="payment-form-installment" class="unzerUI form unzerUI-installmentsecured__form" novalidate>
     <div id="unzer-installment">

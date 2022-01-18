@@ -81,4 +81,14 @@ class ViewConfig extends ViewConfig_parent
         return $this->getServiceFromContainer(ModuleSettings::class)->getInstallmentRate();
     }
 
+
+    /**
+     * checks if jQuery should be imported
+     *
+     * @return bool
+     */
+    public function useModuleJQueryInFrontend()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->useModuleJQueryInFrontend();
+    }
 }
