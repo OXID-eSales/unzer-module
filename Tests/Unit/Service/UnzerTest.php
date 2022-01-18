@@ -82,6 +82,7 @@ class UnzerTest extends TestCase
         return [
             ['paypal', 'special'],
             ['card', 'special'],
+            ['installment-secured', 'special'],
             ['other', ModuleSettings::PAYMENT_CHARGE],
         ];
     }
@@ -106,6 +107,7 @@ class UnzerTest extends TestCase
 
         $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
             'getNettoSum' => 123.45,
+            'getBruttoSum' => 234.56,
             'getBasketCurrency' => $currency
         ]);
 
@@ -113,7 +115,7 @@ class UnzerTest extends TestCase
         $result = $sut->getUnzerBasket('someOrderId', $shopBasketModel);
 
         $this->assertInstanceOf(\UnzerSDK\Resources\Basket::class, $result);
-        $this->assertSame(123.45, $result->getAmountTotalGross());
+        $this->assertSame(234.56, $result->getAmountTotalGross());
         $this->assertSame('EUR', $result->getCurrencyCode());
         $this->assertSame('someOrderId', $result->getOrderId());
     }
@@ -139,6 +141,7 @@ class UnzerTest extends TestCase
 
         $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
             'getNettoSum' => 123.45,
+            'getBruttoSum' => 234.56,
             'getBasketCurrency' => $currency,
             'getContents' => [$basketItem1, $basketItem2],
         ]);
