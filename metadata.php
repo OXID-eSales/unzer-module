@@ -157,6 +157,12 @@ $aModule = [
             'constraints' => '0|1'
         ],
         [
+            'group' => 'paymentoptions',
+            'name' => 'UnzerOption_oscunzer_installment_rate',
+            'type' => 'str',
+            'value' => '4.5'
+        ],
+        [
             'group' => 'other',
             'name' => 'UnzerjQuery',
             'type' => 'bool',

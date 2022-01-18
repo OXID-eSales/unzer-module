@@ -72,6 +72,17 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
+     * Returns unzer Installment Rate.
+     *
+     * @return float
+     */
+    public function getUnzerInstallmentRate(): float
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getInstallmentRate();
+    }
+
+
+    /**
      * checks if jQuery should be imported
      *
      * @return bool

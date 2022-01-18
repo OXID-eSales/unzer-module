@@ -11,16 +11,9 @@
 </form>
 [{assign var=totalgross value=$oxcmp_basket->getBruttoSum()}]
 [{assign var=uzrcurrency value='EUR'}]
+[{assign var=installrate value=$oViewConf->getUnzerInstallmentRate()}]
+
 [{capture assign="unzerInstallmentJS"}]
-
-        var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
-        var divHidden = submitBasketForm.querySelector('.hidden');
-
-        let hiddenInputPaymentTypeId = divHidden.querySelector('paymentData');
-        hiddenInputPaymentTypeId = document.createElement('input');
-        hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
-        hiddenInputPaymentTypeId.setAttribute('name', 'paymentData');
-        divHidden.appendChild(hiddenInputPaymentTypeId);
 
         // Create an Unzer instance with your public key
         let unzerInstance = new unzer('[{$unzerpub}]');
@@ -28,54 +21,45 @@
         let InstallmentSecured = unzerInstance.InstallmentSecured();
 
         InstallmentSecured.create({
-            containerId: 'unzer-installment', // required
-            amount: [{$totalgross}], // required
-            currency: '[{$uzrcurrency}]', // required
-            effectiveInterest: 4.5, // required TODO
-           // orderDate: '2019-04-18', // optional
-        })
-            .then(function(data){
-                // if successful, notify the user that the list of installments was fetched successfully
-                // in case you were using a loading element during the fetching process,
-                // you can remove it inside this callback function
-            })
-            .catch(function(error) {
-                // sent an error message to the user (fetching installment list failed)
-            });
+            containerId: 'unzer-installment',
+            amount: [{$totalgross}],
+            currency: '[{$uzrcurrency}]',
+            effectiveInterest: [{$installrate}]
+        });
 
-
-
-        let continueButton = document.getElementById('continue-button');
-
-        InstallmentSecured.addEventListener('installmentSecuredEvent', function(e) {
-            if (e.action === 'validate') {
-                if (e.success) {
-                    continueButton.removeAttribute('disabled')
-                } else {
-                    continueButton.setAttribute('disabled', 'true')
-                }
-            }
-
-            if (e.action === 'change-step') {
-                if (e.currentStep === 'plan-list') {
-                    continueButton.setAttribute('style', 'display: none')
-                } else {
-                    continueButton.setAttribute('style', 'display: block')
-                }
+        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+            if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+                event.preventDefault();
+                $( '#payment-form-installment' ).submit();
             }
         });
 
-        // Handling the form's submission.
-        let form = document.getElementById('payment-form-installment');
-        form.addEventListener('submit', function(event) {
+        // Handling payment form submission
+        $( "#payment-form-installment" ).submit(function( event ) {
             event.preventDefault();
-            InstallmentSecured.createResource()
+            if($('.unzerUI-installment-secured__selected-rate').length){
+                InstallmentSecured.createResource()
                 .then(function(data) {
-                    form.submit();
+                    let hiddenInput = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentData')
+                    .val(JSON.stringify(data));
+
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+                    $( '#orderConfirmAgbBottom' ).addClass("submitable");
+                    $( "#orderConfirmAgbBottom" ).submit();
                 })
                 .catch(function(error) {
-                    $('#error-holder').html(error.message)
+                    $('#error-holder').html(error.message);
+                    $('html, body').animate({
+                    scrollTop: $("#orderPayment").offset().top - 150
+                    }, 350);
                 });
+            }else{
+                $('html, body').animate({
+                scrollTop: $("#orderPayment").offset().top - 150
+                }, 350);
+            }
         });
-    [{/capture}]
+[{/capture}]
 [{oxscript add=$unzerInstallmentJS}]
