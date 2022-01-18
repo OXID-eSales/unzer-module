@@ -61,7 +61,10 @@ class ModuleSettings
 
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
-        if ($paymentMethod === 'installment-secured' || $this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)) {
+        if (
+            $paymentMethod === 'installment-secured' ||
+            $this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)
+        ) {
             return self::PAYMENT_AUTHORIZE;
         }
         return self::PAYMENT_CHARGE;
