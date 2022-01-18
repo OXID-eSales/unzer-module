@@ -31,23 +31,28 @@ class PaymentController extends PaymentController_parent
     }
 
     /**
-     * @inheritDoc
+     * Template variable getter. Returns paymentlist
+     *
+     * @return array<array-key, mixed>|object
      */
     public function getPaymentList()
     {
-        $aPaymentList = parent::getPaymentList();
+        $paymentList = parent::getPaymentList();
 
         $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
         $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
-
         if (!$pubKey || !$privKey) {
-            foreach ($aPaymentList as $key => $oPayment) {
-                if ($oPayment->isUnzerPayment()) {
-                    unset($aPaymentList[$key]);
+            $paymentListRaw = $paymentList;
+            $paymentList = [];
+
+            foreach ($paymentListRaw as $key => $payment) {
+                if ($payment->isUnzerPayment()) {
+                    continue;
                 }
+                $paymentList[$key] = $payment;
             }
         }
 
-        return $aPaymentList;
+        return $paymentList;
     }
 }
