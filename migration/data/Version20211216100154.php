@@ -428,6 +428,9 @@ final class Version20211216100154 extends AbstractMigration
         if (!$transaction->hasColumn('OXID')) {
             $transaction->addColumn('OXID', Types::STRING, ['columnDefinition' => 'char(32) collate latin1_general_ci']);
         }
+        if (!$transaction->hasColumn('SHORTID')) {
+            $transaction->addColumn('SHORTID', Types::STRING, ['default' => ""]);
+        }
         if (!$transaction->hasColumn('OXORDERID')) {
             $transaction->addColumn('OXORDERID', Types::STRING, ['columnDefinition' => 'char(32) collate latin1_general_ci', 'comment' => 'OXID (oxorder)']);
         }
@@ -445,9 +448,6 @@ final class Version20211216100154 extends AbstractMigration
         }
         if (!$transaction->hasColumn('TYPEID')) {
             $transaction->addColumn('TYPEID', Types::STRING, ['default' => ""]);
-        }
-        if (!$transaction->hasColumn('METADATAID')) {
-            $transaction->addColumn('METADATAID', Types::STRING, ['default' => ""]);
         }
         if (!$transaction->hasColumn('METADATA')) {
             $transaction->addColumn('METADATA', Types::JSON, ['default' => ""]);
@@ -468,7 +468,7 @@ final class Version20211216100154 extends AbstractMigration
             $transaction->setPrimaryKey(['OXID']);
         }
         if (!$transaction->hasIndex('TRANSACTIONUNIQUE')) {
-            $transaction->addUniqueIndex(['OXSHOPID', 'OXORDERID', 'OXUSERID', 'AMOUNT', 'METADATAID', 'CUSTOMERID', 'OXACTION'], 'TRANSACTIONUNIQUE');
+            $transaction->addUniqueIndex(['OXSHOPID', 'OXORDERID', 'OXUSERID', 'AMOUNT', 'SHORTID', 'CUSTOMERID', 'OXACTION'], 'TRANSACTIONUNIQUE');
         }
     }
 
