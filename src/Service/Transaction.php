@@ -69,12 +69,16 @@ class Transaction
 
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
-        $params = [];
-        $params['amount'] = $unzerPayment->getAmount()->getTotal();
-        $params['currency'] = $unzerPayment->getCurrency();
-        $params['typeid'] = $unzerPayment->getId();
-        $params['shortid'] = $unzerPayment->getInitialTransaction()->getShortId();
-        $params['oxaction'] = $unzerPayment->getStateName();
+        $params = [
+            'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'currency' => $unzerPayment->getCurrency(),
+            'typeid'   => $unzerPayment->getId(),
+            'oxaction' => $unzerPayment->getStateName()
+        ];
+
+        if ($initialTransaction = $unzerPayment->getInitialTransaction()) {
+            $params['shortid'] = $initialTransaction->getShortId();
+        }
 
         if ($metadata = $unzerPayment->getMetadata()) {
             $params['metadata'] = $metadata->jsonSerialize();
