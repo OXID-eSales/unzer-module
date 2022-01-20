@@ -30,4 +30,14 @@ class Payment extends Payment_parent
 
         return $this->getServiceFromContainer(PaymentValidator::class)->isPaymentCurrencyAllowed($this);
     }
+
+    /**
+     * Checks if the payment method is secured or installment
+     *
+     * @return bool
+     */
+    public function isUnzerSecuredPayment(): bool
+    {
+        return $this->getServiceFromContainer(PaymentValidator::class)->isSecuredPayment($this);
+    }
 }

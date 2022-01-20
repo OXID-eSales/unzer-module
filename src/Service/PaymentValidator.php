@@ -43,4 +43,22 @@ class PaymentValidator
         return !count($allowedCurrencies)
             || in_array($this->moduleContext->getActiveCurrencyName(), $allowedCurrencies);
     }
+
+    public function isSecuredPayment(Payment $payment): bool
+    {
+        $isSecured = false;
+
+        if ($this->isUnzerPayment($payment)) {
+            if (strpos(strtolower($payment->getId()), "installment") !== false) {
+                $isSecured = true;
+            }
+
+            if (strpos(strtolower($payment->getId()), "secured") !== false) {
+                $isSecured = true;
+            }
+        }
+
+        return $isSecured;
+    }
+
 }

@@ -54,7 +54,7 @@ class OrderController extends OrderController_parent
         }
 
         $ret = parent::execute();
-        if ($ret == 'thankyou') {
+        if (str_starts_with($ret, 'thankyou')) {
             $this->saveUnzerTransaction();
         }
 
