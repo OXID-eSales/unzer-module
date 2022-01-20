@@ -60,5 +60,4 @@ class PaymentValidator
 
         return $isSecured;
     }
-
 }
