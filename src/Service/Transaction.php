@@ -73,10 +73,10 @@ class Transaction
         $params['amount'] = $unzerPayment->getAmount()->getTotal();
         $params['currency'] = $unzerPayment->getCurrency();
         $params['typeid'] = $unzerPayment->getId();
+        $params['shortid'] = $unzerPayment->getInitialTransaction()->getShortId();
         $params['oxaction'] = $unzerPayment->getStateName();
 
         if ($metadata = $unzerPayment->getMetadata()) {
-            $params['metadataid'] = $metadata->getId();
             $params['metadata'] = $metadata->jsonSerialize();
         }
 
