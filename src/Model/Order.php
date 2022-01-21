@@ -18,13 +18,13 @@ class Order extends Order_parent
     /**
      * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket
      * @param \OxidEsales\Eshop\Application\Model\User $oUser
-     * @return int
+     * @return int|bool
      * @throws \Exception
      */
     public function finalizeUnzerOrderAfterRedirect(
         \OxidEsales\Eshop\Application\Model\Basket $oBasket,
         \OxidEsales\Eshop\Application\Model\User $oUser
-    ): int {
+    ): int|bool {
         $this->isRedirectOrder = true;
 
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();

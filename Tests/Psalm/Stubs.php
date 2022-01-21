@@ -40,6 +40,11 @@ class OrderController_parent extends \OxidEsales\Eshop\Application\Controller\Or
 {
 }
 
+namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
+
+class OrderMain_parent extends \OxidEsales\Eshop\Application\Controller\Admin\OrderMain
+{
+}
 
 namespace OxidEsales\Eshop\Core;
 
