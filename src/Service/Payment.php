@@ -5,7 +5,6 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -127,8 +126,6 @@ class Payment
             } elseif ($transaction->isPending()) {
                 $result = "NOT_FINISHED";
 
-                $this->createPaymentStatusWebhook($sessionUnzerPayment->getId());
-
                 $this->redirectUrl = $transaction->getRedirectUrl();
             } elseif ($transaction->isError()) {
                 throw new Exception($this->translator->translateCode(
@@ -141,15 +138,9 @@ class Payment
         return $result;
     }
 
-    public function createPaymentStatusWebhook(string $unzerPaymentId): void
-    {
-        $webhookUrl = Registry::getConfig()->getShopUrl()
-            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus&paymentid='
-            . $unzerPaymentId;
-
-        $this->getUnzerSDK()->createWebhook($webhookUrl, 'payment');
-    }
-
+    /**
+     * @return \UnzerSDK\Unzer
+     */
     protected function getUnzerSDK(): \UnzerSDK\Unzer
     {
         return $this->unzerSDKLoader->getUnzerSDK();

@@ -41,7 +41,9 @@ class PaymentController extends PaymentController_parent
 
         $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
         $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
-        if (!$pubKey || !$privKey) {
+        $registeredWebhook = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhook();
+
+        if (!$pubKey || !$privKey || !$registeredWebhook) {
             $paymentListRaw = $paymentList;
             $paymentList = [];
 

@@ -117,6 +117,13 @@ class ModuleSettingsTest extends TestCase
                 'settingMethod' => 'getAPIKey',
                 'settingValue' => 'productionAPIKey'
             ],
+            [
+                'values' => [
+                    ['registeredWebhook', Module::MODULE_ID, 'Webhook'],
+                ],
+                'settingMethod' => 'getRegisteredWebhook',
+                'settingValue' => "Webhook"
+            ]
         ];
     }
 
