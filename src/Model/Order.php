@@ -26,8 +26,37 @@ class Order extends Order_parent
         \OxidEsales\Eshop\Application\Model\User $oUser
     ): int {
         $this->isRedirectOrder = true;
-        $iRet = $this->finalizeOrder($oBasket, $oUser, true);
+
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
+
+        if (!$this->oxorder__oxordernr->value) {
+            $this->_setNumber();
+        } else {
+            oxNew(\OxidEsales\Eshop\Core\Counter::class)
+                ->update($this->_getCounterIdent(), $this->oxorder__oxordernr->value);
+        }
+
+        // deleting remark info only when order is finished
+        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable('ordrem');
+
+        //#4005: Order creation time is not updated when order processing is complete
+        $this->_updateOrderDate();
+
+        // store orderid
+        $oBasket->setOrderId($this->getId());
+
+        // updating wish lists
+        $this->_updateWishlist($oBasket->getContents(), $oUser);
+
+        // updating users notice list
+        $this->_updateNoticeList($oBasket->getContents(), $oUser);
+
+        // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
+        $this->_markVouchers($oBasket, $oUser);
+
+        $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
+        // send order by email to shop owner and current user
+        $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
 
         $this->_setOrderStatus($unzerPaymentStatus);
 

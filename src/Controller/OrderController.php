@@ -73,6 +73,7 @@ class OrderController extends OrderController_parent
             try {
                 $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
 
+                $oOrder->load(Registry::getSession()->getVariable('sess_challenge'));
                 //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
                 $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 

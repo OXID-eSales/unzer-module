@@ -117,12 +117,8 @@ class Payment
             $result = "OK";
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
-                $result = "NOT_FINISHED";
-
                 if ($transaction instanceof Authorization) {
-                    /** @var \UnzerSDK\Resources\TransactionTypes\Authorization $authorization */
-                    $authorization = $sessionUnzerPayment->getAuthorization();
-                    $authorization->charge();
+                    $result = "OK";
                 }
             } elseif ($transaction->isPending()) {
                 $result = "NOT_FINISHED";

@@ -198,7 +198,7 @@ class Unzer
 
     public function prepareRedirectUrl(string $destination = ''): string
     {
-        return Registry::getConfig()->getSslShopUrl() . 'index.php?cl=' . $destination;
+        return Registry::getConfig()->getSslShopUrl() . 'index.php?cl=' .str_replace('?', '&', $destination);
     }
 
     public function getUnzerPaymentIdFromRequest(): string
