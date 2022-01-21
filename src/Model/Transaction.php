@@ -47,6 +47,11 @@ class Transaction extends BaseModel
         return $this->getRawField('TYPEID');
     }
 
+    public function getUnzerShortId(): ?string
+    {
+        return $this->getRawField('SHORTID');
+    }
+
     public function getUnzerMetaData()
     {
         $json = $this->getRawField('METADATA');

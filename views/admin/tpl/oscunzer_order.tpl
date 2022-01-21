@@ -18,6 +18,7 @@
     <table>
         <tr>
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CREATED" suffix="COLON"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_SHORTID"}]</th>
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID"}]</th>
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</th>
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</th>
@@ -25,6 +26,7 @@
         [{foreach from=$oUnzerTransactions item="oUnzerTransaction"}]
             <tr>
                 <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerShortId()|escape}]</td>
                 <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
                 <td>[{$oUnzerTransaction->getUnzerAction()|escape}]</td>
                 <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
