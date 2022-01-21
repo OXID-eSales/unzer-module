@@ -17,10 +17,9 @@ use UnzerSDK\Unzer;
  */
 class ModuleConfiguration extends ModuleConfiguration_parent
 {
-
     use ServiceContainer;
 
-    protected $_translator;
+    protected $translator;
 
     /**
      * @inheritDoc
@@ -28,7 +27,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function __construct()
     {
         parent::__construct();
-        $this->_translator = oxNew(Translator::class, Registry::getLang());
+        $this->translator = oxNew(Translator::class, Registry::getLang());
     }
 
     /**
@@ -40,7 +39,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         if ($this->_sModuleId == Module::MODULE_ID) {
             try {
-
                 $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
                 $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
 
@@ -52,9 +50,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                         $this->_aViewData["registeredwebhook"] = $aWebhooks[0]->getUrl();
                     }
                 }
-
             } catch (\Throwable $loggerException) {
-                Registry::getUtilsView()->addErrorToDisplay($this->_translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
+                Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
             }
         }
         return 'module_config.tpl';
@@ -74,7 +71,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 ->get(ModuleSettingBridgeInterface::class);
             $moduleSettingBridge->save('registeredWebhook', '', Module::MODULE_ID);
         } catch (\Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay($this->_translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
+            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
         }
     }
 
@@ -96,7 +93,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
             }
         } catch (\Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay($this->_translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
+            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
         }
     }
 }
