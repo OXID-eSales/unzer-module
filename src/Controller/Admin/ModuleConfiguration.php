@@ -83,8 +83,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         try {
             /** @var Unzer $unzer */
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            //$url = Registry::getConfig()->getSslShopUrl() . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
-            $url = 'https://www.dixeno.de/index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
+            $url = Registry::getConfig()->getSslShopUrl() . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
 
             if ($unzer->createWebhook($url, "payment")) {
                 $moduleSettingBridge = ContainerFactory::getInstance()
