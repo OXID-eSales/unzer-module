@@ -24,7 +24,7 @@ class Order extends Order_parent
     public function finalizeUnzerOrderAfterRedirect(
         \OxidEsales\Eshop\Application\Model\Basket $oBasket,
         \OxidEsales\Eshop\Application\Model\User $oUser
-    ): int|bool {
+    ) {
         $this->isRedirectOrder = true;
 
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
