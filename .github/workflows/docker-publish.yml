@@ -32,6 +32,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        
+      - name: downcase REPO
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -66,7 +70,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:oxid63php74
+            ${{ env.REGISTRY }}/${{ env.REPO }}:oxid63php74
           secrets: |
             "github_token=${{ secrets.GITHUB_TOKEN }}"
 
