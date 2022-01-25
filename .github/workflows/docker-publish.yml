@@ -69,3 +69,4 @@ jobs:
             ${{ env.REGISTRY }}/oxid-esales/unzer-module:oxid63php74
           secrets: |
             "github_token=${{ secrets.GITHUB_TOKEN }}"
+
