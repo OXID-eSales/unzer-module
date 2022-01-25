@@ -12,6 +12,7 @@
     <input type="hidden" name="cl" value="order_main">
 </form>
 
+
 [{if !$oUnzerTransactions}]
     [{oxmultilang ident="OSCUNZER_NO_UNZER_ORDER"}]
     [{else}]
@@ -88,6 +89,9 @@
                 <button type="submit">[{oxmultilang ident="OSCUNZER_SHIPMENT_NOTIFICATION"}]</button>
             </form>
         [{/if}]
+        [{if $errShip}]
+            <div style="color: red">[{$errShip}]</div>
+        [{/if}]
     [{/if}]
 [{/block}]
 [{block name="unzer_collect"}]
@@ -111,6 +115,9 @@
                 </table>
             </form>
         [{/if}]
+    [{/if}]
+    [{if $errAuth}]
+        <div style="color: red">[{$errAuth}]</div>
     [{/if}]
 [{/block}]
 
@@ -151,6 +158,11 @@
                 </form>
             </tr>
             [{/foreach}]
+            [{if $errCancel}]
+            <tr>
+                <td colspan="7"><div style="color: red">[{$errCancel}]</div></td>
+            </tr>
+            [{/if}]
         </table>
     [{/if}]
     [{/block}]

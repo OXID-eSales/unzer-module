@@ -67,7 +67,7 @@ class AdminOrderController extends AdminDetailsController
             $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
             $this->_aViewData['sPaymentId'] = $this->sPaymentId;
             if ($this->sPaymentId) {
-               $this->getUnzerViewData($this->sPaymentId);
+                $this->getUnzerViewData($this->sPaymentId);
             }
         } else {
             $this->_aViewData['sMessage'] = Registry::getLang()->translateString("OSCUNZER_NO_UNZER_ORDER");
@@ -147,12 +147,17 @@ class AdminOrderController extends AdminDetailsController
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
 
         if ($unzerid) {
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
-                ->fetchPayment($unzerid);
-            $sInvoiceNr = $this->getEditObject()->getUnzerInvoiceNr();
-            $transactionService->writeTransactionToDB($this->getEditObject()->getId(),
-                $this->getEditObject()->oxorder__oxuserid->value, $unzerPayment, $unzerPayment->ship($sInvoiceNr));
+            try {
+                $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                    ->getUnzerSDK()
+                    ->fetchPayment($unzerid);
+                $sInvoiceNr = $this->getEditObject()->getUnzerInvoiceNr();
+                $transactionService->writeTransactionToDB($this->getEditObject()->getId(),
+                    $this->getEditObject()->oxorder__oxuserid->value, $unzerPayment, $unzerPayment->ship($sInvoiceNr));
+            } catch (\Exception $e) {
+                $this->_aViewData['errShip'] = $e->getMessage();
+            }
+
         }
     }
 
@@ -160,14 +165,20 @@ class AdminOrderController extends AdminDetailsController
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $amount = (float) Registry::getRequest()->getRequestParameter('amount');
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
-        $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK()
-            ->fetchPayment($unzerid);
 
-        $charge = $unzerPayment->getAuthorization()->charge($amount);
-        $transactionService->writeChargeToDB($this->getEditObjectId(), $this->getEditObject()->oxorder__oxuserid->value, $charge);
-        if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
-            $this->getEditObject()->markUnzerOrderAsPaid();
+        try {
+            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                ->getUnzerSDK()
+                ->fetchPayment($unzerid);
+
+            $charge = $unzerPayment->getAuthorization()->charge($amount);
+            $transactionService->writeChargeToDB($this->getEditObjectId(), $this->getEditObject()->oxorder__oxuserid->value, $charge);
+            if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
+                $this->getEditObject()->markUnzerOrderAsPaid();
+            }
+        }
+        catch (\Exception $e) {
+            $this->_aViewData['errAuth'] = $e->getMessage();
         }
     }
 
@@ -186,12 +197,17 @@ class AdminOrderController extends AdminDetailsController
             return;
         }
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
-        $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK()
-            ->fetchChargeById($unzerid, $chargeid);
+        try {
+            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                ->getUnzerSDK()
+                ->fetchChargeById($unzerid, $chargeid);
 
-        $cancellation = $unzerPayment->cancel($amount, $reason);
-        $transactionService->writeCancellationToDB($this->getEditObjectId(), $this->getEditObject()->oxorder__oxuserid->value, $cancellation);
+            $cancellation = $unzerPayment->cancel($amount, $reason);
+            $transactionService->writeCancellationToDB($this->getEditObjectId(), $this->getEditObject()->oxorder__oxuserid->value, $cancellation);
+        }
+        catch (\Exception $e) {
+            $this->_aViewData['errCancel'] = $chargeid . ": " . $e->getMessage();
+        }
     }
 
     /**
