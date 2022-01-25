@@ -66,6 +66,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/oxidprojects/unzer-oxid:oxid63php74
+            ${{ env.REGISTRY }}/oxid-esales/unzer-module:oxid63php74
           secrets: |
             "github_token=${{ secrets.GITHUB_TOKEN }}"
