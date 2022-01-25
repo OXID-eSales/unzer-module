@@ -2,10 +2,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidSolutionCatalysts\Unzer\Model\TransactionList;
+use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use PHPUnit\Exception;
 use UnzerSDK\Resources\Payment;
 
 class OrderMain extends OrderMain_parent
@@ -25,37 +24,29 @@ class OrderMain extends OrderMain_parent
                 $oPayment->load($oOrder->oxorder__oxpaymenttype->value) &&
                 $oPayment->isUnzerSecuredPayment()
             ) {
-                $transactionList = oxNew(TransactionList::class);
-                $transactionList->getTransactionList($this->getEditObjectId());
 
-                $lTransaction = null;
-                foreach ($transactionList as $transaction) {
-                    $lTransaction = $transaction;
-                }
+                $transactionService = $this->getServiceFromContainer(TransactionService::class);
+                $sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
 
-                if ($lTransaction !== null) {
-                    $sPaymentId = $lTransaction->getUnzerTypeId();
-                    if ($sPaymentId) {
-                        /** @var Payment $unzerPayment */
-                        $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                            ->getUnzerSDK()
-                            ->fetchPayment($sPaymentId);
+                if ($sPaymentId) {
+                    /** @var Payment $unzerPayment */
+                    $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                        ->getUnzerSDK()
+                        ->fetchPayment($sPaymentId);
 
-                        $blIsShipped = false;
-                        foreach ($unzerPayment->getShipments() as $unzShipment) {
-                            if ($unzShipment->isSuccess()) {
-                                $blIsShipped = true;
-                            }
+                    $blIsShipped = false;
+                    foreach ($unzerPayment->getShipments() as $unzShipment) {
+                        if ($unzShipment->isSuccess()) {
+                            $blIsShipped = true;
                         }
-                        if (!$blIsShipped) {
-                            $sInvoiceNr = $oOrder->getFieldData('OXINVOICENR') == 0 ?
-                                'inv' . $oOrder->getFieldData('OXORDERNR') :
-                                $oOrder->getFieldData('OXINVOICENR');
-                            try {
-                                $unzerPayment->ship($sInvoiceNr);
-                            } catch (\Exception $e) {
-                                // TODO Logging
-                            }
+                    }
+                    if (!$blIsShipped) {
+                        $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
+                        try {
+                            $transactionService->writeTransactionToDB($oOrder->getId(),
+                                $oOrder->oxorder__oxuserid->value, $unzerPayment, $unzerPayment->ship($sInvoiceNr));
+                        } catch (\Exception $e) {
+                            // TODO Logging
                         }
                     }
                 }

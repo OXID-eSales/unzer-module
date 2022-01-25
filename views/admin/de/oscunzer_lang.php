@@ -17,4 +17,17 @@ $aLang = [
     'OSCUNZER_TRANSACTION_TYPEID'                   => 'Unzer Type-ID:',
     'OSCUNZER_TRANSACTION_PAYMENTMETA'              => 'Bezahl-Info:',
     'OSCUNZER_TRANSACTION_SHORTID'                  => 'Unzer Short-ID:',
+    'OSCUNZER_REMAING_AMOUNT'                       => 'Offener Betrag',
+    'OSCUNZER_ORDER_AMOUNT'                         => 'Gesamtbetrag',
+    'OSCUNZER_CHARGED_AMOUNT'                       => 'Eingezogener Betrag',
+    'OSCUNZER_CHARGED_CANCELLED'                    => 'Erstatteter Betrag',
+    'OSCUNZER_CHARGE_CANCELREASON'                  => 'Rückzahlungsgrund',
+    'OSCUNZER_CHARGE_CANCELAMOUNT'                  => 'Rückzahlungsbetrag',
+    'OSCUNZER_CHARGE_COLLECT'                       => 'Einziehen',
+    'OSCUNZER_CHARGE_ID'                            => 'Charge-ID',
+    'OSCUNZER_CANCEL_ID'                            => 'Cancel-ID',
+    'OSCUNZER_AUTHORIZATION'                        => 'Autorisierung',
+    'OSCUNZER_NOSHIPINGYET'                         => 'Bestellung ist bei Unzer noch nicht als Versendet markiert',
+    'OSCUNZER_SHIPMENT_NOTIFICATION'                => 'Versand bestätigen',
+
 ];

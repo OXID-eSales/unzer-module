@@ -115,4 +115,12 @@ class Order extends Order_parent
 
         return false;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getUnzerInvoiceNr()
+    {
+        return $this->getFieldData('OXINVOICENR') == 0 ? $this->getFieldData('OXORDERNR') : $this->getFieldData('OXINVOICENR');
+    }
 }
