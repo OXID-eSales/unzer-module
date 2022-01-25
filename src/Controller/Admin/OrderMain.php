@@ -24,7 +24,6 @@ class OrderMain extends OrderMain_parent
                 $oPayment->load($oOrder->oxorder__oxpaymenttype->value) &&
                 $oPayment->isUnzerSecuredPayment()
             ) {
-
                 $transactionService = $this->getServiceFromContainer(TransactionService::class);
                 $sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
 
