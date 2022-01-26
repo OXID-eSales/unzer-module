@@ -32,4 +32,5 @@ $aLang = [
     'OSCUNZER_SHIPMENT_NOTIFICATION'                => 'Confirm shipment',
     'OSCUNZER_CANCEL_MISSINGREASON'                 => 'A reason for repayment must be specified for the payment method',
     'OSCUNZER_CANCEL_ALERT'                         => 'Refunded amounts cannot be recovered! Do you really want to refund the selected amount? chosen amount: ',
+    'OSCUNZER_SHIP_ID'                              => 'Shipping-Id',
 ];

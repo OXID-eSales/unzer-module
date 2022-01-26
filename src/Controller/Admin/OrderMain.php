@@ -43,7 +43,9 @@ class OrderMain extends OrderMain_parent
                         $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
                         try {
                             $transactionService->writeTransactionToDB($oOrder->getId(),
-                                $oOrder->oxorder__oxuserid->value, $unzerPayment, $unzerPayment->ship($sInvoiceNr));
+                            $oOrder->oxorder__oxuserid->value,
+                            $unzerPayment,
+                            $unzerPayment->ship($sInvoiceNr));
                         } catch (\Exception $e) {
                             // TODO Logging
                         }

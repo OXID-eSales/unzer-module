@@ -92,7 +92,7 @@ class AdminOrderController extends AdminDetailsController
             $aRv = [];
             $aRv['shipingDate'] = $shipment->getDate();
             $aRv['shipId'] = $shipment->getId();
-            $aRv['invoiceid'] = $shipment->getInvoiceId();
+            $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
             $aRv['amount'] = $shipment->getAmount();
 
             $shipments[] = $aRv;
@@ -141,6 +141,7 @@ class AdminOrderController extends AdminDetailsController
         $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
         $this->_aViewData['aCharges'] = $charges;
         $this->_aViewData['aCancellations'] = $cancellations;
+        $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
     }
 
     public function sendShipmentNotification() {
@@ -198,7 +199,7 @@ class AdminOrderController extends AdminDetailsController
             return;
         }
 
-        if ($amount > $fCharged || $amount == 0) {          
+        if ($amount > $fCharged || $amount == 0) {
             $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_ERR_AMOUNT') . " " . $amount;
             return;
         }

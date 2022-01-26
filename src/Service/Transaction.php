@@ -32,7 +32,7 @@ class Transaction
      * @param string $orderid
      * @param string $userId
      * @param Payment|null $unzerPayment
-     * @param Shipment|null $unzerShipment
+     * @param \UnzerSDK\Resources\AbstractUnzerResource|\UnzerSDK\Resources\TransactionTypes\Shipment|null $unzerShipment
      * @throws \Exception
      * @return bool
      */

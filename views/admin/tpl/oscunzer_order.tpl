@@ -67,7 +67,7 @@
                 <tr>
                     <th>[{oxmultilang ident="GENERAL_DATE"}]</th>
                     <th>[{oxmultilang ident="OSCUNZER_SHIP_ID"}]</th>
-                    <th>[{oxmultilang ident="AMOUNT"}]</th>
+                    <th>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT"}]</th>
                     <th>[{oxmultilang ident="ORDER_MAIN_BILLNUM"}]</th>
                 </tr>
                 [{foreach from=$aShipments item="oUnzerShipment"}]
@@ -152,9 +152,25 @@
                     <td>[{$oUnzerCharge.chargedAmount|escape}]</td>
                     <td>[{$oUnzerCharge.cancelledAmount|escape}]</td>
 
-                    <td><input type="text" name="reason" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]></td>
-                    <td><input type="text" name="amount" value="[{$oUnzerCharge.chargedAmount}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]></td>
-                    <td><button type="submit" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]>Payout</button></td>
+                    <td>
+                        <select name="reason" id="reason_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]>
+                            [{if !$blCancelReasonReq}]<option value="">NONE</option>[{/if}]
+                            <option value="CANCEL">CANCEL</option>
+                            <option value="RETURN">RETURN</option>
+                            <option value="CREDIT">CREDIT</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]></td>
+                    <td><input type="submit" id="submit_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
+                               value="Payout")"></td>
+                    [{capture assign="cancelConfirm"}]
+                    const button = document.getElementById('submit_[{$oUnzerCharge.chargeId}]');const confirmResult = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
+                    button.addEventListener('click', function (e) {if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + confirmResult.value)) {
+                    confirmResult.innerText = 'Yes';} else {
+                    confirmResult.innerText = 'No';}});
+                    [{/capture}]
+                    [{oxscript add="cancelConfirm"}]
+
                 </form>
             </tr>
             [{/foreach}]

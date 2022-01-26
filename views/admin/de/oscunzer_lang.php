@@ -32,4 +32,5 @@ $aLang = [
     'OSCUNZER_SHIPMENT_NOTIFICATION'                => 'Versand bestätigen',
     'OSCUNZER_CANCEL_MISSINGREASON'                 => 'Für die Zahlungsart muss ein Rückzahlungs-Grund angegeben werden',
     'OSCUNZER_CANCEL_ALERT'                         => 'Zurückgebuchte Beträge können nicht wieder eingezogen werden! Wollen Sie wirklich den gewählten Betrag zurückerstatten? Gewählter Betrag: ',
+    'OSCUNZER_SHIP_ID'                              => 'Shipping-Id',
 ];
