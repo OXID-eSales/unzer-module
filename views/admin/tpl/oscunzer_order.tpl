@@ -2,9 +2,9 @@
 
 [{if $readonly}]
     [{assign var="readonly" value="readonly disabled"}]
-    [{else}]
+[{else}]
     [{assign var="readonly" value=""}]
-    [{/if}]
+[{/if}]
 
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
@@ -15,7 +15,7 @@
 
 [{if !$oUnzerTransactions}]
     [{oxmultilang ident="OSCUNZER_NO_UNZER_ORDER"}]
-    [{else}]
+[{else}]
     <table>
         <tr>
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CREATED" suffix="COLON"}]</th>
@@ -24,15 +24,14 @@
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</th>
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</th>
         </tr>
-
         [{foreach from=$oUnzerTransactions item="oUnzerTransaction"}]
-        <tr>
-            <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
-            <td>[{$oUnzerTransaction->getUnzerShortId()|escape}]</td>
-            <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
-            <td>[{$oUnzerTransaction->getUnzerAction()|escape}]</td>
-            <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
-        </tr>
+            <tr>
+                <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerShortId()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerAction()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
+            </tr>
         [{/foreach}]
     </table>
 
@@ -40,24 +39,25 @@
 
     [{assign var="bHasAdditionalData" value=false}]
     [{capture assign="additionalData"}]
-    [{assign var="aPaymentData" value=$oUnzerTransaction->getUnzerMetaData()}]
-    [{if is_array($aPaymentData)}]
-    <div><b>[{oxmultilang ident="OSCUNZER_TRANSACTION_PAYMENTMETA"}]</b></div>
-    <table>
-        [{foreach from=$aPaymentData key="paramName" item="paramValue"}]
-        [{assign var="bHasAdditionalData" value=true}]
-        <tr>
-            <td>[{$paramName|escape}]:</td>
-            <td>&nbsp;</td>
-            <td>[{$paramValue|escape}]</td>
-        </tr>
-        [{/foreach}]
-    </table>
-    [{/if}]
+        [{assign var="aPaymentData" value=$oUnzerTransaction->getUnzerMetaData()}]
+            [{if is_array($aPaymentData)}]
+                <div><b>[{oxmultilang ident="OSCUNZER_TRANSACTION_PAYMENTMETA"}]</b></div>
+                <table>
+                    [{foreach from=$aPaymentData key="paramName" item="paramValue"}]
+                    [{assign var="bHasAdditionalData" value=true}]
+                    <tr>
+                        <td>[{$paramName|escape}]:</td>
+                        <td>&nbsp;</td>
+                        <td>[{$paramValue|escape}]</td>
+                    </tr>
+                    [{/foreach}]
+                </table>
+            [{/if}]
     [{/capture}]
 
     [{if $bHasAdditionalData}][{$additionalData}][{/if}]
-    [{/if}]
+[{/if}]
+
 [{block name="unzer_ship"}]
     [{if $blShipment}]
         <br><br>
@@ -71,12 +71,12 @@
                     <th>[{oxmultilang ident="ORDER_MAIN_BILLNUM"}]</th>
                 </tr>
                 [{foreach from=$aShipments item="oUnzerShipment"}]
-                <tr>
-                    <td>[{$oUnzerShipment.shipingDate|escape}]</td>
-                    <td>[{$oUnzerShipment.shipId|escape}]</td>
-                    <td>[{$oUnzerShipment.amount|escape}]</td>
-                    <td>[{$oUnzerShipment.invoiceid|escape}]</td>
-                </tr>
+                    <tr>
+                        <td>[{$oUnzerShipment.shipingDate|escape}]</td>
+                        <td>[{$oUnzerShipment.shipId|escape}]</td>
+                        <td>[{$oUnzerShipment.amount|escape}]</td>
+                        <td>[{$oUnzerShipment.invoiceid|escape}]</td>
+                    </tr>
                 [{/foreach}]
             </table>
         [{else}]
@@ -162,22 +162,26 @@
                     </td>
                     <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]></td>
                     <td><input type="submit" id="submit_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
-                               value="Payout")"></td>
+                               value="Payout"></td>
                     [{capture assign="cancelConfirm"}]
-                    const button = document.getElementById('submit_[{$oUnzerCharge.chargeId}]');const confirmResult = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
-                    button.addEventListener('click', function (e) {if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + confirmResult.value)) {
-                    confirmResult.innerText = 'Yes';} else {
-                    confirmResult.innerText = 'No';}});
+                    const inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
+                    const form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');
+                    form.addEventListener('submit', function (e) {
+                    if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                    });
                     [{/capture}]
-                    [{oxscript add="cancelConfirm"}]
-
+                    [{oxscript add=$cancelConfirm}]
                 </form>
             </tr>
             [{/foreach}]
             [{if $errCancel}]
-            <tr>
-                <td colspan="7"><div style="color: red">[{$errCancel}]</div></td>
-            </tr>
+                <tr>
+                    <td colspan="7"><div style="color: red">[{$errCancel}]</div></td>
+                </tr>
             [{/if}]
         </table>
     [{/if}]

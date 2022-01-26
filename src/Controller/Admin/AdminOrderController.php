@@ -192,8 +192,6 @@ class AdminOrderController extends AdminDetailsController
         $reason = Registry::getRequest()->getRequestParameter('reason');
 
         $translator = $this->getServiceFromContainer(Translator::class);
-        $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_MISSINGREASON') . " " . $amount;
-        return;
         if ($this->isUnzerOrder() && $this->isCancelReasonRequired() && trim($reason) === "") {
             $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_MISSINGREASON') . " " . $amount;
             return;
