@@ -21,6 +21,7 @@ $aLang = [
     'OSCUNZER_ORDER_AMOUNT'                         => 'Grand total',
     'OSCUNZER_CHARGED_AMOUNT'                       => 'amount collected',
     'OSCUNZER_CHARGED_CANCELLED'                    => 'refunded amount',
+    'OSCUNZER_CANCEL_ERR_AMOUNT'                    => 'wrong amount',
     'OSCUNZER_CHARGE_CANCELREASON'                  => 'refund reason',
     'OSCUNZER_CHARGE_CANCELAMOUNT'                  => 'redemption amount',
     'OSCUNZER_CHARGE_COLLECT'                       => 'Collect',
@@ -29,4 +30,6 @@ $aLang = [
     'OSCUNZER_AUTHORIZATION'                        => 'Authorization',
     'OSCUNZER_NOSHIPINGYET'                         => 'order has not yet been marked as shipped',
     'OSCUNZER_SHIPMENT_NOTIFICATION'                => 'Confirm shipment',
+    'OSCUNZER_CANCEL_MISSINGREASON'                 => 'A reason for repayment must be specified for the payment method',
+    'OSCUNZER_CANCEL_ALERT'                         => 'Refunded amounts cannot be recovered! Do you really want to refund the selected amount? chosen amount: ',
 ];

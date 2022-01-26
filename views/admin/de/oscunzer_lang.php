@@ -21,6 +21,7 @@ $aLang = [
     'OSCUNZER_ORDER_AMOUNT'                         => 'Gesamtbetrag',
     'OSCUNZER_CHARGED_AMOUNT'                       => 'Eingezogener Betrag',
     'OSCUNZER_CHARGED_CANCELLED'                    => 'Erstatteter Betrag',
+    'OSCUNZER_CANCEL_ERR_AMOUNT'                    => 'Ungültiger Betrag',
     'OSCUNZER_CHARGE_CANCELREASON'                  => 'Rückzahlungsgrund',
     'OSCUNZER_CHARGE_CANCELAMOUNT'                  => 'Rückzahlungsbetrag',
     'OSCUNZER_CHARGE_COLLECT'                       => 'Einziehen',
@@ -29,5 +30,6 @@ $aLang = [
     'OSCUNZER_AUTHORIZATION'                        => 'Autorisierung',
     'OSCUNZER_NOSHIPINGYET'                         => 'Bestellung ist bei Unzer noch nicht als Versendet markiert',
     'OSCUNZER_SHIPMENT_NOTIFICATION'                => 'Versand bestätigen',
-
+    'OSCUNZER_CANCEL_MISSINGREASON'                 => 'Für die Zahlungsart muss ein Rückzahlungs-Grund angegeben werden',
+    'OSCUNZER_CANCEL_ALERT'                         => 'Zurückgebuchte Beträge können nicht wieder eingezogen werden! Wollen Sie wirklich den gewählten Betrag zurückerstatten? Gewählter Betrag: ',
 ];

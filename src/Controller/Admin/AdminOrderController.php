@@ -9,6 +9,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -189,11 +190,16 @@ class AdminOrderController extends AdminDetailsController
         $fCharged = (float) Registry::getRequest()->getRequestParameter('chargedamount');
         $reason = Registry::getRequest()->getRequestParameter('reason');
 
+        $translator = $this->getServiceFromContainer(Translator::class);
+        $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_MISSINGREASON') . " " . $amount;
+        return;
         if ($this->isUnzerOrder() && $this->isCancelReasonRequired() && trim($reason) === "") {
+            $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_MISSINGREASON') . " " . $amount;
             return;
         }
 
-        if ($amount > $fCharged || $amount == 0) {
+        if ($amount > $fCharged || $amount == 0) {          
+            $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_ERR_AMOUNT') . " " . $amount;
             return;
         }
         $transactionService = $this->getServiceFromContainer(TransactionService::class);

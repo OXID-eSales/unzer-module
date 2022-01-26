@@ -265,7 +265,7 @@ class Transaction
     {
         if ($orderid) {
             return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE OXORDERID=?",
+                "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
                 [(string)$orderid]
             );
         }
