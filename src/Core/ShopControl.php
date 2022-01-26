@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Core\DisplayError;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -14,7 +20,7 @@ use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 class ShopControl extends ShopControl_parent
 {
     /**
-     * @param \OxidEsales\Eshop\Core\Exception\StandardException $exception
+     * @param StandardException $exception
      */
     protected function _handleBaseException($exception): void // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -25,6 +31,9 @@ class ShopControl extends ShopControl_parent
         }
     } // @codeCoverageIgnore
 
+    /**
+     * @param UnzerException $exception
+     */
     public function handleCustomUnzerException(UnzerException $exception): void
     {
         if ($exception instanceof RedirectWithMessage) {
@@ -36,11 +45,17 @@ class ShopControl extends ShopControl_parent
         }
     } // @codeCoverageIgnore
 
+    /**
+     * @param Redirect $redirectException
+     */
     protected function handleRedirectException(Redirect $redirectException): void
     {
         Registry::getUtils()->redirect($redirectException->getDestination());
     }
 
+    /**
+     * @param RedirectWithMessage $redirectException
+     */
     protected function handleRedirectWithMessageException(RedirectWithMessage $redirectException): void
     {
         $displayError = oxNew(DisplayError::class);

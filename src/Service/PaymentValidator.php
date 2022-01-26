@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment;
@@ -12,6 +17,10 @@ class PaymentValidator
     /** @var Context */
     protected $moduleContext;
 
+    /**
+     * @param PaymentExtensionLoader $paymentExtensionLoader
+     * @param Context $moduleContext
+     */
     public function __construct(
         PaymentExtensionLoader $paymentExtensionLoader,
         Context $moduleContext
@@ -20,6 +29,10 @@ class PaymentValidator
         $this->moduleContext = $moduleContext;
     }
 
+    /**
+     * @param Payment $payment
+     * @return bool
+     */
     public function isUnzerPayment(Payment $payment): bool
     {
         $isUnzer = false;
@@ -31,6 +44,10 @@ class PaymentValidator
         return $isUnzer;
     }
 
+    /**
+     * @param Payment $payment
+     * @return bool
+     */
     public function isPaymentCurrencyAllowed(Payment $payment): bool
     {
         return $this->isSelectedCurrencyAllowed(
@@ -38,6 +55,10 @@ class PaymentValidator
         );
     }
 
+    /**
+     * @param array $allowedCurrencies
+     * @return bool
+     */
     public function isSelectedCurrencyAllowed(array $allowedCurrencies): bool
     {
         return !count($allowedCurrencies)

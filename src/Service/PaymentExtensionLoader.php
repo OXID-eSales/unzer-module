@@ -1,9 +1,13 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
-use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\AliPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Bancontact;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
@@ -45,9 +49,20 @@ class PaymentExtensionLoader
         'oscunzer_wechatpay' => WeChatPay::class,
     ];
 
+    /**
+     * @var UnzerSDKLoader
+     */
     private $unzerSdkLoader;
+
+    /**
+     * @var Unzer
+     */
     private $unzerService;
 
+    /**
+     * @param UnzerSDKLoader $unzerSDKLoader
+     * @param Unzer $unzerService
+     */
     public function __construct(
         UnzerSDKLoader $unzerSDKLoader,
         Unzer $unzerService
@@ -56,6 +71,10 @@ class PaymentExtensionLoader
         $this->unzerService = $unzerService;
     }
 
+    /**
+     * @param PaymentModel $payment
+     * @return AbstractUnzerPayment
+     */
     public function getPaymentExtension(PaymentModel $payment): AbstractUnzerPayment
     {
         return oxNew(

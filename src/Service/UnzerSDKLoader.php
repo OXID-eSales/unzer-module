@@ -1,15 +1,30 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use UnzerSDK\Unzer;
 
 class UnzerSDKLoader
 {
+    /**
+     * @var ModuleSettings
+     */
     private $moduleSettings;
 
+    /**
+     * @var DebugHandler
+     */
     private $debugHandler;
 
+    /**
+     * @param ModuleSettings $moduleSettings
+     * @param DebugHandler $debugHandler
+     */
     public function __construct(
         ModuleSettings $moduleSettings,
         DebugHandler $debugHandler
@@ -18,6 +33,9 @@ class UnzerSDKLoader
         $this->debugHandler = $debugHandler;
     }
 
+    /**
+     * @return Unzer
+     */
     public function getUnzerSDK(): Unzer
     {
         $sdk = oxNew(Unzer::class, $this->moduleSettings->getShopPrivateKey());

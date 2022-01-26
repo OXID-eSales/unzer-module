@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -7,6 +12,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\UtilsDate;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment;
 
 class Transaction
@@ -17,6 +23,10 @@ class Transaction
     /** @var UtilsDate */
     protected $utilsDate;
 
+    /**
+     * @param Context $context
+     * @param UtilsDate $utilsDate
+     */
     public function __construct(
         Context $context,
         UtilsDate $utilsDate
@@ -29,8 +39,8 @@ class Transaction
      * @param string $orderid
      * @param string $userId
      * @param Payment|null $unzerPayment
-     * @throws \Exception
      * @return bool
+     * @throws \Exception
      */
     public function writeTransactionToDB(string $orderid, string $userId, ?Payment $unzerPayment)
     {
@@ -61,12 +71,21 @@ class Transaction
         return false;
     }
 
+    /**
+     * @param array $params
+     * @return string
+     */
     protected function prepareTransactionOxid(array $params): string
     {
         unset($params['oxactiondate']);
         return md5(json_encode($params));
     }
 
+    /**
+     * @param Payment $unzerPayment
+     * @return array
+     * @throws UnzerApiException
+     */
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
         $params = [
@@ -91,6 +110,9 @@ class Transaction
         return $params;
     }
 
+    /**
+     * @return TransactionModel
+     */
     protected function getNewTransactionObject(): TransactionModel
     {
         return oxNew(TransactionModel::class);
