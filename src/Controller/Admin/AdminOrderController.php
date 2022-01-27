@@ -145,6 +145,7 @@ class AdminOrderController extends AdminDetailsController
     public function sendShipmentNotification() {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
+        $translator = $this->getServiceFromContainer(Translator::class);
 
         if ($unzerid) {
             try {
@@ -155,7 +156,7 @@ class AdminOrderController extends AdminDetailsController
                 $transactionService->writeTransactionToDB($this->getEditObject()->getId(),
                     $this->getEditObject()->oxorder__oxuserid->value, $unzerPayment, $unzerPayment->ship($sInvoiceNr));
             } catch (\Exception $e) {
-                $this->_aViewData['errShip'] = $e->getMessage();
+                $this->_aViewData['errShip'] = $translator->translateCode($e->getCode(), $e->getMessage());
             }
         }
     }
@@ -164,7 +165,7 @@ class AdminOrderController extends AdminDetailsController
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $amount = (float) Registry::getRequest()->getRequestParameter('amount');
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
-
+        $translator = $this->getServiceFromContainer(Translator::class);
         try {
             $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
                 ->getUnzerSDK()
@@ -177,7 +178,7 @@ class AdminOrderController extends AdminDetailsController
             }
         }
         catch (\Exception $e) {
-            $this->_aViewData['errAuth'] = $e->getMessage();
+            $this->_aViewData['errAuth'] = $translator->translateCode($e->getCode(), $e->getMessage());
         }
     }
 
