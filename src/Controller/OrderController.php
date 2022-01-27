@@ -32,7 +32,7 @@ class OrderController extends OrderController_parent
         }
 
         $ret = parent::execute();
-        if ($ret == 'thankyou') {
+        if (str_starts_with($ret, 'thankyou')) {
             $this->saveUnzerTransaction();
         }
 
@@ -51,6 +51,7 @@ class OrderController extends OrderController_parent
             try {
                 $oOrder = oxNew(Order::class);
 
+                $oOrder->load(Registry::getSession()->getVariable('sess_challenge'));
                 //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
                 $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
