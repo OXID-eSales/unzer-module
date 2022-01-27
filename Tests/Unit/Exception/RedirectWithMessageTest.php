@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Exception;
 
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;

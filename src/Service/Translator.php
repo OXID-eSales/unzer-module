@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Language;
@@ -17,6 +22,11 @@ class Translator
         $this->language = $language;
     }
 
+    /**
+     * @param string $languageCode
+     * @param string $defaultMessage
+     * @return string
+     */
     public function translateCode(string $languageCode, string $defaultMessage): string
     {
         if (
@@ -36,11 +46,19 @@ class Translator
         return $translation;
     }
 
+    /**
+     * @param string $message
+     * @return string
+     */
     public function translate(string $message): string
     {
         return $this->language->translateString($message, null, false);
     }
 
+    /**
+     * @param float $amount
+     * @return string
+     */
     public function formatCurrency(float $amount): string
     {
         return $this->language->formatCurrency($amount);

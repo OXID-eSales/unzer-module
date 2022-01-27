@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Core\UtilsDate;
@@ -10,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\EmbeddedResources\Amount;
 use UnzerSDK\Resources\Metadata;
+use UnzerSDK\Resources\Payment;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 
 class TransactionTest extends TestCase
 {
@@ -33,13 +40,15 @@ class TransactionTest extends TestCase
         $model = $this->createPartialMock(Transaction::class, ['assign']);
         $sut = $this->getTransactionServiceMock($model);
 
-        $payment = $this->createConfiguredMock(\UnzerSDK\Resources\Payment::class, [
+        $payment = $this->createConfiguredMock(Payment::class, [
             'getAmount' => $this->createConfiguredMock(Amount::class, ['getTotal' => 10.20]),
             'getCurrency' => 'specialCurrency',
             'getId' => 'unzerPaymentId',
             'getStateName' => 'stateName',
+            'getInitialTransaction' => $this->createConfiguredMock(AbstractTransactionType::class, [
+                'getShortID' => 'unzerShortId'
+            ]),
             'getMetadata' => $this->createConfiguredMock(Metadata::class, [
-                'getId' => 'metadataId',
                 'jsonSerialize' => 'metadataJson'
             ]),
             'getCustomer' => $this->createConfiguredMock(Customer::class, [
@@ -49,6 +58,7 @@ class TransactionTest extends TestCase
 
         $model->expects($this->at(0))->method('assign')->with([
             'oxorderid' => 'orderId',
+            'shortid' => 'unzerShortId',
             'oxshopid' => 5,
             'oxuserid' => 'userId',
             'oxactiondate' => '2021-12-10 16:44:54',
@@ -56,7 +66,6 @@ class TransactionTest extends TestCase
             'currency' => 'specialCurrency',
             'typeid' => 'unzerPaymentId',
             'oxaction' => 'stateName',
-            'metadataid' => 'metadataId',
             'metadata' => 'metadataJson',
             'customerid' => 'unzerCustomerId',
         ]);

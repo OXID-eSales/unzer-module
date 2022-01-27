@@ -1,11 +1,16 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use Exception;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
-use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Unzer;
 
@@ -39,25 +44,35 @@ abstract class UnzerPayment
         $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
     }
 
+    /**
+     * @return array
+     */
     public function getPaymentCurrencies(): array
     {
         return $this->allowedCurrencies;
     }
 
+    /**
+     * @return bool
+     */
     public function redirectUrlNeedPending(): bool
     {
         return $this->needPending;
     }
 
+    /**
+     * @return BasePaymentType
+     */
     abstract public function getUnzerPaymentTypeObject(): BasePaymentType;
 
     /**
-     * @throws UnzerApiException
-     * @throws Exception
+     * @param User $userModel
+     * @param Basket $basketModel
+     * @return bool
      */
     public function execute(
-        \OxidEsales\Eshop\Application\Model\User $userModel,
-        \OxidEsales\Eshop\Application\Model\Basket $basketModel
+        User $userModel,
+        Basket $basketModel
     ): bool {
         $paymentType = $this->getUnzerPaymentTypeObject();
 

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 $sLangName = 'English';
 
 // -------------------------------
@@ -16,4 +21,5 @@ $aLang = [
     'OSCUNZER_TRANSACTION_STATUS'                   => 'Unzer OrderState:',
     'OSCUNZER_TRANSACTION_TYPEID'                   => 'Unzer Type-ID:',
     'OSCUNZER_TRANSACTION_PAYMENTMETA'              => 'Payment-Info:',
+    'OSCUNZER_TRANSACTION_SHORTID'                  => 'Unzer Short-ID:',
 ];

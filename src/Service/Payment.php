@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
@@ -28,8 +33,18 @@ class Payment
     /** @var UnzerSDKLoader */
     protected $unzerSDKLoader;
 
-    protected $redirectUrl = null;
+    /**
+     * @var string
+     */
+    protected $redirectUrl;
 
+    /**
+     * @param Session $session
+     * @param PaymentExtensionLoader $paymentExtensionLoader
+     * @param Translator $translator
+     * @param Unzer $unzerService
+     * @param UnzerSDKLoader $unzerSDKLoader
+     */
     public function __construct(
         Session $session,
         PaymentExtensionLoader $paymentExtensionLoader,
@@ -87,6 +102,9 @@ class Payment
         return $paymentStatus;
     }
 
+    /**
+     * @return bool
+     */
     public function removeTemporaryOrder(): bool
     {
         $result = false;
@@ -119,7 +137,7 @@ class Payment
                 $result = "NOT_FINISHED";
 
                 if ($transaction instanceof Authorization) {
-                    /** @var \UnzerSDK\Resources\TransactionTypes\Authorization $authorization */
+                    /** @var Authorization $authorization */
                     $authorization = $sessionUnzerPayment->getAuthorization();
                     $authorization->charge();
                 }
@@ -147,6 +165,7 @@ class Payment
     }
 
     /**
+     * @return \UnzerSDK\Resources\Payment|null
      * @throws UnzerApiException
      */
     public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment

@@ -1,24 +1,8 @@
 <?php
 
 /**
- * This file is part of OXID eSales Unzer module.
- *
- * OXID eSales Unzer module is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * OXID eSales Unzer module is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OXID eSales Unzer module.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @copyright 2003-2021 OXID eSales AG
- * @link      http://www.oxid-esales.com
- * @author    OXID Solution Catalysts
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
  */
 
 namespace OxidSolutionCatalysts\Unzer\Core;
@@ -66,7 +50,7 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return string
      */
-    public function getSessionPaymentInfo()
+    public function getSessionPaymentInfo(): string
     {
         return Registry::getSession()->getVariable('additionalPaymentInformation');
     }
@@ -81,13 +65,12 @@ class ViewConfig extends ViewConfig_parent
         return $this->getServiceFromContainer(ModuleSettings::class)->getInstallmentRate();
     }
 
-
     /**
      * checks if jQuery should be imported
      *
      * @return bool
      */
-    public function useModuleJQueryInFrontend()
+    public function useModuleJQueryInFrontend(): bool
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->useModuleJQueryInFrontend();
     }

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Exception;
 
 class Redirect extends UnzerException
@@ -7,6 +12,9 @@ class Redirect extends UnzerException
     /** @var string */
     private $destination;
 
+    /**
+     * @param string $destination
+     */
     public function __construct(string $destination)
     {
         $this->destination = $destination;
@@ -14,6 +22,9 @@ class Redirect extends UnzerException
         parent::__construct();
     }
 
+    /**
+     * @return string
+     */
     public function getDestination(): string
     {
         return $this->destination;
