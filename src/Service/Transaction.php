@@ -5,6 +5,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
 use UnzerSDK\Resources\Payment;
@@ -32,7 +33,7 @@ class Transaction
      * @param string $orderid
      * @param string $userId
      * @param Payment|null $unzerPayment
-     * @param \UnzerSDK\Resources\AbstractUnzerResource|\UnzerSDK\Resources\TransactionTypes\Shipment|null $unzerShipment
+     * @param Shipment|null $unzerShipment
      * @throws \Exception
      * @return bool
      */
@@ -147,6 +148,9 @@ class Transaction
         return md5(json_encode($params));
     }
 
+    /**
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     */
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
         $params = [
@@ -156,8 +160,10 @@ class Transaction
             'oxaction' => $unzerPayment->getStateName()
         ];
 
-        if ($initialTransaction = $unzerPayment->getInitialTransaction()) {
+        if (($initialTransaction = $unzerPayment->getInitialTransaction()) && $initialTransaction->getShortId() !== null) {
             $params['shortid'] = $initialTransaction->getShortId();
+        } else {
+            $params['shortid'] = Registry::getSession()->getVariable('ShortId');
         }
 
         if ($metadata = $unzerPayment->getMetadata()) {

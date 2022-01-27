@@ -216,7 +216,10 @@ class Unzer
     public function setSessionVars(AbstractTransactionType $charge): void
     {
         // You'll need to remember the shortId to show it on the success or failure page
-        $this->session->setVariable('ShortId', $charge->getShortId());
+        if ($charge->getShortId() !== null && $this->session->getVariable('ShortId') !== $charge->getShortId()) {
+            $this->session->setVariable('ShortId', $charge->getShortId());
+        }
+
         $this->session->setVariable('PaymentId', $charge->getPaymentId());
 
         $paymentType = $charge->getPayment()->getPaymentType();

@@ -75,7 +75,7 @@ class Order extends Order_parent
         return $iRet;
     }
 
-    private function markUnzerOrderAsPaid(): void
+    public function markUnzerOrderAsPaid(): void
     {
         $utilsDate = Registry::getUtilsDate();
         $date = date('Y-m-d H:i:s', $utilsDate->getTime());

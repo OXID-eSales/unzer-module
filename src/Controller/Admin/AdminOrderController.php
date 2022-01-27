@@ -51,10 +51,8 @@ class AdminOrderController extends AdminDetailsController
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
             $oPayment = oxNew(Payment::class);
-            if ($oPayment->load($oOrder->oxorder__oxpaymenttype->value)) {
-                if ($oPayment->isUnzerSecuredPayment()) {
-                    $this->_aViewData["blShipment"] = true;
-                }
+            if ($oPayment->load($oOrder->oxorder__oxpaymenttype->value) && $oPayment->isUnzerSecuredPayment()) {
+                $this->_aViewData["blShipment"] = true;
             }
 
             $this->_aViewData['oOrder'] = $oOrder;
@@ -159,7 +157,6 @@ class AdminOrderController extends AdminDetailsController
             } catch (\Exception $e) {
                 $this->_aViewData['errShip'] = $e->getMessage();
             }
-
         }
     }
 
@@ -192,7 +189,7 @@ class AdminOrderController extends AdminDetailsController
         $reason = Registry::getRequest()->getRequestParameter('reason');
 
         $translator = $this->getServiceFromContainer(Translator::class);
-        if ($this->isUnzerOrder() && $this->isCancelReasonRequired() && trim($reason) === "") {
+        if ($reason === "NONE" && $this->isUnzerOrder() && $this->isCancelReasonRequired()) {
             $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_MISSINGREASON') . " " . $amount;
             return;
         }
@@ -226,11 +223,10 @@ class AdminOrderController extends AdminDetailsController
 
         $order = $this->getEditObject();
         if ($order && strpos($order->getFieldData('oxpaymenttype'), "oscunzer") !== false) {
-            $oPaymnet = oxNew(Payment::class);
-            if ($oPaymnet->load($order->getFieldData('oxpaymenttype'))) {
-                $this->oPaymnet = $oPaymnet;
+            $this->oPaymnet = oxNew(Payment::class);
+            if ($this->oPaymnet->load($order->getFieldData('oxpaymenttype'))) {
+                $isUnzer = true;
             }
-            $isUnzer = true;
         }
 
         return $isUnzer;
