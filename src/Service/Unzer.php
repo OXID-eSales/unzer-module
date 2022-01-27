@@ -1,10 +1,16 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
@@ -15,6 +21,7 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
+use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use OxidEsales\Eshop\Core\Field;
@@ -37,6 +44,13 @@ class Unzer
     /** @var Request */
     protected $request;
 
+    /**
+     * @param Session $session
+     * @param Translator $translator
+     * @param Context $context
+     * @param ModuleSettings $moduleSettings
+     * @param Request $request
+     */
     public function __construct(
         Session $session,
         Translator $translator,
@@ -51,7 +65,12 @@ class Unzer
         $this->request = $request;
     }
 
-    public function getUnzerCustomer(\OxidEsales\Eshop\Application\Model\User $oUser, ?Order $oOrder = null): Customer
+    /**
+     * @param User $oUser
+     * @param Order|null $oOrder
+     * @return Customer
+     */
+    public function getUnzerCustomer(User $oUser, ?Order $oOrder = null): Customer
     {
         $customer = CustomerFactory::createCustomer(
             $oUser->getFieldData('oxfname'),
@@ -119,6 +138,11 @@ class Unzer
         return $customer;
     }
 
+    /**
+     * @param string $unzerOrderId
+     * @param BasketModel $basketModel
+     * @return Basket
+     */
     public function getUnzerBasket(string $unzerOrderId, BasketModel $basketModel): Basket
     {
         $basket = new Basket(
@@ -145,6 +169,10 @@ class Unzer
         return $basket;
     }
 
+    /**
+     * @param Charge $charge
+     * @return string
+     */
     public function getBankDataFromCharge(Charge $charge): string
     {
         $bankData = sprintf(
@@ -176,6 +204,10 @@ class Unzer
         return $bankData;
     }
 
+    /**
+     * @param string $paymentMethod
+     * @return string
+     */
     public function getPaymentProcedure(string $paymentMethod): string
     {
         if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured'])) {
@@ -185,6 +217,10 @@ class Unzer
         return $this->moduleSettings::PAYMENT_CHARGE;
     }
 
+    /**
+     * @param bool $addPending
+     * @return string
+     */
     public function prepareOrderRedirectUrl(bool $addPending = false): string
     {
         $redirectUrl = $this->prepareRedirectUrl('order');
@@ -196,11 +232,19 @@ class Unzer
         return $redirectUrl;
     }
 
+    /**
+     * @param string $destination
+     * @return string
+     */
     public function prepareRedirectUrl(string $destination = ''): string
     {
         return Registry::getConfig()->getSslShopUrl() . 'index.php?cl=' . str_replace('?', '&', $destination);
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getUnzerPaymentIdFromRequest(): string
     {
         $jsonPaymentData = $this->request->getRequestParameter('paymentData');
@@ -213,6 +257,9 @@ class Unzer
         throw new \Exception('oscunzer_WRONGPAYMENTID');
     }
 
+    /**
+     * @param AbstractTransactionType $charge
+     */
     public function setSessionVars(AbstractTransactionType $charge): void
     {
         // You'll need to remember the shortId to show it on the success or failure page
@@ -229,7 +276,7 @@ class Unzer
         }
 
         // TODO: $charge is not only class of Charge possible here. Investigate and fix.
-        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Prepayment || $paymentType->isInvoiceType()) {
+        if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
             $this->session->setVariable(
                 'additionalPaymentInformation',
                 $this->getBankDataFromCharge($charge)
@@ -237,6 +284,11 @@ class Unzer
         }
     }
 
+    /**
+     * @param string $paymentMethod
+     * @return Metadata
+     * @throws \Exception
+     */
     public function getShopMetadata(string $paymentMethod): Metadata
     {
         $metadata = new Metadata();
@@ -249,6 +301,9 @@ class Unzer
         return $metadata;
     }
 
+    /**
+     * @return string
+     */
     public function generateUnzerOrderId(): string
     {
         return 'o' . str_replace(['0.', ' '], '', microtime(false));

@@ -1,7 +1,13 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class InvoiceSecured extends UnzerPayment
@@ -11,7 +17,8 @@ class InvoiceSecured extends UnzerPayment
     protected $allowedCurrencies = ['EUR'];
 
     /**
-     * @return \UnzerSDK\Resources\PaymentTypes\InvoiceSecured
+     * @return BasePaymentType
+     * @throws UnzerApiException
      */
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {

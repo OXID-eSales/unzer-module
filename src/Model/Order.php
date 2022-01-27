@@ -1,7 +1,14 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Model;
 
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -16,14 +23,14 @@ class Order extends Order_parent
     protected $isRedirectOrder = false;
 
     /**
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser
+     * @param Basket $oBasket
+     * @param User $oUser
      * @return int|bool
      * @throws \Exception
      */
     public function finalizeUnzerOrderAfterRedirect(
-        \OxidEsales\Eshop\Application\Model\Basket $oBasket,
-        \OxidEsales\Eshop\Application\Model\User $oUser
+        Basket $oBasket,
+        User $oUser
     ) {
         $this->isRedirectOrder = true;
 

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
@@ -29,8 +34,18 @@ class Payment
     /** @var UnzerSDKLoader */
     protected $unzerSDKLoader;
 
-    protected $redirectUrl = null;
+    /**
+     * @var string
+     */
+    protected $redirectUrl;
 
+    /**
+     * @param Session $session
+     * @param PaymentExtensionLoader $paymentExtensionLoader
+     * @param Translator $translator
+     * @param Unzer $unzerService
+     * @param UnzerSDKLoader $unzerSDKLoader
+     */
     public function __construct(
         Session $session,
         PaymentExtensionLoader $paymentExtensionLoader,
@@ -88,6 +103,9 @@ class Payment
         return $paymentStatus;
     }
 
+    /**
+     * @return bool
+     */
     public function removeTemporaryOrder(): bool
     {
         $result = false;
@@ -118,7 +136,6 @@ class Payment
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
-                    $result = "OK";
                 }
             } elseif ($transaction->isPending()) {
                 $result = "NOT_FINISHED";
@@ -137,6 +154,10 @@ class Payment
         return $result;
     }
 
+    /**
+     * @param string $unzerPaymentId
+     * @throws UnzerApiException
+     */
     public function createPaymentStatusWebhook(string $unzerPaymentId): void
     {
         $webhookUrl = Registry::getConfig()->getShopUrl()
@@ -146,12 +167,16 @@ class Payment
         $this->getUnzerSDK()->createWebhook($webhookUrl, 'payment');
     }
 
+    /**
+     * @return \UnzerSDK\Unzer
+     */
     protected function getUnzerSDK(): \UnzerSDK\Unzer
     {
         return $this->unzerSDKLoader->getUnzerSDK();
     }
 
     /**
+     * @return \UnzerSDK\Resources\Payment|null
      * @throws UnzerApiException
      */
     public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment

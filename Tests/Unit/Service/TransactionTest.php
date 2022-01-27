@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Core\UtilsDate;
@@ -10,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\EmbeddedResources\Amount;
 use UnzerSDK\Resources\Metadata;
+use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 
 class TransactionTest extends TestCase
@@ -34,7 +40,7 @@ class TransactionTest extends TestCase
         $model = $this->createPartialMock(Transaction::class, ['assign']);
         $sut = $this->getTransactionServiceMock($model);
 
-        $payment = $this->createConfiguredMock(\UnzerSDK\Resources\Payment::class, [
+        $payment = $this->createConfiguredMock(Payment::class, [
             'getAmount' => $this->createConfiguredMock(Amount::class, ['getTotal' => 10.20]),
             'getCurrency' => 'specialCurrency',
             'getId' => 'unzerPaymentId',

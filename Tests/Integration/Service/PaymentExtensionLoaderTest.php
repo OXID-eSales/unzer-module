@@ -1,12 +1,14 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
-use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
-use OxidSolutionCatalysts\Unzer\Service\Translator;
-use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use PHPUnit\Framework\TestCase;

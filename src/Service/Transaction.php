@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -8,6 +13,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -21,6 +27,10 @@ class Transaction
     /** @var UtilsDate */
     protected $utilsDate;
 
+    /**
+     * @param Context $context
+     * @param UtilsDate $utilsDate
+     */
     public function __construct(
         Context $context,
         UtilsDate $utilsDate
@@ -34,9 +44,9 @@ class Transaction
      * @param string $userId
      * @param Payment|null $unzerPayment
      * @param Shipment|null $unzerShipment
-     * @throws \Exception
      * @return bool
-     */
+     * @throws \Exception
+    */
     public function writeTransactionToDB(string $orderid, string $userId, ?Payment $unzerPayment, ?Shipment  $unzerShipment = null)
     {
         $transaction = $this->getNewTransactionObject();
@@ -47,11 +57,9 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
-
         if ($unzerPayment && !$unzerShipment) {
             $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
         }
-
         if ($unzerShipment) {
             $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
         }
@@ -74,8 +82,8 @@ class Transaction
      * @param string $orderid
      * @param string $userId
      * @param Cancellation|null $unzerCharge
-     * @throws \Exception
      * @return bool
+     * @throws \Exception
      */
     public function writeCancellationToDB(string $orderid, string $userId, ?Cancellation $unzerCancel)
     {
@@ -124,9 +132,7 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
-
         $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
-
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
@@ -142,6 +148,10 @@ class Transaction
         return false;
     }
 
+    /**
+     * @param array $params
+     * @return string
+     */
     protected function prepareTransactionOxid(array $params): string
     {
         unset($params['oxactiondate']);
@@ -149,7 +159,9 @@ class Transaction
     }
 
     /**
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @param Payment $unzerPayment
+     * @return array
+     * @throws UnzerApiException
      */
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
@@ -226,6 +238,10 @@ class Transaction
 
         return $params;
     }
+
+    /**
+     * @return TransactionModel
+     */
 
     protected function getNewTransactionObject(): TransactionModel
     {

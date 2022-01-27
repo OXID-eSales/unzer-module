@@ -1,36 +1,33 @@
 <?php
 
 /**
- * This Software is the property of OXID eSales and is protected
- * by copyright law - it is NOT Freeware.
- *
- * Any unauthorized use of this software without a valid license key
- * is a violation of the license agreement and will be prosecuted by
- * civil and criminal law.
- *
- * @copyright 2003-2021 OXID eSales AG
- * @author    OXID Solution Catalysts
- * @link      https://www.oxid-esales.com
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
  */
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 class DispatcherController extends FrontendController
 {
     use ServiceContainer;
 
     /**
-     * @param string $paymentid
      * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws UnzerApiException
      */
     public function updatePaymentTransStatus(): void
     {

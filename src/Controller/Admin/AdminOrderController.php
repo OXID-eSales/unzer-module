@@ -1,10 +1,14 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
@@ -39,7 +43,6 @@ class AdminOrderController extends AdminDetailsController
      * name of template file "oscunzer_order.tpl".
      *
      * @return string
-     * @throws DatabaseConnectionException
      */
     public function render(): string
     {

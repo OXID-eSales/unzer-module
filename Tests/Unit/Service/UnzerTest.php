@@ -1,11 +1,15 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Application\Model\Basket as ShopBasketModel;
 use OxidEsales\Eshop\Application\Model\BasketItem;
 use OxidEsales\Eshop\Core\Config;
-use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;

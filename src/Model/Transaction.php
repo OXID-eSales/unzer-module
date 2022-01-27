@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Field;
@@ -27,32 +32,50 @@ class Transaction extends BaseModel
         $this->init($this->_sCoreTable);
     }
 
+    /**
+     * @return string|null
+     */
     public function getUnzerCreated(): ?string
     {
         return $this->getRawField('OXACTIONDATE');
     }
 
+    /**
+     * @return string|null
+     */
     public function getUnzerCustomerId(): ?string
     {
         return $this->getRawField('CUSTOMERID');
     }
 
+    /**
+     * @return string|null
+     */
     public function getUnzerAction(): ?string
     {
         return $this->getRawField('OXACTION');
     }
 
+    /**
+     * @return string|null
+     */
     public function getUnzerTypeId(): ?string
     {
         return $this->getRawField('TYPEID');
     }
 
+    /**
+     * @return string|null
+     */
     public function getUnzerShortId(): ?string
     {
         return $this->getRawField('SHORTID');
     }
 
-    public function getUnzerMetaData()
+    /**
+     * @return array|mixed
+     */
+    public function getUnzerMetaData(): ?array
     {
         $json = $this->getRawField('METADATA');
         if ($json) {
@@ -62,6 +85,10 @@ class Transaction extends BaseModel
         return [];
     }
 
+    /**
+     * @param string $sFieldName
+     * @return string|null
+     */
     private function getRawField(string $sFieldName): ?string
     {
         $sLongFieldName = $this->_getFieldLongName($sFieldName);
