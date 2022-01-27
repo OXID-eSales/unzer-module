@@ -37,7 +37,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         parent::render();
 
-        if ($this->_sModuleId == Module::MODULE_ID) {
+        if ($this->getSelectedModuleId() == Module::MODULE_ID) {
             try {
                 $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
                 $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
@@ -51,7 +51,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                     }
                 }
             } catch (\Throwable $loggerException) {
-                Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
+                Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getMessage()));
             }
         }
         return 'module_config.tpl';
@@ -71,7 +71,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 ->get(ModuleSettingBridgeInterface::class);
             $moduleSettingBridge->save('registeredWebhook', '', Module::MODULE_ID);
         } catch (\Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
+            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getMessage()));
         }
     }
 
@@ -85,14 +85,13 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
             $url = Registry::getConfig()->getSslShopUrl() . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
 
-            if ($unzer->createWebhook($url, "payment")) {
-                $moduleSettingBridge = ContainerFactory::getInstance()
-                    ->getContainer()
-                    ->get(ModuleSettingBridgeInterface::class);
-                $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
-            }
+            $unzer->createWebhook($url, "payment");
+            $moduleSettingBridge = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(ModuleSettingBridgeInterface::class);
+            $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
         } catch (\Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getClientMessage()));
+            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getMessage()));
         }
     }
 }

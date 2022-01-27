@@ -421,6 +421,7 @@ $aLang = [
     "oscunzer_500.100.402"   => "general technical system error",
     "oscunzer_500.100.403"   => "general technical system error",
     "oscunzer_500.200.101"   => "general technical system error",
+    "oscunzer_510.310.010"   => "Your domain requires an SSL certificate.",
     "oscunzer_600.100.100"   => "general technical system error",
     "oscunzer_600.200.100"   => "general technical system error",
     "oscunzer_600.200.200"   => "general technical system error",

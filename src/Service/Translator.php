@@ -38,7 +38,7 @@ class Translator
 
     public function translate(string $message): string
     {
-        return $this->language->translateString($message);
+        return $this->language->translateString($message, null, false);
     }
 
     public function formatCurrency(float $amount): string
