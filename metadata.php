@@ -38,6 +38,7 @@ $aModule = [
         \OxidEsales\Eshop\Application\Model\Order::class                            => \OxidSolutionCatalysts\Unzer\Model\Order::class,
         \OxidEsales\Eshop\Core\ShopControl::class                                   => \OxidSolutionCatalysts\Unzer\Core\ShopControl::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class   => \OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class             => \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain::class,
     ],
     'controllers' => [
         'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,

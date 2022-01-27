@@ -86,7 +86,7 @@ class Payment
                 $this->unzerService->prepareOrderRedirectUrl(
                     isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
                 ),
-                $this->translator->translateCode((string)$e->getCode(), $e->getClientMessage())
+                $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
             );
         } catch (Exception $e) {
             $this->removeTemporaryOrder();
@@ -134,12 +134,7 @@ class Payment
             $result = "OK";
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
-                $result = "NOT_FINISHED";
-
                 if ($transaction instanceof Authorization) {
-                    /** @var Authorization $authorization */
-                    $authorization = $sessionUnzerPayment->getAuthorization();
-                    $authorization->charge();
                 }
             } elseif ($transaction->isPending()) {
                 $result = "NOT_FINISHED";
