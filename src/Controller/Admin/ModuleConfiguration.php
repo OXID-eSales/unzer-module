@@ -51,7 +51,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                     }
                 }
             } catch (\Throwable $loggerException) {
-                Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getMessage()));
+                Registry::getUtilsView()->addErrorToDisplay(
+                    $this->translator->translateCode(
+                        (string)$loggerException->getCode(),
+                        $loggerException->getMessage()
+                    )
+                );
             }
         }
         return 'module_config.tpl';
@@ -71,7 +76,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 ->get(ModuleSettingBridgeInterface::class);
             $moduleSettingBridge->save('registeredWebhook', '', Module::MODULE_ID);
         } catch (\Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getMessage()));
+            Registry::getUtilsView()->addErrorToDisplay(
+                $this->translator->translateCode(
+                    (string)$loggerException->getCode(),
+                    $loggerException->getMessage()
+                )
+            );
         }
     }
 
@@ -83,7 +93,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         try {
             /** @var Unzer $unzer */
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $url = Registry::getConfig()->getSslShopUrl() . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
+            $url = Registry::getConfig()->getSslShopUrl()
+                . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
 
             $unzer->createWebhook($url, "payment");
             $moduleSettingBridge = ContainerFactory::getInstance()
@@ -91,7 +102,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 ->get(ModuleSettingBridgeInterface::class);
             $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
         } catch (\Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay($this->translator->translateCode((string)$loggerException->getCode(), $loggerException->getMessage()));
+            Registry::getUtilsView()->addErrorToDisplay(
+                $this->translator->translateCode(
+                    (string)$loggerException->getCode(),
+                    $loggerException->getMessage()
+                )
+            );
         }
     }
 }
