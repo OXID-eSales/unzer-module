@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidSolutionCatalysts\Unzer\Exception;
 
 class RedirectWithMessage extends Redirect
@@ -10,6 +15,11 @@ class RedirectWithMessage extends Redirect
     /** @var array */
     private $messageParams;
 
+    /**
+     * @param string $destination
+     * @param string $messageKey
+     * @param array $messageParams
+     */
     public function __construct(string $destination, string $messageKey, array $messageParams = [])
     {
         parent::__construct($destination);
@@ -18,11 +28,17 @@ class RedirectWithMessage extends Redirect
         $this->messageParams = $messageParams;
     }
 
+    /**
+     * @return string
+     */
     public function getMessageKey(): string
     {
         return $this->messageKey;
     }
 
+    /**
+     * @return array
+     */
     public function getMessageParams(): array
     {
         return $this->messageParams;
