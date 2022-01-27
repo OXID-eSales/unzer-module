@@ -37,4 +37,8 @@ $aLang = [
     'HELP_SHOP_MODULE_UnzerDebug' => 'Im aktiven Debug-Modus werden Log-Files in das Verzeichnis /log/unzer geschrieben.',
     'HELP_SHOP_MODULE_UnzerLogLevel' => 'Das Log Level bestimmt, welche Ereignisse in der Logdatei protokolliert werden. Mögliche Werte
      sind Debug (alles), Warning (Warnungen und Fehler), oder Error (nur Fehler).',
+    'SHOP_MODULE_WEBHOOK' => 'Registrierter Webhook',
+    'SHOP_MODULE_REGISTER_WEBHOOK' => 'Webhook für diesen Shop registrieren',
+    'SHOP_MODULE_DELETE_WEBHOOK' => 'Webhook für diesen Shop löschen',
+    'SHOP_MODULE_WEBHOOK_NO_UNZER' => 'Um ein Webhook registrieren zu können, müssen die Unzer-Keys hinterlegt sein.',
 ];

@@ -33,7 +33,11 @@ class DispatcherController extends FrontendController
     {
         $result = '';
 
-        if ($paymentId = Registry::getRequest()->getRequestParameter('paymentid')) {
+        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
+        $jsonRequest = file_get_contents('php://input');
+        $resource = $unzer->fetchResourceFromEvent($jsonRequest);
+
+        if ($paymentId = $resource->getId()) {
             $transaction = $this->getServiceFromContainer(Transaction::class);
             $order = oxNew(Order::class);
             $data = $transaction->getTransactionDataByPaymentId($paymentId);
