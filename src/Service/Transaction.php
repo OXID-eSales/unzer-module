@@ -177,7 +177,7 @@ class Transaction
         ];
 
         if (
-            $initialTransaction = $unzerPayment->getInitialTransaction() &&
+            ($initialTransaction = $unzerPayment->getInitialTransaction()) &&
             $initialTransaction->getShortId() !== null
         ) {
             $params['shortid'] = $initialTransaction->getShortId();
