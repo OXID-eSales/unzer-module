@@ -29,7 +29,8 @@ class OrderMain extends OrderMain_parent
         }
     }
 
-    public function sendShipmentNotification($oOrder) {
+    public function sendShipmentNotification($oOrder)
+    {
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
         $sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
 
@@ -48,10 +49,12 @@ class OrderMain extends OrderMain_parent
             if (!$blIsShipped) {
                 $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
                 try {
-                    $transactionService->writeTransactionToDB($oOrder->getId(),
+                    $transactionService->writeTransactionToDB(
+                        $oOrder->getId(),
                         $oOrder->oxorder__oxuserid->value,
                         $unzerPayment,
-                        $unzerPayment->ship($sInvoiceNr));
+                        $unzerPayment->ship($sInvoiceNr)
+                    );
                 } catch (\Exception $e) {
                     // TODO Logging
                 }

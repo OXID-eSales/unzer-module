@@ -47,8 +47,12 @@ class Transaction
      * @return bool
      * @throws \Exception
     */
-    public function writeTransactionToDB(string $orderid, string $userId, ?Payment $unzerPayment, ?Shipment  $unzerShipment = null)
-    {
+    public function writeTransactionToDB(
+        string $orderid,
+        string $userId,
+        ?Payment $unzerPayment,
+        ?Shipment $unzerShipment = null
+    ) {
         $transaction = $this->getNewTransactionObject();
 
         $params = [
@@ -172,7 +176,10 @@ class Transaction
             'oxaction' => $unzerPayment->getStateName()
         ];
 
-        if (($initialTransaction = $unzerPayment->getInitialTransaction()) && $initialTransaction->getShortId() !== null) {
+        if (
+            $initialTransaction = $unzerPayment->getInitialTransaction() &&
+            $initialTransaction->getShortId() !== null
+        ) {
             $params['shortid'] = $initialTransaction->getShortId();
         } else {
             $params['shortid'] = Registry::getSession()->getVariable('ShortId');
@@ -224,7 +231,7 @@ class Transaction
     {
         $params = [
             'amount'   => $unzerShipment->getAmount(),
-            'fetchedAt'=> $unzerShipment->getFetchedAt(),
+            'fetchedAt' => $unzerShipment->getFetchedAt(),
             'typeid'   => $unzerShipment->getId(),
             'oxaction' => 'ship',
             'shortid'  => $unzerShipment->getShortId()
@@ -266,9 +273,11 @@ class Transaction
         return false;
     }
 
-    protected static function getUzrStatus($unzerObject) {
-        if ($unzerObject->isSuccess())
+    protected static function getUzrStatus($unzerObject)
+    {
+        if ($unzerObject->isSuccess()) {
             return "success";
+        }
         if ($unzerObject->isError()) {
             return "error";
         }
@@ -287,7 +296,8 @@ class Transaction
     {
         if ($orderid) {
             return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
+                "SELECT DISTINCT TYPEID FROM oscunzertransaction
+                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
                 [(string)$orderid]
             );
         }

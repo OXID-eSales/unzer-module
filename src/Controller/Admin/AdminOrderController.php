@@ -27,6 +27,7 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 class AdminOrderController extends AdminDetailsController
 {
     use ServiceContainer;
+
     /**
      * Active order object
      *
@@ -79,7 +80,8 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    protected function getUnzerViewData($sPaymentId) {
+    protected function getUnzerViewData($sPaymentId)
+    {
         /** @var \UnzerSDK\Resources\Payment $unzerPayment */
         $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
             ->getUnzerSDK()
@@ -146,7 +148,8 @@ class AdminOrderController extends AdminDetailsController
         $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
     }
 
-    public function sendShipmentNotification() {
+    public function sendShipmentNotification()
+    {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
         $translator = $this->getServiceFromContainer(Translator::class);
@@ -157,15 +160,20 @@ class AdminOrderController extends AdminDetailsController
                     ->getUnzerSDK()
                     ->fetchPayment($unzerid);
                 $sInvoiceNr = $this->getEditObject()->getUnzerInvoiceNr();
-                $transactionService->writeTransactionToDB($this->getEditObject()->getId(),
-                    $this->getEditObject()->oxorder__oxuserid->value, $unzerPayment, $unzerPayment->ship($sInvoiceNr));
+                $transactionService->writeTransactionToDB(
+                    $this->getEditObject()->getId(),
+                    $this->getEditObject()->oxorder__oxuserid->value,
+                    $unzerPayment,
+                    $unzerPayment->ship($sInvoiceNr)
+                );
             } catch (UnzerApiException $e) {
                 $this->_aViewData['errShip'] = $translator->translateCode($e->getErrorId(), $e->getMessage());
             }
         }
     }
 
-    public function doUnzerCollect() {
+    public function doUnzerCollect()
+    {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $amount = (float) Registry::getRequest()->getRequestParameter('amount');
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
@@ -176,17 +184,21 @@ class AdminOrderController extends AdminDetailsController
                 ->fetchPayment($unzerid);
 
             $charge = $unzerPayment->getAuthorization()->charge($amount);
-            $transactionService->writeChargeToDB($this->getEditObjectId(), $this->getEditObject()->oxorder__oxuserid->value, $charge);
+            $transactionService->writeChargeToDB(
+                $this->getEditObjectId(),
+                $this->getEditObject()->oxorder__oxuserid->value,
+                $charge
+            );
             if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
                 $this->getEditObject()->markUnzerOrderAsPaid();
             }
-        }
-        catch (UnzerApiException $e) {
+        } catch (UnzerApiException $e) {
             $this->_aViewData['errAuth'] = $translator->translateCode($e->getErrorId(), $e->getMessage());
         }
     }
 
-    public function doUnzerCancel() {
+    public function doUnzerCancel()
+    {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $chargeid = Registry::getRequest()->getRequestParameter('chargeid');
         $amount = (float) Registry::getRequest()->getRequestParameter('amount');
@@ -195,12 +207,14 @@ class AdminOrderController extends AdminDetailsController
 
         $translator = $this->getServiceFromContainer(Translator::class);
         if ($reason === "NONE" && $this->isUnzerOrder() && $this->isCancelReasonRequired()) {
-            $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_MISSINGREASON') . " " . $amount;
+            $this->_aViewData['errCancel'] = $chargeid . ": "
+                . $translator->translate('OSCUNZER_CANCEL_MISSINGREASON') . " " . $amount;
             return;
         }
 
         if ($amount > $fCharged || $amount == 0) {
-            $this->_aViewData['errCancel'] = $chargeid . ": " . $translator->translate('OSCUNZER_CANCEL_ERR_AMOUNT') . " " . $amount;
+            $this->_aViewData['errCancel'] = $chargeid . ": "
+                . $translator->translate('OSCUNZER_CANCEL_ERR_AMOUNT') . " " . $amount;
             return;
         }
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
@@ -210,9 +224,12 @@ class AdminOrderController extends AdminDetailsController
                 ->fetchChargeById($unzerid, $chargeid);
 
             $cancellation = $unzerPayment->cancel($amount, $reason);
-            $transactionService->writeCancellationToDB($this->getEditObjectId(), $this->getEditObject()->oxorder__oxuserid->value, $cancellation);
-        }
-        catch (\Exception $e) {
+            $transactionService->writeCancellationToDB(
+                $this->getEditObjectId(),
+                $this->getEditObject()->oxorder__oxuserid->value,
+                $cancellation
+            );
+        } catch (\Exception $e) {
             $this->_aViewData['errCancel'] = $chargeid . ": " . $e->getMessage();
         }
     }
@@ -237,7 +254,8 @@ class AdminOrderController extends AdminDetailsController
         return $isUnzer;
     }
 
-    public function isCancelReasonRequired() {
+    public function isCancelReasonRequired()
+    {
         if (!$this->oPaymnet) {
             return false;
         } else {

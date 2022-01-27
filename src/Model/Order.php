@@ -128,6 +128,8 @@ class Order extends Order_parent
      */
     public function getUnzerInvoiceNr()
     {
-        return $this->getFieldData('OXINVOICENR') == 0 ? $this->getFieldData('OXORDERNR') : $this->getFieldData('OXINVOICENR');
+        return (int)$this->getFieldData('OXINVOICENR') !== 0 ?
+            $this->getFieldData('OXINVOICENR') :
+            $this->getFieldData('OXORDERNR');
     }
 }
