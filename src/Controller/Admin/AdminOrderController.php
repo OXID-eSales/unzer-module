@@ -16,6 +16,7 @@ use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -158,8 +159,8 @@ class AdminOrderController extends AdminDetailsController
                 $sInvoiceNr = $this->getEditObject()->getUnzerInvoiceNr();
                 $transactionService->writeTransactionToDB($this->getEditObject()->getId(),
                     $this->getEditObject()->oxorder__oxuserid->value, $unzerPayment, $unzerPayment->ship($sInvoiceNr));
-            } catch (\Exception $e) {
-                $this->_aViewData['errShip'] = $translator->translateCode($e->getCode(), $e->getMessage());
+            } catch (UnzerApiException $e) {
+                $this->_aViewData['errShip'] = $translator->translateCode($e->getErrorId(), $e->getMessage());
             }
         }
     }
@@ -180,8 +181,8 @@ class AdminOrderController extends AdminDetailsController
                 $this->getEditObject()->markUnzerOrderAsPaid();
             }
         }
-        catch (\Exception $e) {
-            $this->_aViewData['errAuth'] = $translator->translateCode($e->getCode(), $e->getMessage());
+        catch (UnzerApiException $e) {
+            $this->_aViewData['errAuth'] = $translator->translateCode($e->getErrorId(), $e->getMessage());
         }
     }
 
