@@ -80,6 +80,9 @@ class ModuleSettings
         return (string) $this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
     }
 
+    /**
+     * @return string
+     */
     public function getRegisteredWebhook(): string
     {
         return (string) $this->getSettingValue('registeredWebhook');
