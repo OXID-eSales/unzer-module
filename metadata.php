@@ -29,15 +29,16 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class       => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class                                => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
-        \OxidEsales\Eshop\Core\Config::class                                    => \OxidSolutionCatalysts\Unzer\Core\Config::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class                      => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
-        \OxidEsales\Eshop\Application\Controller\OrderController::class         => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class               => \OxidSolutionCatalysts\Unzer\Model\PaymentGateway::class,
-        \OxidEsales\Eshop\Application\Model\Order::class                        => \OxidSolutionCatalysts\Unzer\Model\Order::class,
-        \OxidEsales\Eshop\Core\ShopControl::class                               => \OxidSolutionCatalysts\Unzer\Core\ShopControl::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class         => \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class           => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class                                    => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
+        \OxidEsales\Eshop\Core\Config::class                                        => \OxidSolutionCatalysts\Unzer\Core\Config::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class                          => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class             => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class                   => \OxidSolutionCatalysts\Unzer\Model\PaymentGateway::class,
+        \OxidEsales\Eshop\Application\Model\Order::class                            => \OxidSolutionCatalysts\Unzer\Model\Order::class,
+        \OxidEsales\Eshop\Core\ShopControl::class                                   => \OxidSolutionCatalysts\Unzer\Core\ShopControl::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class   => \OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class             => \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain::class,
     ],
     'controllers' => [
         'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,
@@ -87,6 +88,12 @@ $aModule = [
             'block' => 'select_payment',
             'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
         ],
+        //admin
+        [
+            'template' => 'module_config.tpl',
+            'block' => 'admin_module_config_var',
+            'file' => 'views/admin/blocks/admin_module_config_var.tpl'
+        ],
         //email
         [
             'template' => 'email/plain/order_cust.tpl',
@@ -129,6 +136,11 @@ $aModule = [
             'group' => 'merchant',
             'name' => 'production-UnzerApiKey',
             'type' => 'str'
+        ],
+        [
+            'group' => 'merchant',
+            'name' => 'registeredWebhook',
+            'type' => 'str',
         ],
         [
             'group' => 'environment',

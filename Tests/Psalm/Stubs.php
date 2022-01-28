@@ -51,6 +51,13 @@ class OrderMain_parent extends \OxidEsales\Eshop\Application\Controller\Admin\Or
 {
 }
 
+namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
+
+class ModuleConfiguration_parent extends \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration
+{
+}
+
+
 namespace OxidEsales\Eshop\Core;
 
 class Language extends \OxidEsales\EshopCommunity\Core\Language

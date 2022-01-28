@@ -129,7 +129,7 @@ class PaymentTest extends TestCase
 
         $translatorMock = $this->createPartialMock(Translator::class, ['translateCode']);
         $translatorMock->method('translateCode')
-            ->with("specialCode", "clientMessage")
+            ->with("No error id provided", "clientMessage")
             ->willReturn("specialTranslation");
 
         $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareOrderRedirectUrl']);
