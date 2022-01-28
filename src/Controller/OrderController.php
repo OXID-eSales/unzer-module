@@ -85,7 +85,7 @@ class OrderController extends OrderController_parent
      */
     public function isSepaConfirmed(): ?bool
     {
-        if ($this->getPayment()->getId() === 'oscunzer_sepa') {
+        if ($this->getPayment()->getId() === 'oscunzer_sepa' || $this->getPayment()->getId() === 'oscunzer_sepa-secured') {
             $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {
                 $this->blSepaMandateConfirmError = true;
