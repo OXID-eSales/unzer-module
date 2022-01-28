@@ -37,7 +37,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         parent::render();
 
-        if ($this->getSelectedModuleId() == Module::MODULE_ID) {
+        if ($this->_sEditObjectId == Module::MODULE_ID) {
             try {
                 $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
                 $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
