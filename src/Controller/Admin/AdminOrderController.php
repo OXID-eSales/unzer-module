@@ -52,6 +52,12 @@ class AdminOrderController extends AdminDetailsController
 
         $this->_aViewData["sOxid"] = $this->getEditObjectId();
 
+        $transactionList = oxNew(TransactionList::class);
+        $transactionList->getTransactionList($this->getEditObjectId());
+        if ($transactionList->count()) {
+            $this->_aViewData['oUnzerTransactions'] = $transactionList;
+        }
+
         if ($this->isUnzerOrder()) {
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
@@ -61,11 +67,6 @@ class AdminOrderController extends AdminDetailsController
             }
 
             $this->_aViewData['oOrder'] = $oOrder;
-            $transactionList = oxNew(TransactionList::class);
-            $transactionList->getTransactionList($this->getEditObjectId());
-            if ($transactionList->count()) {
-                $this->_aViewData['oUnzerTransactions'] = $transactionList;
-            }
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
@@ -91,6 +92,8 @@ class AdminOrderController extends AdminDetailsController
         $fCharged = 0.0;
 
         $shipments = [];
+        $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
+
         /** @var Shipment $shipment */
         foreach ($unzerPayment->getShipments() as $shipment) {
             $aRv = [];
@@ -110,9 +113,10 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
             $this->_aViewData["AuthId"] = $unzAuthorization->getId();
             $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
+            $this->_aViewData['AuthCur'] = $unzAuthorization->getCurrency();
         }
         $charges = [];
-        if (!$unzerPayment->isPending() && !$unzerPayment->isCanceled()) {
+        if (!$unzerPayment->isCanceled()) {
             /** @var Charge $charge */
             foreach ($unzerPayment->getCharges() as $charge) {
                 $aRv = [];
@@ -124,6 +128,7 @@ class AdminOrderController extends AdminDetailsController
                     $fCharged += $charge->getAmount();
                 }
                 $aRv['chargeDate'] = $charge->getDate();
+
                 $charges [] = $aRv;
             }
         }
@@ -229,8 +234,8 @@ class AdminOrderController extends AdminDetailsController
                 $this->getEditObject()->oxorder__oxuserid->value,
                 $cancellation
             );
-        } catch (\Exception $e) {
-            $this->_aViewData['errCancel'] = $chargeid . ": " . $e->getMessage();
+        } catch (UnzerApiException $e) {
+            $this->_aViewData['errCancel'] = $chargeid . ": " .  $translator->translateCode($e->getErrorId(), $e->getMessage());
         }
     }
 
