@@ -133,14 +133,15 @@
                     <td>
                         <select name="reason" id="reason_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]>
                             [{if !$blCancelReasonReq}]<option value="">NONE</option>[{/if}]
-                            <option value="CANCEL">CANCEL</option>
-                            <option value="RETURN">RETURN</option>
-                            <option value="CREDIT">CREDIT</option>
+                            <option value="CANCEL">[{oxmultilang ident="OSCUNZER_REASON_CANCEL"}]</option>
+                            <option value="RETURN">[{oxmultilang ident="OSCUNZER_REASON_RETURN"}]</option>
+                            <option value="CREDIT">[{oxmultilang ident="OSCUNZER_REASON_CREDIT"}]</option>
                         </select>
                     </td>
                     <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]> [{$uzrCurrency}]</td>
                     <td><input type="submit" id="submit_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
-                               value="Payout"></td>
+                               value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
+                    </td>
                     [{capture assign="cancelConfirm"}]
                     const inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
                     const form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');
