@@ -303,12 +303,13 @@ final class Version20211216100154 extends AbstractMigration
             'oxloadid' => 'oscunzerinstallmentconfirmation',
             'oxactive' => 1,
             'oxtitle_de' => 'Unzer Ratenkauf-Bestätigung',
-            'oxtitle_en' => 'Unzer Installment Text',
-            'oxcontent_de' => 'Bestätigen...
-    <br>Gesamtbetrag [{$fPruchaseAmount}] [{$uzrCurrency}]
+            'oxtitle_en' => 'tr Unzer Installment Text',
+            'oxcontent_de' => 'tr Bestätigen...
+   
+    <br>Ursprungsbetrag [{$fPruchaseAmount}] ([{$uzrRate}]
     <br>Zinsen [{$fInterestAmount}] [{$uzrCurrency}] ([{$uzrRate}] %)
-    <br>
-    <a href="[{$sPdfLink}]" target="_blank">Pdf-Details</a>'
+    <br>Gesamtbetrag [{$fTotal}] [{$uzrCurrency}]
+    '
         ]
     ];
 

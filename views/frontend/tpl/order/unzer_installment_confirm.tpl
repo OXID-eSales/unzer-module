@@ -1,14 +1,14 @@
 [{capture append="oxidBlock_content"}]
 
 
-[{* ordering steps *}]
-[{include file="page/checkout/inc/steps.tpl" active=4}]
+    [{* ordering steps *}]
+    [{include file="page/checkout/inc/steps.tpl" active=4}]
 
-[{oxifcontent ident="oscunzerinstallmentconfirmation" object="oCont"}]
+    [{oxifcontent ident="oscunzerinstallmentconfirmation" object="oCont"}]
     [{$oCont->oxcontents__oxcontent->value}]
-[{/oxifcontent}]
+    [{/oxifcontent}]
 
-[{block name="checkout_order_btn_confirm_pdf"}]
+    [{block name="checkout_order_btn_confirm_pdf"}]
     <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentBottom" class="form-horizontal">
         <div class="hidden">
             [{$oViewConf->getHiddenSid()}]
@@ -22,8 +22,14 @@
             <div class="card-body">
 
                 [{block name="checkout_order_btn_confirm_pdf_bottom"}]
+                [{oxifcontent ident="oxrighttocancellegend" object="oContent"}]
+                <label>
+                    <input id="checkInsallConfirm" type="checkbox" name="ord_instconf" value="0">Ich bin mit dem <a href="[{$sPdfLink}]" target="_blank">Vertrag</a> einverstanden!
+                </label>
+
+                [{/oxifcontent}]
                 <button type="submit" class="btn btn-lg btn-primary float-right submitButton nextStep largeButton">
-                    <i class="fa fa-check"></i> Einverstanden
+                    <i class="fa fa-check"></i>[{oxmultilang ident="OSCUNZER_INSTALLMENT_SUBMIT"}]
                 </button>
                 [{/block}]
 

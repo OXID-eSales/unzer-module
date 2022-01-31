@@ -37,7 +37,7 @@ class InstallmentController extends FrontendController
         if ($this->getIsOrderStep()) {
             $oBasket = Registry::getSession()->getBasket();
             $myConfig = Registry::getConfig();
-            
+
         }
 
         $this->_aViewData['sPdfLink'] = Registry::getSession()->getVariable('UzrPdfLink');
@@ -45,7 +45,6 @@ class InstallmentController extends FrontendController
         $this->getUnzerSessionPayment();
         /** @var InstallmentSecured $uzrInstallment */
         $uzrInstallment = $this->uzrPayment->getPaymentType();
-
 
         $this->_aViewData['fTotal'] = $uzrInstallment->getTotalAmount();
         $this->_aViewData['fPruchaseAmount'] = $uzrInstallment->getTotalPurchaseAmount();
@@ -74,37 +73,26 @@ class InstallmentController extends FrontendController
         }
         return $this->uzrPayment;
     }
-    
+
     public function confirmInstallment() {
+        $unzerPayment = $this->getUnzerSessionPayment();
+        $oOrder = oxNew(Order::class);
 
-        try {
-            $unzerPayment = $this->getUnzerSessionPayment();
+        if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
+            $charge = $unzerPayment->getAuthorization()->charge();
 
-            $oOrder = oxNew(Order::class);
-
-            if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
-//                $charge = $unzerPayment->getAuthorization()->charge();
-               $charge = $unzerPayment->getCharges()[0];
-                $transactionService = $this->getServiceFromContainer(Transaction::class);
-                $transactionService->writeChargeToDB(
-                    $oOrder->getId(),
-                    $oOrder->oxorder__oxuserid->value,
-                    $charge
-                );
-                if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
-                    $oOrder->markUnzerOrderAsPaid();
-                }
-
-                $unzerService = $this->getServiceFromContainer(Unzer::class);
-                throw new Redirect($unzerService->prepareRedirectUrl('order&fnc=unzerExecuteAfterRedirect&pdfConfirm=1'));
+            $transactionService = $this->getServiceFromContainer(Transaction::class);
+            $transactionService->writeChargeToDB(
+                $oOrder->getId(),
+                $oOrder->oxorder__oxuserid->value,
+                $charge
+            );
+            if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
+                $oOrder->markUnzerOrderAsPaid();
             }
 
-
-        } catch (UnzerApiException $e) {
-            throw $e;
+            $unzerService = $this->getServiceFromContainer(Unzer::class);
+            throw new Redirect($unzerService->prepareRedirectUrl('order&fnc=unzerExecuteAfterRedirect&pdfConfirm=1'));
         }
-
-
-
     }
 }
