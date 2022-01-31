@@ -20,7 +20,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     use ServiceContainer;
 
     protected $translator;
-    protected $_sModuleId;
+    protected string $_sModuleId; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
     /**
      * @inheritDoc
