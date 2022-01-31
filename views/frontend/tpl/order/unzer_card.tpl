@@ -18,19 +18,16 @@
             </div>
         </div>
     </div>
-    <div class="field" id="error-holder" style="color: #9f3a38"> </div>
 </form>
 
 
 [{capture assign="unzerCardJS"}]
-    var submitBasketForm = document.getElementById("orderConfirmAgbBottom");
-    var divHidden = submitBasketForm.querySelector('.hidden');
-
-    let hiddenInputPaymentTypeId = divHidden.querySelector('paymentData');
-    hiddenInputPaymentTypeId = document.createElement('input');
-    hiddenInputPaymentTypeId.setAttribute('type', 'hidden');
-    hiddenInputPaymentTypeId.setAttribute('name', 'paymentData');
-    divHidden.appendChild(hiddenInputPaymentTypeId);
+    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+            event.preventDefault();
+            $( "#payment-form-card" ).submit();
+        }
+    });
 
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]');
@@ -50,26 +47,23 @@
     onlyIframe: false
     });
 
-    let $errorHolder = $('#error-holder');
-
-    $('#orderConfirmAgbBottom').find(".submitButton").click(function(e) {
-    e.preventDefault();
-    $('#payment-form-card').submit();
-    });
-
     $( "#payment-form-card" ).submit(function( event ) {
     event.preventDefault();
     Card.createResource()
-    .then(function(result) {
-    hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(result) );
-    $('#orderConfirmAgbBottom').submit();
-    })
-    .catch(function(error) {
-    hiddenInputPaymentTypeId.setAttribute('value', JSON.stringify(error) );
-        $('html, body').animate({
-        scrollTop: $("#orderPayment").offset().top - 150
-        }, 350);
-    })
+        .then(function(result) {
+            let hiddenInput = $(document.createElement('input'))
+            .attr('type', 'hidden')
+            .attr('name', 'paymentData')
+            .val(JSON.stringify(result));
+            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+            $( '#orderConfirmAgbBottom' ).addClass("submitable");
+            $('#orderConfirmAgbBottom').submit();
+        })
+        .catch(function(error) {
+            $('html, body').animate({
+            scrollTop: $("#orderPayment").offset().top - 150
+            }, 350);
+        })
     });
 
     [{/capture}]
