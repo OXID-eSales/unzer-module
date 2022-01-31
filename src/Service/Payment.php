@@ -10,14 +10,20 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class Payment
 {
+    use ServiceContainer;
+
     /** @var Session */
     protected $session;
 
@@ -37,6 +43,11 @@ class Payment
      * @var string
      */
     protected $redirectUrl;
+    
+    /**
+     * @var string
+     */
+    protected $pdfLink;
 
     /**
      * @param Session $session
@@ -76,6 +87,10 @@ class Payment
 
             if ($this->redirectUrl) {
                 throw new Redirect($this->redirectUrl);
+            }
+
+            if ($this->pdfLink) {
+                throw new Redirect($this->unzerService->preparePdfConfirmRedirectUrl());
             }
         } catch (Redirect $e) {
             throw $e;
@@ -135,6 +150,11 @@ class Payment
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
+                    $this->pdfLink = $transaction->getPDFLink();
+                }
+                if ($this->isPdfSession()) {
+                    $this->pdfLink = null;
+                    $result = "OK";
                 }
             } elseif ($transaction->isPending()) {
                 $result = "NOT_FINISHED";
@@ -170,5 +190,145 @@ class Payment
         }
 
         return null;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isPdfSession(): bool
+    {
+        return (bool) Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
+    }
+
+    /**
+     * @param Order $oOrder
+     * @param string $unzerid
+     * @param string $chargeid
+     * @param float $amount
+     * @param string $reason
+     * @return UnzerApiException|bool
+     */
+    public function doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, $reason)
+    {
+        $transactionService = $this->getServiceFromContainer(TransactionService::class);
+        try {
+            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                ->getUnzerSDK()
+                ->fetchChargeById($unzerid, $chargeid);
+
+            $cancellation = $unzerPayment->cancel($amount, $reason);
+            $transactionService->writeCancellationToDB(
+                $oOrder->getId(),
+                $oOrder->oxorder__oxuserid->value,
+                $cancellation
+            );
+        } catch (UnzerApiException $e) {
+            return $e;
+        }
+        return true;
+    }
+
+    /**
+     * @param Order $oOrder
+     * @param string $unzerid
+     * @param float $amount
+     * @return UnzerApiException|bool
+     */
+    public function doUnzerCollect($oOrder, $unzerid, $amount)
+    {
+        $transactionService = $this->getServiceFromContainer(TransactionService::class);
+        try {
+            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                ->getUnzerSDK()
+                ->fetchPayment($unzerid);
+
+            $charge = $unzerPayment->getAuthorization()->charge($amount);
+            $transactionService->writeChargeToDB(
+                $oOrder->getId(),
+                $oOrder->oxorder__oxuserid->value,
+                $charge
+            );
+            if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
+                $oOrder->markUnzerOrderAsPaid();
+            }
+        } catch (UnzerApiException $e) {
+            return $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Order $oOrder
+     * @param string $sPaymentId
+     * @return UnzerApiException|bool
+     */
+    public function sendShipmentNotification($oOrder, $sPaymentId = null)
+    {
+        $transactionService = $this->getServiceFromContainer(TransactionService::class);
+
+        if ($sPaymentId === null) {
+            $sPaymentId = $transactionService->getPaymentIdByOrderId($oOrder->getId())[0]['TYPEID'];
+        }
+
+        if ($sPaymentId) {
+            /** @var \UnzerSDK\Resources\Payment $unzerPayment */
+            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                ->getUnzerSDK()
+                ->fetchPayment($sPaymentId);
+
+            if ($unzerPayment->getPaymentType() instanceof  InstallmentSecured) {
+                $this->setInstallmentDueDate($unzerPayment);
+            }
+
+            foreach ($unzerPayment->getShipments() as $unzShipment) {
+                if ($unzShipment->isSuccess()) {
+                    return false;
+                }
+            }
+
+            if ($unzerPayment->getAmount()->getRemaining() === 0.0) {
+                $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
+                try {
+                    return $transactionService->writeTransactionToDB(
+                        $oOrder->getId(),
+                        $oOrder->oxorder__oxuserid->value,
+                        $unzerPayment,
+                        $unzerPayment->ship($sInvoiceNr)
+                    );
+                } catch (UnzerApiException $e) {
+                    return $e;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \UnzerSDK\Resources\Payment $unzerPayment
+     */
+    public function setInstallmentDueDate($unzerPayment){
+        /** @var InstallmentSecured $installment */
+        $installment = $unzerPayment->getPaymentType();
+        if ($installment->getInvoiceDate() === null) {
+            $installment->setInvoiceDate($this->getYesterdaysTimestamp());
+        }
+        if ($installment->getInvoiceDueDate() === null) {
+            $installment->setInvoiceDueDate($this->getTomorrowsTimestamp());
+        }
+
+        $unzerPayment->getUnzerObject()->updatePaymentType($installment);
+    }
+
+    public function getYesterdaysTimestamp()
+    {
+        return date('Y-m-d',strtotime("-1 days"));;
+    }
+
+    public function getTomorrowsTimestamp()
+    {
+        return date('Y-m-d',strtotime("+1 days"));;
     }
 }
