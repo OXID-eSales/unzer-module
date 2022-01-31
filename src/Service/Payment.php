@@ -254,7 +254,7 @@ class Payment
                 ->getUnzerSDK()
                 ->fetchPayment($sPaymentId);
 
-            if ($unzerPayment->getPaymentType() instanceof  InstallmentSecured) {
+            if ($unzerPayment->getPaymentType() instanceof InstallmentSecured) {
                 $this->setInstallmentDueDate($unzerPayment);
             }
 
@@ -285,7 +285,8 @@ class Payment
     /**
      * @param \UnzerSDK\Resources\Payment $unzerPayment
      */
-    public function setInstallmentDueDate($unzerPayment){
+    public function setInstallmentDueDate($unzerPayment)
+    {
         /** @var InstallmentSecured $installment */
         $installment = $unzerPayment->getPaymentType();
         if ($installment->getInvoiceDate() === null) {
@@ -300,11 +301,13 @@ class Payment
 
     public function getYesterdaysTimestamp()
     {
-        return date('Y-m-d',strtotime("-1 days"));;
+        return date('Y-m-d', strtotime("-1 days"));
+        ;
     }
 
     public function getTomorrowsTimestamp()
     {
-        return date('Y-m-d',strtotime("+1 days"));;
+        return date('Y-m-d', strtotime("+1 days"));
+        ;
     }
 }
