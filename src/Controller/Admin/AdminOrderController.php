@@ -163,7 +163,10 @@ class AdminOrderController extends AdminDetailsController
             $oStatus = $paymentService->sendShipmentNotification($this->getEditObject(), $unzerid);
 
             if ($oStatus instanceof UnzerApiException) {
-                $this->_aViewData['errShip'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
+                $this->_aViewData['errShip'] = $translator->translateCode(
+                    $oStatus->getErrorId(),
+                    $oStatus->getMessage()
+                );
             }
         }
     }

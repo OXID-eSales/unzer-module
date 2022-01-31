@@ -21,11 +21,13 @@ use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 class InstallmentController extends FrontendController
 {
     use ServiceContainer;
+
     /**
      * Current class template name.
      *
      * @var string
      */
+    // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
     protected $_sThisTemplate = 'modules/osc/unzer/unzer_installment_confirm.tpl';
 
     /** @var Payment $uzrPayment */
@@ -37,7 +39,6 @@ class InstallmentController extends FrontendController
         if ($this->getIsOrderStep()) {
             $oBasket = Registry::getSession()->getBasket();
             $myConfig = Registry::getConfig();
-            
         }
 
         $this->_aViewData['sPdfLink'] = Registry::getSession()->getVariable('UzrPdfLink');
@@ -68,14 +69,18 @@ class InstallmentController extends FrontendController
         return 'confirmInstallment';
     }
 
-    protected function getUnzerSessionPayment() {
+    protected function getUnzerSessionPayment()
+    {
         if ($this->uzrPayment === null) {
-            $this->uzrPayment = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class)->getSessionUnzerPayment();
+            $this->uzrPayment = $this->getServiceFromContainer(
+                \OxidSolutionCatalysts\Unzer\Service\Payment::class
+            )->getSessionUnzerPayment();
         }
         return $this->uzrPayment;
     }
-    
-    public function confirmInstallment() {
+
+    public function confirmInstallment()
+    {
 
         try {
             $unzerPayment = $this->getUnzerSessionPayment();
@@ -84,7 +89,7 @@ class InstallmentController extends FrontendController
 
             if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
 //                $charge = $unzerPayment->getAuthorization()->charge();
-               $charge = $unzerPayment->getCharges()[0];
+                $charge = $unzerPayment->getCharges()[0];
                 $transactionService = $this->getServiceFromContainer(Transaction::class);
                 $transactionService->writeChargeToDB(
                     $oOrder->getId(),
@@ -96,15 +101,14 @@ class InstallmentController extends FrontendController
                 }
 
                 $unzerService = $this->getServiceFromContainer(Unzer::class);
-                throw new Redirect($unzerService->prepareRedirectUrl('order&fnc=unzerExecuteAfterRedirect&pdfConfirm=1'));
+                throw new Redirect(
+                    $unzerService->prepareRedirectUrl(
+                        'order&fnc=unzerExecuteAfterRedirect&pdfConfirm=1'
+                    )
+                );
             }
-
-
         } catch (UnzerApiException $e) {
             throw $e;
         }
-
-
-
     }
 }

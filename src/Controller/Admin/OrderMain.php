@@ -34,9 +34,12 @@ class OrderMain extends OrderMain_parent
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
         $oShipment = $paymentService->sendShipmentNotification($oOrder);
         if ($oShipment instanceof UnzerApiException) {
-            $oxException = oxNew(StandardException::class,
-                $oShipment->getMessage(), $oShipment->getCode(),
-                $oShipment);
+            $oxException = oxNew(
+                StandardException::class,
+                $oShipment->getMessage(),
+                $oShipment->getCode(),
+                $oShipment
+            );
 
             Registry::getUtilsView()->addErrorToDisplay($oxException);
         }
