@@ -4,18 +4,12 @@
 [{* ordering steps *}]
 [{include file="page/checkout/inc/steps.tpl" active=4}]
 
-[{oxifcontent ident="uzrpdfconf" object="oCont"}]
+[{oxifcontent ident="oscunzerinstallmentconfirmation" object="oCont"}]
     [{$oCont->oxcontents__oxcontent->value}]
-[{else}]
-   Bestätigen...
-    <br>Gesamtbetrag [{$fPruchaseAmount}] [{$uzrCurrency}]
-    <br>Zinsen [{$fInterestAmount}] [{$uzrCurrency}] ([{$uzrRate}] %)
-    <br>
-    <a href="[{$sPdfLink}]" target="_blank">Pdf-Details</a>
 [{/oxifcontent}]
 
 [{block name="checkout_order_btn_confirm_pdf"}]
-    <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmAgbBottom" class="form-horizontal">
+    <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentBottom" class="form-horizontal">
         <div class="hidden">
             [{$oViewConf->getHiddenSid()}]
             [{$oViewConf->getNavFormParams()}]
