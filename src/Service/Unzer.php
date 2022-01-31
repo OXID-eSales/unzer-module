@@ -233,6 +233,17 @@ class Unzer
     }
 
     /**
+     * @param bool $addPending
+     * @return string
+     */
+    public function preparePdfRedirectUrl(): string
+    {
+        $redirectUrl = $this->prepareRedirectUrl('unzer_installment');
+
+        return $redirectUrl;
+    }
+
+    /**
      * @param string $destination
      * @return string
      */
