@@ -254,8 +254,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=oxidprojects
-            -Dsonar.projectKey=OXIDprojects_unzer-oxid
+            -Dsonar.organization=oxid-esales
+            -Dsonar.projectKey=OXID-eSales_unzer-module
             -Dsonar.projectVersion=0.1.0
             -Dsonar.sources=src
             -Dsonar.tests=Tests
