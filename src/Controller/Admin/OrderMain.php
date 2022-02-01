@@ -2,10 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
-use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use UnzerSDK\Resources\Payment;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 class OrderMain extends OrderMain_parent
 {
@@ -31,34 +31,17 @@ class OrderMain extends OrderMain_parent
 
     public function sendShipmentNotification($oOrder)
     {
-        $transactionService = $this->getServiceFromContainer(TransactionService::class);
-        $sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
+        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $oShipment = $paymentService->sendShipmentNotification($oOrder);
+        if ($oShipment instanceof UnzerApiException) {
+            $oxException = oxNew(
+                StandardException::class,
+                $oShipment->getMessage(),
+                $oShipment->getCode(),
+                $oShipment
+            );
 
-        if ($sPaymentId) {
-            /** @var Payment $unzerPayment */
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
-                ->fetchPayment($sPaymentId);
-
-            $blIsShipped = false;
-            foreach ($unzerPayment->getShipments() as $unzShipment) {
-                if ($unzShipment->isSuccess()) {
-                    $blIsShipped = true;
-                }
-            }
-            if (!$blIsShipped) {
-                $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
-                try {
-                    $transactionService->writeTransactionToDB(
-                        $oOrder->getId(),
-                        $oOrder->oxorder__oxuserid->value,
-                        $unzerPayment,
-                        $unzerPayment->ship($sInvoiceNr)
-                    );
-                } catch (\Exception $e) {
-                    // TODO Logging
-                }
-            }
+            Registry::getUtilsView()->addErrorToDisplay($oxException);
         }
     }
 }
