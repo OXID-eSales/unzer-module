@@ -29,10 +29,19 @@
                     <i class="fa fa-check"></i>[{oxmultilang ident="OSCUNZER_INSTALLMENT_SUBMIT"}]
                 </button>
                 [{/block}]
-
+    </form>
+    <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentCancel" class="form-horizontal">
+        [{$oViewConf->getHiddenSid()}]
+        [{$oViewConf->getNavFormParams()}]
+        <input type="hidden" name="cl" value="unzer_installment">
+        <input type="hidden" name="fnc" value="cancelInstallment">
+        <input type="hidden" name="challenge" value="[{$challenge}]">
+        <a onclick="this.closest('form').submit();return false;">Cancel</a>
+    </form>
             </div>
         </div>
-    </form>
+
+
     [{/block}]
     [{/capture}]
 

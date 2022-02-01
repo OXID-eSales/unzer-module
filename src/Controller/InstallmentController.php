@@ -36,11 +36,6 @@ class InstallmentController extends FrontendController
 
     public function render()
     {
-        if ($this->getIsOrderStep()) {
-            $oBasket = Registry::getSession()->getBasket();
-            $myConfig = Registry::getConfig();
-        }
-
         $this->_aViewData['sPdfLink'] = Registry::getSession()->getVariable('UzrPdfLink');
 
         $this->getUnzerSessionPayment();
@@ -78,7 +73,18 @@ class InstallmentController extends FrontendController
         return $this->uzrPayment;
     }
 
-    public function confirmInstallment() {
+    public function cancelInstallment()
+    {
+        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $paymentService->removeTemporaryOrder();
+
+        $unzerService = $this->getServiceFromContainer(Unzer::class);
+
+        throw new Redirect($unzerService->prepareRedirectUrl('payment'));
+    }
+
+    public function confirmInstallment()
+    {
         $unzerPayment = $this->getUnzerSessionPayment();
         $oOrder = oxNew(Order::class);
 
