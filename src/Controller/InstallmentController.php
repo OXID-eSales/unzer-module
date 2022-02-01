@@ -88,8 +88,7 @@ class InstallmentController extends FrontendController
             $oOrder = oxNew(Order::class);
 
             if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
-//                $charge = $unzerPayment->getAuthorization()->charge();
-                $charge = $unzerPayment->getCharges()[0];
+                $charge = $unzerPayment->getAuthorization()->charge();
                 $transactionService = $this->getServiceFromContainer(Transaction::class);
                 $transactionService->writeChargeToDB(
                     $oOrder->getId(),

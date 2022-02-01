@@ -39,7 +39,7 @@ class ShopControl extends ShopControl_parent
         if ($exception instanceof RedirectWithMessage) {
             $this->handleRedirectWithMessageException($exception);
         } elseif ($exception instanceof Redirect) {
-            $this->handleRedirectException($exception);
+            $this->handleRedirectException($exception, false);
         } else {
             parent::_handleBaseException($exception);
         }
@@ -47,10 +47,11 @@ class ShopControl extends ShopControl_parent
 
     /**
      * @param Redirect $redirectException
+     * @param bool $blAddRedirectParam
      */
-    protected function handleRedirectException(Redirect $redirectException): void
+    protected function handleRedirectException(Redirect $redirectException, bool $blAddRedirectParam = true): void
     {
-        Registry::getUtils()->redirect($redirectException->getDestination());
+        Registry::getUtils()->redirect($redirectException->getDestination(), $blAddRedirectParam);
     }
 
     /**
