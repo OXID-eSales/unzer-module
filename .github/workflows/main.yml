@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: oxidprojects/oxid-apache-php:oxid${{ matrix.oxid }}-php${{ matrix.php }}
-      options: --tmpfs=/build:noatime
+      options: --tmpfs=/build:noatime,exec
     env:
       MODULE_NAME: oxid-solution-catalysts/unzer
       MYSQL_DATABASE: oxid
