@@ -46,10 +46,14 @@ jobs:
         working-directory: /build/oxid/vendor/oxid-solution-catalysts/unzer/
 
       - name: run phpcs
+        continue-on-error: true
+        id: phpcs
         run: php vendor/bin/phpcs --standard=Tests/phpcs.xml
         working-directory: /build/oxid/vendor/oxid-solution-catalysts/unzer/
 
       - name: run psalm
+        continue-on-error: true
+        id: psalm
         run: php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
         working-directory: /build/oxid/vendor/oxid-solution-catalysts/unzer/
 
@@ -116,6 +120,9 @@ jobs:
           name: logs
           path: /build/oxid/logs
           retention-days: 1
+      - name: fail on psalm error
+        if: steps.psalm.outcome != 'success' || steps.phpcs.outcome != 'success'
+        run: exit 1 
     services:
       db:
         image: mariadb:10.5
