@@ -46,11 +46,11 @@ jobs:
         working-directory: /build/oxid/vendor/oxid-solution-catalysts/unzer/
 
       - name: run phpcs
-        run: composer phpcs
+        run: php vendor/bin/phpcs --standard=Tests/phpcs.xml
         working-directory: /build/oxid/vendor/oxid-solution-catalysts/unzer/
 
       - name: run psalm
-        run: composer psalm-report
+        run: php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
         working-directory: /build/oxid/vendor/oxid-solution-catalysts/unzer/
 
       - name: Save psalm logs
