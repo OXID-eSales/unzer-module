@@ -14,7 +14,6 @@ use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 
@@ -33,6 +32,9 @@ class InstallmentController extends FrontendController
     /** @var Payment $uzrPayment */
     protected $uzrPayment;
 
+    /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $oxPayment */
+    protected $oxPayment;
+
     /**
      * @inheritDoc
      */
@@ -47,6 +49,35 @@ class InstallmentController extends FrontendController
      */
     public function render()
     {
+        $oBasket = Registry::getSession()->getBasket();
+        $oUser = Registry::getSession()->getUser();
+
+        $myConfig = Registry::getConfig();
+
+        if (!$oBasket || ($oBasket && !$oBasket->getProductsCount())) {
+            Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
+        }
+
+        // can we proceed with ordering ?
+        if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
+            Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
+        } elseif (!$oBasket || !$oUser || ($oBasket && !$oBasket->getProductsCount())) {
+            Registry::getUtils()->redirect($myConfig->getShopHomeUrl(), false, 302);
+        }
+
+        // payment is set ?
+        if (!$this->getPayment()) {
+            // redirecting to payment step on error ..
+            Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', true, 302);
+        }
+
+        $sPdfLink = Registry::getSession()->getVariable('UzrPdfLink');
+
+        if (!$sPdfLink || $sPdfLink === '') {
+            // redirecting to payment step on error ..
+            Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', true, 302);
+        }
+
         $this->_aViewData['sPdfLink'] = Registry::getSession()->getVariable('UzrPdfLink');
 
         $this->getUnzerSessionPayment();
@@ -62,6 +93,40 @@ class InstallmentController extends FrontendController
         parent::render();
 
         return $this->_sThisTemplate;
+    }
+
+    /**
+     * Template variable getter. Returns payment object
+     *
+     * @return object|bool
+     */
+    public function getPayment()
+    {
+        if ($this->oxPayment === null) {
+            $this->oxPayment = false;
+
+            $oBasket = Registry::getSession()->getBasket();
+            $oUser = Registry::getSession()->getUser();
+
+            // payment is set ?
+            $sPaymentid = $oBasket->getPaymentId();
+            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+
+            if (
+                $sPaymentid && $oPayment->load($sPaymentid) &&
+                $oPayment->isValidPayment(
+                    Registry::getSession()->getVariable('dynvalue'),
+                    (string) $this->getConfig()->getShopId(),
+                    $oUser,
+                    $oBasket->getPriceForPayment(),
+                    Registry::getSession()->getVariable('sShipSet')
+                )
+            ) {
+                $this->oxPayment = $oPayment;
+            }
+        }
+
+        return $this->oxPayment;
     }
 
     /**
@@ -91,7 +156,7 @@ class InstallmentController extends FrontendController
 
         $unzerService = $this->getServiceFromContainer(Unzer::class);
 
-        throw new Redirect($unzerService->prepareRedirectUrl('payment'));
+        throw new Redirect($unzerService->prepareRedirectUrl('payment?payerror=2'));
     }
 
     public function confirmInstallment()
