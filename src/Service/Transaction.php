@@ -295,11 +295,13 @@ class Transaction
     public static function getPaymentIdByOrderId($orderid)
     {
         if ($orderid) {
-            return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
+            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
                 WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
                 [(string)$orderid]
             );
+
+            return $rows[0]['TYPEID'];
         }
 
         return false;
