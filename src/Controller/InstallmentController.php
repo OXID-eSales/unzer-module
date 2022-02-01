@@ -75,7 +75,7 @@ class InstallmentController extends FrontendController
 
         if (!$sPdfLink || $sPdfLink === '') {
             // redirecting to payment step on error ..
-            Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', true, 302);
+            Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', false, 302);
         }
 
         $this->_aViewData['sPdfLink'] = Registry::getSession()->getVariable('UzrPdfLink');
@@ -165,8 +165,8 @@ class InstallmentController extends FrontendController
         $oOrder = oxNew(Order::class);
 
         if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
-            $charge = $unzerPayment->getAuthorization()->charge();
 
+            $charge = $unzerPayment->getAuthorization()->charge();
             $transactionService = $this->getServiceFromContainer(Transaction::class);
             $transactionService->writeChargeToDB(
                 $oOrder->getId(),

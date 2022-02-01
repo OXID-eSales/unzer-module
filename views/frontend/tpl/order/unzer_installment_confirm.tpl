@@ -42,6 +42,8 @@
                 [{/block}]
                 [{block name="checkout_installment_confirm_summary_form"}]
                     <div class="col-6">
+
+                        [{block name="checkout_installment_confirm_input"}]
                         <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentBottom" class="form-horizontal">
                             <div class="hidden">
                                 [{$oViewConf->getHiddenSid()}]
@@ -50,7 +52,6 @@
                                 <input type="hidden" name="fnc" value="[{$oView->getExecuteFnc()}]" />
                                 <input type="hidden" name="challenge" value="[{$challenge}]" />
                             </div>
-                            [{block name="checkout_installment_confirm_input"}]
                                 <div class="card bg-light cart-buttons">
                                     <div class="card-body">
                                         [{block name="checkout_installment_confirm_button"}]
@@ -63,6 +64,7 @@
                                             </button>
                                         [{/block}]
                                     </div>
+                        </form>
                                     <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentCancel" class="form-horizontal">
                                         [{$oViewConf->getHiddenSid()}]
                                         [{$oViewConf->getNavFormParams()}]
@@ -73,7 +75,6 @@
                                     </form>
                                 </div>
                             [{/block}]
-                        </form>
                     </div>
                 [{/block}]
             </div>
