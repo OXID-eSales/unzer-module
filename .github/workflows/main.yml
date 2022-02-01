@@ -61,7 +61,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          retention-days: 30
+          retention-days: 1
           name: psalm-log
           path: /build/oxid/vendor/oxid-solution-catalysts/unzer/logs/psalm.sonarqube.json
       - name: mysql shema
