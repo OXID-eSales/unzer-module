@@ -279,7 +279,7 @@ class Unzer
         }
 
         $this->session->setVariable('PaymentId', $charge->getPaymentId());
-
+        
         if ($charge instanceof Authorization) {
             $this->session->setVariable('UzrPdfLink', $charge->getPDFLink());
         }
