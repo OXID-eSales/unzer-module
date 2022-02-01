@@ -1,6 +1,7 @@
 name: Remove old artifacts
 
 on:
+  push: {}
   schedule:
     # Every day at 1am
     - cron: '0 1 * * *'
@@ -14,7 +15,7 @@ jobs:
     - name: Remove old artifacts
       uses: c-hive/gha-remove-artifacts@v1
       with:
-        age: '1 month'
+        age: '1 day'
         # Optional inputs
         # skip-tags: true
-        # skip-recent: 1
+        skip-recent: 2
