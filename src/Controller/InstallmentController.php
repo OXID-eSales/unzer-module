@@ -33,7 +33,18 @@ class InstallmentController extends FrontendController
     /** @var Payment $uzrPayment */
     protected $uzrPayment;
 
+    /**
+     * @inheritDoc
+     */
+    public function init()
+    {
+        $this->setIsOrderStep(true);
+        parent::init();
+    }
 
+    /**
+     * @inheritDoc
+     */
     public function render()
     {
         $this->_aViewData['sPdfLink'] = Registry::getSession()->getVariable('UzrPdfLink');

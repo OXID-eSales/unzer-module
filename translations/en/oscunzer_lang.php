@@ -12,13 +12,22 @@ $sLangName = 'English';
 // -------------------------------
 $aLang = [
     'charset' => 'UTF-8',
+
+    //Invoice
     'OSCUNZER_BANK_DETAILS_AMOUNT' => 'Please transfer the amount of %s %s to the following account:<br /><br />',
     'OSCUNZER_BANK_DETAILS_HOLDER' => 'Holder: %s<br/>',
     'OSCUNZER_BANK_DETAILS_IBAN' => 'IBAN: %s<br/>',
     'OSCUNZER_BANK_DETAILS_BIC' => 'BIC: %s<br/><br/>',
     'OSCUNZER_BANK_DETAILS_DESCRIPTOR' => 'Please use only this identification number as the descriptor: <br/>%s',
-    'OSCUNZER_DIRECT_DEBIT_MANDATE' => 'By signing this mandate form, you authorise %s to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from %s.<br />Note: As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights regarding this SEPA mandate are explained in a statement that you can obtain from your bank.<br />In case of refusal or rejection of direct debit payment I instruct my bank irrevocably to inform %s or any third party upon request about my name, address and date of birth.',
-    'ERROR_UNZER_SEPA_CONFIRMATION_MISSING' => 'Bitte bestätigen Sie das SEPA-Mandat',
-    'OSCUNZER_INSTALLMENT_SUBMIT' => 'Vertrag bestätigen',
-    'OSCUNZER_INSTALLMENT_CANCEL' => 'Vertrag ablehnen und eine andere Zahlartwählen',
+
+    // SEPA
+    'OSCUNZER_DIRECT_DEBIT_MANDATE' => 'SEPA direct debit mandate (direct debit) is issued',
+    'ERROR_UNZER_SEPA_CONFIRMATION_MISSING' => 'Please confirm the SEPA mandate',
+
+    // Installment
+    'OSCUNZER_INSTALLMENT_PURCHASE_AMOUNT' => 'total purchase amount',
+    'OSCUNZER_INSTALLMENT_INTEREST_AMOUNT' => 'total interest amount',
+    'OSCUNZER_INSTALLMENT_TOTAL' => 'total',
+    'OSCUNZER_INSTALLMENT_PDF' => 'I agree to the <b><a href="%s" target="_blank">contract (PDF)</a></b>!',
+    'OSCUNZER_INSTALLMENT_SUBMIT' => 'confirm contract',
 ];
