@@ -44,6 +44,7 @@ jobs:
         with:
           name: oxid${{ matrix.oxid }}-php${{ matrix.php }}-with-deps
           path: /build/oxid.tar.gz
+          retention-days: 1
 
   static_code_checks:
     strategy:
