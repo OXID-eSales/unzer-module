@@ -1,7 +1,6 @@
 name: Remove old artifacts
 
 on:
-  push: {}
   schedule:
     # Every day at 1am
     - cron: '0 1 * * *'
@@ -9,7 +8,7 @@ on:
 jobs:
   remove-old-artifacts:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     steps:
     - name: Remove old artifacts
