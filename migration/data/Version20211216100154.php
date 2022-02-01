@@ -444,6 +444,9 @@ final class Version20211216100154 extends AbstractMigration
         if (!$transaction->hasColumn('SHORTID')) {
             $transaction->addColumn('SHORTID', Types::STRING, ['default' => ""]);
         }
+        if (!$transaction->hasColumn('TRACEID')) {
+            $transaction->addColumn('TRACEID', Types::STRING, ['default' => ""]);
+        }
         if (!$transaction->hasColumn('OXORDERID')) {
             $transaction->addColumn('OXORDERID', Types::STRING, ['columnDefinition' => 'char(32) collate latin1_general_ci', 'comment' => 'OXID (oxorder)']);
         }

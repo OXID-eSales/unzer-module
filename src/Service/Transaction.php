@@ -170,10 +170,11 @@ class Transaction
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
         $params = [
-            'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'amount' => $unzerPayment->getAmount()->getTotal(),
             'currency' => $unzerPayment->getCurrency(),
-            'typeid'   => $unzerPayment->getId(),
-            'oxaction' => $unzerPayment->getStateName()
+            'typeid' => $unzerPayment->getId(),
+            'oxaction' => $unzerPayment->getStateName(),
+            'traceid' => $unzerPayment->getTraceId()
         ];
 
         if (
