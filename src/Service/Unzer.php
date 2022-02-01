@@ -23,6 +23,7 @@ use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
@@ -233,10 +234,9 @@ class Unzer
     }
 
     /**
-     * @param bool $addPending
      * @return string
      */
-    public function preparePdfRedirectUrl(): string
+    public function preparePdfConfirmRedirectUrl(): string
     {
         $redirectUrl = $this->prepareRedirectUrl('unzer_installment');
 
@@ -279,6 +279,10 @@ class Unzer
         }
 
         $this->session->setVariable('PaymentId', $charge->getPaymentId());
+
+        if ($charge instanceof Authorization) {
+            $this->session->setVariable('UzrPdfLink', $charge->getPDFLink());
+        }
 
         $paymentType = $charge->getPayment()->getPaymentType();
 

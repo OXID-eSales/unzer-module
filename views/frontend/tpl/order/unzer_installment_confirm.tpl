@@ -1,0 +1,83 @@
+[{capture append="oxidBlock_content"}]
+
+    [{* ordering steps *}]
+    [{include file="page/checkout/inc/steps.tpl" active=4}]
+    [{oxcontent ident="oscunzerinstallmentconfirmation" assign="content"}]
+    [{oxcontent ident="oscunzerinstallmentconfirmation" field="oxtitle" assign="title"}]
+
+    [{block name="checkout_installment_confirm_main"}]
+        [{block name="checkout_installment_confirm_info"}]
+            <div id="installmentconfirmPage">
+                <h3 class="blockHead">[{$title}]</h3>
+                <article class="cmsContent">
+                    [{$content}]
+                </article>
+            </div>
+        [{/block}]
+        [{block name="checkout_installment_confirm_summary_row"}]
+            <div class="row">
+                [{block name="checkout_installment_confirm_summary_table"}]
+                    <div class="col-6">
+                        <table id="checkout_installment_confirm_table" class="table table-bordered table-striped">
+                            <colgroup>
+                                <col class="descCol">
+                                <col class="totalCol">
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">[{oxmultilang ident="OSCUNZER_INSTALLMENT_PURCHASE_AMOUNT" suffix="COLON"}]</th>
+                                    <td class="text-right">[{$fPruchaseAmount}] [{$uzrCurrency}]</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">[{oxmultilang ident="OSCUNZER_INSTALLMENT_INTEREST_AMOUNT" suffix="COLON"}] ([{$uzrRate}]%)</th>
+                                    <td class="text-right">[{$fInterestAmount}] [{$uzrCurrency}]</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">[{oxmultilang ident="OSCUNZER_INSTALLMENT_TOTAL" suffix="COLON"}]</th>
+                                    <td class="text-right">[{$fTotal}] [{$uzrCurrency}]</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                [{/block}]
+                [{block name="checkout_installment_confirm_summary_form"}]
+                    <div class="col-6">
+                        <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentBottom" class="form-horizontal">
+                            <div class="hidden">
+                                [{$oViewConf->getHiddenSid()}]
+                                [{$oViewConf->getNavFormParams()}]
+                                <input type="hidden" name="cl" value="unzer_installment" />
+                                <input type="hidden" name="fnc" value="[{$oView->getExecuteFnc()}]" />
+                                <input type="hidden" name="challenge" value="[{$challenge}]" />
+                            </div>
+                            [{block name="checkout_installment_confirm_input"}]
+                                <div class="card bg-light cart-buttons">
+                                    <div class="card-body">
+                                        [{block name="checkout_installment_confirm_button"}]
+                                            <label>
+                                                <input id="checkInsallConfirm" type="checkbox" name="ord_instconf" value="0" required />
+                                                [{oxmultilang ident="OSCUNZER_INSTALLMENT_PDF" args=$sPdfLink}]
+                                            </label>
+                                            <button type="submit" class="btn btn-lg btn-primary submitButton nextStep largeButton">
+                                                <i class="fa fa-check"></i>[{oxmultilang ident="OSCUNZER_INSTALLMENT_SUBMIT"}]
+                                            </button>
+                                        [{/block}]
+                                    </div>
+                                    <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentCancel" class="form-horizontal">
+                                        [{$oViewConf->getHiddenSid()}]
+                                        [{$oViewConf->getNavFormParams()}]
+                                        <input type="hidden" name="cl" value="unzer_installment">
+                                        <input type="hidden" name="fnc" value="cancelInstallment">
+                                        <input type="hidden" name="challenge" value="[{$challenge}]">
+                                        <a onclick="this.closest('form').submit();return false;">Cancel</a>
+                                    </form>
+                                </div>
+                            [{/block}]
+                        </form>
+                    </div>
+                [{/block}]
+            </div>
+        [{/block}]
+    [{/block}]
+[{/capture}]
+[{include file="layout/page.tpl" title=$title location=$title}]

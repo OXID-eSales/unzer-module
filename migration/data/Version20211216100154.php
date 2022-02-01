@@ -298,6 +298,14 @@ final class Version20211216100154 extends AbstractMigration
             'oxcontent_en' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
                 Confirm <a rel="nofollow" href="[{ $oCont->getLink() }]" onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\', \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;" class="fontunderline">Sepa-Mandate</a>.
                 [{/oxifcontent}]'
+        ],
+        [
+            'oxloadid' => 'oscunzerinstallmentconfirmation',
+            'oxactive' => 1,
+            'oxtitle_de' => 'Unzer Ratenkauf-Bestätigung',
+            'oxtitle_en' => 'TR: Unzer Installment Text',
+            'oxcontent_de' => '<p>Bitte lesen Sie den Inhalt des Vertrags (siehe PDF) und bestätigen Sie die Konditionen.</p><p></p>',
+            'oxcontent_en' => 'TR: <p>Bitte lesen Sie den Inhalt des Vertrags (siehe PDF) und bestätigen Sie die Konditionen.</p><p></p>'
         ]
     ];
 
