@@ -304,12 +304,12 @@ final class Version20211216100154 extends AbstractMigration
             'oxactive' => 1,
             'oxtitle_de' => 'Unzer Ratenkauf-Bestätigung',
             'oxtitle_en' => 'tr Unzer Installment Text',
-            'oxcontent_de' => 'tr Bestätigen...
-   
-    <br>Ursprungsbetrag [{$fPruchaseAmount}] ([{$uzrRate}]
-    <br>Zinsen [{$fInterestAmount}] [{$uzrCurrency}] ([{$uzrRate}] %)
-    <br>Gesamtbetrag [{$fTotal}] [{$uzrCurrency}]
-    '
+            'oxcontent_de' => '<h3>Ratenplan bestätigen</h3><br>Gesamtkaufbetrag: [{$fPruchaseAmount}] [{$uzrCurrency}]
+    <br>Gesamtzinsbetrag: [{$fInterestAmount}] [{$uzrCurrency}] ([{$uzrRate}] %)
+    <br>Gesamtsumme: [{$fTotal}] [{$uzrCurrency}]',
+            'oxcontent_en' => '<h3>Confirm instalment plan</h3><br>Total Purchase Amount: [{$fPruchaseAmount}] [{$uzrCurrency}]
+    <br>Total Interest Amount: [{$fInterestAmount}] [{$uzrCurrency}] ([{$uzrRate}] %)
+    <br>Total Amount: [{$fTotal}] [{$uzrCurrency}]'
         ]
     ];
 
