@@ -47,10 +47,11 @@ class ShopControl extends ShopControl_parent
 
     /**
      * @param Redirect $redirectException
+     * @param bool $blAddRedirectParam
      */
-    protected function handleRedirectException(Redirect $redirectException, $blAddRedirectParm = true): void
+    protected function handleRedirectException(Redirect $redirectException, bool $blAddRedirectParam = true): void
     {
-        Registry::getUtils()->redirect($redirectException->getDestination(), $blAddRedirectParm);
+        Registry::getUtils()->redirect($redirectException->getDestination(), $blAddRedirectParam);
     }
 
     /**
