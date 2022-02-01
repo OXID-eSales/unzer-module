@@ -56,14 +56,13 @@ jobs:
         id: psalm
         run: php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
         working-directory: /build/oxid/vendor/oxid-solution-catalysts/unzer/
-#quota exeted, logs can not be stored
-#      - name: Save psalm logs
-#        if: always()
-#        uses: actions/upload-artifact@v2
-#        with:
-#          retention-days: 1
-#          name: psalm-log
-#          path: /build/oxid/vendor/oxid-solution-catalysts/unzer/logs/psalm.sonarqube.json
+      - name: Save psalm logs
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          retention-days: 1
+          name: psalm-log
+          path: /build/oxid/vendor/oxid-solution-catalysts/unzer/logs/psalm.sonarqube.json
       - name: mysql shema
         run: mysql -u $MYSQL_USER -h db -p$MYSQL_PASSWORD $MYSQL_DATABASE < "vendor/oxid-esales/oxideshop-ce/source/Setup/Sql/database_schema.sql"
         working-directory: /build/oxid
@@ -113,13 +112,12 @@ jobs:
             --coverage-text \
             --log-junit /build/oxid/logs/phpunit.xml
         working-directory: /build/oxid
-#commented because quoata exceeted
-#      - name: Save logs
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: logs
-#          path: /build/oxid/logs
-#          retention-days: 1
+      - name: Save logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: /build/oxid/logs
+          retention-days: 1
       - name: fail on psalm error
         if: steps.psalm.outcome != 'success' || steps.phpcs.outcome != 'success'
         run: exit 1 
@@ -147,18 +145,17 @@ jobs:
         run: |
           pwd
           ls -alh
+      - name: Load phpunit logs
+        uses: actions/download-artifact@v2
+        with:
+         name: logs
+         path: logs
 
- #     - name: Load phpunit logs
- #       uses: actions/download-artifact@v2
- #       with:
- #         name: logs
- #         path: logs
-
- #     - name: Load psalm logs
- #       uses: actions/download-artifact@v2
- #       with:
- #         name: psalm-log
- #         path: logs/
+      - name: Load psalm logs
+        uses: actions/download-artifact@v2
+        with:
+          name: psalm-log
+          path: logs/
 
       - name: Fix phpunit logs
         run: |
@@ -176,9 +173,9 @@ jobs:
       - name: Show logs
         run: |
           ls -alh logs
-#          cat logs/clover.xml
-#          cat logs/phpunit.xml
-#          cat logs/psalm.sonarqube.json
+          cat logs/clover.xml
+          cat logs/phpunit.xml
+          cat logs/psalm.sonarqube.json
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
@@ -196,5 +193,5 @@ jobs:
             -Dsonar.php.coverage.reportPaths=logs/clover.xml
             -Dsonar.cpd.php.minimumTokens=30
             -Dsonar.cpd.php.minimumLines=6
-#            -Dsonar.php.tests.reportPath=logs/phpunit.xml
-#            -Dsonar.php.psalm.reportPaths=logs/psalm.sonarqube.json
+            -Dsonar.php.tests.reportPath=logs/phpunit.xml
+            -Dsonar.php.psalm.reportPaths=logs/psalm.sonarqube.json
