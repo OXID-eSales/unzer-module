@@ -474,6 +474,9 @@ final class Version20211216100154 extends AbstractMigration
         if (!$transaction->hasColumn('OXACTION')) {
             $transaction->addColumn('OXACTION', Types::STRING, ['default' => ""]);
         }
+        if (!$transaction->hasColumn('SERIALIZED_BASKET')) {
+            $transaction->addColumn('SERIALIZED_BASKET', Types::TEXT, ['default' => ""]);
+        }
         if (!$transaction->hasColumn('OXTIMESTAMP')) {
             $transaction->addColumn('OXTIMESTAMP', Types::DATETIME_MUTABLE, ['columnDefinition' => 'timestamp default current_timestamp on update current_timestamp']);
         }

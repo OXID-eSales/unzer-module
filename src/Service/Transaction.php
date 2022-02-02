@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -52,7 +53,7 @@ class Transaction
         string $userId,
         ?Payment $unzerPayment,
         ?Shipment $unzerShipment = null
-    ) {
+    ): bool {
         $transaction = $this->getNewTransactionObject();
 
         $params = [
@@ -67,6 +68,50 @@ class Transaction
         if ($unzerShipment) {
             $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
         }
+
+        if ($unzerPayment->getState() == 2) {
+            $this->deleteOldInitOrders();
+        }
+
+        // building oxid from unique index columns
+        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
+        $oxid = $this->prepareTransactionOxid($params);
+        if (!$transaction->load($oxid)) {
+            $transaction->assign($params);
+            $transaction->setId($oxid);
+            $transaction->save();
+            $this->deleteInitOrder($params);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $orderid
+     * @param string $userId
+     * @param Payment|null $unzerPayment
+     * @param Basket|null $basketModel
+     * @return bool
+     * @throws \Exception
+     */
+    public function writeInitOrderToDB(
+        string $orderid,
+        string $userId,
+        ?Payment $unzerPayment,
+        ?Basket $basketModel
+    ): bool {
+        $transaction = $this->getNewTransactionObject();
+
+        $params = [
+            'oxorderid' => $orderid,
+            'oxshopid' => $this->context->getCurrentShopId(),
+            'oxuserid' => $userId,
+            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+        ];
+
+        $params = array_merge($params, $this->getUnzerInitOrderData($unzerPayment, $basketModel));
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
@@ -83,13 +128,33 @@ class Transaction
     }
 
     /**
+     * @param $params
+     */
+    public function deleteInitOrder($params)
+    {
+        $transaction = $this->getNewTransactionObject();
+
+        $oxid = $this->getInitOrderOxid($params);
+        if ($transaction->load($oxid)) {
+            $transaction->delete();
+        }
+    }
+
+    public function deleteOldInitOrders()
+    {
+        DatabaseProvider::getDb()->Execute(
+            "DELETE from oscunzertransaction where OXACTION = 'init' AND OXACTIONDATE < NOW() - INTERVAL 1 DAY"
+        );
+    }
+
+    /**
      * @param string $orderid
      * @param string $userId
      * @param Cancellation|null $unzerCharge
      * @return bool
      * @throws \Exception
      */
-    public function writeCancellationToDB(string $orderid, string $userId, ?Cancellation $unzerCancel)
+    public function writeCancellationToDB(string $orderid, string $userId, ?Cancellation $unzerCancel): bool
     {
         $transaction = $this->getNewTransactionObject();
 
@@ -125,7 +190,7 @@ class Transaction
      * @throws \Exception
      * @return bool
      */
-    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge)
+    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
     {
         $transaction = $this->getNewTransactionObject();
 
@@ -159,6 +224,19 @@ class Transaction
     protected function prepareTransactionOxid(array $params): string
     {
         unset($params['oxactiondate']);
+        unset($params['serialized_basket']);
+        return md5(json_encode($params));
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    protected function getInitOrderOxid(array $params): string
+    {
+        unset($params['oxactiondate']);
+        unset($params['serialized_basket']);
+        $params['oxaction'] = "init";
         return md5(json_encode($params));
     }
 
@@ -242,6 +320,18 @@ class Transaction
         if ($unzerCustomer = $unzerPayment->getCustomer()) {
             $params['customerid'] = $unzerCustomer->getId();
         }
+
+        return $params;
+    }
+
+    /**
+     * @throws UnzerApiException
+     */
+    protected function getUnzerInitOrderData(Payment $unzerPayment, Basket $basketModel): array
+    {
+        $params = $this->getUnzerPaymentData($unzerPayment);
+        $params["oxaction"] = 'init';
+        $params["serialized_basket"] = base64_encode(serialize($basketModel));
 
         return $params;
     }

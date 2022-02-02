@@ -47,16 +47,26 @@ class DispatcherController extends FrontendController
                 ->fetchPayment($paymentId);
 
             if ($order->load($data[0]['OXORDERID'])) {
-                if ($unzerPayment->getState() == 1) {
+                if ($unzerPayment->getState() == 1 && $order->oxorder__oxtransstatus->value == "OK") {
                     $utilsDate = Registry::getUtilsDate();
                     $date = date('Y-m-d H:i:s', $utilsDate->getTime());
                     $order->oxorder__oxpaid = new Field($date);
                     $order->save();
                 }
 
+                if ($unzerPayment->getState() == 2) {
+                    $order->cancelOrder();
+                }
+
                 $translator = $this->getServiceFromContainer(Translator::class);
 
-                if ($order->initWriteTransactionToDB()) {
+                if ($unzerPayment->getState() != 2 && $order->oxorder__oxtransstatus->value != "OK") {
+                    if (!$order->reinitializeOrder()) {
+                        // TODO
+                    }
+                }
+
+                if ($order->initWriteTransactionToDB($unzerPayment)) {
                     $result = sprintf(
                         $translator->translate('oscunzer_TRANSACTION_CHANGE'),
                         $unzerPayment->getStateName(),
