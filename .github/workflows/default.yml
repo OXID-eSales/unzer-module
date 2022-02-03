@@ -106,6 +106,7 @@ jobs:
             php php vendor/bin/runtests \
               --coverage-clover=/var/www/coverage.xml \
               --coverage-text \
+              --log-junit=/var/www/phpunit.xml \
               AllTestsUnit
 
       - name: Upload log artifact
@@ -113,7 +114,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: TestsLog
-          path: source/coverage.xml
+          path: |
+            source/coverage.xml
+            source/phpunit.xml
 
   codeception_tests:
     strategy:
@@ -147,8 +150,42 @@ jobs:
             -e ADDITIONAL_TEST_PATHS='/var/www/vendor/oxid-solution-catalysts/unzer/Tests' \
             php php vendor/bin/runtests-codeception
 
+  psalm:
+    strategy:
+      matrix:
+        php: [ '7.4' ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current module
+        uses: actions/checkout@v2
+        with:
+          path: source/test-module
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+
+      - name: Install module dependencies
+        run: |
+          cd source/test-module
+          composer install
+
+      - name: Run psalm
+        run: |
+          cd source/test-module
+          php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
+
+      - name: Save psalm logs
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: TestsLog
+          path: source/test-module/logs/psalm.sonarqube.json
+
   sonarcloud:
-    needs: [ unit_tests ]
+    needs: [ unit_tests, psalm ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout current module
@@ -160,9 +197,10 @@ jobs:
           name: TestsLog
           path: ./logs/
 
-      - name: Fix unit coverage paths
+      - name: Fix paths in unit logs
         run: |
-          sed -i 's+/var/www/test-module/+./+' logs/coverage.xml
+          sed -i 's+/var/www/test-module/++' logs/coverage.xml
+          sed -i 's+/var/www/test-module/++' logs/phpunit.xml
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
@@ -180,3 +218,5 @@ jobs:
             -Dsonar.php.coverage.reportPaths=logs/coverage.xml
             -Dsonar.cpd.php.minimumTokens=30
             -Dsonar.cpd.php.minimumLines=6
+            -Dsonar.php.tests.reportPath=logs/phpunit.xml
+            -Dsonar.php.psalm.reportPaths=logs/psalm.sonarqube.json
