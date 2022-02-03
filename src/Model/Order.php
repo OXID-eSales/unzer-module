@@ -117,9 +117,9 @@ class Order extends Order_parent
             && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            return    $transactionService->writeTransactionToDB(
+            return $transactionService->writeTransactionToDB(
                 $this->getId(),
-                $this->getUser()->getId() ?: '',
+                $this->getOrderUser()->getId() ?: '',
                 $unzerPayment ?? $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
             );
         }

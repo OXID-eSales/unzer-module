@@ -61,8 +61,9 @@ class DispatcherController extends FrontendController
                 $translator = $this->getServiceFromContainer(Translator::class);
 
                 if ($unzerPayment->getState() != 2 && $order->oxorder__oxtransstatus->value != "OK") {
-                    if (!$order->reinitializeOrder()) {
-                        // TODO
+                    $ret = $order->reinitializeOrder();
+                    if ($ret != 1) {
+                        $unzer->debugLog("Order-Recalculation failed and returned with code: " . $ret);
                     }
                 }
 
