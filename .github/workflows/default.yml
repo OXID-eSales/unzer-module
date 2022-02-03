@@ -150,7 +150,7 @@ jobs:
             -e ADDITIONAL_TEST_PATHS='/var/www/vendor/oxid-solution-catalysts/unzer/Tests' \
             php php vendor/bin/runtests-codeception
 
-  psalm:
+  styles:
     strategy:
       matrix:
         php: [ '7.4' ]
@@ -173,9 +173,17 @@ jobs:
           composer install
 
       - name: Run psalm
+        continue-on-error: true
         run: |
           cd source/test-module
           php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
+
+      - name: Run phpcs
+        continue-on-error: true
+        id: phpcs
+        run: |
+          cd source/test-module
+          php vendor/bin/phpcs --standard=Tests/phpcs.xml
 
       - name: Save psalm logs
         if: always()
@@ -185,7 +193,7 @@ jobs:
           path: source/test-module/logs/psalm.sonarqube.json
 
   sonarcloud:
-    needs: [ unit_tests, psalm ]
+    needs: [ unit_tests, styles ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout current module
