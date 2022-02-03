@@ -195,6 +195,7 @@ jobs:
   sonarcloud:
     needs: [ unit_tests, styles ]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout current module
         uses: actions/checkout@v2
