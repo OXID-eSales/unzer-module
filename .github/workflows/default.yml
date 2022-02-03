@@ -45,7 +45,7 @@ jobs:
 
       - name: Start containers
         run: |
-          docker-compose up -d
+          make up
           sleep 2
 
       - name: Install dependencies
@@ -73,11 +73,6 @@ jobs:
           echo "${{ secrets.MODULE_SETTINGS }}" > source/var/configuration/environment/1.yaml
           docker-compose exec -T php php bin/oe-console oe:module:apply-configuration
 
-      - name: Stop containers
-        run: |
-          docker-compose down
-          sleep 2
-
   unit_tests:
     strategy:
       matrix:
@@ -96,11 +91,10 @@ jobs:
 
       - name: Start containers
         run: |
-          docker-compose up -d
+          make up
           sleep 2
 
       - name: Run tests
-        continue-on-error: true
         run: |
           docker-compose exec -T \
             -e PARTIAL_MODULE_PATHS=osc/unzer \
@@ -109,10 +103,80 @@ jobs:
             -e RUN_TESTS_FOR_MODULES=0 \
             -e XDEBUG_MODE=coverage \
             -e ADDITIONAL_TEST_PATHS='/var/www/vendor/oxid-solution-catalysts/unzer/Tests' \
-            php php vendor/bin/runtests --coverage-php=/var/www/unit.cov AllTestsUnit
+            php php vendor/bin/runtests \
+              --coverage-clover=/var/www/coverage.xml \
+              --coverage-text \
+              AllTestsUnit
 
       - name: Upload log artifact
+        if: always()
         uses: actions/upload-artifact@v2
         with:
           name: TestsLog
-          path: source/unit.cov
+          path: source/coverage.xml
+
+  codeception_tests:
+    strategy:
+      matrix:
+        php: [ '7.4' ]
+    needs: [ install_shop_with_module ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load current installation from cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./*
+          key: shopInstallation-${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            shopInstallation-${{ matrix.php }}-${{ github.sha }}
+
+      - name: Start containers
+        run: |
+          make file=services/selenium-chrome.yml addservice
+          make up
+          sleep 2
+
+      - name: Run tests
+        run: |
+          docker-compose exec -T \
+            -e PARTIAL_MODULE_PATHS=osc/unzer \
+            -e ACTIVATE_ALL_MODULES=1 \
+            -e RUN_TESTS_FOR_SHOP=0 \
+            -e RUN_TESTS_FOR_MODULES=0 \
+            -e ADDITIONAL_TEST_PATHS='/var/www/vendor/oxid-solution-catalysts/unzer/Tests' \
+            php php vendor/bin/runtests-codeception
+
+  sonarcloud:
+    needs: [ unit_tests ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current module
+        uses: actions/checkout@v2
+
+      - name: Download fixed artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: TestsLog
+          path: ./logs/
+
+      - name: Fix unit coverage paths
+        run: |
+          sed -i 's+/var/www/test-module/+./+' logs/coverage.xml
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=oxid-esales
+            -Dsonar.projectKey=OXID-eSales_unzer-module
+            -Dsonar.projectVersion=0.1.0
+            -Dsonar.sources=src
+            -Dsonar.tests=Tests
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.php.coverage.reportPaths=logs/coverage.xml
+            -Dsonar.cpd.php.minimumTokens=30
+            -Dsonar.cpd.php.minimumLines=6
