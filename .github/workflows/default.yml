@@ -47,6 +47,7 @@ jobs:
         run: |
           docker-compose up -d
           sleep 2
+
       - name: Install dependencies
         run: docker-compose exec -T php composer update --no-interaction
 
@@ -76,3 +77,42 @@ jobs:
         run: |
           docker-compose down
           sleep 2
+
+  unit_tests:
+    strategy:
+      matrix:
+        php: [ '7.4' ]
+    needs: [ install_shop_with_module ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load current installation from cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./*
+          key: shopInstallation-${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            shopInstallation-${{ matrix.php }}-${{ github.sha }}
+
+      - name: Start containers
+        run: |
+          docker-compose up -d
+          sleep 2
+
+      - name: Run tests
+        continue-on-error: true
+        run: |
+          docker-compose exec -T \
+            -e PARTIAL_MODULE_PATHS=osc/unzer \
+            -e ACTIVATE_ALL_MODULES=1 \
+            -e RUN_TESTS_FOR_SHOP=0 \
+            -e RUN_TESTS_FOR_MODULES=0 \
+            -e XDEBUG_MODE=coverage \
+            -e ADDITIONAL_TEST_PATHS='/var/www/vendor/oxid-solution-catalysts/unzer/Tests' \
+            php php vendor/bin/runtests --coverage-php=/var/www/unit.cov AllTestsUnit
+
+      - name: Upload log artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: TestsLog
+          path: source/unit.cov
