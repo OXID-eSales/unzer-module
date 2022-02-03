@@ -1,0 +1,78 @@
+name: oxid module tests
+
+on: [push]
+
+jobs:
+  install_shop_with_module:
+    strategy:
+      matrix:
+        php: [ '7.4' ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone testing environment
+        run: git clone https://github.com/Fresh-Advance/development.git .
+
+      - name: Clone the shop
+        run: git clone --depth 1 https://github.com/OXID-eSales/oxideshop_ce.git --branch b-6.4.x --single-branch source
+
+      - name: Cache current installation
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./*
+          key: shopInstallation-${{ matrix.php }}-${{ github.sha }}
+
+      - name: Prepare container configuration
+        run: |
+          make setup
+          make addbasicservices
+          sed "s/PHP_VERSION=.*/PHP_VERSION='${{ matrix.php }}'/" -i .env
+          sed "s/display_errors =.*/display_errors = false/" -i containers/php-fpm/custom.ini
+          sed -i -e "s+/var/www/+/var/www/source/+" containers/httpd/project.conf
+
+      - name: Prepare shop configuration
+        run: |
+          cp source/source/config.inc.php.dist source/source/config.inc.php
+          sed -i -e 's/<dbHost>/mysql/'\
+                 -e 's/<dbUser>/root/'\
+                 -e 's/<dbName>/example/'\
+                 -e 's/<dbPwd>/root/'\
+                 -e 's/<dbPort>/3306/'\
+                 -e 's/<sShopURL>/http:\/\/localhost.local\//'\
+                 -e 's/<sShopDir>/\/var\/www\/source\//'\
+                 -e 's/<sCompileDir>/\/var\/www\/source\/tmp\//'\
+              source/source/config.inc.php
+
+      - name: Start containers
+        run: |
+          docker-compose up -d
+          sleep 2
+      - name: Install dependencies
+        run: docker-compose exec -T php composer update --no-interaction
+
+      - name: Checkout current module
+        uses: actions/checkout@v2
+        with:
+          path: source/test-module
+
+      - name: Install module
+        run: |
+          docker-compose exec -T \
+            php composer config repositories.oxid-solution-catalysts/unzer \
+            --json '{"type":"path", "url":"./test-module", "options": {"symlink": true}}'
+          docker-compose exec -T php composer require oxid-solution-catalysts/unzer:*
+
+      - name: Reset shop
+        run: docker-compose exec -T php vendor/bin/reset-shop
+
+      - name: Put module settings
+        continue-on-error: true
+        run: |
+          mkdir -p source/var/configuration/environment/
+          echo "${{ secrets.MODULE_SETTINGS }}" > source/var/configuration/environment/1.yaml
+          docker-compose exec -T php php bin/oe-console oe:module:apply-configuration
+
+      - name: Stop containers
+        run: |
+          docker-compose down
+          sleep 2
