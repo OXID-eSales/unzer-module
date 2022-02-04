@@ -69,7 +69,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
         }
 
-        if ($unzerPayment->getState() == 2) {
+        if ($unzerPayment && $unzerPayment->getState() == 2) {
             $this->deleteOldInitOrders();
         }
 
