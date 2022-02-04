@@ -46,7 +46,7 @@ class TransactionTest extends TestCase
             'getId' => 'unzerPaymentId',
             'getStateName' => 'stateName',
             'getInitialTransaction' => $this->createConfiguredMock(AbstractTransactionType::class, [
-                'getShortID' => 'unzerShortId'
+                'getShortID' => 'unzerShortId',
                 'getTraceID' => 'unzerTraceId'
             ]),
             'getMetadata' => $this->createConfiguredMock(Metadata::class, [
