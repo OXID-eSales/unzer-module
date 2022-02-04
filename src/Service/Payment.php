@@ -251,8 +251,8 @@ class Payment
             );
             if (
                 $charge->isSuccess() &&
-                $charge->getPayment() &&
-                $charge->getPayment()->getAmount()->getRemaining() == 0
+                ($o = $charge->getPayment()) &&
+                $o->getAmount()->getRemaining() == 0
             ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
