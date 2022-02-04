@@ -147,9 +147,11 @@ class Order extends Order_parent
         $rs = $oDB->getRow("SELECT OXUSERID, SERIALIZED_BASKET from oscunzertransaction 
                             where OXORDERID = :oxorderid AND OXACTION = 'init'", [':oxorderid' => $this->getId()]);
         if ($rs) {
+            $oUser = oxNew(User::class);
+            $oUser->load($rs['OXUSERID']);
             if (
-                $oUser = oxNew(User::class)->load($rs['OXUSERID']) &&
-                    $oBasket = unserialize(base64_decode($rs['SERIALIZED_BASKET']))
+                $oUser->isLoaded() &&
+                $oBasket = unserialize(base64_decode($rs['SERIALIZED_BASKET']))
             ) {
                 return $this->finalizeOrder($oBasket, $oUser, true);
             }
