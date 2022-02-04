@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -82,6 +83,13 @@ class Payment
             $paymentExtension = $this->paymentExtensionLoader->getPaymentExtension($paymentModel);
             $paymentExtension->execute(
                 $this->session->getUser(),
+                $this->session->getBasket()
+            );
+
+            $this->getServiceFromContainer(TransactionService::class)->writeInitOrderToDB(
+                $this->session->getVariable('sess_challenge'),
+                $this->session->getUser()->getId(),
+                $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment(),
                 $this->session->getBasket()
             );
 
