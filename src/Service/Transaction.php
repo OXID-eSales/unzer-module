@@ -64,7 +64,7 @@ class Transaction
         if ($unzerPayment && !$unzerShipment) {
             $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
         }
-        if ($unzerShipment) {
+        elseif ($unzerShipment) {
             $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
         }
 
@@ -217,8 +217,8 @@ class Transaction
             'typeid'   => $unzerCancel->getId(),
             'oxaction' => 'cancel',
             'traceid'  => $unzerCancel->getTraceId(),
-            'shortid'  => $unzerCharge->getShortId(),
-            'status'   => $this->getUzrStatus($unzerCharge),
+            'shortid'  => $unzerCancel->getShortId(),
+            'status'   => $this->getUzrStatus($unzerCancel),
         ];
     }
 
