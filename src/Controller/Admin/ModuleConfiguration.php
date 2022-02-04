@@ -66,7 +66,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     /**
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
-    public function deleteWebhook()
+    public function deleteWebhook(): void
     {
         /** @var Unzer $unzer */
         try {
@@ -89,7 +89,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     /**
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
-    public function registerWebhook()
+    public function registerWebhook(): void
     {
         try {
             /** @var Unzer $unzer */

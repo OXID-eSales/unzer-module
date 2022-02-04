@@ -312,7 +312,7 @@ class Payment
      * @param \UnzerSDK\Resources\Payment $unzerPayment
      * @return BasePaymentType|AbstractUnzerResource The updated PaymentType object.
      */
-    public function setInstallmentDueDate($unzerPayment)
+    public function setInstallmentDueDate($unzerPayment): void
     {
         /** @var InstallmentSecured $installment */
         $installment = $unzerPayment->getPaymentType();
@@ -326,12 +326,12 @@ class Payment
         return $unzerPayment->getUnzerObject()->updatePaymentType($installment);
     }
 
-    public function getYesterdaysTimestamp()
+    public function getYesterdaysTimestamp(): string
     {
         return date('Y-m-d', strtotime("-1 days"));
     }
 
-    public function getTomorrowsTimestamp()
+    public function getTomorrowsTimestamp(): string
     {
         return date('Y-m-d', strtotime("+1 days"));
     }
