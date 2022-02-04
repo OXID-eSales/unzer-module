@@ -43,9 +43,18 @@ class PaymentTest extends TestCase
             ->willReturn($paymentExtension);
 
         $sessionStub = $this->createPartialMock(Session::class, ['getVariable', 'getBasket', 'getUser']);
-        $sessionStub->method('getVariable')->with('PaymentId')->willReturn('examplePaymentId');
+        $sessionStub->method('getVariable')
+            ->willReturnCallback(function($param){
+                return $param === 'PaymentId' ? 'examplePaymentId' : 'someValue';
+            });
         $sessionStub->method('getBasket')->willReturn($this->createConfiguredMock(BasketModel::class, []));
-        $sessionStub->method('getUser')->willReturn($this->createConfiguredMock(UserModel::class, []));
+        $sessionStub->method('getUser')->willReturn(
+            $this->createConfiguredMock(UserModel::class, [
+                'getId' => 'someId'
+            ])
+        );
+
+        $transactionMock = $this->createPartialMock(TransactionService::class, ['writeTransactionToDB']);
 
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
@@ -54,9 +63,9 @@ class PaymentTest extends TestCase
                 $this->createPartialMock(Translator::class, []),
                 $this->createConfiguredMock(UnzerService::class, []),
                 $this->createPartialMock(UnzerSDKLoader::class, []),
-                $this->createPartialMock(TransactionService::class, [])
+                $transactionMock
             ])
-            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus'])
+            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment'])
             ->getMock();
         $sut->expects($this->never())->method('removeTemporaryOrder');
         $sut->method('getUnzerPaymentStatus')->willReturn($expectedValue);
