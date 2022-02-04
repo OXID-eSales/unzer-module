@@ -242,13 +242,18 @@ class Payment
         try {
             $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
 
+            /** @psalm-suppress InvalidArgument */
             $charge = $unzerPayment->getAuthorization()->charge($amount);
             $this->transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oOrder->oxorder__oxuserid->value,
                 $charge
             );
-            if ($charge->isSuccess() && $charge->getPayment() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
+            if (
+                $charge->isSuccess() &&
+                $charge->getPayment() &&
+                $charge->getPayment()->getAmount()->getRemaining() == 0
+            ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
         } catch (UnzerApiException $e) {

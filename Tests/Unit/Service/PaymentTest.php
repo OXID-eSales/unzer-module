@@ -44,7 +44,7 @@ class PaymentTest extends TestCase
 
         $sessionStub = $this->createPartialMock(Session::class, ['getVariable', 'getBasket', 'getUser']);
         $sessionStub->method('getVariable')
-            ->willReturnCallback(function($param){
+            ->willReturnCallback(function ($param) {
                 return $param === 'PaymentId' ? 'examplePaymentId' : 'someValue';
             });
         $sessionStub->method('getBasket')->willReturn($this->createConfiguredMock(BasketModel::class, []));

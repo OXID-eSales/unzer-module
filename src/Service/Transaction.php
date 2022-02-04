@@ -64,8 +64,7 @@ class Transaction
         ];
         if ($unzerPayment && !$unzerShipment) {
             $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
-        }
-        elseif ($unzerShipment) {
+        } elseif ($unzerShipment) {
             $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
         }
 
