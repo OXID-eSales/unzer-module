@@ -22,7 +22,7 @@ $aLang = [
     'OSCUNZER_TRANSACTION_TYPEID'                   => 'Unzer Type-ID',
     'OSCUNZER_TRANSACTION_PAYMENTMETA'              => 'Bezahl-Info',
     'OSCUNZER_TRANSACTION_SHORTID'                  => 'Unzer Short-ID',
-    'OSCUNZER_TRANSACTION_SHORTID'                  => 'Unzer Trace-ID',
+    'OSCUNZER_TRANSACTION_TRACEID'                  => 'Unzer Trace-ID',
     'OSCUNZER_REMAING_AMOUNT'                       => 'Offener Betrag',
     'OSCUNZER_ORDER_AMOUNT'                         => 'Gesamtbetrag',
     'OSCUNZER_CHARGED_AMOUNT'                       => 'Eingezogener Betrag',
@@ -39,4 +39,8 @@ $aLang = [
     'OSCUNZER_CANCEL_MISSINGREASON'                 => 'Für die Zahlungsart muss ein Rückzahlungs-Grund angegeben werden',
     'OSCUNZER_CANCEL_ALERT'                         => 'Zurückgebuchte Beträge können nicht wieder eingezogen werden! Wollen Sie wirklich den gewählten Betrag zurückerstatten? Gewählter Betrag: ',
     'OSCUNZER_SHIP_ID'                              => 'Shipping-Id',
+    'OSCUNZER_REASON_CANCEL'                        => 'Bestellung widerrufen',
+    'OSCUNZER_REASON_RETURN'                        => 'Kunde sendet Ware zurück',
+    'OSCUNZER_REASON_CREDIT'                        => 'Kunde bekommt Geld zurück, Ware kann er behalten',
+    'OSCUNZER_PAYOUT'                               => 'Rückzahlung',
 ];

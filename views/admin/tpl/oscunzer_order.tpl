@@ -36,28 +36,6 @@
             </tr>
         [{/foreach}]
     </table>
-
-    <div>&nbsp;</div>
-
-    [{assign var="bHasAdditionalData" value=false}]
-    [{capture assign="additionalData"}]
-        [{assign var="aPaymentData" value=$oUnzerTransaction->getUnzerMetaData()}]
-            [{if is_array($aPaymentData)}]
-                <div><b>[{oxmultilang ident="OSCUNZER_TRANSACTION_PAYMENTMETA"}]</b></div>
-                <table>
-                    [{foreach from=$aPaymentData key="paramName" item="paramValue"}]
-                    [{assign var="bHasAdditionalData" value=true}]
-                    <tr>
-                        <td>[{$paramName|escape}]:</td>
-                        <td>&nbsp;</td>
-                        <td>[{$paramValue|escape}]</td>
-                    </tr>
-                    [{/foreach}]
-                </table>
-            [{/if}]
-    [{/capture}]
-
-    [{if $bHasAdditionalData}][{$additionalData}][{/if}]
 [{/if}]
 
 [{block name="unzer_ship"}]
@@ -100,8 +78,8 @@
     [{if $AuthId}]
         <br><br>
         <b>[{oxmultilang ident="OSCUNZER_AUTHORIZATION"}]</b><br>
-        <b>[{oxmultilang ident="OSCUNZER_REMAING_AMOUNT"}]</b>: [{$AuthAmountRemaining}]<br>
-        <b>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT"}]</b>: [{$AuthAmount}]<br>
+        <b>[{oxmultilang ident="OSCUNZER_REMAING_AMOUNT"}]</b>: [{$AuthAmountRemaining}] [{$AuthCur}]<br>
+        <b>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT"}]</b>: [{$AuthAmount}]  [{$AuthCur}]<br>
 
         [{if $AuthAmountRemaining>0}]
             <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
@@ -111,7 +89,7 @@
                 <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
                 <table>
                     <tr>
-                        <td><input type="text" name="amount" value="[{$AuthAmountRemaining}]"></td>
+                        <td><input type="text" name="amount" value="[{$AuthAmountRemaining}]"> [{$AuthCur}]</td>
                         <td><button type="submit">[{oxmultilang ident="OSCUNZER_CHARGE_COLLECT"}]</button></td>
                     </tr>
                 </table>
@@ -151,20 +129,21 @@
 
                     <td>[{$oUnzerCharge.chargeDate|escape}]</td>
                     <td>[{$oUnzerCharge.chargeId|escape}]</td>
-                    <td>[{$oUnzerCharge.chargedAmount|escape}]</td>
-                    <td>[{$oUnzerCharge.cancelledAmount|escape}]</td>
+                    <td>[{$oUnzerCharge.chargedAmount|escape}] [{$uzrCurrency}]</td>
+                    <td>[{$oUnzerCharge.cancelledAmount|escape}] [{$uzrCurrency}]</td>
 
                     <td>
                         <select name="reason" id="reason_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]>
                             [{if !$blCancelReasonReq}]<option value="">NONE</option>[{/if}]
-                            <option value="CANCEL">CANCEL</option>
-                            <option value="RETURN">RETURN</option>
-                            <option value="CREDIT">CREDIT</option>
+                            <option value="CANCEL">[{oxmultilang ident="OSCUNZER_REASON_CANCEL"}]</option>
+                            <option value="RETURN">[{oxmultilang ident="OSCUNZER_REASON_RETURN"}]</option>
+                            <option value="CREDIT">[{oxmultilang ident="OSCUNZER_REASON_CREDIT"}]</option>
                         </select>
                     </td>
-                    <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]></td>
+                    <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]> [{$uzrCurrency}]</td>
                     <td><input type="submit" id="submit_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
-                               value="Payout"></td>
+                               value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
+                    </td>
                     [{capture assign="cancelConfirm"}]
                     const inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
                     const form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');

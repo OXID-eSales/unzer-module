@@ -69,7 +69,7 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['oOrder'] = $oOrder;
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
+            $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId());
             $this->_aViewData['sPaymentId'] = $this->sPaymentId;
             if ($this->sPaymentId) {
                 $this->getUnzerViewData($this->sPaymentId);
@@ -81,7 +81,7 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    protected function getUnzerViewData($sPaymentId): void
+    protected function getUnzerViewData(string $sPaymentId): void
     {
         /** @var \UnzerSDK\Resources\Payment $unzerPayment */
         $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
@@ -113,7 +113,7 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
             $this->_aViewData["AuthId"] = $unzAuthorization->getId();
             $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
-            $this->_aViewData['AuthCur'] = $unzAuthorization->getCurrency();
+            $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
         }
         $charges = [];
         if (!$unzerPayment->isCanceled()) {
@@ -252,7 +252,7 @@ class AdminOrderController extends AdminDetailsController
     /**
      * Returns editable order object
      *
-     * @return object
+     * @return Order|null
      */
     public function getEditObject(): ?object
     {

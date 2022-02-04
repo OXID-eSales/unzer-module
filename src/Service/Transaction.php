@@ -290,20 +290,24 @@ class Transaction
 
     /**
      * @param $paymentid
-     * @return array|false
+     * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
     public static function getPaymentIdByOrderId(string $orderid)
     {
+        $result = '';
+
         if ($orderid) {
-            return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
+            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
                 WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
                 [$orderid]
             );
+
+            $result = $rows[0]['TYPEID'];
         }
 
-        return false;
+        return $result;
     }
 }
