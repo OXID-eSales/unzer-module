@@ -268,9 +268,7 @@ class Payment
         }
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
 
-        if ($sPaymentId === null) {
-            $sPaymentId = $transactionService->getPaymentIdByOrderId($oOrder->getId());
-        }
+        $sPaymentId = $sPaymentId ?? $transactionService->getPaymentIdByOrderId($oOrder->getId());
 
         $blSuccess = false;
 
