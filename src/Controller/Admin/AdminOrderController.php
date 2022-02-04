@@ -81,7 +81,7 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    protected function getUnzerViewData($sPaymentId)
+    protected function getUnzerViewData($sPaymentId): void
     {
         /** @var \UnzerSDK\Resources\Payment $unzerPayment */
         $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
@@ -153,7 +153,7 @@ class AdminOrderController extends AdminDetailsController
         $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
     }
 
-    public function sendShipmentNotification()
+    public function sendShipmentNotification(): void
     {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $translator = $this->getServiceFromContainer(Translator::class);
@@ -171,7 +171,7 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    public function doUnzerCollect()
+    public function doUnzerCollect(): void
     {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $amount = (float) Registry::getRequest()->getRequestParameter('amount');
@@ -186,6 +186,9 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
+    /**
+     * @return void
+     */
     public function doUnzerCancel()
     {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
@@ -238,7 +241,7 @@ class AdminOrderController extends AdminDetailsController
         return $isUnzer;
     }
 
-    public function isCancelReasonRequired()
+    public function isCancelReasonRequired(): bool
     {
         if (!$this->oPaymnet) {
             return false;

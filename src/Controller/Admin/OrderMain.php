@@ -13,6 +13,8 @@ class OrderMain extends OrderMain_parent
 
     /**
      * Method is used for overriding.
+     *
+     * @return void
      */
     protected function onOrderSend()
     {
@@ -29,7 +31,7 @@ class OrderMain extends OrderMain_parent
         }
     }
 
-    public function sendShipmentNotification($oOrder)
+    public function sendShipmentNotification(\OxidEsales\Eshop\Application\Model\Order $oOrder): void
     {
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
         $oShipment = $paymentService->sendShipmentNotification($oOrder);

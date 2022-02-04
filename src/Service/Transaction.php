@@ -256,18 +256,25 @@ class Transaction
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public static function getTransactionDataByPaymentId($paymentid)
+    public static function getTransactionDataByPaymentId(string $paymentid)
     {
         if ($paymentid) {
             return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT OXORDERID, OXUSERID FROM oscunzertransaction WHERE TYPEID=?",
-                [(string)$paymentid]
+                [$paymentid]
             );
         }
 
         return false;
     }
 
+    /**
+     * @param Cancellation|Charge $unzerObject
+     *
+     * @return null|string
+     *
+     * @psalm-return 'error'|'pending'|'success'|null
+     */
     protected static function getUzrStatus($unzerObject)
     {
         if ($unzerObject->isSuccess()) {
@@ -287,13 +294,13 @@ class Transaction
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public static function getPaymentIdByOrderId($orderid)
+    public static function getPaymentIdByOrderId(string $orderid)
     {
         if ($orderid) {
             return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
                 WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
-                [(string)$orderid]
+                [$orderid]
             );
         }
 
