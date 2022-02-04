@@ -30,4 +30,5 @@ $aLang = [
     'OSCUNZER_INSTALLMENT_TOTAL' => 'Gesamtsumme',
     'OSCUNZER_INSTALLMENT_PDF' => 'Ich erkläre mich mit dem <b><a href="%s" target="_blank">Vertrag (PDF)</a></b> einverstanden!',
     'OSCUNZER_INSTALLMENT_SUBMIT' => 'Vertrag bestätigen',
+    'OSCUNZER_INSTALLMENT_CANCEL' => 'Vertrag ablehnen',
 ];

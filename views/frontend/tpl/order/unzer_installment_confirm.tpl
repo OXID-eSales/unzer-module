@@ -17,7 +17,7 @@
         [{block name="checkout_installment_confirm_summary_row"}]
             <div class="row">
                 [{block name="checkout_installment_confirm_summary_table"}]
-                    <div class="col-6">
+                    <div class="col-4">
                         <table id="checkout_installment_confirm_table" class="table table-bordered table-striped">
                             <colgroup>
                                 <col class="descCol">
@@ -41,39 +41,49 @@
                     </div>
                 [{/block}]
                 [{block name="checkout_installment_confirm_summary_form"}]
-                    <div class="col-6">
-                        <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentBottom" class="form-horizontal">
-                            <div class="hidden">
-                                [{$oViewConf->getHiddenSid()}]
-                                [{$oViewConf->getNavFormParams()}]
-                                <input type="hidden" name="cl" value="unzer_installment" />
-                                <input type="hidden" name="fnc" value="[{$oView->getExecuteFnc()}]" />
-                                <input type="hidden" name="challenge" value="[{$challenge}]" />
-                            </div>
-                            [{block name="checkout_installment_confirm_input"}]
-                                <div class="card bg-light cart-buttons">
-                                    <div class="card-body">
-                                        [{block name="checkout_installment_confirm_button"}]
-                                            <label>
-                                                <input id="checkInsallConfirm" type="checkbox" name="ord_instconf" value="0" required />
-                                                [{oxmultilang ident="OSCUNZER_INSTALLMENT_PDF" args=$sPdfLink}]
-                                            </label>
-                                            <button type="submit" class="btn btn-lg btn-primary submitButton nextStep largeButton">
-                                                <i class="fa fa-check"></i>[{oxmultilang ident="OSCUNZER_INSTALLMENT_SUBMIT"}]
-                                            </button>
-                                        [{/block}]
+                    <div class="col-8">
+                        [{block name="checkout_installment_confirm_input"}]
+                            <div class="card bg-light cart-buttons">
+                                <div class="card-body">
+                                    <div class="row align-items-end">
+                                        <div class="col-6">
+                                            [{block name="checkout_installment_confirm_button"}]
+                                                <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentBottom" class="form-horizontal">
+                                                    <div class="hidden">
+                                                        [{$oViewConf->getHiddenSid()}]
+                                                        [{$oViewConf->getNavFormParams()}]
+                                                        <input type="hidden" name="cl" value="unzer_installment" />
+                                                        <input type="hidden" name="fnc" value="[{$oView->getExecuteFnc()}]" />
+                                                        <input type="hidden" name="challenge" value="[{$challenge}]" />
+                                                    </div>
+                                                    <label>
+                                                        <input id="checkInsallConfirm" type="checkbox" name="ord_instconf" value="0" required />
+                                                        [{oxmultilang ident="OSCUNZER_INSTALLMENT_PDF" args=$sPdfLink}]
+                                                    </label>
+                                                    <button type="submit" class="btn btn-lg btn-primary submitButton nextStep largeButton">
+                                                        <i class="fa fa-check"></i>[{oxmultilang ident="OSCUNZER_INSTALLMENT_SUBMIT"}]
+                                                    </button>
+                                                </form>
+                                            [{/block}]
+                                        </div>
+                                        <div class="col-6">
+                                            [{block name="checkout_installment_confirm_cancel"}]
+                                                <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentCancel" class="form-horizontal">
+                                                    [{$oViewConf->getHiddenSid()}]
+                                                    [{$oViewConf->getNavFormParams()}]
+                                                    <input type="hidden" name="cl" value="unzer_installment">
+                                                    <input type="hidden" name="fnc" value="cancelInstallment">
+                                                    <input type="hidden" name="challenge" value="[{$challenge}]">
+                                                    <button class="btn btn-lg btn-primary submitButton nextStep largeButton float-right" onclick="this.closest('form').submit();return false;">
+                                                        <i class="fa fa-times"></i>[{oxmultilang ident="OSCUNZER_INSTALLMENT_CANCEL"}]
+                                                    </button>
+                                                </form>
+                                            [{/block}]
+                                        </div>
                                     </div>
-                                    <form action="[{$oViewConf->getSslSelfLink()}]" method="post" id="orderConfirmInstallmentCancel" class="form-horizontal">
-                                        [{$oViewConf->getHiddenSid()}]
-                                        [{$oViewConf->getNavFormParams()}]
-                                        <input type="hidden" name="cl" value="unzer_installment">
-                                        <input type="hidden" name="fnc" value="cancelInstallment">
-                                        <input type="hidden" name="challenge" value="[{$challenge}]">
-                                        <a onclick="this.closest('form').submit();return false;">Cancel</a>
-                                    </form>
                                 </div>
                             [{/block}]
-                        </form>
+                        </div>
                     </div>
                 [{/block}]
             </div>
