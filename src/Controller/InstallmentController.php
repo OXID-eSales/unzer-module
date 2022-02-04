@@ -37,6 +37,8 @@ class InstallmentController extends FrontendController
 
     /**
      * @inheritDoc
+     *
+     * @return void
      */
     public function init()
     {
@@ -139,7 +141,7 @@ class InstallmentController extends FrontendController
         return 'confirmInstallment';
     }
 
-    protected function getUnzerSessionPayment()
+    protected function getUnzerSessionPayment(): ?Payment
     {
         if ($this->uzrPayment === null) {
             $this->uzrPayment = $this->getServiceFromContainer(
@@ -149,6 +151,9 @@ class InstallmentController extends FrontendController
         return $this->uzrPayment;
     }
 
+    /**
+     * @return never
+     */
     public function cancelInstallment()
     {
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
@@ -159,7 +164,7 @@ class InstallmentController extends FrontendController
         throw new Redirect($unzerService->prepareRedirectUrl('payment?payerror=2'));
     }
 
-    public function confirmInstallment()
+    public function confirmInstallment(): void
     {
         $unzerPayment = $this->getUnzerSessionPayment();
         $oOrder = oxNew(Order::class);

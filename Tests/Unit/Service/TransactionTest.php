@@ -46,7 +46,8 @@ class TransactionTest extends TestCase
             'getId' => 'unzerPaymentId',
             'getStateName' => 'stateName',
             'getInitialTransaction' => $this->createConfiguredMock(AbstractTransactionType::class, [
-                'getShortID' => 'unzerShortId'
+                'getShortID' => 'unzerShortId',
+                'getTraceID' => null
             ]),
             'getMetadata' => $this->createConfiguredMock(Metadata::class, [
                 'jsonSerialize' => 'metadataJson'
@@ -59,6 +60,7 @@ class TransactionTest extends TestCase
         $model->expects($this->at(0))->method('assign')->with([
             'oxorderid' => 'orderId',
             'shortid' => 'unzerShortId',
+            'traceid' => null,
             'oxshopid' => 5,
             'oxuserid' => 'userId',
             'oxactiondate' => '2021-12-10 16:44:54',
