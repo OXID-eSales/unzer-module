@@ -170,10 +170,11 @@ class Transaction
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
         $params = [
-            'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'amount' => $unzerPayment->getAmount()->getTotal(),
             'currency' => $unzerPayment->getCurrency(),
-            'typeid'   => $unzerPayment->getId(),
-            'oxaction' => $unzerPayment->getStateName()
+            'typeid' => $unzerPayment->getId(),
+            'oxaction' => $unzerPayment->getStateName(),
+            'traceid' => $unzerPayment->getTraceId()
         ];
 
         if (
@@ -203,7 +204,7 @@ class Transaction
             'currency' => $unzerCharge->getCurrency(),
             'typeid'   => $unzerCharge->getId(),
             'oxaction' => 'charge',
-
+            'traceid' => $unzerCharge->getTraceId()
         ];
 
         $params['shortid'] = $unzerCharge->getShortId();
@@ -218,7 +219,7 @@ class Transaction
             'amount'   => $unzerCancel->getAmount(),
             'typeid'   => $unzerCancel->getId(),
             'oxaction' => 'cancel',
-
+            'traceid' => $unzerCancel->getTraceId()
         ];
 
         $params['shortid'] = $unzerCancel->getShortId();
@@ -234,7 +235,8 @@ class Transaction
             'fetchedAt' => $unzerShipment->getFetchedAt(),
             'typeid'   => $unzerShipment->getId(),
             'oxaction' => 'ship',
-            'shortid'  => $unzerShipment->getShortId()
+            'shortid'  => $unzerShipment->getShortId(),
+            'traceid' => $unzerShipment->getTraceId()
         ];
 
         $params['metadata'] = json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()]);
