@@ -169,10 +169,10 @@ jobs:
           php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
 
       - name: Run phpcs
-        id: phpcs
+        if: always()
         run: |
           cd source/test-module
-          php vendor/bin/phpcs --standard=Tests/phpcs.xml
+          composer phpcs
 
       - name: Save psalm logs
         if: always()

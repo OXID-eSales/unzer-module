@@ -14,9 +14,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
-use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
-use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
@@ -25,8 +23,6 @@ use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class Payment
 {
-    use ServiceContainer;
-
     /** @var Session */
     protected $session;
 
@@ -52,6 +48,9 @@ class Payment
      */
     protected $pdfLink;
 
+    /** @var TransactionService */
+    protected $transactionService;
+
     /**
      * @param Session $session
      * @param PaymentExtensionLoader $paymentExtensionLoader
@@ -64,13 +63,15 @@ class Payment
         PaymentExtensionLoader $paymentExtensionLoader,
         Translator $translator,
         Unzer $unzerService,
-        UnzerSDKLoader $unzerSDKLoader
+        UnzerSDKLoader $unzerSDKLoader,
+        TransactionService $transactionService
     ) {
         $this->session = $session;
         $this->paymentExtensionLoader = $paymentExtensionLoader;
         $this->translator = $translator;
         $this->unzerService = $unzerService;
         $this->unzerSDKLoader = $unzerSDKLoader;
+        $this->transactionService = $transactionService;
     }
 
     /**
@@ -86,11 +87,10 @@ class Payment
                 $this->session->getBasket()
             );
 
-            $this->getServiceFromContainer(TransactionService::class)->writeInitOrderToDB(
+            $this->transactionService->writeTransactionToDB(
                 $this->session->getVariable('sess_challenge'),
                 $this->session->getUser()->getId(),
-                $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment(),
-                $this->session->getBasket()
+                $this->getSessionUnzerPayment()
             );
 
             $paymentStatus = ($this->getUnzerPaymentStatus() != "ERROR");
@@ -212,14 +212,11 @@ class Payment
      */
     public function doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, $reason)
     {
-        $transactionService = $this->getServiceFromContainer(TransactionService::class);
         try {
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
-                ->fetchChargeById($unzerid, $chargeid);
+            $unzerPayment = $this->getUnzerSDK()->fetchChargeById($unzerid, $chargeid);
 
             $cancellation = $unzerPayment->cancel($amount, $reason);
-            $transactionService->writeCancellationToDB(
+            $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oOrder->oxorder__oxuserid->value,
                 $cancellation
@@ -242,19 +239,21 @@ class Payment
             return false;
         }
 
-        $transactionService = $this->getServiceFromContainer(TransactionService::class);
         try {
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
-                ->fetchPayment($unzerid);
+            $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
 
+            /** @psalm-suppress InvalidArgument */
             $charge = $unzerPayment->getAuthorization()->charge($amount);
-            $transactionService->writeChargeToDB(
+            $this->transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oOrder->oxorder__oxuserid->value,
                 $charge
             );
-            if ($charge->isSuccess() && $charge->getPayment() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
+            if (
+                $charge->isSuccess() &&
+                $charge->getPayment() &&
+                $charge->getPayment()->getAmount()->getRemaining() == 0
+            ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
         } catch (UnzerApiException $e) {
@@ -274,17 +273,13 @@ class Payment
         if (!$oOrder) {
             return false;
         }
-        $transactionService = $this->getServiceFromContainer(TransactionService::class);
 
-        $sPaymentId = $sPaymentId ?? $transactionService->getPaymentIdByOrderId($oOrder->getId());
+        $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
 
         $blSuccess = false;
 
         if ($sPaymentId) {
-            /** @var \UnzerSDK\Resources\Payment $unzerPayment */
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
-                ->fetchPayment($sPaymentId);
+            $unzerPayment = $this->getUnzerSDK()->fetchPayment($sPaymentId);
 
             if ($unzerPayment->getPaymentType() instanceof InstallmentSecured) {
                 $this->setInstallmentDueDate($unzerPayment);
@@ -299,7 +294,7 @@ class Payment
             if (!$blSuccess && $unzerPayment->getAmount()->getRemaining() === 0.0) {
                 $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
                 try {
-                    $blSuccess = $transactionService->writeTransactionToDB(
+                    $blSuccess = $this->transactionService->writeTransactionToDB(
                         $oOrder->getId(),
                         $oOrder->oxorder__oxuserid->value,
                         $unzerPayment,

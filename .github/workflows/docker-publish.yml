@@ -12,8 +12,8 @@ on:
     branches: [ b-6.3.x ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ b-6.3.x ]
+  #pull_request:
+  #  branches: [ b-6.3.x ]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+
       - name: downcase REPO
         run: |
           echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
