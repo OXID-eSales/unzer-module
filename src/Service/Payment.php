@@ -312,7 +312,7 @@ class Payment
      * @param \UnzerSDK\Resources\Payment $unzerPayment
      * @return BasePaymentType|AbstractUnzerResource The updated PaymentType object.
      */
-    public function setInstallmentDueDate($unzerPayment): void
+    public function setInstallmentDueDate($unzerPayment)
     {
         /** @var InstallmentSecured $installment */
         $installment = $unzerPayment->getPaymentType();

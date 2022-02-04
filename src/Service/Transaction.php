@@ -290,12 +290,14 @@ class Transaction
 
     /**
      * @param $paymentid
-     * @return array|false
+     * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
     public static function getPaymentIdByOrderId(string $orderid)
     {
+        $result = '';
+
         if ($orderid) {
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
@@ -303,9 +305,9 @@ class Transaction
                 [$orderid]
             );
 
-            return $rows[0]['TYPEID'];
+            $result = $rows[0]['TYPEID'];
         }
 
-        return false;
+        return $result;
     }
 }

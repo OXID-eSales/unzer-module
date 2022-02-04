@@ -37,7 +37,7 @@ class AdminOrderController extends AdminDetailsController
     /** @var Payment $oPaymnet */
     protected $oPaymnet = null;
 
-    /** @var string|bool $sPaymentId */
+    /** @var string $sPaymentId */
     protected $sPaymentId;
 
     /**
@@ -81,7 +81,7 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    protected function getUnzerViewData($sPaymentId): void
+    protected function getUnzerViewData(string $sPaymentId): void
     {
         /** @var \UnzerSDK\Resources\Payment $unzerPayment */
         $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
