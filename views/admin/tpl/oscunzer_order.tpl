@@ -19,15 +19,17 @@
     <table>
         <tr>
             <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CREATED" suffix="COLON"}]</th>
-            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_SHORTID"}]</th>
-            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID"}]</th>
-            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</th>
-            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_SHORTID" suffix="COLON"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_TRACEID" suffix="COLON"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID" suffix="COLON"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS" suffix="COLON"}]</th>
+            <th>[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID" suffix="COLON"}]</th>
         </tr>
         [{foreach from=$oUnzerTransactions item="oUnzerTransaction"}]
             <tr>
                 <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
                 <td>[{$oUnzerTransaction->getUnzerShortId()|escape}]</td>
+                <td>[{$oUnzerTransaction->getUnzerTraceId()|escape}]</td>
                 <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
                 <td>[{$oUnzerTransaction->getUnzerAction()|escape}]</td>
                 <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>

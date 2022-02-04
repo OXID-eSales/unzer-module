@@ -170,11 +170,11 @@ class Transaction
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
         $params = [
-            'amount' => $unzerPayment->getAmount()->getTotal(),
+            'amount'   => $unzerPayment->getAmount()->getTotal(),
             'currency' => $unzerPayment->getCurrency(),
-            'typeid' => $unzerPayment->getId(),
+            'typeid'   => $unzerPayment->getId(),
             'oxaction' => $unzerPayment->getStateName(),
-            'traceid' => $unzerPayment->getTraceId()
+            'traceid'  => $unzerPayment->getTraceId()
         ];
 
         if (
@@ -199,47 +199,40 @@ class Transaction
 
     protected function getUnzerChargeData(Charge $unzerCharge): array
     {
-        $params = [
+        return [
             'amount'   => $unzerCharge->getAmount(),
             'currency' => $unzerCharge->getCurrency(),
             'typeid'   => $unzerCharge->getId(),
             'oxaction' => 'charge',
-            'traceid' => $unzerCharge->getTraceId()
+            'traceid'  => $unzerCharge->getTraceId(),
+            'shortid'  => $unzerCharge->getShortId(),
+            'status'   => $this->getUzrStatus($unzerCharge),
         ];
-
-        $params['shortid'] = $unzerCharge->getShortId();
-        $params['status'] = $this->getUzrStatus($unzerCharge);
-
-        return $params;
     }
 
     protected function getUnzerCancelData(Cancellation $unzerCancel): array
     {
-        $params = [
+        return [
             'amount'   => $unzerCancel->getAmount(),
             'typeid'   => $unzerCancel->getId(),
             'oxaction' => 'cancel',
-            'traceid' => $unzerCancel->getTraceId()
+            'traceid'  => $unzerCancel->getTraceId(),
+            'shortid'  => $unzerCharge->getShortId(),
+            'status'   => $this->getUzrStatus($unzerCharge),
         ];
-
-        $params['shortid'] = $unzerCancel->getShortId();
-        $params['status'] = $this->getUzrStatus($unzerCancel);
-
-        return $params;
     }
 
     protected function getUnzerShipmentData(Shipment $unzerShipment, Payment $unzerPayment): array
     {
         $params = [
-            'amount'   => $unzerShipment->getAmount(),
+            'amount'    => $unzerShipment->getAmount(),
             'fetchedAt' => $unzerShipment->getFetchedAt(),
-            'typeid'   => $unzerShipment->getId(),
-            'oxaction' => 'ship',
-            'shortid'  => $unzerShipment->getShortId(),
-            'traceid' => $unzerShipment->getTraceId()
+            'typeid'    => $unzerShipment->getId(),
+            'oxaction'  => 'ship',
+            'shortid'   => $unzerShipment->getShortId(),
+            'traceid'   => $unzerShipment->getTraceId(),
+            'metadata'  => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
         ];
-
-        $params['metadata'] = json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()]);
 
         if ($unzerCustomer = $unzerPayment->getCustomer()) {
             $params['customerid'] = $unzerCustomer->getId();
