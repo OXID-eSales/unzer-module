@@ -69,7 +69,7 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['oOrder'] = $oOrder;
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId())[0]['TYPEID'];
+            $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId());
             $this->_aViewData['sPaymentId'] = $this->sPaymentId;
             if ($this->sPaymentId) {
                 $this->getUnzerViewData($this->sPaymentId);
@@ -81,7 +81,7 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    protected function getUnzerViewData($sPaymentId)
+    protected function getUnzerViewData(string $sPaymentId): void
     {
         /** @var \UnzerSDK\Resources\Payment $unzerPayment */
         $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
@@ -113,7 +113,7 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
             $this->_aViewData["AuthId"] = $unzAuthorization->getId();
             $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
-            $this->_aViewData['AuthCur'] = $unzAuthorization->getCurrency();
+            $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
         }
         $charges = [];
         if (!$unzerPayment->isCanceled()) {
@@ -153,7 +153,7 @@ class AdminOrderController extends AdminDetailsController
         $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
     }
 
-    public function sendShipmentNotification()
+    public function sendShipmentNotification(): void
     {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $translator = $this->getServiceFromContainer(Translator::class);
@@ -171,7 +171,7 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    public function doUnzerCollect()
+    public function doUnzerCollect(): void
     {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         $amount = (float) Registry::getRequest()->getRequestParameter('amount');
@@ -186,6 +186,9 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
+    /**
+     * @return void
+     */
     public function doUnzerCancel()
     {
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
@@ -238,7 +241,7 @@ class AdminOrderController extends AdminDetailsController
         return $isUnzer;
     }
 
-    public function isCancelReasonRequired()
+    public function isCancelReasonRequired(): bool
     {
         if (!$this->oPaymnet) {
             return false;
@@ -249,7 +252,7 @@ class AdminOrderController extends AdminDetailsController
     /**
      * Returns editable order object
      *
-     * @return object
+     * @return Order|null
      */
     public function getEditObject(): ?object
     {

@@ -73,6 +73,14 @@ class Transaction extends BaseModel
     }
 
     /**
+     * @return string|null
+     */
+    public function getUnzerTraceId(): ?string
+    {
+        return $this->getRawField('TRACEID');
+    }
+
+    /**
      * @return array|mixed
      */
     public function getUnzerMetaData(): ?array
