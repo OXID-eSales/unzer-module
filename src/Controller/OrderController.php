@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
@@ -66,7 +67,7 @@ class OrderController extends OrderController_parent
             } catch (OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
-            } catch (NoArticleException | ArticleInputException $oEx) {
+            } catch (NoArticleException|ArticleInputException $oEx) {
                 Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
@@ -104,5 +105,13 @@ class OrderController extends OrderController_parent
         if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
             $oOrder->initWriteTransactionToDB();
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function publicApiKey(): string
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
     }
 }

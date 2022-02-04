@@ -168,6 +168,16 @@ final class Version20211216100154 extends AbstractMigration
             'countries' => []
         ],
 
+        //PayPal is one of the world’s most popular online payment systems.
+        'applepay' => [
+            'insert' => 1,
+            'de_desc' => "Apple Pay",
+            'en_desc' => "Apple Pay",
+            'de_longdesc' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+            'en_longdesc' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+            'countries' => []
+        ],
+
         //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
         'oscunzer_prepayment' => [
             'insert' => 1,
@@ -370,7 +380,7 @@ final class Version20211216100154 extends AbstractMigration
             'oxpaymentid' => 'oscunzer_paypal',
             'oxobjectid' => 'PayPal',
             'oxtype' => 'rdfapayment',
-        ],
+        ]
     ];
 
     /** @var array[] */
