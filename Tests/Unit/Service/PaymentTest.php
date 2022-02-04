@@ -16,6 +16,7 @@ use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
+use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -52,7 +53,8 @@ class PaymentTest extends TestCase
                 $extensionLoader,
                 $this->createPartialMock(Translator::class, []),
                 $this->createConfiguredMock(UnzerService::class, []),
-                $this->createPartialMock(UnzerSDKLoader::class, [])
+                $this->createPartialMock(UnzerSDKLoader::class, []),
+                $this->createPartialMock(TransactionService::class, [])
             ])
             ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus'])
             ->getMock();
@@ -93,7 +95,8 @@ class PaymentTest extends TestCase
             $extensionLoader,
             $this->createPartialMock(Translator::class, []),
             $this->createPartialMock(UnzerService::class, []),
-            $this->createPartialMock(UnzerSDKLoader::class, [])
+            $this->createPartialMock(UnzerSDKLoader::class, []),
+            $this->createPartialMock(TransactionService::class, [])
         );
 
         $this->expectException(Redirect::class);
@@ -145,7 +148,8 @@ class PaymentTest extends TestCase
                 $extensionLoader,
                 $translatorMock,
                 $unzerServiceMock,
-                $this->createPartialMock(UnzerSDKLoader::class, [])
+                $this->createPartialMock(UnzerSDKLoader::class, []),
+                $this->createPartialMock(TransactionService::class, [])
             ])
             ->onlyMethods(['removeTemporaryOrder'])
             ->getMock();
@@ -190,7 +194,8 @@ class PaymentTest extends TestCase
                 $extensionLoader,
                 $this->createPartialMock(Translator::class, []),
                 $unzerServiceMock,
-                $this->createPartialMock(UnzerSDKLoader::class, [])
+                $this->createPartialMock(UnzerSDKLoader::class, []),
+                $this->createPartialMock(TransactionService::class, [])
             ])
             ->onlyMethods(['removeTemporaryOrder'])
             ->getMock();
