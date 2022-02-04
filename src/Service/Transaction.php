@@ -64,8 +64,7 @@ class Transaction
         ];
         if ($unzerPayment && !$unzerShipment) {
             $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
-        }
-        elseif ($unzerShipment) {
+        } elseif ($unzerShipment) {
             $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
         }
 
@@ -403,8 +402,12 @@ class Transaction
 
     public function isValidTransactionTypeId($typeid): bool
     {
-        if (DatabaseProvider::getDb()->getOne(
-            "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE TYPEID=? ", [$typeid])) {
+        if (
+            DatabaseProvider::getDb()->getOne(
+                "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE TYPEID=? ",
+                [$typeid]
+            )
+        ) {
             return true;
         }
         return false;

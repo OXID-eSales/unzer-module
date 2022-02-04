@@ -40,8 +40,10 @@ class DispatcherController extends FrontendController
         $aPath = explode("/", $url['path']);
         $typeid = end($aPath);
 
-        if (($url['scheme'] != "https" || $url['host'] != "api.unzer.com")
-            || !$transaction->isValidTransactionTypeId($typeid)) {
+        if (
+            ($url['scheme'] != "https" || $url['host'] != "api.unzer.com")
+            || !$transaction->isValidTransactionTypeId($typeid)
+        ) {
             Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
         }
 
