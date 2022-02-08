@@ -73,6 +73,11 @@ jobs:
           echo "${{ secrets.MODULE_SETTINGS }}" > source/var/configuration/environment/1.yaml
           docker-compose exec -T php php bin/oe-console oe:module:apply-configuration
 
+      - name: Stop containers
+        run: |
+          make down
+          sleep 2
+
   unit_tests:
     needs: [ install_shop_with_module ]
     runs-on: ubuntu-latest
