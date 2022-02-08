@@ -50,6 +50,15 @@ final class Version20211216100154 extends AbstractMigration
             'countries' => []
         ],
 
+        'oscunzer_applepay' => [
+            'insert' => 1,
+            'de_desc' => "Apple Pay",
+            'en_desc' => "Apple Pay",
+            'de_longdesc' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+            'en_longdesc' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+            'countries' => []
+        ],
+
         //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
         'oscunzer_bancontact' => [
             'insert' => 1,
@@ -165,16 +174,6 @@ final class Version20211216100154 extends AbstractMigration
             million PayPal customers. Buyers then use it to pay in online shops in particular. But they also use the Google
             Pay app on their smartphone in brick-and-mortar retail. Since no bank details are transferred during the transaction,
             the payment is considered secure. ",
-            'countries' => []
-        ],
-
-        //PayPal is one of the world’s most popular online payment systems.
-        'applepay' => [
-            'insert' => 1,
-            'de_desc' => "Apple Pay",
-            'en_desc' => "Apple Pay",
-            'de_longdesc' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
-            'en_longdesc' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
             'countries' => []
         ],
 

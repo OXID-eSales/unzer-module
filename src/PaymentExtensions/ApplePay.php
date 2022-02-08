@@ -21,6 +21,8 @@ class ApplePay extends UnzerPayment
      */
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        throw new \Exception('Payment method not implemented yet');
+        return $this->unzerSDK->createPaymentType(
+            new \UnzerSDK\Resources\PaymentTypes\Applepay()
+        );
     }
 }
