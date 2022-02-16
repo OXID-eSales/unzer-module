@@ -40,8 +40,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         if ($this->_sModuleId == Module::MODULE_ID) {
             try {
-                $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
-                $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
+                $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+                $pubKey = $moduleSettings->getShopPublicKey();
+                $privKey = $moduleSettings->getShopPrivateKey();
 
                 if ($pubKey && $privKey) {
                     $this->_aViewData["shobWebhookButtons"] = true;
@@ -50,6 +51,14 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                     if ($aWebhooks = $unzer->fetchAllWebhooks()) {
                         $this->_aViewData["registeredwebhook"] = $aWebhooks[0]->getUrl();
                     }
+                }
+
+                if ($capabilities = $moduleSettings->getApplePayMerchantCapabilities()) {
+                    $this->_aViewData['applePayMC'] = $capabilities;
+                }
+
+                if ($networks = $moduleSettings->getApplePayNetworks()) {
+                    $this->_aViewData['applePayNetworks'] = $networks;
                 }
             } catch (\Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
@@ -111,4 +120,18 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             );
         }
     }
+
+    public function saveConfVars()
+    {
+        parent::saveConfVars();
+
+        $request = Registry::getRequest();
+        $request->getRequestEscapedParameter('applePayMC');
+        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+
+        $moduleSettings->saveApplePayMerchantCapabilities($request->getRequestEscapedParameter('applePayMC'));
+        $moduleSettings->saveApplePayNetworks($request->getRequestEscapedParameter('applePayNetworks'));
+    }
+
+
 }

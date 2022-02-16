@@ -8,13 +8,28 @@
 /**
  * Metadata version
  */
+
+use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
+use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
+use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain;
+use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
+use OxidSolutionCatalysts\Unzer\Controller\InstallmentController;
+use OxidSolutionCatalysts\Unzer\Controller\OrderController;
+use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
+use OxidSolutionCatalysts\Unzer\Core\Config;
+use OxidSolutionCatalysts\Unzer\Core\ShopControl;
+use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
+use OxidSolutionCatalysts\Unzer\Model\PaymentGateway;
+use OxidSolutionCatalysts\Unzer\Module;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+
 $sMetadataVersion = '2.1';
 
 /**
  * Module information.
  */
 $aModule = [
-    'id' => 'osc-unzer',
+    'id' => Module::MODULE_ID,
     'title' => [
         'de' => 'Unzer Payment-Modul für OXID',
         'en' => 'Unzer Payment Module for OXID',
@@ -23,27 +38,27 @@ $aModule = [
         'de' => '',
         'en' => '',
     ],
-    'thumbnail'    => 'logo.svg',
+    'thumbnail' => 'logo.svg',
     'version' => '1.0.0',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class           => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class                                    => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
-        \OxidEsales\Eshop\Core\Config::class                                        => \OxidSolutionCatalysts\Unzer\Core\Config::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class                          => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
-        \OxidEsales\Eshop\Application\Controller\OrderController::class             => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class                   => \OxidSolutionCatalysts\Unzer\Model\PaymentGateway::class,
-        \OxidEsales\Eshop\Application\Model\Order::class                            => \OxidSolutionCatalysts\Unzer\Model\Order::class,
-        \OxidEsales\Eshop\Core\ShopControl::class                                   => \OxidSolutionCatalysts\Unzer\Core\ShopControl::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class   => \OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class             => \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
+        \OxidEsales\Eshop\Core\Config::class => Config::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => \OxidSolutionCatalysts\Unzer\Model\Order::class,
+        \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
     ],
     'controllers' => [
-        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,
-        'unzer_dispatcher'  =>   \OxidSolutionCatalysts\Unzer\Controller\DispatcherController::class,
-        'unzer_installment' => \OxidSolutionCatalysts\Unzer\Controller\InstallmentController::class,
+        'unzer_admin_order' => AdminOrderController::class,
+        'unzer_dispatcher' => DispatcherController::class,
+        'unzer_installment' => InstallmentController::class,
     ],
     'templates' => [
         // admin
@@ -182,6 +197,24 @@ $aModule = [
             'value' => '4.5'
         ],
         [
+            'group' => 'applePay',
+            'name' => 'applepay_networks',
+            'type' => 'aarr',
+            'value' => ModuleSettings::APPLE_PAY_NETWORKS
+        ],
+        [
+            'group' => 'applePay',
+            'name' => 'applepay_merchant_capabilities',
+            'type' => 'aarr',
+            'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
+        ],
+        [
+            'group' => 'applePay',
+            'name' => 'applepay_label',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
             'group' => 'other',
             'name' => 'UnzerjQuery',
             'type' => 'bool',
@@ -189,7 +222,7 @@ $aModule = [
         ]
     ],
     'events' => [
-        'onActivate'    => '\OxidSolutionCatalysts\Unzer\Core\Events::onActivate',
-        'onDeactivate'  => '\OxidSolutionCatalysts\Unzer\Core\Events::onDeActivate',
+        'onActivate' => '\OxidSolutionCatalysts\Unzer\Core\Events::onActivate',
+        'onDeactivate' => '\OxidSolutionCatalysts\Unzer\Core\Events::onDeActivate',
     ],
 ];

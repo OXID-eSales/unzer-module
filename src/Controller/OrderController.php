@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Application\Model\RequiredAddressFields;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
@@ -107,11 +108,28 @@ class OrderController extends OrderController_parent
         }
     }
 
-    /**
-     * @return string
-     */
-    public function publicApiKey(): string
+    public function getApplePayLabel()
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
+        return $this->getServiceFromContainer(ModuleSettings::class)->getApplePayLabel();
+    }
+
+    public function getSupportedApplepayMerchantCapabilities()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayMerchantCapabilities();
+    }
+
+    public function getSupportedApplePayNetworks()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayNetworks();
+    }
+
+    public function getRequiredApplePayBillingFields()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getRequiredApplePayBillingFields();
+    }
+
+    public function getRequiredApplePayShippingFields()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getRequiredApplePayShippingFields();
     }
 }
