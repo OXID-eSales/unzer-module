@@ -5,15 +5,14 @@
 <script>
     [{/if}]
     [{capture assign="unzerApplePayJS"}]
-    [{strip}]
+[{*    [{strip}]*}]
     var $errorHolder = $('#error-holder');
 
-    var unzerInstance = new unzer('[{$oViewConf->getUnzerPubKey()}]');
+    var unzerInstance = new unzer('[{$unzerpub}]');
     var unzerApplePayInstance = unzerInstance.ApplePay();
 
     $('#orderConfirmAgbBottom').submit(function (e) {
         e.preventDefault();
-        console.log('start apple pay session');
         setupApplePaySession();
     });
 
@@ -39,19 +38,19 @@
     }
 
     function applePayAuthorizedCallback(event, session) {
-        // Get payment data from event. "event.payment" also contains contact information, if they were set via Apple Pay.
+        /* Get payment data from event. "event.payment" also contains contact information, if they were set via Apple Pay. */
         var paymentData = event.payment.token.paymentData;
         var $form = $('form[id="payment-form"]');
         var formObject = QueryStringToObject($form.serialize());
 
-        // Create an Unzer instance with your public key
+        /* Create an Unzer instance with your public key */
         unzerApplePayInstance.createResource(paymentData)
             .then(function (createdResource) {
                 formObject.typeId = createdResource.id;
-                // Hand over the type ID to your backend.
+                /* Hand over the type ID to your backend. */
                 $.post('./Controller.php', JSON.stringify(formObject), null, 'json')
                     .done(function (result) {
-                        // Handle the transaction respone from backend.
+                        /* Handle the transaction respone from backend. */
                         var status = result.transactionStatus;
                         if (status === 'success' || status === 'pending') {
                             session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
@@ -74,8 +73,11 @@
     }
 
     function merchantValidationCallback(session, event) {
-        $.post('./merchantvalidation.php', JSON.stringify({'merchantValidationUrl': event.validationURL}), null, 'json')
-            .done(function (validationResponse) {
+        $.post('[{$oViewConf->getSelfActionLink()}]', {
+            cl: '[{$oViewConf->getTopActiveClassName()}]',
+            fnc: 'validateApplepayMerchant',
+            merchantValidationUrl: event.validationURL
+        }).done(function (validationResponse) {
                 try {
                     session.completeMerchantValidation(validationResponse);
                 } catch (e) {
@@ -97,7 +99,6 @@
     [{assign var="total" value=$oxcmp_basket->getPrice()}]
     [{assign var="deliveryCost" value=$oxcmp_basket->getDeliveryCost()}]
 
-    // Get called when pay button is clicked. Prepare ApplePayPaymentRequest and call `startApplePaySession` with it.
     function setupApplePaySession() {
         var applePayPaymentRequest = {
             countryCode: '[{$oViewConf->getActLanguageAbbr()|upper}]',
@@ -169,12 +170,12 @@
         startApplePaySession(applePayPaymentRequest);
     }
 
-    // Updates the error holder with the given message.
+    /* Updates the error holder with the given message. */
     function handleError(message) {
         $errorHolder.html(message);
     }
 
-    // Translates query string to object
+    /* Translates query string to object */
     function QueryStringToObject(queryString) {
         var pairs = queryString.slice().split('&');
         var result = {};
@@ -186,12 +187,12 @@
         return JSON.parse(JSON.stringify(result));
     }
 
-    // abort current payment session.
+    /* abort current payment session. */
     function abortPaymentSession(session) {
         session.completePayment({status: window.ApplePaySession.STATUS_FAILURE});
         session.abort();
     }
-    [{/strip}]
+[{*    [{/strip}]*}]
     [{/capture}]
 
     [{if false}]

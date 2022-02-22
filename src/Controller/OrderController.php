@@ -16,6 +16,7 @@ use OxidEsales\EshopCommunity\Application\Model\RequiredAddressFields;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class OrderController extends OrderController_parent
@@ -34,7 +35,8 @@ class OrderController extends OrderController_parent
         }
 
         $ret = parent::execute();
-        if (str_starts_with($ret, 'thankyou')) {
+
+        if ($ret && str_starts_with($ret, 'thankyou')) {
             $this->saveUnzerTransaction();
         }
 
@@ -106,6 +108,13 @@ class OrderController extends OrderController_parent
         if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
             $oOrder->initWriteTransactionToDB();
         }
+    }
+
+    public function validateApplepayMerchant()
+    {
+        $merchantValidationUrl = Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl');
+
+        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
     }
 
     public function getApplePayLabel()
