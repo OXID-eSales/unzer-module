@@ -39,9 +39,13 @@ chmod 444 /var/www/oxideshop/source/config.inc.php
 chmod 444 /var/www/oxideshop/source/.htaccess
 chown -R www-data:www-data /var/www/oxideshop/
 
-echo "Setup done."
+sed -i "s+[{$oView->getShopFullEdition()}]+Enterprise Edition+" /var/www/oxideshop/source/Application/views/admin/tpl/header.tpl
+echo "EE Fake done."
+
 php /var/www/oxideshop/vendor/bin/oe-eshop-doctrine_migration migrations:migrate;
 /var/www/oxideshop/vendor/bin/oe-console oe:module:apply-configuration;
 /var/www/oxideshop/vendor/bin/oe-console oe:module:activate osc-unzer;
+
+echo "Setup done."
 
 exec "$@"
