@@ -121,6 +121,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
+    public function transferApplePayCert(): void
+    {
+
+    }
+
+    public function transferApplePayPrivateKey(): void
+    {
+        
+    }
+
     public function saveConfVars()
     {
         parent::saveConfVars();
@@ -132,6 +142,4 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $moduleSettings->saveApplePayMerchantCapabilities($request->getRequestEscapedParameter('applePayMC'));
         $moduleSettings->saveApplePayNetworks($request->getRequestEscapedParameter('applePayNetworks'));
     }
-
-
 }

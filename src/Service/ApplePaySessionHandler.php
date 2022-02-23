@@ -4,30 +4,47 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Adapter\ApplepayAdapter;
+use UnzerSDK\Exceptions\ApplepayMerchantValidationException;
 use UnzerSDK\Resources\ExternalResources\ApplepaySession;
 
-class ApplePayHandler
+class ApplePaySessionHandler
 {
-    const MERCHANT_IDENTIFIER = 'merchant.io.unzer.merchantconnectivity';
-    const IDENTIFIER = 'PHP-SDK Example';
+    private const IDENTIFIER = 'OXID Unzer';
 
     private ApplepaySession $session;
     private ApplepayAdapter $adapter;
     private ModuleSettings $moduleSettingsService;
 
+    /**
+     * @param ModuleSettings $moduleSettings
+     */
     public function __construct(ModuleSettings $moduleSettings)
     {
         $this->moduleSettingsService = $moduleSettings;
-        $this->init();
+        $this->initialize();
     }
 
     /**
      * @return void
      */
-    private function init(): void
+    private function initialize(): void
     {
-        $this->session = new ApplepaySession(self::MERCHANT_IDENTIFIER, self::IDENTIFIER, Registry::getConfig()->getSslShopUrl());
+        $this->session = new ApplepaySession($this->moduleSettingsService->getApplePayMerchantIdentifier(), self::IDENTIFIER, Registry::getConfig()->getSslShopUrl());
         $this->adapter = new ApplepayAdapter();
         $this->adapter->init($this->moduleSettingsService->getApplePayMerchantCert(), $this->moduleSettingsService->getApplePayMerchantCertKey());
+    }
+
+    /**
+     * @param string $validationUrl
+     * @return string|null
+     */
+    public function validateMerchant(string $validationUrl): ?string
+    {
+        try {
+            return $this->adapter->validateApplePayMerchant($validationUrl, $this->session);
+        } catch (ApplepayMerchantValidationException $e) {
+            Registry::getLogger()->error($e->getMessage());
+            return false;
+        }
     }
 }

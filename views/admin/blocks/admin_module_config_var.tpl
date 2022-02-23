@@ -41,41 +41,78 @@
             <div class="spacer"></div>
         </dl>
     [{/if}]
-[{elseif $oModule->getInfo('id') eq "osc-unzer" and $var_group eq "applePay" and $module_var != 'applepay_label'}]
-    <dl>
-        <dd>
-            [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]
-            [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
-        </dd>
-        [{if $module_var eq "applepay_merchant_capabilities"}]
+[{elseif $oModule->getInfo('id') eq "osc-unzer" and $var_group eq "applePay"}]
+    [{if $module_var eq "applepay_merchant_capabilities" or $module_var eq "applepay_networks"}]
+        <dl>
             <dd>
-                [{foreach from=$applePayMC item="setting" key="settingName"}]
-                    <label>
-                        <input type="hidden" name="applePayMC[[{$settingName}]]" value="0">
-                        <input type="checkbox" name="applePayMC[[{$settingName}]]"
-                               value="1"[{if $setting}] checked="checked"[{/if}]>
-                        [{oxmultilang ident="SHOP_MODULE_`$module_var`_`$settingName`"}]
-                    </label>
-                    <br>
-                [{/foreach}]
+                [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]
+                [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
             </dd>
+            [{if $module_var eq "applepay_merchant_capabilities"}]
+                <dd>
+                    [{foreach from=$applePayMC item="setting" key="settingName"}]
+                        <label>
+                            <input type="hidden" name="applePayMC[[{$settingName}]]" value="0">
+                            <input type="checkbox" name="applePayMC[[{$settingName}]]"
+                                   value="1"[{if $setting}] checked="checked"[{/if}]>
+                            [{oxmultilang ident="SHOP_MODULE_`$module_var`_`$settingName`"}]
+                        </label>
+                        <br>
+                    [{/foreach}]
+                </dd>
+                <div class="spacer"></div>
+            [{elseif $module_var eq "applepay_networks"}]
+                <dd>
+                    [{* TODO we need central point for activation *}]
+                    [{foreach from=$applePayNetworks item="setting" key="settingName"}]
+                        <label>
+                            <input type="hidden" name="applePayNetworks[[{$settingName}]]" value="0">
+                            <input type="checkbox" name="applePayNetworks[[{$settingName}]]"
+                                   value="1"[{if $setting}] checked="checked"[{/if}]>
+                            [{oxmultilang ident="SHOP_MODULE_`$module_var`_`$settingName`"}]
+                        </label>
+                        <br>
+                    [{/foreach}]
+                </dd>
+            [{/if}]
             <div class="spacer"></div>
-        [{elseif $module_var eq "applepay_networks"}]
+        </dl>
+    [{elseif $module_var eq "applepay_merchant_cert_key" or $module_var eq "applepay_merchant_cert"}]
+        <dl>
+            <dt>
+                <textarea class="txt"
+                          style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
+                          name="confstrs[[{$module_var}]]" [{$readonly}]>[{$confstrs.$module_var}]</textarea>
+                [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
+            </dt>
             <dd>
-                [{* TODO we need central point for activation *}]
-                [{foreach from=$applePayNetworks item="setting" key="settingName"}]
-                    <label>
-                        <input type="hidden" name="applePayNetworks[[{$settingName}]]" value="0">
-                        <input type="checkbox" name="applePayNetworks[[{$settingName}]]"
-                               value="1"[{if $setting}] checked="checked"[{/if}]>
-                        [{oxmultilang ident="SHOP_MODULE_`$module_var`_`$settingName`"}]
-                    </label>
-                    <br>
-                [{/foreach}]
+                [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]
             </dd>
-        [{/if}]
+        </dl>
         <div class="spacer"></div>
-    </dl>
+        [{if $module_var eq "applepay_merchant_cert_key"}]
+            <dl style="border-top: 0;">
+                <dt>
+                    <input type="submit" class="confinput" name="transferApplePayPrivateKey"
+                           value="[{oxmultilang ident="SHOP_MODULE_TRANSFER_APPLE_PAY_PRIVATE_KEY"}]"
+                           onClick="Javascript:document.module_configuration.fnc.value='transferApplePayPrivateKey'" [{$readonly}]>
+                </dt>
+                <div class="spacer"></div>
+            </dl>
+        [{/if}]
+        [{if $module_var eq "applepay_merchant_cert"}]
+            <dl style="border-top: 0;">
+                <dt>
+                    <input type="submit" class="confinput" name="transferApplePayCert"
+                           value="[{oxmultilang ident="SHOP_MODULE_TRANSFER_APPLE_PAY_CERT"}]"
+                           onClick="Javascript:document.module_configuration.fnc.value='transferApplePayCert'" [{$readonly}]>
+                </dt>
+                <div class="spacer"></div>
+            </dl>
+        [{/if}]
+    [{else}]
+        [{$smarty.block.parent}]
+    [{/if}]
 [{else}]
     [{$smarty.block.parent}]
 [{/if}]

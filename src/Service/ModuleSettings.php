@@ -176,6 +176,21 @@ class ModuleSettings
         return array_keys(array_filter($this->getApplePayNetworks(), 'self::isActiveSetting'));
     }
 
+    public function getApplePayMerchantIdentifier(): string
+    {
+        return $this->getSettingValue('applepay_merchant_identifier');
+    }
+
+    public function getApplePayMerchantCert(): string
+    {
+        return $this->getSettingValue('applepay_merchant_cert');
+    }
+
+    public function getApplePayMerchantCertKey(): string
+    {
+        return $this->getSettingValue('applepay_merchant_cert_key');
+    }
+
     /**
      * @param array $capabilities
      * @return void

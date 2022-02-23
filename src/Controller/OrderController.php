@@ -110,13 +110,6 @@ class OrderController extends OrderController_parent
         }
     }
 
-    public function validateApplepayMerchant()
-    {
-        $merchantValidationUrl = Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl');
-
-        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-    }
-
     public function getApplePayLabel()
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getApplePayLabel();

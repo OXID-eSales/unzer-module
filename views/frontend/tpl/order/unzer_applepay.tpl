@@ -74,8 +74,8 @@
 
     function merchantValidationCallback(session, event) {
         $.post('[{$oViewConf->getSelfActionLink()}]', {
-            cl: '[{$oViewConf->getTopActiveClassName()}]',
-            fnc: 'validateApplepayMerchant',
+            cl: 'unzer_applepay_callback',
+            fnc: 'validateMerchant',
             merchantValidationUrl: event.validationURL
         }).done(function (validationResponse) {
                 try {
@@ -105,7 +105,7 @@
             currencyCode: '[{$currency->name}]',
             total: {
                 label: '[{$oView->getApplePayLabel()}]',
-                amount: [{$total->getPrice()}]
+                amount: '[{$total->getPrice()|number_format:2}]'
             },
             merchantCapabilities: [
                 'supports3DS',
@@ -134,10 +134,11 @@
                 [{/foreach}]
                 [{if $oViewConf->getShowVouchers() && $oxcmp_basket->getVoucherDiscValue()}]
                 [{foreach from=$oxcmp_basket->getVouchers() item="oVoucher"}]
+                [{assign var="voucherDiscount" value=$oVoucher->dVoucherdiscount*-1}]
                 {
                     'label': '[{oxmultilang ident="COUPON"}] ([{oxmultilang ident="NUMBER"}] [{$oVoucher->sVoucherNr}])',
                     'type': 'final',
-                    'amount': '[{$oVoucher->dVoucherdiscount*-1}]'
+                    'amount': '[{$voucherDiscount|number_format:2}]'
                 },
                 [{/foreach}]
                 [{/if}]

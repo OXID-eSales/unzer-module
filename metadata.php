@@ -12,6 +12,7 @@
 use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain;
+use OxidSolutionCatalysts\Unzer\Controller\ApplePayCallbackController;
 use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
 use OxidSolutionCatalysts\Unzer\Controller\InstallmentController;
 use OxidSolutionCatalysts\Unzer\Controller\OrderController;
@@ -59,6 +60,7 @@ $aModule = [
         'unzer_admin_order' => AdminOrderController::class,
         'unzer_dispatcher' => DispatcherController::class,
         'unzer_installment' => InstallmentController::class,
+        'unzer_applepay_callback' => ApplePayCallbackController::class,
     ],
     'templates' => [
         // admin
@@ -196,6 +198,24 @@ $aModule = [
             'name' => 'UnzerOption_oscunzer_installment_rate',
             'type' => 'str',
             'value' => '4.5'
+        ],
+        [
+            'group' => 'applePay',
+            'name' => 'applepay_merchant_identifier',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'applePay',
+            'name' => 'applepay_merchant_cert',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'applePay',
+            'name' => 'applepay_merchant_cert_key',
+            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'applePay',
