@@ -38,8 +38,7 @@ rm -rf /var/www/oxideshop/source/Setup/
 chmod 444 /var/www/oxideshop/source/config.inc.php
 chmod 444 /var/www/oxideshop/source/.htaccess
 chown -R www-data:www-data /var/www/oxideshop/
-
-sed -i "s+[{$oView->getShopFullEdition()}]+Enterprise Edition+" /var/www/oxideshop/source/Application/views/admin/tpl/header.tpl
+sed -i "s/.*oView->getShopFullEdition.*/Enterprise Edition/" /var/www/oxideshop/source/Application/views/admin/tpl/header.tpl
 echo "EE Fake done."
 
 php /var/www/oxideshop/vendor/bin/oe-eshop-doctrine_migration migrations:migrate;
