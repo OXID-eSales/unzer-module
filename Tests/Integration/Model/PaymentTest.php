@@ -11,6 +11,7 @@ use OxidEsales\Eshop\Application\Model\Payment as ShopPaymentModel;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\TestingLibrary\UnitTestCase;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Module;
 
 class PaymentTest extends UnitTestCase
@@ -43,7 +44,7 @@ class PaymentTest extends UnitTestCase
         $bridge->save('production-UnzerPrivateKey', 's-priv-someExampleOfGoodKey', Module::MODULE_ID);
 
         $payment = oxNew(ShopPaymentModel::class);
-        $payment->load('oscunzer_sepa');
+        $payment->load(UnzerDefinitions::SEPA_UNZER_PAYMENT_ID);
 
         $this->assertTrue($payment->isUnzerPaymentTypeAllowed());
     }
