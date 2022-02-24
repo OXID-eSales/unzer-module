@@ -22,6 +22,10 @@ use OxidEsales\Facts\Facts;
  */
 final class Version20211216100154 extends AbstractMigration
 {
+    protected $activeCountries = null;
+    protected $shopIds = null;
+    protected $languageIds = null;
+
     /** @var array[]|string[] */
     private $defaultLanguageAbbr = [
         'de' => 'Deutsch',
@@ -373,12 +377,6 @@ final class Version20211216100154 extends AbstractMigration
         ],
     ];
 
-    /** @var array[] */
-    protected $isoCountries;
-
-    /** @var array[] */
-    protected $languageIds = [];
-
     /** @throws Exception */
     public function __construct($version)
     {
@@ -520,15 +518,15 @@ final class Version20211216100154 extends AbstractMigration
 
             // set Payment to Countries
             foreach ($paymentDefinitions['countries'] as $country) {
-                if (array_key_exists($country, $this->getIsoCountries())) {
+                if (array_key_exists($country, $this->getActiveCountries())) {
                     $this->addSql(
                         "INSERT IGNORE INTO `oxobject2payment`
                         (`OXID`, `OXPAYMENTID`, `OXOBJECTID`, `OXTYPE`)
                         VALUES(?, ?, ?, ?)",
                         [
-                            md5($paymentId . $this->getIsoCountries()[$country] . ".oxcountry"),
+                            md5($paymentId . $this->getActiveCountries()[$country] . ".oxcountry"),
                             $paymentId,
-                            $this->getIsoCountries()[$country],
+                            $this->getActiveCountries()[$country],
                             'oxcountry'
                         ]
                     );
@@ -550,34 +548,27 @@ final class Version20211216100154 extends AbstractMigration
         foreach ($this->staticContents as $content) {
             $langRows = '';
             $sqlPlaceHolder = '?, ?, ?';
-            $sqlValues = [md5($content['oxloadid'] . '1'), $content['oxloadid'], 1];
-            foreach ($this->getLanguageIds() as $langId => $langAbbr) {
-                if (isset($content['oxcontent_' . $langAbbr])) {
-                    $langRows .= ($langId == 0) ? ', `OXTITLE`, `OXCONTENT`, `OXACTIVE`' :
-                        sprintf(', `OXTITLE_%s`, `OXCONTENT_%s`, `OXACTIVE_%s`', $langId, $langId, $langId);
-                    $sqlPlaceHolder .= ', ?, ?, ?';
-                    $sqlValues[] = $content['oxtitle_' . $langAbbr];
-                    $sqlValues[] = $content['oxcontent_' . $langAbbr];
-                    $sqlValues[] = '1';
+            foreach ($this->getShopIds() as $shopId) {
+                $sqlValues = [md5($content['oxloadid'] . $shopId), $content['oxloadid'], $shopId];
+                foreach ($this->getLanguageIds() as $langId => $langAbbr) {
+                    if (isset($content['oxcontent_' . $langAbbr])) {
+                        $langRows .= ($langId == 0) ? ', `OXTITLE`, `OXCONTENT`, `OXACTIVE`' :
+                            sprintf(', `OXTITLE_%s`, `OXCONTENT_%s`, `OXACTIVE_%s`', $langId, $langId, $langId);
+                        $sqlPlaceHolder .= ', ?, ?, ?';
+                        $sqlValues[] = $content['oxtitle_' . $langAbbr];
+                        $sqlValues[] = $content['oxcontent_' . $langAbbr];
+                        $sqlValues[] = '1';
+                    }
                 }
+
+                $this->addSql(
+                    "INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
+                    " . $langRows . ")
+                    VALUES (" . $sqlPlaceHolder . ")",
+                    $sqlValues
+                );
             }
-
-            $this->addSql(
-                "INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
-                " . $langRows . ")
-                VALUES (" . $sqlPlaceHolder . ")",
-                $sqlValues
-            );
         }
-
-        $langRowsWithPrefix = str_replace(', ', ', c.', $langRows);
-
-        $this->addSql("INSERT IGNORE INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`
-                " . $langRows . ")
-        SELECT md5(CONCAT(OXLOADID, s.OXID)), OXLOADID, s.OXID " .
-            $langRowsWithPrefix .
-            " FROM oxcontents c, oxshops s
-        WHERE OXLOADID IN ('oscunzersepamandatetext', 'oscunzersepamandateconfirmation') AND c.OXSHOPID=1");
     }
 
     /**
@@ -647,19 +638,44 @@ final class Version20211216100154 extends AbstractMigration
     }
 
     /**
-     * get the ISO-Codes of active Countries
+     * get active Countries
      */
-    protected function getIsoCountries(): array
+    protected function getActiveCountries()
     {
-        if (!$this->isoCountries) {
-            $sSql = "SELECT OXID, OXISOALPHA2 FROM oxcountry";
-            $this->isoCountries = [];
-
-            foreach ($this->connection->fetchAllAssociative($sSql) as $row) {
-                $this->isoCountries [$row['OXISOALPHA2']] = $row['OXID'];
+        if (is_null($this->activeCountries)) {
+            $this->activeCountries = [];
+            if (
+                $results = $this->connection->executeQuery(
+                    'SELECT OXID, OXISOALPHA2 FROM `oxcountry` WHERE `OXACTIVE` = ?',
+                    [1]
+                )->fetchAllAssociative()
+            ) {
+                foreach ($results as $result) {
+                    $this->activeCountries[$row['OXISOALPHA2']] = $row['OXID'];
+                }
             }
         }
+        return $this->activeCountries;
+    }
 
-        return $this->isoCountries;
+    /**
+     * get shop IDs
+     */
+    protected function getShopIds()
+    {
+        if (is_null($this->shopIds)) {
+            $this->shopIds = [];
+            if (
+                $results = $this->connection->executeQuery(
+                    'SELECT OXID FROM `oxshops` WHERE `OXACTIVE` = ?',
+                    [1]
+                )->fetchAllAssociative()
+            ) {
+                foreach ($results as $result) {
+                    $this->shopIds[] = $result['OXID'];
+                }
+            }
+        }
+        return $this->shopIds;
     }
 }
