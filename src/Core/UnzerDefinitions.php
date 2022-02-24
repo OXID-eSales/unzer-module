@@ -474,15 +474,18 @@ final class UnzerDefinitions
         ],
     ];
 
-    public static function getUnzerDefinitions() {
+    public static function getUnzerDefinitions()
+    {
         return self::UNZER_DEFINTIONS;
     }
 
-    public static function getUnzerRdfaDefinitions() {
+    public static function getUnzerRdfaDefinitions()
+    {
         return self::UNZER_RDFA_DEFINITIONS;
     }
 
-    public static function getPayPalStaticContents() {
+    public static function getUnzerStaticContents()
+    {
         return self::PAYPAL_STATIC_CONTENTS;
     }
 }

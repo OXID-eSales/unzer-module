@@ -23,7 +23,7 @@ class Events
      * Execute action on activate event
      *
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public static function onActivate()
     {
@@ -40,7 +40,7 @@ class Events
      * Execute action on deactivate event
      *
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public static function onDeactivate()
     {
