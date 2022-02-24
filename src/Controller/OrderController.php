@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 
 class OrderController extends OrderController_parent
 {
@@ -86,8 +87,8 @@ class OrderController extends OrderController_parent
     public function isSepaConfirmed(): ?bool
     {
         if (
-            $this->getPayment()->getId() === 'oscunzer_sepa'
-            || $this->getPayment()->getId() === 'oscunzer_sepa-secured'
+            $this->getPayment()->getId() === UnzerDefinitions::SEPA_UNZER_PAYMENT_ID
+            || $this->getPayment()->getId() === UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID
         ) {
             $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {

@@ -7,33 +7,32 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
-use Exception;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
-use OxidEsales\Eshop\Core\DbMetaDataHandler;
-use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use OxidSolutionCatalysts\Unzer\Service\StaticContent;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 
 /**
  * Class defines what module does on Shop events.
  */
 class Events
 {
+    use ServiceContainer;
+
     /**
      * Execute action on activate event
      *
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public static function onActivate()
     {
         // execute module migrations
         self::executeModuleMigrations();
 
-        // clear tmp
-        self::clearTmp();
-
-        // update views
-        $oDbMeta = oxNew(DbMetaDataHandler::class);
-        $oDbMeta->updateViews();
+        //add static contents and payment methods
+        //NOTE: this assumes the module's servies.yaml is already in place at the time this method is called
+        self::addStaticContents();
     }
 
 
@@ -41,7 +40,7 @@ class Events
      * Execute action on deactivate event
      *
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public static function onDeactivate()
     {
@@ -59,26 +58,19 @@ class Events
     }
 
     /**
-     * clearTmp
-     *
-     * Clears the tmp folder
+     * Execute necessary module migrations on activate event
      *
      * @return void
      */
-    private static function clearTmp(): void
+    private static function addStaticContents(): void
     {
-        $oConf = Registry::getConfig();
-        $sTmpDir = realpath($oConf->getConfigParam('sCompileDir'));
+        /** @var StaticContent $service */
+        $service = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(StaticContent::class);
 
-        $aFiles = glob($sTmpDir . '/*{.php,.txt,.inc}', GLOB_BRACE);
-        $aFiles = array_merge($aFiles, glob($sTmpDir . '/smarty/*{.inc,.php}', GLOB_BRACE));
-
-        if (count($aFiles) > 0) {
-            foreach ($aFiles as $file) {
-                if (is_file($file)) {
-                    @unlink($file);
-                }
-            }
-        }
+        $service->ensureStaticContents();
+        $service->ensureUnzerPaymentMethods();
+        $service->createRdfa();
     }
 }
