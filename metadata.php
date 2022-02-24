@@ -16,12 +16,20 @@ $sMetadataVersion = '2.1';
 $aModule = [
     'id' => 'osc-unzer',
     'title' => [
-        'de' => 'Unzer Payment-Modul für OXID',
-        'en' => 'Unzer Payment Module for OXID',
+        'de' => 'Unzer Payment für OXID',
+        'en' => 'Unzer Payment for OXID',
     ],
     'description' => [
-        'de' => '',
-        'en' => '',
+        'de' => 'Vor dem Start bitte lesen und prüfen:
+            <ul>
+                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target_blank>Go-live checklist</a></li>
+                <li><a href="https://insights.unzer.com/" target_blank>Prüfen Sie Ihren Account und Ihre Zahlarten direkt bei Unzer</a></li>
+            </ul>',
+        'en' => 'Please read and check before you start:
+            <ul>
+                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target_blank>Go-live checklist</a></li>
+                <li><a href="https://insights.unzer.com/" target_blank>Check your account and your payments at unzer</a></li>
+            </ul>',
     ],
     'thumbnail'    => 'logo.svg',
     'version' => '1.0.0',
