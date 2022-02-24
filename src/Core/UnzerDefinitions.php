@@ -390,6 +390,7 @@ final class UnzerDefinitions
     ];
 
     private const PAYPAL_STATIC_CONTENTS = [
+        'oscunzersepamandatetext' =>
         [
             'oxloadid' => 'oscunzersepamandatetext',
             'oxactive' => 1,
@@ -416,6 +417,7 @@ final class UnzerDefinitions
                 to inform [{$oxcmp_shop->oxshops__oxname->value}] or any third party upon request about my name,
                 address and date of birth.</p>'
         ],
+        'oscunzersepamandateconfirmation' =>
         [
             'oxloadid' => 'oscunzersepamandateconfirmation',
             'oxactive' => 1,
@@ -434,6 +436,7 @@ final class UnzerDefinitions
                 class="fontunderline">Sepa-Mandate</a>.
                 [{/oxifcontent}]'
         ],
+        'oscunzerinstallmentconfirmation' =>
         [
             'oxloadid' => 'oscunzerinstallmentconfirmation',
             'oxactive' => 1,

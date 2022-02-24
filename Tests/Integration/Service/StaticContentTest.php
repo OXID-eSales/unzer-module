@@ -10,13 +10,16 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Service;
 
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Tests\Integration\BaseTestCase;
 use OxidSolutionCatalysts\Unzer\Service\StaticContent;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment as EshopModelPayment;
 use OxidEsales\Eshop\Application\Model\Content as EshopModelContent;
+use PHPUnit\Framework\TestCase;
 
-final class StaticContentTest extends BaseTestCase
+final class StaticContentTest extends TestCase
 {
+    use ServiceContainer;
+
     public function testCreateStaticContent()
     {
         $before = oxNew(EshopModelContent::class);
