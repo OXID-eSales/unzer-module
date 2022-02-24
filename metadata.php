@@ -121,22 +121,12 @@ $aModule = [
         ],
         [
             'group' => 'merchant',
-            'name' => 'sandbox-UnzerApiKey',
-            'type' => 'str'
-        ],
-        [
-            'group' => 'merchant',
             'name' => 'production-UnzerPublicKey',
             'type' => 'str'
         ],
         [
             'group' => 'merchant',
             'name' => 'production-UnzerPrivateKey',
-            'type' => 'str'
-        ],
-        [
-            'group' => 'merchant',
-            'name' => 'production-UnzerApiKey',
             'type' => 'str'
         ],
         [

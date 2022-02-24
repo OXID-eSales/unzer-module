@@ -23,7 +23,6 @@ class ViewConfigTest extends UnitTestCase
         $bridge->save('UnzerSystemMode', 1, Module::MODULE_ID);
         $bridge->save('production-UnzerPublicKey', 'publickey', Module::MODULE_ID);
         $bridge->save('production-UnzerPrivateKey', 'privatekey', Module::MODULE_ID);
-        $bridge->save('production-UnzerApiKey', 'apikey', Module::MODULE_ID);
 
         $viewConfig = $this->getViewConfig();
         $this->assertSame(ModuleSettings::SYSTEM_MODE_PRODUCTION, $viewConfig->getUnzerSystemMode());
