@@ -48,23 +48,38 @@
             .then(function (createdResource) {
                 formObject.typeId = createdResource.id;
                 /* Hand over the type ID to your backend. */
-                $.post('./Controller.php', JSON.stringify(formObject), null, 'json')
-                    .done(function (result) {
-                        /* Handle the transaction respone from backend. */
-                        var status = result.transactionStatus;
-                        if (status === 'success' || status === 'pending') {
-                            session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
-                            window.location.href = '<?php echo RETURN_CONTROLLER_URL; ?>';
-                        } else {
-                            window.location.href = '<?php echo FAILURE_URL; ?>';
-                            abortPaymentSession(session);
-                            session.abort();
-                        }
-                    })
-                    .fail(function (error) {
-                        handleError(error.statusText);
+                $.post('[{$oViewConf->getSelfActionLink()}]', {
+                    cl: 'unzer_applepay_callback',
+                    fnc: 'authorizeApplePay',
+                    merchantValidationUrl: event.validationURL
+                }).done(function (result) {
+                    /* Handle the transaction respone from backend. */
+                    var status = result.transactionStatus;
+
+/* Hier würde ich bei  (status === 'success' || status === 'pending')
+ nicht umleiten, sondern einfach unseren OXID-Submit-Button auslösen
+ Dann im PaymentGateway in der executePayment auf "ApplePay" prüfen,
+ wenn ja, dann dort nicht noch mal den Paymentvorgang auslösen,
+ den wir für UnzerPaymenter angedacht haben
+ (denn das haben wir ja dann schon in der unzer_applepay_callback->authorizeApplePay erledigt),
+  sondern den ganz normalen OXID-parent-Flow ...
+
+ nur im Fall dass das Payment fehlschlägt zurück auf den Payment-Controller
+ */
+
+                    if (status === 'success' || status === 'pending') {
+                        session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
+                        window.location.href = '<?php echo RETURN_CONTROLLER_URL; ?>';
+                    } else {
+                        window.location.href = '<?php echo FAILURE_URL; ?>';
                         abortPaymentSession(session);
-                    });
+                        session.abort();
+                    }
+                })
+                .fail(function (error) {
+                    handleError(error.statusText);
+                    abortPaymentSession(session);
+                });
             })
             .catch(function (error) {
                 handleError(error.message);
