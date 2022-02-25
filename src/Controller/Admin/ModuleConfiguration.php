@@ -128,9 +128,13 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     public function transferApplePayPrivateKey(): void
     {
-        
+
     }
 
+    /**
+     * @return void
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
+     */
     public function saveConfVars()
     {
         parent::saveConfVars();
@@ -141,5 +145,17 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $moduleSettings->saveApplePayMerchantCapabilities($request->getRequestEscapedParameter('applePayMC'));
         $moduleSettings->saveApplePayNetworks($request->getRequestEscapedParameter('applePayNetworks'));
+        $this->saveApplePayMerchantCertToFile();
+    }
+
+    /**
+     * @return void
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
+     */
+    protected function saveApplePayMerchantCertToFile(): void
+    {
+        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+        file_put_contents($moduleSettings->getApplePayMerchantCertFilePath(), $moduleSettings->getApplePayMerchantCert());
+        file_put_contents($moduleSettings->getApplePayMerchantCertKeyFilePath(), $moduleSettings->getApplePayMerchantCertKey());
     }
 }

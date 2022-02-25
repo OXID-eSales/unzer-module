@@ -102,6 +102,9 @@ class OrderController extends OrderController_parent
         return true;
     }
 
+    /**
+     * @return void
+     */
     public function saveUnzerTransaction(): void
     {
         $oOrder = oxNew(Order::class);
@@ -115,22 +118,22 @@ class OrderController extends OrderController_parent
         return $this->getServiceFromContainer(ModuleSettings::class)->getApplePayLabel();
     }
 
-    public function getSupportedApplepayMerchantCapabilities()
+    public function getSupportedApplepayMerchantCapabilities(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayMerchantCapabilities();
     }
 
-    public function getSupportedApplePayNetworks()
+    public function getSupportedApplePayNetworks(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayNetworks();
     }
 
-    public function getRequiredApplePayBillingFields()
+    public function getRequiredApplePayBillingFields(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getRequiredApplePayBillingFields();
     }
 
-    public function getRequiredApplePayShippingFields()
+    public function getRequiredApplePayShippingFields(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getRequiredApplePayShippingFields();
     }

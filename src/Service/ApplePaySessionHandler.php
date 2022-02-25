@@ -31,7 +31,7 @@ class ApplePaySessionHandler
     {
         $this->session = new ApplepaySession($this->moduleSettingsService->getApplePayMerchantIdentifier(), self::IDENTIFIER, Registry::getConfig()->getSslShopUrl());
         $this->adapter = new ApplepayAdapter();
-        $this->adapter->init($this->moduleSettingsService->getApplePayMerchantCert(), $this->moduleSettingsService->getApplePayMerchantCertKey());
+        $this->adapter->init($this->moduleSettingsService->getApplePayMerchantCertFilePath(), $this->moduleSettingsService->getApplePayMerchantCertKeyFilePath());
     }
 
     /**

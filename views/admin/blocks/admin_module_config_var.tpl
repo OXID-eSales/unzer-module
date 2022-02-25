@@ -90,26 +90,6 @@
             </dd>
         </dl>
         <div class="spacer"></div>
-        [{if $module_var eq "applepay_merchant_cert_key"}]
-            <dl style="border-top: 0;">
-                <dt>
-                    <input type="submit" class="confinput" name="transferApplePayPrivateKey"
-                           value="[{oxmultilang ident="SHOP_MODULE_TRANSFER_APPLE_PAY_PRIVATE_KEY"}]"
-                           onClick="Javascript:document.module_configuration.fnc.value='transferApplePayPrivateKey'" [{$readonly}]>
-                </dt>
-                <div class="spacer"></div>
-            </dl>
-        [{/if}]
-        [{if $module_var eq "applepay_merchant_cert"}]
-            <dl style="border-top: 0;">
-                <dt>
-                    <input type="submit" class="confinput" name="transferApplePayCert"
-                           value="[{oxmultilang ident="SHOP_MODULE_TRANSFER_APPLE_PAY_CERT"}]"
-                           onClick="Javascript:document.module_configuration.fnc.value='transferApplePayCert'" [{$readonly}]>
-                </dt>
-                <div class="spacer"></div>
-            </dl>
-        [{/if}]
     [{else}]
         [{$smarty.block.parent}]
     [{/if}]

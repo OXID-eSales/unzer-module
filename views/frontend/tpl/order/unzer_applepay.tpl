@@ -20,21 +20,17 @@
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
             var session = new ApplePaySession(6, applePayPaymentRequest);
             session.onvalidatemerchant = function (event) {
-                console.log('geht rin 1')
                 merchantValidationCallback(session, event);
             };
 
             session.onpaymentauthorized = function (event) {
-                console.log('geht rin 2')
                 applePayAuthorizedCallback(event, session);
             };
 
             session.oncancel = function (event) {
-                console.log('geht rin 3')
                 onCancelCallback(event);
             };
 
-            console.log('geht rin 4')
             session.begin();
         } else {
             handleError('This device does not support Apple Pay!');
@@ -60,16 +56,16 @@
                     /* Handle the transaction respone from backend. */
                     var status = result.transactionStatus;
 
-/* Hier würde ich bei  (status === 'success' || status === 'pending')
- nicht umleiten, sondern einfach unseren OXID-Submit-Button auslösen
- Dann im PaymentGateway in der executePayment auf "ApplePay" prüfen,
- wenn ja, dann dort nicht noch mal den Paymentvorgang auslösen,
- den wir für UnzerPaymenter angedacht haben
- (denn das haben wir ja dann schon in der unzer_applepay_callback->authorizeApplePay erledigt),
-  sondern den ganz normalen OXID-parent-Flow ...
+                    /* Hier würde ich bei  (status === 'success' || status === 'pending')
+                     nicht umleiten, sondern einfach unseren OXID-Submit-Button auslösen
+                     Dann im PaymentGateway in der executePayment auf "ApplePay" prüfen,
+                     wenn ja, dann dort nicht noch mal den Paymentvorgang auslösen,
+                     den wir für UnzerPaymenter angedacht haben
+                     (denn das haben wir ja dann schon in der unzer_applepay_callback->authorizeApplePay erledigt),
+                      sondern den ganz normalen OXID-parent-Flow ...
 
- nur im Fall dass das Payment fehlschlägt zurück auf den Payment-Controller
- */
+                     nur im Fall dass das Payment fehlschlägt zurück auf den Payment-Controller
+                     */
 
                     if (status === 'success' || status === 'pending') {
                         session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
@@ -79,8 +75,7 @@
                         abortPaymentSession(session);
                         session.abort();
                     }
-                })
-                .fail(function (error) {
+                }).fail(function (error) {
                     handleError(error.statusText);
                     abortPaymentSession(session);
                 });
@@ -96,18 +91,18 @@
             cl: 'unzer_applepay_callback',
             fnc: 'validateMerchant',
             merchantValidationUrl: event.validationURL
-        }).done(function (validationResponse) {
+        }).done(function (data) {
             try {
-                session.completeMerchantValidation(validationResponse);
+                var parsedResponse = JSON.parse(data.validationResponse);
+                session.completeMerchantValidation(parsedResponse);
             } catch (e) {
                 alert(e.message);
             }
 
-        })
-            .fail(function (error) {
-                handleError(JSON.stringify(error.statusText));
-                session.abort();
-            });
+        }).fail(function (error) {
+            handleError(JSON.stringify(error.statusText));
+            session.abort();
+        });
     }
 
     function onCancelCallback(event) {
@@ -124,7 +119,7 @@
             currencyCode: '[{$currency->name}]',
             total: {
                 label: '[{$oView->getApplePayLabel()}]',
-                amount: [{$total->getPrice()|number_format:2}]
+                amount: '[{$total->getPrice()|number_format:2}]'
             },
             merchantCapabilities: [
                 'supports3DS',
@@ -153,7 +148,7 @@
                 {
                     'label': '[{$oDiscount->sDiscount}]',
                     'type': 'final',
-                    'amount': [{$discount|number_format:2}]
+                    'amount': '[{$discount|number_format:2}]'
                 },
                 [{/foreach}]
                 [{if $oViewConf->getShowVouchers() && $oxcmp_basket->getVoucherDiscValue()}]
@@ -162,7 +157,7 @@
                 {
                     'label': '[{oxmultilang ident="COUPON"}] ([{oxmultilang ident="NUMBER"}] [{$oVoucher->sVoucherNr}])',
                     'type': 'final',
-                    'amount': [{$voucherDiscount|number_format:2}]
+                    'amount': '[{$voucherDiscount|number_format:2}]'
                 },
                 [{/foreach}]
                 [{/if}]
@@ -172,20 +167,20 @@
                 {
                     'label': '[{oxmultilang ident="SHIPPING_NET"}]',
                     'type': 'final',
-                    'amount': [{$deliveryCost->getNettoPrice()|number_format:2}]
+                    'amount': '[{$deliveryCost->getNettoPrice()|number_format:2}]'
                 },
                 [{if $dShippingVatValue}]
                 {
                     'label': '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" suffix="COLON"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$deliveryCost->getVat()}][{/if}]',
                     'type': 'final',
-                    'amount': [{$dShippingVatValue|number_format:2}]
+                    'amount': '[{$dShippingVatValue|number_format:2}]'
                 },
                 [{/if}]
                 [{else}]
                 {
                     'label': '[{oxmultilang ident="SHIPPING_COST"}]',
                     'type': 'final',
-                    'amount': [{$deliveryCost->getBruttoPrice()|number_format:2}]
+                    'amount': '[{$deliveryCost->getBruttoPrice()|number_format:2}]'
                 },
                 [{/if}]
                 [{/if}]
@@ -197,7 +192,7 @@
 
     /* Updates the error holder with the given message. */
     function handleError(message) {
-        $errorHolder.html(message);
+        console.error(message);
     }
 
     /* Translates query string to object */

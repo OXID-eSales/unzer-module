@@ -128,8 +128,11 @@ class Transaction
 
     /**
      * @param $params
+     * @param (int|mixed|string)[] $params
+     *
+     * @psalm-param array{oxorderid: mixed|string, oxshopid: int|mixed, oxuserid: mixed|string, oxactiondate: mixed|string} $params
      */
-    public function deleteInitOrder($params)
+    public function deleteInitOrder(array $params): void
     {
         $transaction = $this->getNewTransactionObject();
 
@@ -139,7 +142,7 @@ class Transaction
         }
     }
 
-    public function deleteOldInitOrders()
+    public function deleteOldInitOrders(): void
     {
         DatabaseProvider::getDb()->Execute(
             "DELETE from oscunzertransaction where OXACTION = 'init' AND OXACTIONDATE < NOW() - INTERVAL 1 DAY"

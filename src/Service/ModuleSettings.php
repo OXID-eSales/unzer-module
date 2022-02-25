@@ -8,13 +8,18 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Closure;
+use http\Exception\RuntimeException;
 use OxidEsales\Eshop\Application\Model\RequiredAddressFields;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Exception\FileException;
+use OxidEsales\EshopCommunity\Core\ViewConfig;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class ModuleSettings
 {
+
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
     public const SYSTEM_MODE_PRODUCTION = 'production';
     public const PAYMENT_CHARGE = 'charge';
@@ -139,6 +144,9 @@ class ModuleSettings
         return self::PAYMENT_CHARGE;
     }
 
+    /**
+     * @return mixed
+     */
     public function getApplePayLabel()
     {
         return $this->getSettingValue('applepay_label') ?: Registry::getConfig()->getActiveShop()->oxshops__oxcompany->value;
@@ -176,16 +184,25 @@ class ModuleSettings
         return array_keys(array_filter($this->getApplePayNetworks(), 'self::isActiveSetting'));
     }
 
+    /**
+     * @return string
+     */
     public function getApplePayMerchantIdentifier(): string
     {
         return $this->getSettingValue('applepay_merchant_identifier');
     }
 
+    /**
+     * @return string
+     */
     public function getApplePayMerchantCert(): string
     {
         return $this->getSettingValue('applepay_merchant_cert');
     }
 
+    /**
+     * @return string
+     */
     public function getApplePayMerchantCertKey(): string
     {
         return $this->getSettingValue('applepay_merchant_cert_key');
@@ -217,6 +234,39 @@ class ModuleSettings
     }
 
     /**
+     * @return string
+     * @throws FileException
+     */
+    public function getApplePayMerchantCertFilePath(): string
+    {
+        return $this->getFilesPath() . '/.merchant_cert';
+    }
+
+    /**
+     * @return string
+     * @throws FileException
+     */
+    public function getApplePayMerchantCertKeyFilePath(): string
+    {
+        return $this->getFilesPath() . '/.merchant_cert_key';
+    }
+
+    /**
+     * @return string
+     * @throws FileException
+     */
+    public function getFilesPath(): string
+    {
+        $path = Registry::get(ViewConfig::class)->getModulePath(Module::MODULE_ID) . '/' . 'files';
+
+        if (!file_exists($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
+            throw new RuntimeException();
+        }
+
+        return $path;
+    }
+
+    /**
      * @param array $networks
      * @return void
      */
@@ -225,7 +275,7 @@ class ModuleSettings
         $this->saveSetting('applepay_networks', $networks);
     }
 
-    private function saveSetting(string $name, $setting): void
+    private function saveSetting(string $name, array $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }

@@ -29,8 +29,6 @@ class ApplePayCallbackController extends FrontendController
         }
 
         $responseHandler->response()->setUnauthorized()->sendJson();
-// todo: Hier musst Du JSON für den JS-Callback zurückgeben. Kein void
-
     }
 
     public function authorizeApplePay(): void
@@ -40,6 +38,5 @@ class ApplePayCallbackController extends FrontendController
             $paymentService = $this->getServiceFromContainer(PaymentService::class);
             $paymentService->executeUnzerPayment($oPayment);
         }
-// todo: Hier musst Du JSON für den JS-Callback zurückgeben. Kein void. Also am Besten den aktuellen Paymentstatus (siehe/suche getPaymentStatus)
     }
 }
