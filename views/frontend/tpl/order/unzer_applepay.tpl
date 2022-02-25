@@ -5,7 +5,7 @@
 <script>
     [{/if}]
     [{capture assign="unzerApplePayJS"}]
-[{*    [{strip}]*}]
+    [{*    [{strip}]*}]
     var $errorHolder = $('#error-holder');
 
     var unzerInstance = new unzer('[{$unzerpub}]');
@@ -20,17 +20,21 @@
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
             var session = new ApplePaySession(6, applePayPaymentRequest);
             session.onvalidatemerchant = function (event) {
+                console.log('geht rin 1')
                 merchantValidationCallback(session, event);
             };
 
             session.onpaymentauthorized = function (event) {
+                console.log('geht rin 2')
                 applePayAuthorizedCallback(event, session);
             };
 
             session.oncancel = function (event) {
+                console.log('geht rin 3')
                 onCancelCallback(event);
             };
 
+            console.log('geht rin 4')
             session.begin();
         } else {
             handleError('This device does not support Apple Pay!');
@@ -78,13 +82,13 @@
             fnc: 'validateMerchant',
             merchantValidationUrl: event.validationURL
         }).done(function (validationResponse) {
-                try {
-                    session.completeMerchantValidation(validationResponse);
-                } catch (e) {
-                    alert(e.message);
-                }
+            try {
+                session.completeMerchantValidation(validationResponse);
+            } catch (e) {
+                alert(e.message);
+            }
 
-            })
+        })
             .fail(function (error) {
                 handleError(JSON.stringify(error.statusText));
                 session.abort();
@@ -105,7 +109,7 @@
             currencyCode: '[{$currency->name}]',
             total: {
                 label: '[{$oView->getApplePayLabel()}]',
-                amount: '[{$total->getPrice()|number_format:2}]'
+                amount: [{$total->getPrice()|number_format:2}]
             },
             merchantCapabilities: [
                 'supports3DS',
@@ -130,7 +134,12 @@
             ],
             lineItems: [
                 [{foreach from=$oxcmp_basket->getDiscounts() item="oDiscount"}]
-                {'label': '[{$oDiscount->sDiscount}]', 'type': 'final', 'amount': '[{$oDiscount->dDiscount*-1}]'},
+                [{assign var="discount" value=$oDiscount->dDiscount*-1}]
+                {
+                    'label': '[{$oDiscount->sDiscount}]',
+                    'type': 'final',
+                    'amount': [{$discount|number_format:2}]
+                },
                 [{/foreach}]
                 [{if $oViewConf->getShowVouchers() && $oxcmp_basket->getVoucherDiscValue()}]
                 [{foreach from=$oxcmp_basket->getVouchers() item="oVoucher"}]
@@ -138,7 +147,7 @@
                 {
                     'label': '[{oxmultilang ident="COUPON"}] ([{oxmultilang ident="NUMBER"}] [{$oVoucher->sVoucherNr}])',
                     'type': 'final',
-                    'amount': '[{$voucherDiscount|number_format:2}]'
+                    'amount': [{$voucherDiscount|number_format:2}]
                 },
                 [{/foreach}]
                 [{/if}]
@@ -148,20 +157,20 @@
                 {
                     'label': '[{oxmultilang ident="SHIPPING_NET"}]',
                     'type': 'final',
-                    'amount': '[{$deliveryCost->getNettoPrice()}]'
+                    'amount': [{$deliveryCost->getNettoPrice()|number_format:2}]
                 },
                 [{if $dShippingVatValue}]
                 {
                     'label': '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" suffix="COLON"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$deliveryCost->getVat()}][{/if}]',
                     'type': 'final',
-                    'amount': '[{$dShippingVatValue}]'
+                    'amount': [{$dShippingVatValue|number_format:2}]
                 },
                 [{/if}]
                 [{else}]
                 {
                     'label': '[{oxmultilang ident="SHIPPING_COST"}]',
                     'type': 'final',
-                    'amount': '[{$deliveryCost->getBruttoPrice()}]'
+                    'amount': [{$deliveryCost->getBruttoPrice()|number_format:2}]
                 },
                 [{/if}]
                 [{/if}]
@@ -193,7 +202,7 @@
         session.completePayment({status: window.ApplePaySession.STATUS_FAILURE});
         session.abort();
     }
-[{*    [{/strip}]*}]
+    [{*    [{/strip}]*}]
     [{/capture}]
 
     [{if false}]

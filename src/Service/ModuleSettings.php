@@ -21,6 +21,12 @@ class ModuleSettings
     public const PAYMENT_AUTHORIZE = 'authorize';
 
     public const APPLE_PAY_MERCHANT_CAPABILITIES = [
+        'supportsCredit' => '0',
+        'supportsDebit' => '0',
+        'supportsEMV' => '0'
+    ];
+
+    public const APPLE_PAY_NETWORKS = [
         'amex' => '0',
         'cartesBancaires' => '0',
         'chinaUnionPay' => '0',
@@ -36,12 +42,6 @@ class ModuleSettings
         'privateLabel' => '0',
         'visa' => '0',
         'vPay' => '0'
-    ];
-
-    public const APPLE_PAY_NETWORKS = [
-        'supportsCredit' => '0',
-        'supportsDebit' => '0',
-        'supportsEMV' => '0'
     ];
 
     /** @var ModuleSettingBridgeInterface */
