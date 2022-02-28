@@ -93,10 +93,9 @@
             merchantValidationUrl: event.validationURL
         }).done(function (data) {
             try {
-                var parsedResponse = JSON.parse(data.validationResponse);
-                session.completeMerchantValidation(parsedResponse);
+                session.completeMerchantValidation(data.validationResponse);
             } catch (e) {
-                alert(e.message);
+                handleError(e.message);
             }
 
         }).fail(function (error) {
@@ -115,7 +114,7 @@
 
     function setupApplePaySession() {
         var applePayPaymentRequest = {
-            countryCode: '[{$oViewConf->getActLanguageAbbr()|upper}]',
+            countryCode: '[{$oView->getUserCountryIso()}]',
             currencyCode: '[{$currency->name}]',
             total: {
                 label: '[{$oView->getApplePayLabel()}]',
@@ -132,32 +131,22 @@
                 '[{$network}]'[{if !$smarty.foreach.applePayNetworks.last}],[{/if}]
                 [{/foreach}]
             ],
-            requiredShippingContactFields: [
-                [{foreach from=$oView->getRequiredApplePayShippingFields() item="field" name="applePayRequiredShippingFields"}]
-                '[{$field}]'[{if !$smarty.foreach.applePayRequiredShippingFields.last}],[{/if}]
-                [{/foreach}]
-            ],
-            requiredBillingContactFields: [
-                [{foreach from=$oView->getRequiredApplePayBillingFields() item="field" name="applePayRequiredBillingFields"}]
-                '[{$field}]'[{if !$smarty.foreach.applePayRequiredBillingFields.last}],[{/if}]
-                [{/foreach}]
-            ],
             lineItems: [
                 [{foreach from=$oxcmp_basket->getDiscounts() item="oDiscount"}]
                 [{assign var="discount" value=$oDiscount->dDiscount*-1}]
                 {
-                    'label': '[{$oDiscount->sDiscount}]',
-                    'type': 'final',
-                    'amount': '[{$discount|number_format:2}]'
+                    label: '[{$oDiscount->sDiscount}]',
+                    type: 'final',
+                    amount: '[{$discount|number_format:2}]'
                 },
                 [{/foreach}]
                 [{if $oViewConf->getShowVouchers() && $oxcmp_basket->getVoucherDiscValue()}]
                 [{foreach from=$oxcmp_basket->getVouchers() item="oVoucher"}]
                 [{assign var="voucherDiscount" value=$oVoucher->dVoucherdiscount*-1}]
                 {
-                    'label': '[{oxmultilang ident="COUPON"}] ([{oxmultilang ident="NUMBER"}] [{$oVoucher->sVoucherNr}])',
-                    'type': 'final',
-                    'amount': '[{$voucherDiscount|number_format:2}]'
+                    label: '[{oxmultilang ident="COUPON"}] ([{oxmultilang ident="NUMBER"}] [{$oVoucher->sVoucherNr}])',
+                    type: 'final',
+                    amount: '[{$voucherDiscount|number_format:2}]'
                 },
                 [{/foreach}]
                 [{/if}]
@@ -165,22 +154,22 @@
                 [{if $oViewConf->isFunctionalityEnabled('blShowVATForDelivery') }]
                 [{assign var="dShippingVatValue" value=$deliveryCost->getVatValue()}]
                 {
-                    'label': '[{oxmultilang ident="SHIPPING_NET"}]',
-                    'type': 'final',
-                    'amount': '[{$deliveryCost->getNettoPrice()|number_format:2}]'
+                    label: '[{oxmultilang ident="SHIPPING_NET"}]',
+                    type: 'final',
+                    amount: '[{$deliveryCost->getNettoPrice()|number_format:2}]'
                 },
                 [{if $dShippingVatValue}]
                 {
-                    'label': '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" suffix="COLON"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$deliveryCost->getVat()}][{/if}]',
-                    'type': 'final',
-                    'amount': '[{$dShippingVatValue|number_format:2}]'
+                    label: '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" suffix="COLON"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$deliveryCost->getVat()}][{/if}]',
+                    type: 'final',
+                    amount: '[{$dShippingVatValue|number_format:2}]'
                 },
                 [{/if}]
                 [{else}]
                 {
-                    'label': '[{oxmultilang ident="SHIPPING_COST"}]',
-                    'type': 'final',
-                    'amount': '[{$deliveryCost->getBruttoPrice()|number_format:2}]'
+                    label: '[{oxmultilang ident="SHIPPING_COST"}]',
+                    type: 'final',
+                    amount: '[{$deliveryCost->getBruttoPrice()|number_format:2}]'
                 },
                 [{/if}]
                 [{/if}]
@@ -193,6 +182,10 @@
     /* Updates the error holder with the given message. */
     function handleError(message) {
         console.error(message);
+        $('.js-unzer-error-holder').html('[{oxmultilang ident="oscunzer_APPLEPAY_ERROR"}]').show(0, function() {
+            $(this).focus();
+            $('html, body').animate({ scrollTop: 0 }, "slow");
+        });
     }
 
     /* Translates query string to object */

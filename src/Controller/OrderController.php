@@ -7,16 +7,15 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Application\Model\RequiredAddressFields;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
-use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class OrderController extends OrderController_parent
@@ -136,5 +135,13 @@ class OrderController extends OrderController_parent
     public function getRequiredApplePayShippingFields(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getRequiredApplePayShippingFields();
+    }
+
+    public function getUserCountryIso(): string
+    {
+        $country = oxNew(Country::class);
+        $country->load(Registry::getSession()->getUser()->oxuser__oxcountryid->value);
+
+        return $country->oxcountry__oxisoalpha2->value;
     }
 }
