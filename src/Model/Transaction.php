@@ -118,8 +118,4 @@ class Transaction extends BaseModel
 
         return null;
     }
-
-    public function delteInitOrder()
-    {
-    }
 }

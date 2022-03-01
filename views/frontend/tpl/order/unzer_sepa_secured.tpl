@@ -1,10 +1,11 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
 
 <form id="payment-form-sepa-secured">
+    <br />
     <div id="sepa-secured-IBAN" class="field">
         <!-- The IBAN field UI Element will be inserted here -->
     </div>
-
+    <br />
     <div id="payment-sepa-confirm">
         <div class="sepaagreement" id="sepaagree_unzer">
             <input id="oscunzersepaagreement" type="checkbox" name="oscunzersepaagreement" value="0">

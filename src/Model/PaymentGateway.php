@@ -26,10 +26,7 @@ class PaymentGateway extends PaymentGateway_parent
         if ($oPayment->load($oOrder->getFieldData('oxpaymenttype'))) {
             if ($oPayment->isUnzerPayment()) {
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
-                try {
-                    return $paymentService->executeUnzerPayment($oPayment);
-                } catch (RedirectWithMessage | Redirect $e) {
-                }
+                $paymentService->executeUnzerPayment($oPayment);
             }
         }
 
