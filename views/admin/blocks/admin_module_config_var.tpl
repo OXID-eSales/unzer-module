@@ -1,5 +1,5 @@
 [{if $oModule->getInfo('id') eq "osc-unzer" and $var_group eq "unzermerchant" and $module_var eq "registeredWebhook"}]
-    [{if $shobWebhookButtons}]
+    [{if $showWebhookButtons}]
         [{if $registeredwebhook}]
             <dl>
                 <dt>

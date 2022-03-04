@@ -42,24 +42,36 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             try {
                 $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
                 $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
-                $registeredWebhook = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhook();
+                $registeredWebhookUrl = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhook();
                 $registeredWebhookId = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhookId();
+                $proposedWebhookUrl = $this->getProposedWebhookForActualShop();
 
                 if ($pubKey && $privKey) {
-                    $this->_aViewData["shobWebhookButtons"] = true;
                     /** @var Unzer $unzer */
                     $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-
-                    if ($webhooks = $unzer->fetchAllWebhooks()) {
+                    if (
+                        $registeredWebhookUrl !== $proposedWebhookUrl &&
+                        $webhooks = $unzer->fetchAllWebhooks()
+                    ) {
                         $webhookUrl = '';
+                        $webhookId = '';
                         foreach ($webhooks as $webhook) {
-                            if ($webhook->getId() == $registeredWebhookId) {
+                            if (
+                                $webhook->getId() == $registeredWebhookId ||
+                                $webhook->getUrl() == $proposedWebhookUrl
+                            ) {
                                 $webhookUrl = $webhook->getUrl();
+                                $webhookId = $webhook->getId();
                                 break;
                             }
                         }
-                        $this->_aViewData["registeredwebhook"] = $webhookUrl;
+                        if ($webhookUrl && $webhookId) {
+                            $this->saveWebhookOption($webhookUrl, $webhookId);
+                            $registeredWebhookUrl = $webhookUrl;
+                        }
                     }
+                    $this->_aViewData["registeredwebhook"] = $registeredWebhookUrl;
+                    $this->_aViewData["showWebhookButtons"] = true;
                 }
             } catch (\Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
@@ -109,8 +121,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         try {
             /** @var Unzer $unzer */
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $url = Registry::getConfig()->getSslShopUrl()
-                . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
+            $url = $this->getProposedWebhookForActualShop();
 
             $result = $unzer->createWebhook($url, "payment");
             $this->saveWebhookOption($url, $result->getId());
@@ -122,6 +133,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 )
             );
         }
+    }
+
+    protected function getProposedWebhookForActualShop(): string
+    {
+        return Registry::getConfig()->getSslShopUrl()
+            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
     }
 
     protected function saveWebhookOption($url, $id): void
