@@ -143,6 +143,11 @@ $aModule = [
             'type' => 'str',
         ],
         [
+            'group' => '',
+            'name' => 'registeredWebhookId',
+            'type' => 'str',
+        ],
+        [
             'group' => 'unzerenvironment',
             'name' => 'UnzerSystemMode',
             'type' => 'select',
