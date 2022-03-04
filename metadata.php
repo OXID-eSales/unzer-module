@@ -22,13 +22,13 @@ $aModule = [
     'description' => [
         'de' => 'Vor dem Start bitte lesen und prüfen:
             <ul>
-                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target_blank>Go-live checklist</a></li>
-                <li><a href="https://insights.unzer.com/" target_blank>Prüfen Sie Ihren Account und Ihre Zahlarten direkt bei Unzer</a></li>
+                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target="_blank">Go-live checklist</a></li>
+                <li><a href="https://insights.unzer.com/" target="_blank">Prüfen Sie Ihren Account und Ihre Zahlarten direkt bei Unzer</a></li>
             </ul>',
         'en' => 'Please read and check before you start:
             <ul>
-                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target_blank>Go-live checklist</a></li>
-                <li><a href="https://insights.unzer.com/" target_blank>Check your account and your payments at unzer</a></li>
+                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target="_blank">Go-live checklist</a></li>
+                <li><a href="https://insights.unzer.com/" target="_blank">Check your account and your payments at unzer</a></li>
             </ul>',
     ],
     'thumbnail'    => 'logo.svg',
@@ -118,65 +118,70 @@ $aModule = [
     ],
     'settings' => [
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPublicKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPrivateKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'production-UnzerPublicKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'production-UnzerPrivateKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'registeredWebhook',
             'type' => 'str',
         ],
         [
-            'group' => 'environment',
+            'group' => '',
+            'name' => 'registeredWebhookId',
+            'type' => 'str',
+        ],
+        [
+            'group' => 'unzerenvironment',
             'name' => 'UnzerSystemMode',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'environment',
+            'group' => 'unzerenvironment',
             'name' => 'UnzerDebug',
             'type' => 'bool',
             'value' => '0',
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzercard',
             'name' => 'UnzerOption_oscunzer_card',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzerpaypal',
             'name' => 'UnzerOption_oscunzer_paypal',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzerinstallment',
             'name' => 'UnzerOption_oscunzer_installment_rate',
             'type' => 'str',
             'value' => '4.5'
         ],
         [
-            'group' => 'other',
+            'group' => 'unzerother',
             'name' => 'UnzerjQuery',
             'type' => 'bool',
             'value' => '0',

@@ -152,17 +152,31 @@ class Unzer
             $basketModel->getBasketCurrency()->name
         );
 
+        // additional: Total Discounts
+        $basket->setAmountTotalDiscount($basketModel->getTotalDiscount()->getBruttoPrice());
+
+        // additional: Total Vat
+        $amountTotalVat = 0;
+        foreach ($basketModel->getProductVats(false) as $vatItem) {
+            $amountTotalVat += $vatItem;
+        }
+        $basket->setAmountTotalVat($amountTotalVat);
+
         $shopBasketContents = $basketModel->getContents();
 
         $unzerBasketItems = $basket->getBasketItems();
         /** @var \OxidEsales\Eshop\Application\Model\BasketItem $basketItem */
         foreach ($shopBasketContents as $basketItem) {
-            $unzerBasketItems[] = new BasketItem(
+            $unzerBasketItem = new BasketItem(
                 $basketItem->getTitle(),
                 $basketItem->getPrice()->getNettoPrice(),
                 $basketItem->getUnitPrice()->getNettoPrice(),
                 (int)$basketItem->getAmount()
             );
+            $unzerBasketItem->setAmountVat($basketItem->getPrice()->getVat());
+            $unzerBasketItem->setAmountGross($basketItem->getPrice()->getBruttoPrice());
+
+            $unzerBasketItems[] = $unzerBasketItem;
         }
 
         $basket->setBasketItems($unzerBasketItems);

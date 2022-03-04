@@ -81,6 +81,14 @@ class ModuleSettings
     }
 
     /**
+     * @return string
+     */
+    public function getRegisteredWebhookId(): string
+    {
+        return (string) $this->getSettingValue('registeredWebhookId');
+    }
+
+    /**
      * @return bool
      */
     public function useModuleJQueryInFrontend(): bool

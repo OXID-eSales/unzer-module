@@ -110,6 +110,13 @@ class ModuleSettingsTest extends TestCase
                 ],
                 'settingMethod' => 'getRegisteredWebhook',
                 'settingValue' => "Webhook"
+            ],
+            [
+                'values' => [
+                    ['registeredWebhookId', Module::MODULE_ID, 'WebhookId'],
+                ],
+                'settingMethod' => 'getRegisteredWebhookId',
+                'settingValue' => "WebhookId"
             ]
         ];
     }

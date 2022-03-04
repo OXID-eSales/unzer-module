@@ -1,4 +1,4 @@
-[{if $oModule->getInfo('id') eq "osc-unzer" and $var_group eq "merchant" and $module_var eq "registeredWebhook"}]
+[{if $oModule->getInfo('id') eq "osc-unzer" and $var_group eq "unzermerchant" and $module_var eq "registeredWebhook"}]
     [{if $shobWebhookButtons}]
         [{if $registeredwebhook}]
             <dl>

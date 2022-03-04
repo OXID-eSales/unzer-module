@@ -43,19 +43,22 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
                 $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
                 $registeredWebhook = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhook();
+                $registeredWebhookId = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhookId();
 
                 if ($pubKey && $privKey) {
                     $this->_aViewData["shobWebhookButtons"] = true;
                     /** @var Unzer $unzer */
                     $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-                    if ($aWebhooks = $unzer->fetchAllWebhooks()) {
-                        $url = $aWebhooks[0]->getUrl();
-                        $this->_aViewData["registeredwebhook"] = $url;
-                        // It is possible that a webhook is registered with Unzer
-                        // but not saved in the shop. If so, it will be saved again.
-                        if (!$registeredWebhook && $url) {
-                            $this->saveWebhookOption($url);
+
+                    if ($webhooks = $unzer->fetchAllWebhooks()) {
+                        $webhookUrl = '';
+                        foreach ($webhooks as $webhook) {
+                            if ($webhook->getId() == $registeredWebhookId) {
+                                $webhookUrl = $webhook->getUrl();
+                                break;
+                            }
                         }
+                        $this->_aViewData["registeredwebhook"] = $webhookUrl;
                     }
                 }
             } catch (\Throwable $loggerException) {
@@ -78,8 +81,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         /** @var Unzer $unzer */
         try {
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $unzer->deleteAllWebhooks();
-            $this->saveWebhookOption('');
+            $registeredWebhookId = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhookId();
+
+            if ($webhooks = $unzer->fetchAllWebhooks()) {
+                foreach ($webhooks as $webhook) {
+                    if ($webhook->getId() == $registeredWebhookId) {
+                        $unzer->deleteWebhook($webhook);
+                        $this->saveWebhookOption('', '');
+                    }
+                }
+            }
         } catch (\Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $this->translator->translateCode(
@@ -101,8 +112,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $url = Registry::getConfig()->getSslShopUrl()
                 . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
 
-            $unzer->createWebhook($url, "payment");
-            $this->saveWebhookOption($url);
+            $result = $unzer->createWebhook($url, "payment");
+            $this->saveWebhookOption($url, $result->getId());
         } catch (\Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $this->translator->translateCode(
@@ -113,11 +124,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    protected function saveWebhookOption($url): void
+    protected function saveWebhookOption($url, $id): void
     {
         $moduleSettingBridge = ContainerFactory::getInstance()
             ->getContainer()
             ->get(ModuleSettingBridgeInterface::class);
         $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
+        $moduleSettingBridge->save('registeredWebhookId', $id, Module::MODULE_ID);
     }
 }
