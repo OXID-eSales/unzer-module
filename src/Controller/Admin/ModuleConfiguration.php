@@ -50,7 +50,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                     /** @var Unzer $unzer */
                     $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
                     if (
-                        $registeredWebhookUrl !== $proposedWebhookUrl &&
                         $webhooks = $unzer->fetchAllWebhooks()
                     ) {
                         $webhookUrl = '';
@@ -68,6 +67,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                         if ($webhookUrl && $webhookId) {
                             $this->saveWebhookOption($webhookUrl, $webhookId);
                             $registeredWebhookUrl = $webhookUrl;
+                        }
+                        else {
+                            $this->saveWebhookOption('', '');
+                            $registeredWebhookUrl = '';
                         }
                     }
                     $this->_aViewData["registeredwebhook"] = $registeredWebhookUrl;
