@@ -27,8 +27,8 @@ $aModule = [
             </ul>',
         'en' => 'Please read and check before you start:
             <ul>
-                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target_blank>Go-live checklist</a></li>
-                <li><a href="https://insights.unzer.com/" target_blank>Check your account and your payments at unzer</a></li>
+                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target="_blank">Go-live checklist</a></li>
+                <li><a href="https://insights.unzer.com/" target="_blank">Check your account and your payments at unzer</a></li>
             </ul>',
     ],
     'thumbnail'    => 'logo.svg',
