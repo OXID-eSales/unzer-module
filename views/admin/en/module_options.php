@@ -9,10 +9,12 @@ $sLangName = "English";
 
 $aLang = [
     "charset" => "UTF-8",
-    'SHOP_MODULE_GROUP_merchant' => 'Access Data',
-    'SHOP_MODULE_GROUP_environment' => 'Operation mode',
-    'SHOP_MODULE_GROUP_paymentoptions' => 'Payment settings',
-    'SHOP_MODULE_GROUP_other' => 'Other',
+    'SHOP_MODULE_GROUP_unzermerchant' => 'Access Data',
+    'SHOP_MODULE_GROUP_unzerenvironment' => 'Operation mode',
+    'SHOP_MODULE_GROUP_unzercard' => 'additional options for credit cards',
+    'SHOP_MODULE_GROUP_unzerpaypal' => 'additional options for PayPal',
+    'SHOP_MODULE_GROUP_unzerinstallment' => 'additional options for Installment',
+    'SHOP_MODULE_GROUP_unnzerother' => 'Other',
     'SHOP_MODULE_sandbox-UnzerPublicKey' => 'Sandbox Public-Key',
     'SHOP_MODULE_sandbox-UnzerPrivateKey' => 'Sandbox Private-Key',
     'SHOP_MODULE_production-UnzerPublicKey' => 'Production Public-Key',

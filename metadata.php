@@ -118,65 +118,65 @@ $aModule = [
     ],
     'settings' => [
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPublicKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPrivateKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'production-UnzerPublicKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'production-UnzerPrivateKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'registeredWebhook',
             'type' => 'str',
         ],
         [
-            'group' => 'environment',
+            'group' => 'unzerenvironment',
             'name' => 'UnzerSystemMode',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'environment',
+            'group' => 'unzerenvironment',
             'name' => 'UnzerDebug',
             'type' => 'bool',
             'value' => '0',
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzercard',
             'name' => 'UnzerOption_oscunzer_card',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzerpaypal',
             'name' => 'UnzerOption_oscunzer_paypal',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzerinstallment',
             'name' => 'UnzerOption_oscunzer_installment_rate',
             'type' => 'str',
             'value' => '4.5'
         ],
         [
-            'group' => 'other',
+            'group' => 'unzerother',
             'name' => 'UnzerjQuery',
             'type' => 'bool',
             'value' => '0',
