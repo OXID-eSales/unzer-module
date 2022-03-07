@@ -218,22 +218,6 @@ class ModuleSettings
     }
 
     /**
-     * @return array
-     */
-    public function getRequiredApplePayBillingFields(): array
-    {
-        return $this->getRequiredApplePayAddressFields(oxNew(RequiredAddressFields::class)->getBillingFields());
-    }
-
-    /**
-     * @return array
-     */
-    public function getRequiredApplePayShippingFields(): array
-    {
-        return $this->getRequiredApplePayAddressFields(oxNew(RequiredAddressFields::class)->getDeliveryFields(), 'oxaddress');
-    }
-
-    /**
      * @return string
      * @throws FileException
      */
@@ -297,48 +281,5 @@ class ModuleSettings
     private static function isActiveSetting($active): bool
     {
         return $active === '1';
-    }
-
-
-    /**
-     * TODO probably belongs somewhere else
-     *
-     * @param array $dbFields
-     * @param string $type
-     * @return array
-     */
-    private function getRequiredApplePayAddressFields(array $dbFields, string $type = 'oxuser'): array
-    {
-        return array_filter(array_unique(array_map(self::mapApplePayTypes($type), $dbFields)), static function ($value) {
-            return $value !== false;
-        });
-    }
-
-    /**
-     *
-     * TODO probably belongs somewhere else
-     * @param string $type
-     * @return Closure
-     */
-    private static function mapApplePayTypes(string $type): Closure
-    {
-        return static function ($value) use ($type) {
-            switch ($value) {
-                case $type . '__oxusername':
-                    return 'email';
-                case $type . '__oxlname':
-                case $type . '__oxfname':
-                    return 'name';
-                case $type . '__oxstreet':
-                case $type . '__oxstreetnr':
-                case $type . '__oxzip':
-                case $type . '__oxcity':
-                    return 'postalAddress';
-                case $type . '__oxfon':
-                    return 'phone';
-            }
-
-            return false;
-        };
     }
 }

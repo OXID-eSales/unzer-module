@@ -13,12 +13,18 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Service\Payment;
+use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
+use OxidSolutionCatalysts\Unzer\Service\Unzer;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 /**
  * @mixin \OxidEsales\Eshop\Core\ShopControl
  */
 class ShopControl extends ShopControl_parent
 {
+    use ServiceContainer;
+
     /**
      * @param StandardException $exception
      */
@@ -51,6 +57,15 @@ class ShopControl extends ShopControl_parent
      */
     protected function handleRedirectException(Redirect $redirectException, bool $blAddRedirectParam = true): void
     {
+        $unzer = $this->getServiceFromContainer(Unzer::class);
+        if($unzer->isAjaxPayment()) {
+            $responseHandler = $this->getServiceFromContainer(ResponseHandler::class);
+            $payment = $this->getServiceFromContainer(Payment::class);
+            $responseHandler->response()->setData([
+                'redirectUrl' => $redirectException->getDestination(),
+                'transactionStatus' => $payment->getUnzerPaymentStatus()
+            ]);
+        }
         Registry::getUtils()->redirect($redirectException->getDestination(), $blAddRedirectParam);
     }
 

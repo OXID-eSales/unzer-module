@@ -21,6 +21,7 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
+use UnzerSDK\Resources\PaymentTypes\Applepay;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -211,7 +212,7 @@ class Unzer
      */
     public function getPaymentProcedure(string $paymentMethod): string
     {
-        if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured'])) {
+        if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured', 'applepay'])) {
             return $this->moduleSettings->getPaymentProcedureSetting($paymentMethod);
         }
 
@@ -297,6 +298,10 @@ class Unzer
                 $this->getBankDataFromCharge($charge)
             );
         }
+
+        if($paymentType instanceof Applepay) {
+            $this->session->setVariable('UzrAjaxRedirect', true);
+        }
     }
 
     /**
@@ -322,5 +327,10 @@ class Unzer
     public function generateUnzerOrderId(): string
     {
         return 'o' . str_replace(['0.', ' '], '', microtime(false));
+    }
+
+    public function isAjaxPayment()
+    {
+        return $this->session->getVariable('UzrAjaxRedirect');
     }
 }

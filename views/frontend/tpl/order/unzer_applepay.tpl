@@ -5,20 +5,27 @@
 <script>
     [{/if}]
     [{capture assign="unzerApplePayJS"}]
-    [{*    [{strip}]*}]
-    var $errorHolder = $('#error-holder');
+[{*        [{strip}]*}]
+    const $errorHolder = $('#error-holder');
 
-    var unzerInstance = new unzer('[{$unzerpub}]');
-    var unzerApplePayInstance = unzerInstance.ApplePay();
+    const unzerInstance = new unzer('[{$unzerpub}]');
+    const unzerApplePayInstance = unzerInstance.ApplePay();
+    const $form = $('#orderConfirmAgbBottom');
 
-    $('#orderConfirmAgbBottom').submit(function (e) {
+    $form.submit(function (e) {
         e.preventDefault();
+
+        const agbCheck = $('[name=ord_agb]');
+        if (agbCheck && !agbCheck.is(':checked')) {
+            handleError()
+            return;
+        }
         setupApplePaySession();
     });
 
     function startApplePaySession(applePayPaymentRequest) {
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
-            var session = new ApplePaySession(6, applePayPaymentRequest);
+            const session = new ApplePaySession(6, applePayPaymentRequest);
             session.onvalidatemerchant = function (event) {
                 merchantValidationCallback(session, event);
             };
@@ -27,9 +34,7 @@
                 applePayAuthorizedCallback(event, session);
             };
 
-            session.oncancel = function (event) {
-                onCancelCallback(event);
-            };
+            session.oncancel = onCancelCallback
 
             session.begin();
         } else {
@@ -38,42 +43,27 @@
     }
 
     function applePayAuthorizedCallback(event, session) {
-        /* Get payment data from event. "event.payment" also contains contact information, if they were set via Apple Pay. */
-        var paymentData = event.payment.token.paymentData;
-        var $form = $('form[id="payment-form"]');
-        var formObject = QueryStringToObject($form.serialize());
+        const paymentData = event.payment.token.paymentData;
 
-        /* Create an Unzer instance with your public key */
         unzerApplePayInstance.createResource(paymentData)
-            .then(function (createdResource) {
-                formObject.typeId = createdResource.id;
-                /* Hand over the type ID to your backend. */
-                $.post('[{$oViewConf->getSelfActionLink()}]', {
-                    cl: 'unzer_applepay_callback',
-                    fnc: 'authorizeApplePay',
-                    merchantValidationUrl: event.validationURL
-                }).done(function (result) {
-                    /* Handle the transaction respone from backend. */
-                    var status = result.transactionStatus;
+            .then(function (result) {
+                const hiddenInput = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentData')
+                    .val(JSON.stringify(result));
 
-                    /* Hier würde ich bei  (status === 'success' || status === 'pending')
-                     nicht umleiten, sondern einfach unseren OXID-Submit-Button auslösen
-                     Dann im PaymentGateway in der executePayment auf "ApplePay" prüfen,
-                     wenn ja, dann dort nicht noch mal den Paymentvorgang auslösen,
-                     den wir für UnzerPaymenter angedacht haben
-                     (denn das haben wir ja dann schon in der unzer_applepay_callback->authorizeApplePay erledigt),
-                      sondern den ganz normalen OXID-parent-Flow ...
+                $form.append(hiddenInput);
 
-                     nur im Fall dass das Payment fehlschlägt zurück auf den Payment-Controller
-                     */
+                $.post('[{$oViewConf->getSelfActionLink()}]', $form.serialize()).done(function (data) {
+                    const status = data.transactionStatus;
 
                     if (status === 'success' || status === 'pending') {
                         session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
-                        window.location.href = '<?php echo RETURN_CONTROLLER_URL; ?>';
+                        window.location.href = data.redirectUrl;
                     } else {
-                        window.location.href = '<?php echo FAILURE_URL; ?>';
                         abortPaymentSession(session);
                         session.abort();
+                        window.location.href = '[{$oViewConf->getSelfLink()}]cl=payment&payerror=2'
                     }
                 }).fail(function (error) {
                     handleError(error.statusText);
@@ -104,7 +94,7 @@
         });
     }
 
-    function onCancelCallback(event) {
+    function onCancelCallback() {
         handleError('Canceled by user');
     }
 
@@ -113,7 +103,7 @@
     [{assign var="deliveryCost" value=$oxcmp_basket->getDeliveryCost()}]
 
     function setupApplePaySession() {
-        var applePayPaymentRequest = {
+        const applePayPaymentRequest = {
             countryCode: '[{$oView->getUserCountryIso()}]',
             currencyCode: '[{$currency->name}]',
             total: {
@@ -131,6 +121,8 @@
                 '[{$network}]'[{if !$smarty.foreach.applePayNetworks.last}],[{/if}]
                 [{/foreach}]
             ],
+            requiredShippingContactFields: [],
+            requiredBillingContactFields: [],
             lineItems: [
                 [{foreach from=$oxcmp_basket->getDiscounts() item="oDiscount"}]
                 [{assign var="discount" value=$oDiscount->dDiscount*-1}]
@@ -179,33 +171,22 @@
         startApplePaySession(applePayPaymentRequest);
     }
 
-    /* Updates the error holder with the given message. */
     function handleError(message) {
-        console.error(message);
-        $('.js-unzer-error-holder').html('[{oxmultilang ident="oscunzer_APPLEPAY_ERROR"}]').show(0, function() {
+        if (message) {
+            console.error(message);
+        }
+
+        $('.js-unzer-error-holder').html('[{oxmultilang ident="oscunzer_APPLEPAY_ERROR"}]').show(0, function () {
             $(this).focus();
-            $('html, body').animate({ scrollTop: 0 }, "slow");
+            $('html, body').animate({scrollTop: 0}, "slow");
         });
     }
 
-    /* Translates query string to object */
-    function QueryStringToObject(queryString) {
-        var pairs = queryString.slice().split('&');
-        var result = {};
-
-        pairs.forEach(function (pair) {
-            pair = pair.split('=');
-            result[pair[0]] = decodeURIComponent(pair[1] || '');
-        });
-        return JSON.parse(JSON.stringify(result));
-    }
-
-    /* abort current payment session. */
     function abortPaymentSession(session) {
         session.completePayment({status: window.ApplePaySession.STATUS_FAILURE});
         session.abort();
     }
-    [{*    [{/strip}]*}]
+[{*        [{/strip}]*}]
     [{/capture}]
 
     [{if false}]

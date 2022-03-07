@@ -21,8 +21,8 @@ class ApplePay extends UnzerPayment
      */
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        return $this->unzerSDK->createPaymentType(
-            new \UnzerSDK\Resources\PaymentTypes\Applepay()
+        return $this->unzerSDK->fetchPaymentType(
+            $this->unzerService->getUnzerPaymentIdFromRequest()
         );
     }
 }

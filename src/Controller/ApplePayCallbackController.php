@@ -20,7 +20,7 @@ class ApplePayCallbackController extends FrontendController
      */
     public function validateMerchant(): void
     {
-        $merchantValidationUrl = Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl');
+        $merchantValidationUrl = urldecode(Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl'));
 
         $responseHandler = $this->getServiceFromContainer(ResponseHandler::class);
 
@@ -31,12 +31,22 @@ class ApplePayCallbackController extends FrontendController
         $responseHandler->response()->setUnauthorized()->sendJson();
     }
 
+    /**
+     * @throws Redirect
+     * @throws RedirectWithMessage
+     * @throws \JsonException
+     */
     public function authorizeApplePay(): void
     {
         $oPayment = oxNew(PaymentModel::class);
+
+        $responseHandler = $this->getServiceFromContainer(ResponseHandler::class);
         if ($oPayment->load('oscunzer_applepay')) {
             $paymentService = $this->getServiceFromContainer(PaymentService::class);
-            $paymentService->executeUnzerPayment($oPayment);
+            $transactionStatus = $paymentService->executeUnzerPayment($oPayment);
+            $responseHandler->response()->setData(['transactionStatus' => $transactionStatus])->sendJson();
         }
+
+        $responseHandler->response()->setUnauthorized()->sendJson();
     }
 }

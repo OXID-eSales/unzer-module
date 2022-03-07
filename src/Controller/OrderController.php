@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
@@ -37,6 +38,19 @@ class OrderController extends OrderController_parent
 
         if ($ret && str_starts_with($ret, 'thankyou')) {
             $this->saveUnzerTransaction();
+        }
+
+        $unzer = $this->getServiceFromContainer(Unzer::class);
+        if($unzer->isAjaxPayment()) {
+            $response = $this->getServiceFromContainer(ResponseHandler::class)->response();
+            if($ret && !str_contains($ret, 'thankyou')) {
+                $response->setUnauthorized()->sendJson();
+            }
+
+            $response->setData([
+                'transactionStatus' => 'success',
+                'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
+            ])->sendJson();
         }
 
         return $ret;
@@ -125,16 +139,6 @@ class OrderController extends OrderController_parent
     public function getSupportedApplePayNetworks(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayNetworks();
-    }
-
-    public function getRequiredApplePayBillingFields(): array
-    {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getRequiredApplePayBillingFields();
-    }
-
-    public function getRequiredApplePayShippingFields(): array
-    {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getRequiredApplePayShippingFields();
     }
 
     public function getUserCountryIso(): string

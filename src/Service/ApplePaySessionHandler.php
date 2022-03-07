@@ -4,7 +4,6 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Adapter\ApplepayAdapter;
-use UnzerSDK\Exceptions\ApplepayMerchantValidationException;
 use UnzerSDK\Resources\ExternalResources\ApplepaySession;
 
 class ApplePaySessionHandler
@@ -27,7 +26,8 @@ class ApplePaySessionHandler
      */
     private function initialize(): void
     {
-        $this->session = new ApplepaySession($this->moduleSettingsService->getApplePayMerchantIdentifier(), $this->moduleSettingsService->getApplePayLabel(), Registry::getConfig()->getSslShopUrl());
+        $domainName = rtrim(str_replace(['http://', 'https://'], '', Registry::getConfig()->getSslShopUrl()), '/');
+        $this->session = new ApplepaySession($this->moduleSettingsService->getApplePayMerchantIdentifier(), $this->moduleSettingsService->getApplePayLabel(), $domainName);
         $this->adapter = new ApplepayAdapter();
         $this->adapter->init($this->moduleSettingsService->getApplePayMerchantCertFilePath(), $this->moduleSettingsService->getApplePayMerchantCertKeyFilePath());
     }
