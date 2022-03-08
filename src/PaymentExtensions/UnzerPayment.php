@@ -31,17 +31,25 @@ abstract class UnzerPayment
     /** @var bool */
     protected $needPending = false;
 
+    /** @var bool */
+    protected $ajaxResponse = false;
+
     /** @var array */
     protected $allowedCurrencies = [];
 
     public function __construct(
-        Unzer $unzerSDK,
+        Unzer        $unzerSDK,
         UnzerService $unzerService
-    ) {
+    )
+    {
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
         $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
+
+        if ($this->ajaxResponse) {
+            $this->unzerService->setIsAjaxPayment();
+        }
     }
 
     /**
@@ -71,9 +79,10 @@ abstract class UnzerPayment
      * @return bool
      */
     public function execute(
-        User $userModel,
+        User   $userModel,
         Basket $basketModel
-    ): bool {
+    ): bool
+    {
         $paymentType = $this->getUnzerPaymentTypeObject();
 
         $customer = $this->unzerService->getUnzerCustomer($userModel);

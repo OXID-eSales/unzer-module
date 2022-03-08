@@ -31,4 +31,5 @@ $aLang = [
     'OSCUNZER_INSTALLMENT_PDF' => 'I agree to the <b><a href="%s" target="_blank">contract (PDF)</a></b>!',
     'OSCUNZER_INSTALLMENT_SUBMIT' => 'confirm contract',
     'OSCUNZER_INSTALLMENT_CAMCEL' => 'cancel contract',
+    'OSCUNZER_BUY_WITH' => 'Buy with',
 ];

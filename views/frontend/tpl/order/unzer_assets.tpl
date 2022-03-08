@@ -12,4 +12,8 @@
 [{/block}]
 [{block name="unzer_css"}]
     [{oxstyle include="https://static.unzer.com/v1/unzer.css"}]
+    [{assign var="payment" value=$oView->getPayment()}]
+    [{if $payment->getId() === 'oscunzer_applepay'}]
+        [{oxstyle include=$oViewConf->getModuleUrl('osc-unzer','out/src/css/applepay_button.css')}]
+    [{/if}]
 [{/block}]

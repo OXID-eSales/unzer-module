@@ -11,23 +11,22 @@ use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 use OxidEsales\Facts\Facts;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Metadata;
-use UnzerSDK\Resources\PaymentTypes\Applepay;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 
 class Unzer
 {
@@ -54,12 +53,13 @@ class Unzer
      * @param Request $request
      */
     public function __construct(
-        Session $session,
-        Translator $translator,
-        Context $context,
+        Session        $session,
+        Translator     $translator,
+        Context        $context,
         ModuleSettings $moduleSettings,
-        Request $request
-    ) {
+        Request        $request
+    )
+    {
         $this->session = $session;
         $this->translator = $translator;
         $this->context = $context;
@@ -298,10 +298,6 @@ class Unzer
                 $this->getBankDataFromCharge($charge)
             );
         }
-
-        if($paymentType instanceof Applepay) {
-            $this->session->setVariable('UzrAjaxRedirect', true);
-        }
     }
 
     /**
@@ -329,8 +325,19 @@ class Unzer
         return 'o' . str_replace(['0.', ' '], '', microtime(false));
     }
 
-    public function isAjaxPayment()
+    /**
+     * @return void
+     */
+    public function setIsAjaxPayment(): void
     {
-        return $this->session->getVariable('UzrAjaxRedirect');
+        $this->session->setVariable('UzrAjaxRedirect', true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAjaxPayment(): bool
+    {
+        return (bool)$this->session->getVariable('UzrAjaxRedirect');
     }
 }

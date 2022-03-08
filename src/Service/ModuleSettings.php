@@ -7,15 +7,12 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Closure;
 use http\Exception\RuntimeException;
-use OxidEsales\Eshop\Application\Model\RequiredAddressFields;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Core\ViewConfig;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;
-use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class ModuleSettings
 {
@@ -194,18 +191,30 @@ class ModuleSettings
 
     /**
      * @return string
+     * @throws FileException
      */
     public function getApplePayMerchantCert(): string
     {
-        return $this->getSettingValue('applepay_merchant_cert');
+        $path = $this->getApplePayMerchantCertFilePath();
+        if (file_exists($path)) {
+            return file_get_contents($path);
+        }
+
+        return '';
     }
 
     /**
      * @return string
+     * @throws FileException
      */
     public function getApplePayMerchantCertKey(): string
     {
-        return $this->getSettingValue('applepay_merchant_cert_key');
+        $path = $this->getApplePayMerchantCertKeyFilePath();
+        if (file_exists($path)) {
+            return file_get_contents($path);
+        }
+
+        return '';
     }
 
     /**
@@ -223,7 +232,7 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertFilePath(): string
     {
-        return $this->getFilesPath() . '/.merchant_cert';
+        return $this->getFilesPath() . '/.merchant_cert.' . Registry::getConfig()->getShopId();
     }
 
     /**
@@ -232,7 +241,7 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertKeyFilePath(): string
     {
-        return $this->getFilesPath() . '/.merchant_cert_key';
+        return $this->getFilesPath() . '/.merchant_cert_key.' . Registry::getConfig()->getShopId();
     }
 
     /**

@@ -41,14 +41,13 @@ class OrderController extends OrderController_parent
         }
 
         $unzer = $this->getServiceFromContainer(Unzer::class);
-        if($unzer->isAjaxPayment()) {
+        if ($unzer->isAjaxPayment()) {
             $response = $this->getServiceFromContainer(ResponseHandler::class)->response();
-            if($ret && !str_contains($ret, 'thankyou')) {
+            if ($ret && !str_contains($ret, 'thankyou')) {
                 $response->setUnauthorized()->sendJson();
             }
 
             $response->setData([
-                'transactionStatus' => 'success',
                 'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
             ])->sendJson();
         }

@@ -81,6 +81,7 @@ $aModule = [
         'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
         'modules/osc/unzer/message/js-errors.tpl' => 'osc/unzer/views/frontend/tpl/message/js-errors.tpl',
         'modules/osc/unzer/payment/applepay_availibility_check.tpl' => 'osc/unzer/views/frontend/tpl/payment/applepay_availibility_check.tpl',
+        'modules/osc/unzer/order/applepay_button.tpl' => 'osc/unzer/views/frontend/tpl/order/applepay_button.tpl',
     ],
     'blocks' => [
         //frontend
@@ -100,6 +101,11 @@ $aModule = [
             'template' => 'page/checkout/order.tpl',
             'block' => 'checkout_order_errors',
             'file' => 'views/frontend/blocks/page/checkout/checkout_order_errors.tpl'
+        ],
+        [
+            'template' => 'page/checkout/order.tpl',
+            'block' => 'checkout_order_btn_submit_bottom',
+            'file' => 'views/frontend/blocks/page/checkout/checkout_order_btn_submit_bottom.tpl'
         ],
         [
             'template' => 'page/checkout/payment.tpl',
@@ -202,6 +208,12 @@ $aModule = [
         ],
         [
             'group' => 'applePay',
+            'name' => 'applepay_payment_certs_processed',
+            'type' => 'bool',
+            'value' => '0'
+        ],
+        [
+            'group' => 'applePay',
             'name' => 'applepay_merchant_identifier',
             'type' => 'str',
             'value' => ''
@@ -220,6 +232,12 @@ $aModule = [
         ],
         [
             'group' => 'applePay',
+            'name' => 'applepay_label',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'applePay',
             'name' => 'applepay_networks',
             'type' => 'aarr',
             'value' => ModuleSettings::APPLE_PAY_NETWORKS
@@ -229,12 +247,6 @@ $aModule = [
             'name' => 'applepay_merchant_capabilities',
             'type' => 'aarr',
             'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
-        ],
-        [
-            'group' => 'applePay',
-            'name' => 'applepay_label',
-            'type' => 'str',
-            'value' => ''
         ],
         [
             'group' => 'other',

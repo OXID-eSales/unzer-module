@@ -15,6 +15,8 @@ class ApplePay extends UnzerPayment
 
     protected $needPending = true;
 
+    protected $ajaxResponse = true;
+
     /**
      * @return BasePaymentType
      * @throws \Exception

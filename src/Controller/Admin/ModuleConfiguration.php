@@ -2,14 +2,20 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
+use GuzzleHttp\Exception\GuzzleException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;
+use OxidSolutionCatalysts\Unzer\Service\ApiClient;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use Throwable;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Unzer;
 
 /**
@@ -60,7 +66,15 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($networks = $moduleSettings->getApplePayNetworks()) {
                     $this->_aViewData['applePayNetworks'] = $networks;
                 }
-            } catch (\Throwable $loggerException) {
+
+                if ($cert = $moduleSettings->getApplePayMerchantCert()) {
+                    $this->_aViewData['applePayMerchantCert'] = $cert;
+                }
+
+                if ($key = $moduleSettings->getApplePayMerchantCertKey()) {
+                    $this->_aViewData['applePayMerchantCertKey'] = $key;
+                }
+            } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
                     $this->translator->translateCode(
                         (string)$loggerException->getCode(),
@@ -73,7 +87,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws UnzerApiException
      */
     public function deleteWebhook(): void
     {
@@ -85,7 +99,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 ->getContainer()
                 ->get(ModuleSettingBridgeInterface::class);
             $moduleSettingBridge->save('registeredWebhook', '', Module::MODULE_ID);
-        } catch (\Throwable $loggerException) {
+        } catch (Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $this->translator->translateCode(
                     (string)$loggerException->getCode(),
@@ -96,7 +110,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws UnzerApiException
      */
     public function registerWebhook(): void
     {
@@ -111,7 +125,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 ->getContainer()
                 ->get(ModuleSettingBridgeInterface::class);
             $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
-        } catch (\Throwable $loggerException) {
+        } catch (Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $this->translator->translateCode(
                     (string)$loggerException->getCode(),
@@ -121,19 +135,53 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    public function transferApplePayCert(): void
+    /**
+     * @throws GuzzleException
+     * @throws \JsonException
+     */
+    public function transferApplePayPaymentProcessingData(): void
     {
+        $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
+        $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
 
+        if(!$key || !$cert) {
+            Registry::getUtilsView()->addErrorToDisplay(oxNew(UnzerException::class, Registry::getLang()->translateString('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT')));
+            return;
+        }
+
+        $apiClient = $this->getServiceFromContainer(ApiClient::class);
+        $response = $apiClient->uploadApplePayPaymentKey($key);
+        if($response->getStatusCode() !== 200) {
+            Registry::getUtilsView()->addErrorToDisplay(oxNew(UnzerException::class, Registry::getLang()->translateString('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY')));
+            return;
+        }
+
+        $response = $apiClient->uploadApplePayPaymentCertificate($cert);
+        if($response->getStatusCode() !== 200) {
+            Registry::getUtilsView()->addErrorToDisplay(oxNew(UnzerException::class, Registry::getLang()->translateString('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT')));
+            return;
+        }
     }
 
-    public function transferApplePayPrivateKey(): void
+    /**
+     * @throws GuzzleException
+     */
+    public function getApplePayPaymentProcessingKeyExists(): bool
     {
+        return $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentCert()->getStatusCode() === 200;
+    }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function getApplePayPaymentProcessingCertExists(): bool
+    {
+        return $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentKey()->getStatusCode() === 200;
     }
 
     /**
      * @return void
-     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
+     * @throws FileException
      */
     public function saveConfVars()
     {
@@ -145,17 +193,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $moduleSettings->saveApplePayMerchantCapabilities($request->getRequestEscapedParameter('applePayMC'));
         $moduleSettings->saveApplePayNetworks($request->getRequestEscapedParameter('applePayNetworks'));
-        $this->saveApplePayMerchantCertToFile();
-    }
-
-    /**
-     * @return void
-     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
-     */
-    protected function saveApplePayMerchantCertToFile(): void
-    {
-        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
-        file_put_contents($moduleSettings->getApplePayMerchantCertFilePath(), $moduleSettings->getApplePayMerchantCert());
-        file_put_contents($moduleSettings->getApplePayMerchantCertKeyFilePath(), $moduleSettings->getApplePayMerchantCertKey());
+        file_put_contents($moduleSettings->getApplePayMerchantCertFilePath(), $request->getRequestEscapedParameter('applePayMerchantCert'));
+        file_put_contents($moduleSettings->getApplePayMerchantCertKeyFilePath(), $request->getRequestEscapedParameter('applePayMerchantCertKey'));
     }
 }
