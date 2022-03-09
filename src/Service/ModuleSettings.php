@@ -12,11 +12,10 @@ use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
-use \Exception;
+use Exception;
 
 class ModuleSettings
 {
-
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
     public const SYSTEM_MODE_PRODUCTION = 'production';
     public const PAYMENT_CHARGE = 'charge';
