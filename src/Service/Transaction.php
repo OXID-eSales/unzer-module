@@ -402,4 +402,17 @@ class Transaction
 
         return $result;
     }
+
+    public function isValidTransactionTypeId($typeid): bool
+    {
+        if (
+            DatabaseProvider::getDb()->getOne(
+                "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE TYPEID=? ",
+                [$typeid]
+            )
+        ) {
+            return true;
+        }
+        return false;
+    }
 }

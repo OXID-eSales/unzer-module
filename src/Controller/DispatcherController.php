@@ -33,12 +33,24 @@ class DispatcherController extends FrontendController
     {
         $result = '';
 
-        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
         $jsonRequest = file_get_contents('php://input');
+        $aJson = json_decode($jsonRequest, true);
+        $url = parse_url($aJson['retrieveUrl']);
+        $transaction = $this->getServiceFromContainer(Transaction::class);
+        $aPath = explode("/", $url['path']);
+        $typeid = end($aPath);
+
+        if (
+            ($url['scheme'] != "https" || $url['host'] != "api.unzer.com")
+            || !$transaction->isValidTransactionTypeId($typeid)
+        ) {
+            Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
+        }
+
+        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
 
         if ($paymentId = $resource->getId()) {
-            $transaction = $this->getServiceFromContainer(Transaction::class);
             $order = oxNew(Order::class);
             $data = $transaction->getTransactionDataByPaymentId($paymentId);
 

@@ -49,14 +49,38 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
                 $pubKey = $moduleSettings->getShopPublicKey();
                 $privKey = $moduleSettings->getShopPrivateKey();
+                $registeredWebhookUrl = $moduleSettings->getRegisteredWebhook();
+                $registeredWebhookId = $moduleSettings->getRegisteredWebhookId();
+                $proposedWebhookUrl = $this->getProposedWebhookForActualShop();
 
                 if ($pubKey && $privKey) {
-                    $this->_aViewData["shobWebhookButtons"] = true;
                     /** @var Unzer $unzer */
                     $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-                    if ($aWebhooks = $unzer->fetchAllWebhooks()) {
-                        $this->_aViewData["registeredwebhook"] = $aWebhooks[0]->getUrl();
+                    if (
+                        $webhooks = $unzer->fetchAllWebhooks()
+                    ) {
+                        $webhookUrl = '';
+                        $webhookId = '';
+                        foreach ($webhooks as $webhook) {
+                            if (
+                                $webhook->getId() == $registeredWebhookId ||
+                                $webhook->getUrl() == $proposedWebhookUrl
+                            ) {
+                                $webhookUrl = $webhook->getUrl();
+                                $webhookId = $webhook->getId();
+                                break;
+                            }
+                        }
+                        if ($webhookUrl && $webhookId) {
+                            $this->saveWebhookOption($webhookUrl, $webhookId);
+                            $registeredWebhookUrl = $webhookUrl;
+                        } else {
+                            $this->saveWebhookOption('', '');
+                            $registeredWebhookUrl = '';
+                        }
                     }
+                    $this->_aViewData["registeredwebhook"] = $registeredWebhookUrl;
+                    $this->_aViewData["showWebhookButtons"] = true;
                 }
 
                 if ($capabilities = $moduleSettings->getApplePayMerchantCapabilities()) {
@@ -94,11 +118,17 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         /** @var Unzer $unzer */
         try {
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $unzer->deleteAllWebhooks();
-            $moduleSettingBridge = ContainerFactory::getInstance()
-                ->getContainer()
-                ->get(ModuleSettingBridgeInterface::class);
-            $moduleSettingBridge->save('registeredWebhook', '', Module::MODULE_ID);
+            $registeredWebhookId = $this->getServiceFromContainer(ModuleSettings::class)
+                ->getRegisteredWebhookId();
+
+            if ($webhooks = $unzer->fetchAllWebhooks()) {
+                foreach ($webhooks as $webhook) {
+                    if ($webhook->getId() == $registeredWebhookId) {
+                        $unzer->deleteWebhook($webhook);
+                        $this->saveWebhookOption('', '');
+                    }
+                }
+            }
         } catch (Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $this->translator->translateCode(
@@ -107,6 +137,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 )
             );
         }
+    }
+
+    protected function getProposedWebhookForActualShop(): string
+    {
+        return Registry::getConfig()->getSslShopUrl()
+            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
     }
 
     /**
@@ -117,14 +153,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         try {
             /** @var Unzer $unzer */
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $url = Registry::getConfig()->getSslShopUrl()
-                . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
+            $url = $this->getProposedWebhookForActualShop();
 
-            $unzer->createWebhook($url, "payment");
-            $moduleSettingBridge = ContainerFactory::getInstance()
-                ->getContainer()
-                ->get(ModuleSettingBridgeInterface::class);
-            $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
+            $result = $unzer->createWebhook($url, "payment");
+            $this->saveWebhookOption($url, $result->getId());
         } catch (Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $this->translator->translateCode(
@@ -135,6 +167,15 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
+    protected function saveWebhookOption($url, $id): void
+    {
+        $moduleSettingBridge = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(ModuleSettingBridgeInterface::class);
+        $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
+        $moduleSettingBridge->save('registeredWebhookId', $id, Module::MODULE_ID);
+    }
+
     /**
      * @throws GuzzleException
      * @throws \JsonException
@@ -143,23 +184,36 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
         $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
+        $errorMessage = null;
 
-        if(!$key || !$cert) {
-            Registry::getUtilsView()->addErrorToDisplay(oxNew(UnzerException::class, Registry::getLang()->translateString('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT')));
-            return;
+        if (!$key || !$cert) {
+            $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT';
         }
 
-        $apiClient = $this->getServiceFromContainer(ApiClient::class);
-        $response = $apiClient->uploadApplePayPaymentKey($key);
-        if($response->getStatusCode() !== 200) {
-            Registry::getUtilsView()->addErrorToDisplay(oxNew(UnzerException::class, Registry::getLang()->translateString('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY')));
-            return;
+        if (is_null($errorMessage)) {
+            $apiClient = $this->getServiceFromContainer(ApiClient::class);
+            $response = $apiClient->uploadApplePayPaymentKey($key);
+            if ($response->getStatusCode() !== 200) {
+                $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY';
+            }
         }
 
-        $response = $apiClient->uploadApplePayPaymentCertificate($cert);
-        if($response->getStatusCode() !== 200) {
-            Registry::getUtilsView()->addErrorToDisplay(oxNew(UnzerException::class, Registry::getLang()->translateString('OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT')));
-            return;
+        if (is_null($errorMessage)) {
+            $response = $apiClient->uploadApplePayPaymentCertificate($cert);
+            if ($response->getStatusCode() !== 200) {
+                $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT';
+            }
+        }
+
+        if ($errorMessage) {
+            Registry::getUtilsView()->addErrorToDisplay(
+                oxNew(
+                    UnzerException::class,
+                    Registry::getLang()->translateString(
+                        $errorMessage
+                    )
+                )
+            );
         }
     }
 
@@ -188,12 +242,17 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         parent::saveConfVars();
 
         $request = Registry::getRequest();
-        $request->getRequestEscapedParameter('applePayMC');
         $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
 
         $moduleSettings->saveApplePayMerchantCapabilities($request->getRequestEscapedParameter('applePayMC'));
         $moduleSettings->saveApplePayNetworks($request->getRequestEscapedParameter('applePayNetworks'));
-        file_put_contents($moduleSettings->getApplePayMerchantCertFilePath(), $request->getRequestEscapedParameter('applePayMerchantCert'));
-        file_put_contents($moduleSettings->getApplePayMerchantCertKeyFilePath(), $request->getRequestEscapedParameter('applePayMerchantCertKey'));
+        file_put_contents(
+            $moduleSettings->getApplePayMerchantCertFilePath(),
+            $request->getRequestEscapedParameter('applePayMerchantCert')
+        );
+        file_put_contents(
+            $moduleSettings->getApplePayMerchantCertKeyFilePath(),
+            $request->getRequestEscapedParameter('applePayMerchantCertKey')
+        );
     }
 }

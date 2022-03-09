@@ -32,12 +32,20 @@ $sMetadataVersion = '2.1';
 $aModule = [
     'id' => Module::MODULE_ID,
     'title' => [
-        'de' => 'Unzer Payment-Modul für OXID',
-        'en' => 'Unzer Payment Module for OXID',
+        'de' => 'Unzer Payment für OXID',
+        'en' => 'Unzer Payment for OXID',
     ],
     'description' => [
-        'de' => '',
-        'en' => '',
+        'de' => 'Vor dem Start bitte lesen und prüfen:
+            <ul>
+                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target="_blank">Go-live checklist</a></li>
+                <li><a href="https://insights.unzer.com/" target="_blank">Prüfen Sie Ihren Account und Ihre Zahlarten direkt bei Unzer</a></li>
+            </ul>',
+        'en' => 'Please read and check before you start:
+            <ul>
+                <li><a href="https://docs.unzer.com/online-payments/go-live-checklist/" target="_blank">Go-live checklist</a></li>
+                <li><a href="https://insights.unzer.com/" target="_blank">Check your account and your payments at unzer</a></li>
+            </ul>',
     ],
     'thumbnail' => 'logo.svg',
     'version' => '1.0.0',
@@ -132,124 +140,119 @@ $aModule = [
     ],
     'settings' => [
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPublicKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPrivateKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
-            'name' => 'sandbox-UnzerApiKey',
-            'type' => 'str'
-        ],
-        [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'production-UnzerPublicKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'production-UnzerPrivateKey',
             'type' => 'str'
         ],
         [
-            'group' => 'merchant',
-            'name' => 'production-UnzerApiKey',
-            'type' => 'str'
-        ],
-        [
-            'group' => 'merchant',
+            'group' => 'unzermerchant',
             'name' => 'registeredWebhook',
             'type' => 'str',
         ],
         [
-            'group' => 'environment',
+            'group' => '',
+            'name' => 'registeredWebhookId',
+            'type' => 'str',
+        ],
+        [
+            'group' => 'unzerenvironment',
             'name' => 'UnzerSystemMode',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'environment',
+            'group' => 'unzerenvironment',
             'name' => 'UnzerDebug',
             'type' => 'bool',
             'value' => '0',
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzercard',
             'name' => 'UnzerOption_oscunzer_card',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzerpaypal',
             'name' => 'UnzerOption_oscunzer_paypal',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'paymentoptions',
+            'group' => 'unzerinstallment',
+            'name' => 'UnzerOption_oscunzer_installment_rate',
+            'type' => 'str',
+            'value' => '4.5'
+        ],
+        [
+            'group' => 'unzerapplepay',
             'name' => 'UnzerOption_oscunzer_applepay',
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
         ],
         [
-            'group' => 'paymentoptions',
-            'name' => 'UnzerOption_oscunzer_installment_rate',
-            'type' => 'str',
-            'value' => '4.5'
-        ],
-        [
-            'group' => 'applePay',
+            'group' => 'unzerapplepay',
             'name' => 'applepay_payment_certs_processed',
             'type' => 'bool',
             'value' => '0'
         ],
         [
-            'group' => 'applePay',
+            'group' => 'unzerapplepay',
             'name' => 'applepay_merchant_identifier',
             'type' => 'str',
             'value' => ''
         ],
         [
-            'group' => 'applePay',
+            'group' => 'unzerapplepay',
             'name' => 'applepay_merchant_cert',
             'type' => 'str',
             'value' => ''
         ],
         [
-            'group' => 'applePay',
+            'group' => 'unzerapplepay',
             'name' => 'applepay_merchant_cert_key',
             'type' => 'str',
             'value' => ''
         ],
         [
-            'group' => 'applePay',
+            'group' => 'unzerapplepay',
             'name' => 'applepay_label',
             'type' => 'str',
             'value' => ''
         ],
         [
-            'group' => 'applePay',
+            'group' => 'unzerapplepay',
             'name' => 'applepay_networks',
             'type' => 'aarr',
             'value' => ModuleSettings::APPLE_PAY_NETWORKS
         ],
         [
-            'group' => 'applePay',
+            'group' => 'unzerapplepay',
             'name' => 'applepay_merchant_capabilities',
             'type' => 'aarr',
             'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
         ],
         [
-            'group' => 'other',
+            'group' => 'unzerother',
             'name' => 'UnzerjQuery',
             'type' => 'bool',
             'value' => '0',

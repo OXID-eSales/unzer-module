@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\AliPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\ApplePay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Bancontact;
@@ -31,24 +32,24 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\WeChatPay;
 class PaymentExtensionLoader
 {
     public const UNZERCLASSNAMEMAPPING = [
-        'oscunzer_alipay' => AliPay::class,
-        'oscunzer_applepay' => ApplePay::class,
-        'oscunzer_bancontact' => Bancontact::class,
-        'oscunzer_card' => Card::class,
-        'oscunzer_eps' => EPS::class,
-        'oscunzer_giropay' => GiroPay::class,
-        'oscunzer_ideal' => Ideal::class,
-        'oscunzer_installment' => Installment::class,
-        'oscunzer_invoice' => Invoice::class,
-        'oscunzer_invoice-secured' => InvoiceSecured::class,
-        'oscunzer_paypal' => PayPal::class,
-        'oscunzer_pis' => PIS::class,
-        'oscunzer_prepayment' => PrePayment::class,
-        'oscunzer_przelewy24' => Przelewy24::class,
-        'oscunzer_sepa' => Sepa::class,
-        'oscunzer_sepa-secured' => SepaSecured::class,
-        'oscunzer_sofort' => Sofort::class,
-        'oscunzer_wechatpay' => WeChatPay::class,
+        UnzerDefinitions::ALIPAY_UNZER_PAYMENT_ID => AliPay::class,
+        UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID => ApplePay::class,
+        UnzerDefinitions::BANCONTACT_UNZER_PAYMENT_ID => Bancontact::class,
+        UnzerDefinitions::CARD_UNZER_PAYMENT_ID => Card::class,
+        UnzerDefinitions::EPS_UNZER_PAYMENT_ID => EPS::class,
+        UnzerDefinitions::GIROPAY_UNZER_PAYMENT_ID => GiroPay::class,
+        UnzerDefinitions::IDEAL_UNZER_PAYMENT_ID => Ideal::class,
+        UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID => Installment::class,
+        UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID => Invoice::class,
+        UnzerDefinitions::INVOICE_SECURED_UNZER_PAYMENT_ID => InvoiceSecured::class,
+        UnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID => PayPal::class,
+        UnzerDefinitions::PIS_UNZER_PAYMENT_ID => PIS::class,
+        UnzerDefinitions::PREPAYMENT_UNZER_PAYMENT_ID => PrePayment::class,
+        UnzerDefinitions::PRZELEWY24_UNZER_PAYMENT_ID => Przelewy24::class,
+        UnzerDefinitions::SEPA_UNZER_PAYMENT_ID => Sepa::class,
+        UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID => SepaSecured::class,
+        UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID => Sofort::class,
+        UnzerDefinitions::WECHATPAY_UNZER_PAYMENT_ID => WeChatPay::class,
     ];
 
     /**

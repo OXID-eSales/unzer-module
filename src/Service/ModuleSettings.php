@@ -10,8 +10,8 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use http\Exception\RuntimeException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
-use OxidEsales\EshopCommunity\Core\ViewConfig;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
+use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
 
 class ModuleSettings
@@ -105,17 +105,17 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getAPIKey(): string
+    public function getRegisteredWebhook(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerApiKey');
+        return (string) $this->getSettingValue('registeredWebhook');
     }
 
     /**
      * @return string
      */
-    public function getRegisteredWebhook(): string
+    public function getRegisteredWebhookId(): string
     {
-        return (string)$this->getSettingValue('registeredWebhook');
+        return (string) $this->getSettingValue('registeredWebhookId');
     }
 
     /**
@@ -146,7 +146,8 @@ class ModuleSettings
      */
     public function getApplePayLabel()
     {
-        return $this->getSettingValue('applepay_label') ?: Registry::getConfig()->getActiveShop()->oxshops__oxcompany->value;
+        return $this->getSettingValue('applepay_label') ?:
+            Registry::getConfig()->getActiveShop()->oxshops__oxcompany->value;
     }
 
     /**
@@ -154,7 +155,10 @@ class ModuleSettings
      */
     public function getApplePayMerchantCapabilities(): array
     {
-        return array_merge(self::APPLE_PAY_MERCHANT_CAPABILITIES, $this->getSettingValue('applepay_merchant_capabilities'));
+        return array_merge(
+            self::APPLE_PAY_MERCHANT_CAPABILITIES,
+            $this->getSettingValue('applepay_merchant_capabilities')
+        );
     }
 
     /**
@@ -162,7 +166,10 @@ class ModuleSettings
      */
     public function getActiveApplePayMerchantCapabilities(): array
     {
-        return array_keys(array_filter($this->getApplePayMerchantCapabilities(), 'self::isActiveSetting'));
+        return array_keys(array_filter(
+            $this->getApplePayMerchantCapabilities(),
+            'self::isActiveSetting'
+        ));
     }
 
     /**
@@ -170,7 +177,10 @@ class ModuleSettings
      */
     public function getApplePayNetworks(): array
     {
-        return array_merge(self::APPLE_PAY_NETWORKS, $this->getSettingValue('applepay_networks'));
+        return array_merge(
+            self::APPLE_PAY_NETWORKS,
+            $this->getSettingValue('applepay_networks')
+        );
     }
 
     /**
@@ -178,7 +188,9 @@ class ModuleSettings
      */
     public function getActiveApplePayNetworks(): array
     {
-        return array_keys(array_filter($this->getApplePayNetworks(), 'self::isActiveSetting'));
+        return array_keys(array_filter(
+            $this->getApplePayNetworks(), 'self::isActiveSetting')
+        );
     }
 
     /**
@@ -250,7 +262,8 @@ class ModuleSettings
      */
     public function getFilesPath(): string
     {
-        $path = Registry::get(ViewConfig::class)->getModulePath(Module::MODULE_ID) . '/' . 'files';
+        $facts = new Facts();
+        $path = $facts->getSourcePath() . PATH_SEPARATOR . Module::MODULE_ID . '_applepay_merchant_certs';
 
         if (!file_exists($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
             throw new RuntimeException();

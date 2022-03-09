@@ -1,12 +1,14 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
 
 <form id="payment-form-installment" class="unzerUI form unzerUI-installmentsecured__form" novalidate>
+    <br />
     <div id="unzer-installment">
         <!-- The Installment Secured field UI Element will be inserted here -->
     </div>
+    <br />
     <div class="field" id="error-holder" style="color: #9f3a38"> </div>
     <button id="continue-button" class="unzerUI primary button fluid" type="submit" style="display: none" disabled>
-        Continue
+        [{oxmultilang ident="OSCUNZER_INSTALLMENT_CONTINUE"}]
     </button>
 </form>
 [{assign var=totalgross value=$oxcmp_basket->getBruttoSum()}]

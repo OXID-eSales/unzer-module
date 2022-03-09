@@ -106,28 +106,17 @@ class ModuleSettingsTest extends TestCase
             ],
             [
                 'values' => [
-                    ['UnzerSystemMode', Module::MODULE_ID, 0],
-                    ['sandbox-UnzerApiKey', Module::MODULE_ID, 'sandboxAPIKey'],
-                    ['production-UnzerApiKey', Module::MODULE_ID, 'productionAPIKey'],
-                ],
-                'settingMethod' => 'getAPIKey',
-                'settingValue' => 'sandboxAPIKey'
-            ],
-            [
-                'values' => [
-                    ['UnzerSystemMode', Module::MODULE_ID, 1],
-                    ['sandbox-UnzerApiKey', Module::MODULE_ID, 'sandboxAPIKey'],
-                    ['production-UnzerApiKey', Module::MODULE_ID, 'productionAPIKey'],
-                ],
-                'settingMethod' => 'getAPIKey',
-                'settingValue' => 'productionAPIKey'
-            ],
-            [
-                'values' => [
                     ['registeredWebhook', Module::MODULE_ID, 'Webhook'],
                 ],
                 'settingMethod' => 'getRegisteredWebhook',
                 'settingValue' => "Webhook"
+            ],
+            [
+                'values' => [
+                    ['registeredWebhookId', Module::MODULE_ID, 'WebhookId'],
+                ],
+                'settingMethod' => 'getRegisteredWebhookId',
+                'settingValue' => "WebhookId"
             ]
         ];
     }
