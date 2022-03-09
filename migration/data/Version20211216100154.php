@@ -22,12 +22,6 @@ use OxidEsales\Facts\Facts;
  */
 final class Version20211216100154 extends AbstractMigration
 {
-    protected $activeCountries = null;
-    protected $shopIds = null;
-    protected $languageIds = null;
-
-
-
     /** @throws Exception */
     public function __construct($version)
     {

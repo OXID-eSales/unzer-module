@@ -15,12 +15,16 @@ class ApplePay extends UnzerPayment
 
     protected $needPending = true;
 
+    protected $ajaxResponse = true;
+
     /**
      * @return BasePaymentType
      * @throws \Exception
      */
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        throw new \Exception('Payment method not implemented yet');
+        return $this->unzerSDK->fetchPaymentType(
+            $this->unzerService->getUnzerPaymentIdFromRequest()
+        );
     }
 }

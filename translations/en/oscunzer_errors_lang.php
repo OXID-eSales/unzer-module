@@ -636,4 +636,5 @@ $aLang = [
     'oscunzer_WRONGPAYMENTID'     => 'Invalid Payment-ID. Please choose another payment method.',
     'oscunzer_TRANSACTION_CHANGE' => 'State %s was written to database for payment %s',
     'oscunzer_TRANSACTION_NOTHINGTODO' => 'No update needed. There was no new state for payment: ',
+    'oscunzer_APPLEPAY_ERROR' => 'Failed to complete payment with Apple Pay.'
 ];

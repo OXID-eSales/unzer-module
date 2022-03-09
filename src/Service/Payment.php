@@ -17,12 +17,17 @@ use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
+use UnzerSDK\Resources\PaymentTypes\Applepay;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class Payment
 {
+    private const STATUS_OK = "OK";
+    private const STATUS_NOT_FINISHED = "NOT_FINISHED";
+    private const STATUS_ERROR = "ERROR";
+
     /** @var Session */
     protected $session;
 
@@ -93,7 +98,7 @@ class Payment
                 $this->getSessionUnzerPayment()
             );
 
-            $paymentStatus = ($this->getUnzerPaymentStatus() != "ERROR");
+            $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
 
             if ($this->redirectUrl) {
                 throw new Redirect($this->redirectUrl);
@@ -149,14 +154,14 @@ class Payment
      */
     public function getUnzerPaymentStatus(): string
     {
-        $result = "ERROR";
+        $result = self::STATUS_ERROR;
 
         /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {
-            $result = "OK";
+            $result = self::STATUS_OK;
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
@@ -164,10 +169,13 @@ class Payment
                 }
                 if ($this->isPdfSession()) {
                     $this->pdfLink = null;
-                    $result = "OK";
+                    $result = self::STATUS_OK;
+                }
+                if ($this->isApplepaySession()) {
+                    $result = self::STATUS_OK;
                 }
             } elseif ($transaction->isPending()) {
-                $result = "NOT_FINISHED";
+                $result = self::STATUS_NOT_FINISHED;
 
                 $this->redirectUrl = $transaction->getRedirectUrl();
             } elseif ($transaction->isError()) {
@@ -343,5 +351,14 @@ class Payment
     public function isPdfSession(): bool
     {
         return (bool) Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
+    }
+
+    /**
+     * @return bool
+     * @throws UnzerApiException
+     */
+    public function isApplePaySession(): bool
+    {
+        return $this->getSessionUnzerPayment()->getPaymentType() instanceof Applepay;
     }
 }

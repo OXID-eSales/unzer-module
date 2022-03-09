@@ -32,4 +32,5 @@ $aLang = [
     'OSCUNZER_INSTALLMENT_SUBMIT' => 'Vertrag bestätigen',
     'OSCUNZER_INSTALLMENT_CONTINUE' => 'Weiter',
     'OSCUNZER_INSTALLMENT_CANCEL' => 'Vertrag ablehnen',
+    'OSCUNZER_BUY_WITH' => 'Bezahlen mit',
 ];

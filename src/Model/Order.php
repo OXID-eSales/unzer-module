@@ -140,6 +140,8 @@ class Order extends Order_parent
     /**
      * @throws DatabaseErrorException
      * @throws DatabaseConnectionException
+     *
+     * @return false|int
      */
     public function reinitializeOrder()
     {
