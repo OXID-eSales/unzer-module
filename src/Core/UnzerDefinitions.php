@@ -43,25 +43,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Alipay',
-                    'longdesc' => 'Alipay ist Chinas führende Zahlungs- und Lifestyleplattform. Sie wurde
-                        2004 von der Alibaba Group gegründet. Inzwischen zählt Alipay 870 Millionen Nutzer.
-                        80 Prozent Marktanteil im Mobile Payment- und mehr als 50 Prozent im Online-Bereich
-                        machen AliPay unverzichtbar für Händler, die nach China verkaufen. Auch die vielen
-                        chinesischen Touristen bezahlen im Ausland gerne mit ihrer heimischen Zahlungsmethode.
-                        Das wichtigste Produkt ist das Alipay Wallet. Mit der zugehörigen App können Käufer
-                        Transaktionen direkt mit dem Smartphone vornehmen.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/1fb015ed91/alipay.svg"
+                        title="Alipay" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'Alipay',
-                    'longdesc' => 'Alipay is Chinas leading payment and lifestyle platform. It was founded
-                        in 2004 by the Alibaba Group. Alipay now has 870 million users. 80 percent of the
-                        market share in mobile payment and more than 50 percent in the online area make AliPay
-                        indispensable for merchants who sell to China. The many Chinese tourists abroad also
-                        like to pay with their domestic payment method. The most important product is the
-                        Alipay wallet. With the associated app, buyers can carry out transactions directly
-                        with their smartphone.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/1fb015ed91/alipay.svg"
+                        title="Alipay" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -71,23 +62,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'ApplePay',
-                    'longdesc' => 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-                        Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus
-                        et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec,
-                        pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo,
-                        fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a,
-                        venenatis vitae, justo.'
+                    'longdesc' => ''
                 ],
                 'en' => [
                     'desc' => 'ApplePay',
-                    'longdesc' => 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-                        Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus
-                        et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec,
-                        pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo,
-                        fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a,
-                        venenatis vitae, justo.'
+                    'longdesc' => ''
                 ]
             ],
+            'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -97,15 +79,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Bancontact',
-                    'longdesc' => 'Bancontact ist ein belgisches Unternehmen, das benutzerfreundliche Lösungen
-                        für ein einfaches tägliches Einkaufserlebnis bietet.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/7f8c94a7dd/bancontact.svg"
+                        title="Bancontact" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'Bancontact',
-                    'longdesc' => 'Bancontact is a Belgian company that offers user-friendly solutions for easy
-                        everyday shopping experience.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/7f8c94a7dd/bancontact.svg"
+                        title="Bancontact" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => ['BE'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -114,18 +97,17 @@ final class UnzerDefinitions
         self::CARD_UNZER_PAYMENT_ID => [
             'descriptions' => [
                 'de' => [
-                    'desc' => 'Kreditkarte',
-                    'longdesc' => 'Von Europa, über Nordamerika bis Asien: kartenbasierte Zahlungsmethoden sind
-                        international verbreitet. In vielen Teilen der Welt haben sie schon längst das Bargeld
-                        abgelöst. Mit Unzer können Sie einfach alle wichtigen Anbieter akzeptieren.'
+                    'desc' => 'Kartenzahlung',
+                    'longdesc' => 'Kartenzahlungen sind auf der ganzen Welt beliebt. Wenn Sie Ihren Warenkorb
+                        mit einer Kredit- oder Debitkarte bezahlen möchten, wählen Sie diese Zahlungsmethode.'
                 ],
                 'en' => [
-                    'desc' => 'Credit Card',
-                    'longdesc' => 'From Europe to North America to Asia: card-based payment methods are widely
-                        used around the world. In many parts of the world they have long since replaced cash.
-                        With Unzer you can easily accept all major providers.'
+                    'desc' => 'Card',
+                    'longdesc' => 'Card-based payment methods are popular across the globe. If you want to pay
+                        your basket with a credit-or debit card, select this payment method.'
                 ]
             ],
+            'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -135,21 +117,24 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'EPS',
-                    'longdesc' => 'Electronic Payment Standard – oder kurz eps – ist ein österreichisches
-                        Direktüberweisung-Verfahren. Es wurde von den größten Banken des Landes gemeinsam
-                        mit der Regierung konzipiert. Ähnlich wie mit dem deutschen Gegenstück Giropay
-                        können Käufer mit eps sicher und ohne Übermittlung von sensiblen Daten zahlen.
-                        Händlern bietet Electronic Payment Standard vor allem Schutz vor Zahlungsausfällen.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/02e1135598/eps_uberweisung.svg"
+                        title="eps" style="float: left;margin-right: 10px;" />
+                        Um mit eps zu bezahlen, benötigen Sie ein Online-Banking-Konto bei einer der teilnehmenden
+                        Banken. Wählen Sie an der Kasse Ihre Bank aus und loggen Sie sich in den privaten
+                        Online-Banking-Bereich ein. Dort überprüfen Sie die von Ihnen bereits eingegebenen Zahlungsdaten.
+                        Wenn sie korrekt sind, autorisieren Sie die Zahlung und schließen den Kauf ab.'
                 ],
                 'en' => [
                     'desc' => 'EPS',
-                    'longdesc' => 'Electronic Payment Standard - or eps for short - is an Austrian direct
-                        transfer procedure. It was designed by the countrys largest banks together with the
-                        government. Similar to the German counterpart Giropay, buyers can use eps to pay securely
-                        and without transmitting sensitive data. Electronic Payment Standard offers merchants
-                        above all protection against payment defaults.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/02e1135598/eps_uberweisung.svg"
+                        title="eps" style="float: left;margin-right: 10px;" />
+                        To pay with eps, you need an online banking account at one of the participating banks.
+                        At checkout, select your bank and log in to the private online banking area. There you check the
+                        payment details you have already entered. If they are correct, authorize the payment
+                        and complete the purchase.'
                 ]
             ],
+            'active' => true,
             'countries' => ['AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -159,18 +144,22 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Giropay',
-                    'longdesc' => 'Giropay ist besonders in Deutschland stark verbreitet. Das Online-Verfahren
-                        wurde von der deutschen Kreditwirtschaft speziell für den E-Commerce konzipiert und
-                        optimiert. Käufer können damit sicher per Vorkasse bezahlen. Dabei werden keine sensiblen
-                        Daten an den Händler übermittelt.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/3a1b3dafb0/giro_pay.svg"
+                        title="Giropay" style="float: left;margin-right: 10px;" />
+                        Kein Eintippen von IBAN, BIC oder Zahlungsgrund: giropay übernimmt die ganze Arbeit
+                        für Sie. Sie müssen sich nicht einmal registrieren. Sie benötigen lediglich Ihre
+                        Zugangsdaten für das Online-Banking. Den Rest erledigt giropay für Sie.'
                 ],
                 'en' => [
                     'desc' => 'Giropay',
-                    'longdesc' => 'Giropay is particularly widespread in Germany. The online process was specially
-                        designed and optimized by the German banking industry for e-commerce. Buyers can use it
-                        to pay securely in advance. No sensitive data is transmitted to the dealer.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/3a1b3dafb0/giro_pay.svg"
+                        title="Giropay" style="float: left;margin-right: 10px;" />
+                        No typing in IBAN, BIC or reason for payment: giropay does all the hard work for you. You don\'t
+                        even have to register. You only need your access data for online banking.
+                        The rest is done for you by giropay.'
                 ]
             ],
+            'active' => true,
             'countries' => ['DE'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -180,20 +169,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'iDEAL',
-                    'longdesc' => 'iDEAL ist die beliebteste Zahlungsmethode im niederländischen E-Commerce
-                        und nahtlos in das Online-Banking fast aller großen Banken des Landes integriert.
-                        So können die Käufer mit ihren vertrauten Zugangsdaten bezahlen. Dieser komfortable
-                        Checkout-Prozess steigert Beliebtheit und Conversions. Für fast jede zweite Online-
-                        Transaktion in den Niederlanden wird iDEAL verwendet.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/efc1cbe641/ideal.svg"
+                        title="iDEAL" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'iDEAL',
-                    'longdesc' => 'iDEAL is the most popular payment method in Dutch e-commerce and is seamlessly
-                        integrated into the online banking of almost all major banks in the country. Buyers can
-                        pay with their familiar access data. This convenient checkout process increases popularity
-                        and conversions. IDEAL is used for almost every second online transaction in the Netherlands.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/efc1cbe641/ideal.svg"
+                        title="iDEAL" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => ['NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -203,13 +188,21 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Ratenzahlung',
-                    'longdesc' => 'Ratenzahlung mit Unzer'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg"
+                        title="Ratenzahlung" style="float: left;margin-right: 10px;" />
+                        Viele Kunden ziehen es vor, größere Anschaffungen von mehreren hundert Euro
+                        in kleineren Raten zu bezahlen. Wählen Sie diese Methode für eine einfache
+                        und bequeme Ratenzahlung.'
                 ],
                 'en' => [
                     'desc' => 'Installment',
-                    'longdesc' => 'Unzer installment'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg "
+                        title="Installment" style="float: left;margin-right: 10px;" />
+                        Many customers prefer to pay for larger purchases of several hundred euros in
+                        smaller installments. Choose this method for comfortable payment in installments.'
                 ]
             ],
+            'active' => true,
             'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -218,14 +211,18 @@ final class UnzerDefinitions
         self::INVOICE_UNZER_PAYMENT_ID => [
             'descriptions' => [
                 'de' => [
-                    'desc' => 'Rechnung',
-                    'longdesc' => 'Rechnung, ausgestellt von Unzer'
+                    'desc' => 'Kauf auf Rechnung',
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
+                        Bei dieser Methode zahlen Sie per Kauf auf Rechnung'
                 ],
                 'en' => [
                     'desc' => 'Invoice',
-                    'longdesc' => 'Invoice, issued by Unzer'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Invoice" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
@@ -235,14 +232,17 @@ final class UnzerDefinitions
         self::INVOICE_SECURED_UNZER_PAYMENT_ID => [
             'descriptions' => [
                 'de' => [
-                    'desc' => 'Rechnung Secured',
-                    'longdesc' => 'Rechnung, ausgestellt von Unzer (gesicherter Kanal)'
+                    'desc' => 'Abgesicherter Rechnungskauf',
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Abgesicherter Rechnungskauf" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
-                    'desc' => 'Invoice Secured',
-                    'longdesc' => 'Invoice, issued by Unzer (secure channel)'
+                    'desc' => 'Invoice with Unzer',
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Invoice with Unzer" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -252,23 +252,20 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'PayPal',
-                    'longdesc' => 'Paypal kann zum Zahlen per Banküberweisung, Kreditkarte oder Lastschrift
-                        verwendet werden. 246 Millionen Käufer nutzen das e-Wallet weltweit – in über 200 Märkten
-                        und 25 Währungen. Allein in Deutschland erreichen Sie etwa 25 Millionen PayPal-Kunden.
-                        Anschließend bezahlen Käufer damit vor allem in Online-Shops. Aber auch im stationären
-                        Handel nutzen sie die Google Pay App auf ihrem Smartphone. Da während der Transaktion
-                        keine Bankdaten übertragen werden, gilt die die Zahlung als sicher.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/46364241f0/paypal.svg"
+                        title="PayPal" style="float: left;margin-right: 10px;" />
+                        PayPal ist der Online-Zahlungsservice, mit dem Sie in Online-Shops sicher,
+                        einfach und schnell bezahlen können - für Sie völlig kostenlos.'
                 ],
                 'en' => [
                     'desc' => 'PayPal',
-                    'longdesc' => 'Paypal can be used to pay by bank transfer, credit card, or direct debit.
-                        246 million buyers use the e-wallet worldwide - in over 200 markets and 25 currencies.
-                        In Germany alone you can reach around 25 million PayPal customers. Buyers then use it
-                        to pay in online shops in particular. But they also use the Google Pay app on their
-                        smartphone in brick-and-mortar retail. Since no bank details are transferred during
-                        the transaction, the payment is considered secure.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/46364241f0/paypal.svg"
+                        title="PayPal" style="float: left;margin-right: 10px;" />
+                        PayPal is the online payment service that allows you to pay in online stores securely,
+                        easily and quickly - absolutely free of charge for you.'
                 ]
             ],
+            'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -278,17 +275,20 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Vorkasse',
-                    'longdesc' => 'Bei der Vorauskasse oder Vorkasse erklärt schon der Name, wie die
-                        Zahlungsmethode funktioniert: Online-Käufer überweisen das Geld für Ihre Bestellung
-                        im Voraus. Erst wenn der Betrag eingegangen ist, verschickt der Händler die Ware.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/ed7c39ce12/unzer_prepayment.svg"
+                        title="Vorkasse" style="float: left;margin-right: 10px;" />
+                        Bei Vorkasse überweisen Sie das Geld für Ihre Bestellung im Voraus. Erst wenn der Betrag
+                        eingegangen ist, wird die Ware an Ihre Lieferadresse verschickt.'
                 ],
                 'en' => [
                     'desc' => 'Prepayment',
-                    'longdesc' => 'In the case of prepayment or prepayment, the name already explains how
-                        the payment method works: online buyers transfer the money for their order in advance.
-                        Only when the amount has been received does the dealer send the goods.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/ed7c39ce12/unzer_prepayment.svg"
+                        title="Prepayment" style="float: left;margin-right: 10px;" />
+                        With prepayment you transfer the money for your order in advance. Only when the amount
+                        is received, the goods will be shipped to your delivery address.'
                 ]
             ],
+            'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
@@ -299,19 +299,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Przelewy24',
-                    'longdesc' => 'Przelewy24 ist die beliebteste Online-Zahlungsmethode Polens. Sie ermöglicht
-                        Käufern nicht nur Zahlungen vom eigenen Bankkonto oder der Kreditkarte. Sondern unterstützt
-                        auch alternative Zahlungsmethoden wie SMS. Voraussetzung für die Nutzung ist ein Konto
-                        bei einer der über 150 polnischen Banken, die Przelewy24 unterstützt.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/def6433104/przelewy24.svg"
+                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'Przelewy24',
-                    'longdesc' => 'Przelewy24 is the most popular online payment method in Poland. It not only
-                        enables buyers to make payments from their own bank account or credit card. It also supports
-                        alternative payment methods such as SMS. The requirement for use is an account with one of
-                        the more than 150 Polish banks that Przelewy24 supports.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/def6433104/przelewy24.svg"
+                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => ['PL'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -321,13 +318,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'SEPA-Lastschrift',
-                    'longdesc' => 'Sie erteilen ein SEPA-Lastschriftmandat'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/c3ed559dcc/sepa_lastschrift.svg"
+                        title="SEPA-Lastschrift" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'SEPA Direct Debit',
-                    'longdesc' => 'You issue a SEPA direct debit mandate'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/c3ed559dcc/sepa_lastschrift.svg"
+                        title="SEPA Direct Debit" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
@@ -337,14 +337,17 @@ final class UnzerDefinitions
         self::SEPA_SECURED_UNZER_PAYMENT_ID => [
             'descriptions' => [
                 'de' => [
-                    'desc' => 'SEPA-Lastschrift Secured',
-                    'longdesc' => 'Sie erteilen ein SEPA-Lastschriftmandat'
+                    'desc' => 'SEPA Lastschrift (abgesichert durch Unzer)',
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
+                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
-                    'desc' => 'SEPA Direct Debit Secured',
-                    'longdesc' => 'You issue a SEPA direct debit mandate'
+                    'desc' => 'SEPA Direct Debit with Unzer',
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
+                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => ['DE'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -354,13 +357,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Sofort',
-                    'longdesc' => 'Sofortüberweisung (gesicherter Kanal)'
+                    'longdesc' => ''
                 ],
                 'en' => [
                     'desc' => 'Sofort',
-                    'longdesc' => 'Instant bank transfer (secure channel)'
+                    'longdesc' => ''
                 ]
             ],
+            'active' => true,
             'countries' => ['SE', 'NO', 'FI', 'DK', 'DE', 'NL', 'BE', 'CH', 'FR', 'IT',
                 'PL', 'ES', 'PT', 'GB', 'HU', 'CZ', 'AU', 'SK', 'US'],
             'constraints' => self::PAYMENT_CONSTRAINTS
@@ -371,21 +375,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Bank transfer',
-                    'longdesc' => 'Unzer Bank Transfer ist unser Direktüberweisungs- oder auch
-                        Zahlungsauslösedienst. Mit ihm können Käufer im Checkout-Prozess komfortabel
-                        eine Überweisung beauftragen. Dazu geben sie die Zugangsdaten ihres Online-Bankings
-                        ein und authentifizieren sich zusätzlich mit einer TAN. Unzerbank transfer prüft in
-                        Echtzeit, ob das Konto gedeckt ist. Der Betrag wird direkt abgebucht.'
+                    'longdesc' => ''
                 ],
                 'en' => [
                     'desc' => 'Bank Transfer',
-                    'longdesc' => 'Unzer Bank Transfer is our direct transfer or payment initiation service.
-                        With it, buyers can conveniently order a transfer in the checkout process. To do this,
-                        they enter the access data for their online banking and also authenticate themselves
-                        with a TAN. Unzer bank transfer checks in real time whether the account is sufficient.
-                        The amount will be debited directly.'
+                    'longdesc' => ''
                 ]
             ],
+            'active' => false,
             'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
@@ -395,22 +392,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'WeChat Pay',
-                    'longdesc' => 'WeChat Pay ist ein von Tencent betriebenes Bezahlsystem aus China.
-                        Bei WeChat handelte es sich ursprünglich um eine Kommunikationsapp, analog zu WhatsApp.
-                        Im Laufe der Zeit wurde die App um immer mehr Tools erweitert – im Jahr 2015 auch um ein
-                        Bezahlsystem vergleichbar mit Google Pay oder Apple Pay. Dank der sozialen Plattform WeChat
-                        verfügt WeChat Pay über eine riesige Nutzerbasis von über einer Milliarde Chat-Nutzern.
-                        Von diesen vertrauen bereits etwa 600 Millionen WeChat Pay. '
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/35bad89449/wechat_pay.svg"
+                        title="WeChat Pay" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'WeChat Pay',
-                    'longdesc' => 'WeChat Pay is a payment system from China operated by Tencent. WeChat was
-                        originally a communication app, analogous to WhatsApp. Over time, the app has been expanded
-                        to include more and more tools - in 2015 also a payment system comparable to Google Pay or
-                        Apple Pay. Thanks to the WeChat social platform, WeChat Pay has a huge user base of over
-                        a billion chat users. Of these, around 600 million already trust WeChat Pay.'
+                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/35bad89449/wechat_pay.svg"
+                        title="WeChat Pay" style="float: left;margin-right: 10px;" />'
                 ]
             ],
+            'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ]
