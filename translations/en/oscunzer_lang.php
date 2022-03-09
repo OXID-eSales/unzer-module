@@ -32,4 +32,5 @@ $aLang = [
     'OSCUNZER_INSTALLMENT_SUBMIT' => 'confirm contract',
     'OSCUNZER_INSTALLMENT_CONTINUE' => 'Continue',
     'OSCUNZER_INSTALLMENT_CAMCEL' => 'cancel contract',
+    'OSCUNZER_BUY_WITH' => 'Buy with',
 ];

@@ -13,12 +13,15 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 /**
  * @mixin \OxidEsales\Eshop\Core\ShopControl
  */
 class ShopControl extends ShopControl_parent
 {
+    use ServiceContainer;
+
     /**
      * @param StandardException $exception
      */

@@ -11,10 +11,12 @@ use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 use OxidEsales\Facts\Facts;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
@@ -25,8 +27,6 @@ use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
-use OxidEsales\Eshop\Core\Field;
-use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 
 class Unzer
 {
@@ -225,7 +225,7 @@ class Unzer
      */
     public function getPaymentProcedure(string $paymentMethod): string
     {
-        if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured'])) {
+        if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured', 'applepay'])) {
             return $this->moduleSettings->getPaymentProcedureSetting($paymentMethod);
         }
 
@@ -336,5 +336,21 @@ class Unzer
     public function generateUnzerOrderId(): string
     {
         return 'o' . str_replace(['0.', ' '], '', microtime(false));
+    }
+
+    /**
+     * @return void
+     */
+    public function setIsAjaxPayment(): void
+    {
+        $this->session->setVariable('UzrAjaxRedirect', true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAjaxPayment(): bool
+    {
+        return (bool)$this->session->getVariable('UzrAjaxRedirect');
     }
 }

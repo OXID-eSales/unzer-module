@@ -31,6 +31,9 @@ abstract class UnzerPayment
     /** @var bool */
     protected $needPending = false;
 
+    /** @var bool */
+    protected $ajaxResponse = false;
+
     /** @var array */
     protected $allowedCurrencies = [];
 
@@ -42,6 +45,10 @@ abstract class UnzerPayment
         $this->unzerService = $unzerService;
 
         $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
+
+        if ($this->ajaxResponse) {
+            $this->unzerService->setIsAjaxPayment();
+        }
     }
 
     /**

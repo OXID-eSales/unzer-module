@@ -8,13 +8,29 @@
 /**
  * Metadata version
  */
+
+use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
+use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
+use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain;
+use OxidSolutionCatalysts\Unzer\Controller\ApplePayCallbackController;
+use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
+use OxidSolutionCatalysts\Unzer\Controller\InstallmentController;
+use OxidSolutionCatalysts\Unzer\Controller\OrderController;
+use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
+use OxidSolutionCatalysts\Unzer\Core\Config;
+use OxidSolutionCatalysts\Unzer\Core\ShopControl;
+use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
+use OxidSolutionCatalysts\Unzer\Model\PaymentGateway;
+use OxidSolutionCatalysts\Unzer\Module;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+
 $sMetadataVersion = '2.1';
 
 /**
  * Module information.
  */
 $aModule = [
-    'id' => 'osc-unzer',
+    'id' => Module::MODULE_ID,
     'title' => [
         'de' => 'Unzer Payment für OXID',
         'en' => 'Unzer Payment for OXID',
@@ -31,27 +47,28 @@ $aModule = [
                 <li><a href="https://insights.unzer.com/" target="_blank">Check your account and your payments at unzer</a></li>
             </ul>',
     ],
-    'thumbnail'    => 'logo.svg',
+    'thumbnail' => 'logo.svg',
     'version' => '1.0.0',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class           => \OxidSolutionCatalysts\Unzer\Controller\PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class                                    => \OxidSolutionCatalysts\Unzer\Core\ViewConfig::class,
-        \OxidEsales\Eshop\Core\Config::class                                        => \OxidSolutionCatalysts\Unzer\Core\Config::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class                          => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
-        \OxidEsales\Eshop\Application\Controller\OrderController::class             => \OxidSolutionCatalysts\Unzer\Controller\OrderController::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class                   => \OxidSolutionCatalysts\Unzer\Model\PaymentGateway::class,
-        \OxidEsales\Eshop\Application\Model\Order::class                            => \OxidSolutionCatalysts\Unzer\Model\Order::class,
-        \OxidEsales\Eshop\Core\ShopControl::class                                   => \OxidSolutionCatalysts\Unzer\Core\ShopControl::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class   => \OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class             => \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
+        \OxidEsales\Eshop\Core\Config::class => Config::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => \OxidSolutionCatalysts\Unzer\Model\Order::class,
+        \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
     ],
     'controllers' => [
-        'unzer_admin_order' => \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController::class,
-        'unzer_dispatcher'  =>   \OxidSolutionCatalysts\Unzer\Controller\DispatcherController::class,
-        'unzer_installment' => \OxidSolutionCatalysts\Unzer\Controller\InstallmentController::class,
+        'unzer_admin_order' => AdminOrderController::class,
+        'unzer_dispatcher' => DispatcherController::class,
+        'unzer_installment' => InstallmentController::class,
+        'unzer_applepay_callback' => ApplePayCallbackController::class,
     ],
     'templates' => [
         // admin
@@ -59,20 +76,20 @@ $aModule = [
 
         // frontend
         'modules/osc/unzer/unzer_assets.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_assets.tpl',
-        'modules/osc/unzer/unzer_alipay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_alipay.tpl',
-        'modules/osc/unzer/unzer_bancontact.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_bancontact.tpl',
         'modules/osc/unzer/unzer_card.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_card.tpl',
         'modules/osc/unzer/unzer_eps_charge.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_eps_charge.tpl',
         'modules/osc/unzer/unzer_installment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment.tpl',
         'modules/osc/unzer/unzer_invoice_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_secured.tpl',
-        'modules/osc/unzer/unzer_paypal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal.tpl',
+        'modules/osc/unzer/unzer_applepay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl',
         'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
         'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
-        'modules/osc/unzer/unzer_wechat.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_wechat.tpl',
         'modules/osc/unzer/unzer_ideal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_ideal.tpl',
         'modules/osc/unzer/unzer_shippingAndPayment_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
         'modules/osc/unzer/unzer_shippingAndPayment_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
         'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
+        'modules/osc/unzer/message/js-errors.tpl' => 'osc/unzer/views/frontend/tpl/message/js-errors.tpl',
+        'modules/osc/unzer/payment/applepay_availibility_check.tpl' => 'osc/unzer/views/frontend/tpl/payment/applepay_availibility_check.tpl',
+        'modules/osc/unzer/order/applepay_button.tpl' => 'osc/unzer/views/frontend/tpl/order/applepay_button.tpl',
     ],
     'blocks' => [
         //frontend
@@ -92,6 +109,11 @@ $aModule = [
             'template' => 'page/checkout/order.tpl',
             'block' => 'checkout_order_errors',
             'file' => 'views/frontend/blocks/page/checkout/checkout_order_errors.tpl'
+        ],
+        [
+            'template' => 'page/checkout/order.tpl',
+            'block' => 'checkout_order_btn_submit_bottom',
+            'file' => 'views/frontend/blocks/page/checkout/checkout_order_btn_submit_bottom.tpl'
         ],
         [
             'template' => 'page/checkout/payment.tpl',
@@ -181,6 +203,55 @@ $aModule = [
             'value' => '4.5'
         ],
         [
+            'group' => 'unzerapplepay',
+            'name' => 'UnzerOption_oscunzer_applepay',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1'
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'applepay_payment_certs_processed',
+            'type' => 'bool',
+            'value' => '0'
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'applepay_merchant_identifier',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'applepay_merchant_cert',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'applepay_merchant_cert_key',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'applepay_label',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'applepay_networks',
+            'type' => 'aarr',
+            'value' => ModuleSettings::APPLE_PAY_NETWORKS
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'applepay_merchant_capabilities',
+            'type' => 'aarr',
+            'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
+        ],
+        [
             'group' => 'unzerother',
             'name' => 'UnzerjQuery',
             'type' => 'bool',
@@ -188,7 +259,7 @@ $aModule = [
         ]
     ],
     'events' => [
-        'onActivate'    => '\OxidSolutionCatalysts\Unzer\Core\Events::onActivate',
-        'onDeactivate'  => '\OxidSolutionCatalysts\Unzer\Core\Events::onDeActivate',
+        'onActivate' => '\OxidSolutionCatalysts\Unzer\Core\Events::onActivate',
+        'onDeactivate' => '\OxidSolutionCatalysts\Unzer\Core\Events::onDeActivate',
     ],
 ];

@@ -637,4 +637,5 @@ $aLang = [
     'oscunzer_SETWEBHOOK_ERROR'   => 'Fehler beim erstellen dieses Webhooks: ',
     'oscunzer_TRANSACTION_CHANGE' => 'Status %s für Payment %s wurde in die DB geschrieben',
     'oscunzer_TRANSACTION_NOTHINGTODO' => 'Kein Update erforderlich. Es gab keinen neuen Zahlungsstatus: ',
+    'oscunzer_APPLEPAY_ERROR' => 'Zahlung mit Apple Pay konnte nicht ausgeführt werden.',
 ];

@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Core;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use phpDocumentor\Reflection\Types\True_;
 
 class ViewConfig extends ViewConfig_parent
 {
@@ -23,6 +24,14 @@ class ViewConfig extends ViewConfig_parent
     public function getUnzerSystemMode(): string
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getSystemMode();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUnzerDebugMode(): bool
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->isDebugMode();
     }
 
     /**

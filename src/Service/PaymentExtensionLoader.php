@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\AliPay;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\ApplePay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Bancontact;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\EPS;
@@ -32,6 +33,7 @@ class PaymentExtensionLoader
 {
     public const UNZERCLASSNAMEMAPPING = [
         UnzerDefinitions::ALIPAY_UNZER_PAYMENT_ID => AliPay::class,
+        UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID => ApplePay::class,
         UnzerDefinitions::BANCONTACT_UNZER_PAYMENT_ID => Bancontact::class,
         UnzerDefinitions::CARD_UNZER_PAYMENT_ID => Card::class,
         UnzerDefinitions::EPS_UNZER_PAYMENT_ID => EPS::class,

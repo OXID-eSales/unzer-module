@@ -20,7 +20,9 @@
     </div>
 </form>
 
-
+[{if false}]
+<script>
+[{/if}]
 [{capture assign="unzerCardJS"}]
     $( '#orderConfirmAgbBottom' ).submit(function( event ) {
         if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
@@ -67,4 +69,7 @@
     });
 
     [{/capture}]
+[{if false}]
+</script>
+[{/if}]
 [{oxscript add=$unzerCardJS}]

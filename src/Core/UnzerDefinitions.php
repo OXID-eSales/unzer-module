@@ -28,6 +28,7 @@ final class UnzerDefinitions
     public const SEPA_SECURED_UNZER_PAYMENT_ID = 'oscunzer_sepa-secured';
     public const SOFORT_UNZER_PAYMENT_ID = 'oscunzer_sofort';
     public const WECHATPAY_UNZER_PAYMENT_ID = 'oscunzer_wechatpay';
+    public const APPLEPAY_UNZER_PAYMENT_ID = 'oscunzer_applepay';
 
     private const PAYMENT_CONSTRAINTS = [
         'oxfromamount' => 0,
@@ -59,6 +60,32 @@ final class UnzerDefinitions
                         like to pay with their domestic payment method. The most important product is the
                         Alipay wallet. With the associated app, buyers can carry out transactions directly
                         with their smartphone.'
+                ]
+            ],
+            'countries' => [],
+            'constraints' => self::PAYMENT_CONSTRAINTS
+        ],
+
+        //ApplePay
+        self::APPLEPAY_UNZER_PAYMENT_ID => [
+            'descriptions' => [
+                'de' => [
+                    'desc' => 'ApplePay',
+                    'longdesc' => 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+                        Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus
+                        et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec,
+                        pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo,
+                        fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a,
+                        venenatis vitae, justo.'
+                ],
+                'en' => [
+                    'desc' => 'ApplePay',
+                    'longdesc' => 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+                        Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus
+                        et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec,
+                        pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo,
+                        fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a,
+                        venenatis vitae, justo.'
                 ]
             ],
             'countries' => [],

@@ -7,12 +7,15 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
@@ -33,8 +36,21 @@ class OrderController extends OrderController_parent
         }
 
         $ret = parent::execute();
-        if (str_starts_with($ret, 'thankyou')) {
+
+        if ($ret && str_starts_with($ret, 'thankyou')) {
             $this->saveUnzerTransaction();
+        }
+
+        $unzer = $this->getServiceFromContainer(Unzer::class);
+        if ($unzer->isAjaxPayment()) {
+            $response = $this->getServiceFromContainer(ResponseHandler::class)->response();
+            if ($ret && !str_contains($ret, 'thankyou')) {
+                $response->setUnauthorized()->sendJson();
+            }
+
+            $response->setData([
+                'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
+            ])->sendJson();
         }
 
         return $ret;
@@ -99,11 +115,37 @@ class OrderController extends OrderController_parent
         return true;
     }
 
+    /**
+     * @return void
+     */
     public function saveUnzerTransaction(): void
     {
         $oOrder = oxNew(Order::class);
         if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
             $oOrder->initWriteTransactionToDB();
         }
+    }
+
+    public function getApplePayLabel()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getApplePayLabel();
+    }
+
+    public function getSupportedApplepayMerchantCapabilities(): array
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayMerchantCapabilities();
+    }
+
+    public function getSupportedApplePayNetworks(): array
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayNetworks();
+    }
+
+    public function getUserCountryIso(): string
+    {
+        $country = oxNew(Country::class);
+        $country->load(Registry::getSession()->getUser()->oxuser__oxcountryid->value);
+
+        return $country->oxcountry__oxisoalpha2->value;
     }
 }
