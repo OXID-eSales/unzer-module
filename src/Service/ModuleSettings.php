@@ -7,12 +7,12 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use http\Exception\RuntimeException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
+use \Exception;
 
 class ModuleSettings
 {
@@ -54,8 +54,7 @@ class ModuleSettings
      */
     public function __construct(
         ModuleSettingBridgeInterface $moduleSettingBridge
-    )
-    {
+    ) {
         $this->moduleSettingBridge = $moduleSettingBridge;
     }
 
@@ -189,8 +188,9 @@ class ModuleSettings
     public function getActiveApplePayNetworks(): array
     {
         return array_keys(array_filter(
-            $this->getApplePayNetworks(), 'self::isActiveSetting')
-        );
+            $this->getApplePayNetworks(),
+            'self::isActiveSetting'
+        ));
     }
 
     /**
@@ -266,7 +266,7 @@ class ModuleSettings
         $path = $facts->getSourcePath() . PATH_SEPARATOR . Module::MODULE_ID . '_applepay_merchant_certs';
 
         if (!file_exists($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
-            throw new RuntimeException();
+            throw new Exception('could not create path: ' . $path);
         }
 
         return $path;

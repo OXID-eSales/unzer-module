@@ -20,14 +20,25 @@ class ApplePayCallbackController extends FrontendController
      */
     public function validateMerchant(): void
     {
-        $merchantValidationUrl = urldecode(Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl'));
+        $merchantValidationUrl = urldecode(
+            Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl')
+        );
 
         $responseHandler = $this->getServiceFromContainer(ResponseHandler::class);
 
-        if ($validationResponse = $this->getServiceFromContainer(ApplePaySessionHandler::class)->validateMerchant($merchantValidationUrl)) {
-            $responseHandler->response()->setData(['validationResponse' => $validationResponse])->sendJson();
+        if (
+            $validationResponse = $this->getServiceFromContainer(ApplePaySessionHandler::class)
+            ->validateMerchant($merchantValidationUrl)
+        ) {
+            $responseHandler
+                ->response()
+                ->setData(['validationResponse' => $validationResponse])
+                ->sendJson();
         }
 
-        $responseHandler->response()->setUnauthorized()->sendJson();
+        $responseHandler
+            ->response()
+            ->setUnauthorized()
+            ->sendJson();
     }
 }

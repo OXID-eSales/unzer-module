@@ -26,10 +26,24 @@ class ApplePaySessionHandler
      */
     private function initialize(): void
     {
-        $domainName = rtrim(str_replace(['http://', 'https://'], '', Registry::getConfig()->getSslShopUrl()), '/');
-        $this->session = new ApplepaySession($this->moduleSettingsService->getApplePayMerchantIdentifier(), $this->moduleSettingsService->getApplePayLabel(), $domainName);
+        $domainName = rtrim(
+            str_replace(
+                ['http://', 'https://'],
+                '',
+                Registry::getConfig()->getSslShopUrl()
+            ),
+            '/'
+        );
+        $this->session = new ApplepaySession(
+            $this->moduleSettingsService->getApplePayMerchantIdentifier(),
+            $this->moduleSettingsService->getApplePayLabel(),
+            $domainName
+        );
         $this->adapter = new ApplepayAdapter();
-        $this->adapter->init($this->moduleSettingsService->getApplePayMerchantCertFilePath(), $this->moduleSettingsService->getApplePayMerchantCertKeyFilePath());
+        $this->adapter->init(
+            $this->moduleSettingsService->getApplePayMerchantCertFilePath(),
+            $this->moduleSettingsService->getApplePayMerchantCertKeyFilePath()
+        );
     }
 
     /**
@@ -39,7 +53,15 @@ class ApplePaySessionHandler
     public function validateMerchant(string $validationUrl): ?array
     {
         try {
-            return json_decode($this->adapter->validateApplePayMerchant($validationUrl, $this->session), true, 512, JSON_THROW_ON_ERROR);
+            return json_decode(
+                $this->adapter->validateApplePayMerchant(
+                    $validationUrl,
+                    $this->session
+                ),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
         } catch (\Throwable $e) {
             Registry::getLogger()->error($e->getMessage());
             return null;

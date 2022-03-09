@@ -83,7 +83,7 @@ class OrderController extends OrderController_parent
             } catch (OutOfStockException $oEx) {
                 $oEx->setDestination('basket');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
-            } catch (NoArticleException|ArticleInputException $oEx) {
+            } catch (NoArticleException | ArticleInputException $oEx) {
                 Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }

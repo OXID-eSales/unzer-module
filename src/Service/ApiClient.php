@@ -93,8 +93,12 @@ class ApiClient
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
-    private function request(string $url, string $method = 'GET', array $body = [], array $headers = []): ResponseInterface
-    {
+    private function request(
+        string $url,
+        string $method = 'GET',
+        array $body = [],
+        array $headers = []
+    ): ResponseInterface {
         $options['headers'] = array_merge($this->headers, $headers);
         if ($body) {
             $options['headers']['Content-Type'] = 'application/json';

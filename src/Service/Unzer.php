@@ -53,13 +53,12 @@ class Unzer
      * @param Request $request
      */
     public function __construct(
-        Session        $session,
-        Translator     $translator,
-        Context        $context,
+        Session $session,
+        Translator $translator,
+        Context $context,
         ModuleSettings $moduleSettings,
-        Request        $request
-    )
-    {
+        Request $request
+    ) {
         $this->session = $session;
         $this->translator = $translator;
         $this->context = $context;

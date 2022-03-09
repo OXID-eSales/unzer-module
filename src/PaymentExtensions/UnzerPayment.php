@@ -38,10 +38,9 @@ abstract class UnzerPayment
     protected $allowedCurrencies = [];
 
     public function __construct(
-        Unzer        $unzerSDK,
+        Unzer $unzerSDK,
         UnzerService $unzerService
-    )
-    {
+    ) {
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
@@ -79,10 +78,9 @@ abstract class UnzerPayment
      * @return bool
      */
     public function execute(
-        User   $userModel,
+        User $userModel,
         Basket $basketModel
-    ): bool
-    {
+    ): bool {
         $paymentType = $this->getUnzerPaymentTypeObject();
 
         $customer = $this->unzerService->getUnzerCustomer($userModel);

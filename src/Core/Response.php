@@ -47,9 +47,9 @@ class Response
     protected string $status;
 
     /**
-     * @var string
+     * @var int
      */
-    protected string $code;
+    protected int $code;
 
     /**
      * @param array $data
@@ -118,7 +118,7 @@ class Response
         $status = "{$header['code']} {$header['status']}";
 
         $this->data = $data ?? ['message' => $status];
-        $this->code = $header['code'];
+        $this->code = (int)$header['code'];
         $this->status = $status;
 
         return $this;
@@ -135,6 +135,11 @@ class Response
         header('Content-Type: application/json');
         header('Status: ' . $this->status);
 
-        Registry::getUtils()->showMessageAndExit(json_encode($this->data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
+        Registry::getUtils()->showMessageAndExit(
+            json_encode(
+                $this->data,
+                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK
+            )
+        );
     }
 }

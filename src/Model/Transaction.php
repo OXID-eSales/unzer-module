@@ -117,4 +117,5 @@ class Transaction extends BaseModel
         }
 
         return null;
+    }
 }

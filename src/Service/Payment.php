@@ -171,7 +171,7 @@ class Payment
                     $this->pdfLink = null;
                     $result = self::STATUS_OK;
                 }
-                if($this->isApplepaySession()) {
+                if ($this->isApplepaySession()) {
                     $result = self::STATUS_OK;
                 }
             } elseif ($transaction->isPending()) {

@@ -127,10 +127,14 @@ class Transaction
     }
 
     /**
-     * @param $params
      * @param (int|mixed|string)[] $params
      *
-     * @psalm-param array{oxorderid: mixed|string, oxshopid: int|mixed, oxuserid: mixed|string, oxactiondate: mixed|string} $params
+     * @psalm-param array{
+     *     oxorderid: mixed|string,
+     *     oxshopid: int|mixed,
+     *     oxuserid: mixed|string,
+     *     oxactiondate: mixed|string
+     * } $params
      */
     public function deleteInitOrder(array $params): void
     {
