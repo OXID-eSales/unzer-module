@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
@@ -44,6 +45,11 @@ class PaymentController extends PaymentController_parent
                     continue;
                 }
                 $paymentList[$key] = $payment;
+            }
+
+            // check ApplePay Eligibility
+            if (!$this->getServiceFromContainer(ModuleSettings::class)->isApplePayEligibility()) {
+                unset ($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
             }
         }
 

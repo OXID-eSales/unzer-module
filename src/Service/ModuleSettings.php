@@ -140,6 +140,17 @@ class ModuleSettings
     }
 
     /**
+     * @return bool
+     */
+    public function isApplePayEligibility(): bool
+    {
+        return (
+            $this->getApplePayMerchantCert() &&
+            $this->getApplePayMerchantCertKey()
+        );
+    }
+
+    /**
      * @return mixed
      */
     public function getApplePayLabel()
@@ -243,7 +254,7 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertFilePath(): string
     {
-        return $this->getFilesPath() . '/.merchant_cert.' . Registry::getConfig()->getShopId();
+        return $this->getFilesPath() . '/.applepay_merchant_cert.' . Registry::getConfig()->getShopId();
     }
 
     /**
@@ -252,7 +263,7 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertKeyFilePath(): string
     {
-        return $this->getFilesPath() . '/.merchant_cert_key.' . Registry::getConfig()->getShopId();
+        return $this->getFilesPath() . '/.applepay_merchant_cert_key.' . Registry::getConfig()->getShopId();
     }
 
     /**
@@ -262,7 +273,11 @@ class ModuleSettings
     public function getFilesPath(): string
     {
         $facts = new Facts();
-        $path = $facts->getSourcePath() . PATH_SEPARATOR . Module::MODULE_ID . '_applepay_merchant_certs';
+        $path = $facts->getShopRootPath() . DIRECTORY_SEPARATOR
+            . 'var' . DIRECTORY_SEPARATOR
+            . 'module' . DIRECTORY_SEPARATOR
+            . Module::MODULE_ID . DIRECTORY_SEPARATOR
+            . 'certs';
 
         if (!file_exists($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
             throw new Exception('could not create path: ' . $path);

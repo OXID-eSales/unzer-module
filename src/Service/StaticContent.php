@@ -110,8 +110,11 @@ class StaticContent
         $activeCountries = $this->getActiveCountries();
         $iso2LanguageId = array_flip($this->getLanguageIds());
 
-        $active = empty($definitions['countries']) ||
-            0 < count(array_intersect($definitions['countries'], $activeCountries));
+        $active = (
+                empty($definitions['countries']) ||
+                0 < count(array_intersect($definitions['countries'], $activeCountries))
+            ) &&
+            $definitions['active'] === true;
         $paymentModel->assign(
             [
                'oxactive' => (int) $active,

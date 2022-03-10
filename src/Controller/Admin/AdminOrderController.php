@@ -143,7 +143,7 @@ class AdminOrderController extends AdminDetailsController
             $aRv['cancelReason'] = $cancellation->getReasonCode();
 
             if ($cancellation->isSuccess()) {
-                $fCancelled += $charge->getCancelledAmount();
+                $fCancelled += $cancellation->getAmount();
             }
             $cancellations[] = $aRv;
         }
