@@ -224,7 +224,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         $keyExists = false;
         try {
-            $keyExists = $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentCert()->getStatusCode() === 200;
+            $keyExists = $this->getServiceFromContainer(ApiClient::class)
+                ->requestApplePayPaymentCert()
+                ->getStatusCode()
+                === 200;
         } catch (GuzzleException $guzzleException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 oxNew(
@@ -245,7 +248,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         $certExists = false;
         try {
-            $certExists = $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentKey()->getStatusCode() === 200;
+            $certExists = $this->getServiceFromContainer(ApiClient::class)
+                ->requestApplePayPaymentKey()
+                ->getStatusCode()
+                === 200;
         } catch (GuzzleException $guzzleException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 oxNew(

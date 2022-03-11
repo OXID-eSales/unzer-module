@@ -121,8 +121,8 @@ final class UnzerDefinitions
                         title="eps" style="float: left;margin-right: 10px;" />
                         Um mit eps zu bezahlen, benötigen Sie ein Online-Banking-Konto bei einer der teilnehmenden
                         Banken. Wählen Sie an der Kasse Ihre Bank aus und loggen Sie sich in den privaten
-                        Online-Banking-Bereich ein. Dort überprüfen Sie die von Ihnen bereits eingegebenen Zahlungsdaten.
-                        Wenn sie korrekt sind, autorisieren Sie die Zahlung und schließen den Kauf ab.'
+                        Online-Banking-Bereich ein. Dort überprüfen Sie die von Ihnen bereits eingegebenen
+                        Zahlungsdaten. Wenn sie korrekt sind, autorisieren Sie die Zahlung und schließen den Kauf ab.'
                 ],
                 'en' => [
                     'desc' => 'EPS',
