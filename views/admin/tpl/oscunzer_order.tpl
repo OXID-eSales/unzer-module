@@ -129,18 +129,18 @@
 
                     <td>[{$oUnzerCharge.chargeDate|escape}]</td>
                     <td>[{$oUnzerCharge.chargeId|escape}]</td>
-                    <td>[{$oUnzerCharge.chargedAmount|escape}] [{$uzrCurrency}]</td>
-                    <td>[{$oUnzerCharge.cancelledAmount|escape}] [{$uzrCurrency}]</td>
+                    <td>[{$oUnzerCharge.chargedAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                    <td>[{$oUnzerCharge.cancelledAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]</td>
 
                     <td>
                         <select name="reason" id="reason_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]>
-                            [{if !$blCancelReasonReq}]<option value="">NONE</option>[{/if}]
+                            [{if !$blCancelReasonReq}]<option value="">[{oxmultilang ident="OSCUNZER_REASON_NONE"}]</option>[{/if}]
                             <option value="CANCEL">[{oxmultilang ident="OSCUNZER_REASON_CANCEL"}]</option>
                             <option value="RETURN">[{oxmultilang ident="OSCUNZER_REASON_RETURN"}]</option>
                             <option value="CREDIT">[{oxmultilang ident="OSCUNZER_REASON_CREDIT"}]</option>
                         </select>
                     </td>
-                    <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]> [{$uzrCurrency}]</td>
+                    <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount|string_format:"%.2f"}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]> [{$uzrCurrency}]</td>
                     <td><input type="submit" id="submit_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
                                value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
                     </td>

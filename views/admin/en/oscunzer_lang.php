@@ -39,6 +39,7 @@ $aLang = [
     'OSCUNZER_CANCEL_MISSINGREASON' => 'A reason for repayment must be specified for the payment method',
     'OSCUNZER_CANCEL_ALERT' => 'Refunded amounts cannot be recovered! Do you really want to refund the selected amount? chosen amount: ',
     'OSCUNZER_SHIP_ID' => 'Shipping-Id',
+    'OSCUNZER_REASON_NONE' => 'none',
     'OSCUNZER_REASON_CANCEL' => 'cancel order',
     'OSCUNZER_REASON_RETURN' => 'Customer sends articles back',
     'OSCUNZER_REASON_CREDIT' => 'Customer gets money back, he can keep articles',
