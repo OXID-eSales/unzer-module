@@ -46,9 +46,7 @@ abstract class UnzerPayment
 
         $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
 
-        if ($this->ajaxResponse) {
-            $this->unzerService->setIsAjaxPayment();
-        }
+        $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
     }
 
     /**

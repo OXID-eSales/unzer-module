@@ -341,9 +341,9 @@ class Unzer
     /**
      * @return void
      */
-    public function setIsAjaxPayment(): void
+    public function setIsAjaxPayment($isAjaxPayment = false): void
     {
-        $this->session->setVariable('UzrAjaxRedirect', true);
+        $this->session->setVariable('UzrAjaxRedirect', $isAjaxPayment);
     }
 
     /**
