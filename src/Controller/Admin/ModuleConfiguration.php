@@ -187,21 +187,21 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $errorMessage = null;
 
         if (!$key || !$cert) {
-            $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT';
+            $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
         }
 
         if (is_null($errorMessage)) {
             $apiClient = $this->getServiceFromContainer(ApiClient::class);
             $response = $apiClient->uploadApplePayPaymentKey($key);
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY';
+                $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
             }
         }
 
         if (is_null($errorMessage)) {
             $response = $apiClient->uploadApplePayPaymentCertificate($cert);
             if ($response->getStatusCode() !== 200) {
-                $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_CERT';
+                $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
             }
         }
 
@@ -222,7 +222,20 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function getApplePayPaymentProcessingKeyExists(): bool
     {
-        return $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentCert()->getStatusCode() === 200;
+        $keyExists = false;
+        try {
+            $keyExists = $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentCert()->getStatusCode() === 200;
+        } catch (GuzzleException $guzzleException) {
+            Registry::getUtilsView()->addErrorToDisplay(
+                oxNew(
+                    UnzerException::class,
+                    Registry::getLang()->translateString(
+                        'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY'
+                    )
+                )
+            );
+        }
+        return $keyExists;
     }
 
     /**
@@ -230,7 +243,20 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function getApplePayPaymentProcessingCertExists(): bool
     {
-        return $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentKey()->getStatusCode() === 200;
+        $certExists = false;
+        try {
+            $certExists = $this->getServiceFromContainer(ApiClient::class)->requestApplePayPaymentKey()->getStatusCode() === 200;
+        } catch (GuzzleException $guzzleException) {
+            Registry::getUtilsView()->addErrorToDisplay(
+                oxNew(
+                    UnzerException::class,
+                    Registry::getLang()->translateString(
+                        'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT'
+                    )
+                )
+            );
+        }
+        return $certExists;
     }
 
     /**
@@ -244,15 +270,23 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $request = Registry::getRequest();
         $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
 
-        $moduleSettings->saveApplePayMerchantCapabilities($request->getRequestEscapedParameter('applePayMC'));
-        $moduleSettings->saveApplePayNetworks($request->getRequestEscapedParameter('applePayNetworks'));
-        file_put_contents(
-            $moduleSettings->getApplePayMerchantCertFilePath(),
-            $request->getRequestEscapedParameter('applePayMerchantCert')
-        );
-        file_put_contents(
-            $moduleSettings->getApplePayMerchantCertKeyFilePath(),
-            $request->getRequestEscapedParameter('applePayMerchantCertKey')
-        );
+        if ($requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
+            $moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
+        }
+        if ($requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')) {
+            $moduleSettings->saveApplePayNetworks($requestApplePayNetworks);
+        }
+        if ($requestApplePayMerchantCert = $request->getRequestEscapedParameter('applePayMerchantCert')) {
+            file_put_contents(
+                $moduleSettings->getApplePayMerchantCertFilePath(),
+                $requestApplePayMerchantCert
+            );
+        }
+        if ($requestApplePayMerchantCertKey = $request->getRequestEscapedParameter('applePayMerchantCertKey')) {
+            file_put_contents(
+                $moduleSettings->getApplePayMerchantCertKeyFilePath(),
+                $requestApplePayMerchantCertKey
+            );
+        }
     }
 }
