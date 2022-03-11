@@ -83,74 +83,81 @@ class AdminOrderController extends AdminDetailsController
 
     protected function getUnzerViewData(string $sPaymentId): void
     {
-        /** @var \UnzerSDK\Resources\Payment $unzerPayment */
-        $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK()
-            ->fetchPayment($sPaymentId);
+        $translator = oxNew(Translator::class, Registry::getLang());
 
-        $fCancelled = 0.0;
-        $fCharged = 0.0;
+        try {
+            /** @var \UnzerSDK\Resources\Payment $unzerPayment */
+            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
+                ->getUnzerSDK()
+                ->fetchPayment($sPaymentId);
+            $fCancelled = 0.0;
+            $fCharged = 0.0;
 
-        $shipments = [];
-        $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
+            $shipments = [];
+            $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
-        /** @var Shipment $shipment */
-        foreach ($unzerPayment->getShipments() as $shipment) {
-            $aRv = [];
-            $aRv['shipingDate'] = $shipment->getDate();
-            $aRv['shipId'] = $shipment->getId();
-            $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
-            $aRv['amount'] = $shipment->getAmount();
-
-            $shipments[] = $aRv;
-        }
-        $this->_aViewData["aShipments"] = $shipments;
-
-        if ($unzerPayment->getAuthorization()) {
-            $unzAuthorization = $unzerPayment->getAuthorization();
-            $this->_aViewData["AuthAmountRemaining"] = $unzerPayment->getAmount()->getRemaining();
-            $this->_aViewData["AuthFetchedAt"] = $unzAuthorization->getFetchedAt();
-            $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
-            $this->_aViewData["AuthId"] = $unzAuthorization->getId();
-            $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
-            $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
-        }
-        $charges = [];
-        if (!$unzerPayment->isCanceled()) {
-            /** @var Charge $charge */
-            foreach ($unzerPayment->getCharges() as $charge) {
+            /** @var Shipment $shipment */
+            foreach ($unzerPayment->getShipments() as $shipment) {
                 $aRv = [];
-                $aRv['chargedAmount'] = $charge->getAmount();
-                $aRv['cancelledAmount'] = $charge->getCancelledAmount();
-                $aRv['chargeId'] = $charge->getId();
-                $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
-                if ($charge->isSuccess()) {
-                    $fCharged += $charge->getAmount();
+                $aRv['shipingDate'] = $shipment->getDate();
+                $aRv['shipId'] = $shipment->getId();
+                $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
+                $aRv['amount'] = $shipment->getAmount();
+
+                $shipments[] = $aRv;
+            }
+            $this->_aViewData["aShipments"] = $shipments;
+
+            if ($unzerPayment->getAuthorization()) {
+                $unzAuthorization = $unzerPayment->getAuthorization();
+                $this->_aViewData["AuthAmountRemaining"] = $unzerPayment->getAmount()->getRemaining();
+                $this->_aViewData["AuthFetchedAt"] = $unzAuthorization->getFetchedAt();
+                $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
+                $this->_aViewData["AuthId"] = $unzAuthorization->getId();
+                $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
+                $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
+            }
+            $charges = [];
+            if (!$unzerPayment->isCanceled()) {
+                /** @var Charge $charge */
+                foreach ($unzerPayment->getCharges() as $charge) {
+                    $aRv = [];
+                    $aRv['chargedAmount'] = $charge->getAmount();
+                    $aRv['cancelledAmount'] = $charge->getCancelledAmount();
+                    $aRv['chargeId'] = $charge->getId();
+                    $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
+                    if ($charge->isSuccess()) {
+                        $fCharged += $charge->getAmount();
+                    }
+                    $aRv['chargeDate'] = $charge->getDate();
+
+                    $charges [] = $aRv;
                 }
-                $aRv['chargeDate'] = $charge->getDate();
-
-                $charges [] = $aRv;
             }
-        }
 
-        $cancellations = [];
-        /** @var Cancellation $cancellation */
-        foreach ($unzerPayment->getCancellations() as $cancellation) {
-            $aRv = [];
-            $aRv['cancelledAmount'] = $cancellation->getAmount();
-            $aRv['cancelDate'] = $cancellation->getDate();
-            $aRv['cancellationId'] = $cancellation->getId();
-            $aRv['cancelReason'] = $cancellation->getReasonCode();
+            $cancellations = [];
+            /** @var Cancellation $cancellation */
+            foreach ($unzerPayment->getCancellations() as $cancellation) {
+                $aRv = [];
+                $aRv['cancelledAmount'] = $cancellation->getAmount();
+                $aRv['cancelDate'] = $cancellation->getDate();
+                $aRv['cancellationId'] = $cancellation->getId();
+                $aRv['cancelReason'] = $cancellation->getReasonCode();
 
-            if ($cancellation->isSuccess()) {
-                $fCancelled += $cancellation->getAmount();
+                if ($cancellation->isSuccess()) {
+                    $fCancelled += $cancellation->getAmount();
+                }
+                $cancellations[] = $aRv;
             }
-            $cancellations[] = $aRv;
+            $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
+            $this->_aViewData['aCharges'] = $charges;
+            $this->_aViewData['aCancellations'] = $cancellations;
+            $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
+        } catch (\Exception $e) {
+            Registry::getUtilsView()->addErrorToDisplay(
+                $e->getMessage()
+            );
         }
-        $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
-        $this->_aViewData['aCharges'] = $charges;
-        $this->_aViewData['aCancellations'] = $cancellations;
-        $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
     }
 
     public function sendShipmentNotification(): void

@@ -429,6 +429,7 @@ $aLang = [
     "oscunzer_500.100.403"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_500.200.101"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_510.310.010"   => "Ihre Domain benötigt ein SSL Zertifikat.",
+    "oscunzer_510.000.002"   => "Der hinterlegte private Schlüssel ist unbekannt oder nicht valide.",
     "oscunzer_600.100.100"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_600.200.100"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
     "oscunzer_600.200.200"   => "Es ist ein allgemeiner technischer Fehler aufgetreten",
