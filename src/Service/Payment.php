@@ -169,11 +169,8 @@ class Payment
                 }
                 if ($this->isPdfSession()) {
                     $this->pdfLink = null;
-                    $result = self::STATUS_OK;
                 }
-                if ($this->isApplepaySession()) {
-                    $result = self::STATUS_OK;
-                }
+                $result = self::STATUS_OK;
             } elseif ($transaction->isPending()) {
                 $result = self::STATUS_NOT_FINISHED;
 
@@ -351,14 +348,5 @@ class Payment
     public function isPdfSession(): bool
     {
         return (bool) Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
-    }
-
-    /**
-     * @return bool
-     * @throws UnzerApiException
-     */
-    public function isApplePaySession(): bool
-    {
-        return $this->getSessionUnzerPayment()->getPaymentType() instanceof Applepay;
     }
 }

@@ -120,6 +120,11 @@ $aModule = [
             'block' => 'select_payment',
             'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
         ],
+        [
+            'template' => 'page/checkout/thankyou.tpl',
+            'block' => 'checkout_thankyou_info',
+            'file' => 'views/frontend/blocks/page/checkout/checkout_thankyou_info.tpl'
+        ],
         //admin
         [
             'template' => 'module_config.tpl',
@@ -130,12 +135,12 @@ $aModule = [
         [
             'template' => 'email/plain/order_cust.tpl',
             'block' => 'email_plain_order_cust_paymentinfo',
-            'file' => 'views/frontend/blocks/email/unzer_email_plain_order_cust_paymentinfo.tpl'
+            'file' => 'views/frontend/blocks/email/plain/email_plain_order_cust_paymentinfo.tpl'
         ],
         [
             'template' => 'email/html/order_cust.tpl',
             'block' => 'email_html_order_cust_paymentinfo',
-            'file' => 'views/frontend/blocks/email/unzer_email_html_order_cust_paymentinfo.tpl'
+            'file' => 'views/frontend/blocks/email/html/email_html_order_cust_paymentinfo.tpl'
         ],
     ],
     'settings' => [
