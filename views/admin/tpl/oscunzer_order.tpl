@@ -12,7 +12,7 @@
     <input type="hidden" name="cl" value="order_main">
 </form>
 
-<div id="liste">
+<div id="liste" style="margin:0;">
     [{if !$oUnzerTransactions}]
         [{oxmultilang ident="OSCUNZER_NO_UNZER_ORDER"}]
     [{else}]
@@ -58,14 +58,14 @@
                             <tr>
                                 <td>[{$oUnzerShipment.shipingDate|escape}]</td>
                                 <td>[{$oUnzerShipment.shipId|escape}]</td>
-                                <td>[{$oUnzerShipment.amount|escape}]</td>
+                                <td>[{$oUnzerShipment.amount|escape|string_format:"%.2f"}]</td>
                                 <td>[{$oUnzerShipment.invoiceid|escape}]</td>
                             </tr>
                         [{/foreach}]
                     </tbody>
                 </table>
             [{else}]
-                <br>[{oxmultilang ident="OSCUNZER_NOSHIPINGYET"}]
+                [{oxmultilang ident="OSCUNZER_NOSHIPINGYET"}]<br>
                 <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="sendShipmentNotification">
@@ -81,12 +81,11 @@
     [{/block}]
     [{block name="unzer_collect"}]
         [{if $AuthId}]
-            <br><br>
-            <b>[{oxmultilang ident="OSCUNZER_AUTHORIZATION"}]</b><br>
-            <b>[{oxmultilang ident="OSCUNZER_REMAING_AMOUNT"}]</b>: [{$AuthAmountRemaining}] [{$AuthCur}]<br>
-            <b>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT"}]</b>: [{$AuthAmount}]  [{$AuthCur}]<br>
+            <h3>[{oxmultilang ident="OSCUNZER_AUTHORIZATION"}]</h3>
+            <b>[{oxmultilang ident="OSCUNZER_REMAING_AMOUNT" suffix="COLON"}]</b>[{$AuthAmountRemaining}] [{$AuthCur}]<br>
+            <b>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT" suffix="COLON"}]</b>[{$AuthAmount|string_format:"%.2f"}] [{$AuthCur}]<br>
 
-            [{if $AuthAmountRemaining>0}]
+            [{if $AuthAmountRemaining > 0}]
                 <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerCollect">
