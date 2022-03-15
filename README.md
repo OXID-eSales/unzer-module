@@ -4,7 +4,8 @@ Unzer Payment integration for OXID eShop 6.3 and above.
 
 ## Documentation
 
-* official Unzer Payment checkout for OXID [Documentation](https://docs.oxid-esales.com/modules/unzer/de/latest/).
+* official german Unzer Payment checkout for OXID [Documentation](https://docs.oxid-esales.com/modules/unzer/de/latest/).
+* official english Unzer Payment checkout for OXID [Documentation](https://docs.oxid-esales.com/modules/unzer/en/latest/).
 
 ## Compatibility
 
