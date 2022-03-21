@@ -42,7 +42,14 @@ sed -i "s/.*oView->getShopFullEdition.*/Enterprise Edition/" /var/www/oxideshop/
 echo "EE Fake done."
 
 php /var/www/oxideshop/vendor/bin/oe-eshop-doctrine_migration migrations:migrate;
+
+#to be able to have a default configuration, the server does have a mount of the default config file to
+#/var/www/oxideshop/var/configuration/environment/1.yaml.default. that is why I copy this file for oxid,
+#so oxid admin still works when saving configuration but it will be overwritten on deployment
+cp /var/www/oxideshop/var/configuration/environment/1.yaml.default /var/www/oxideshop/var/configuration/environment/1.yaml
+
 /var/www/oxideshop/vendor/bin/oe-console oe:module:apply-configuration;
+
 /var/www/oxideshop/vendor/bin/oe-console oe:module:activate osc-unzer;
 
 echo "Setup done."
