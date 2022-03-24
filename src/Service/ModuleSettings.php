@@ -11,6 +11,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\Facts\Facts;
+use OxidEsales\Eshop\Core\Module\Module as OxidModule;
 use OxidSolutionCatalysts\Unzer\Module;
 use Exception;
 
@@ -137,6 +138,16 @@ class ModuleSettings
             return self::PAYMENT_AUTHORIZE;
         }
         return self::PAYMENT_CHARGE;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModuleVersion(): string
+    {
+        $module = oxNew(OxidModule::class);
+        $module->load(Module::MODULE_ID);
+        return $module->getInfo('version');
     }
 
     /**
