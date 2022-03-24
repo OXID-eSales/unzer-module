@@ -9,9 +9,9 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\Facts\Facts;
-use OxidEsales\Eshop\Core\Module\Module as OxidModule;
 use OxidSolutionCatalysts\Unzer\Module;
 use Exception;
 
@@ -49,13 +49,18 @@ class ModuleSettings
     /** @var ModuleSettingBridgeInterface */
     private $moduleSettingBridge;
 
+    /** @var ModuleConfigurationDaoBridgeInterface */
+    private $moduleInfoBridge;
+
     /**
      * @param ModuleSettingBridgeInterface $moduleSettingBridge
      */
     public function __construct(
-        ModuleSettingBridgeInterface $moduleSettingBridge
+        ModuleSettingBridgeInterface $moduleSettingBridge,
+        ModuleConfigurationDaoBridgeInterface $moduleInfoBridge
     ) {
         $this->moduleSettingBridge = $moduleSettingBridge;
+        $this->moduleInfoBridge = $moduleInfoBridge;
     }
 
     /**
@@ -145,9 +150,7 @@ class ModuleSettings
      */
     public function getModuleVersion(): string
     {
-        $module = oxNew(OxidModule::class);
-        $module->load(Module::MODULE_ID);
-        return $module->getInfo('version');
+        return $this->moduleInfoBridge->get(Module::MODULE_ID)->getVersion();
     }
 
     /**
