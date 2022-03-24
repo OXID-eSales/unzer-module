@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
@@ -48,13 +49,18 @@ class ModuleSettings
     /** @var ModuleSettingBridgeInterface */
     private $moduleSettingBridge;
 
+    /** @var ModuleConfigurationDaoBridgeInterface */
+    private $moduleInfoBridge;
+
     /**
      * @param ModuleSettingBridgeInterface $moduleSettingBridge
      */
     public function __construct(
-        ModuleSettingBridgeInterface $moduleSettingBridge
+        ModuleSettingBridgeInterface $moduleSettingBridge,
+        ModuleConfigurationDaoBridgeInterface $moduleInfoBridge
     ) {
         $this->moduleSettingBridge = $moduleSettingBridge;
+        $this->moduleInfoBridge = $moduleInfoBridge;
     }
 
     /**
@@ -137,6 +143,14 @@ class ModuleSettings
             return self::PAYMENT_AUTHORIZE;
         }
         return self::PAYMENT_CHARGE;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModuleVersion(): string
+    {
+        return $this->moduleInfoBridge->get(Module::MODULE_ID)->getVersion();
     }
 
     /**

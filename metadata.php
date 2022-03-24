@@ -89,6 +89,7 @@ $aModule = [
         'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
         'modules/osc/unzer/message/js-errors.tpl' => 'osc/unzer/views/frontend/tpl/message/js-errors.tpl',
         'modules/osc/unzer/payment/applepay_availibility_check.tpl' => 'osc/unzer/views/frontend/tpl/payment/applepay_availibility_check.tpl',
+        'modules/osc/unzer/payment/payment_unzer.tpl' => 'osc/unzer/views/frontend/tpl/payment/payment_unzer.tpl',
         'modules/osc/unzer/order/applepay_button.tpl' => 'osc/unzer/views/frontend/tpl/order/applepay_button.tpl',
     ],
     'blocks' => [
