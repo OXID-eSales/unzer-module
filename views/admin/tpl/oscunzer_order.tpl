@@ -27,13 +27,13 @@
                     <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</td>
                 </tr>
                 [{foreach from=$oUnzerTransactions item="oUnzerTransaction"}]
-                    [{assign var="transaction_type_id" value=$oUnzerTransaction->getUnzerAction()|escape}]
+                    [{assign var="transaction_state" value=$oUnzerTransaction->getUnzerState()|escape}]
                     <tr>
                         <td>[{$oUnzerTransaction->getUnzerCreated()|escape}]</td>
                         <td>[{$oUnzerTransaction->getUnzerShortId()|escape}]</td>
                         <td>[{$oUnzerTransaction->getUnzerTraceId()|escape}]</td>
                         <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
-                        <td>[{'OSCUNZER_TRANSACTION_TYPEID_'|cat:$transaction_type_id|oxmultilangassign}]</td>
+                        <td>[{'OSCUNZER_TRANSACTION_STATUS_'|cat:$transaction_state|oxmultilangassign}]</td>
                         <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
                     </tr>
                 [{/foreach}]

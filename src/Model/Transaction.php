@@ -51,7 +51,7 @@ class Transaction extends BaseModel
     /**
      * @return string|null
      */
-    public function getUnzerAction(): ?string
+    public function getUnzerState(): ?string
     {
         return $this->getRawField('OXACTION');
     }
