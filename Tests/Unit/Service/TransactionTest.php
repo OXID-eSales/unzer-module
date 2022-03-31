@@ -44,7 +44,7 @@ class TransactionTest extends TestCase
             'getAmount' => $this->createConfiguredMock(Amount::class, ['getTotal' => 10.20]),
             'getCurrency' => 'specialCurrency',
             'getId' => 'unzerPaymentId',
-            'getStateName' => 'stateName',
+            'getStateName' => 'statename',
             'getInitialTransaction' => $this->createConfiguredMock(AbstractTransactionType::class, [
                 'getShortID' => 'unzerShortId',
                 'getTraceID' => null
@@ -67,7 +67,7 @@ class TransactionTest extends TestCase
             'amount' => 10.20,
             'currency' => 'specialCurrency',
             'typeid' => 'unzerPaymentId',
-            'oxaction' => 'stateName',
+            'oxaction' => 'statename',
             'metadata' => 'metadataJson',
             'customerid' => 'unzerCustomerId',
         ]);
