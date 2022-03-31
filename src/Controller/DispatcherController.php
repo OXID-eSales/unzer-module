@@ -79,7 +79,7 @@ class DispatcherController extends FrontendController
                     }
                 }
 
-                $transactionService = $this->getServiceFromContainer(TransactionService::class);
+                $transactionService = $this->getServiceFromContainer(Transaction::class);
                 if (
                     $transactionService->writeTransactionToDB(
                         $order->getId(),
