@@ -253,11 +253,16 @@ class Transaction
      */
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
+        $oxaction = preg_replace(
+            '/[^a-z]/',
+            '',
+            strtolower($unzerPayment->getStateName())
+        );
         $params = [
             'amount'   => $unzerPayment->getAmount()->getTotal(),
             'currency' => $unzerPayment->getCurrency(),
             'typeid'   => $unzerPayment->getId(),
-            'oxaction' => $unzerPayment->getStateName(),
+            'oxaction' => $oxaction,
             'traceid'  => $unzerPayment->getTraceId()
         ];
 
@@ -287,7 +292,7 @@ class Transaction
             'amount'   => $unzerCharge->getAmount(),
             'currency' => $unzerCharge->getCurrency(),
             'typeid'   => $unzerCharge->getId(),
-            'oxaction' => 'charge',
+            'oxaction' => 'charged',
             'traceid'  => $unzerCharge->getTraceId(),
             'shortid'  => $unzerCharge->getShortId(),
             'status'   => $this->getUzrStatus($unzerCharge),
@@ -299,7 +304,7 @@ class Transaction
         return [
             'amount'   => $unzerCancel->getAmount(),
             'typeid'   => $unzerCancel->getId(),
-            'oxaction' => 'cancel',
+            'oxaction' => 'canceled',
             'traceid'  => $unzerCancel->getTraceId(),
             'shortid'  => $unzerCancel->getShortId(),
             'status'   => $this->getUzrStatus($unzerCancel),
@@ -312,7 +317,7 @@ class Transaction
             'amount'    => $unzerShipment->getAmount(),
             'fetchedAt' => $unzerShipment->getFetchedAt(),
             'typeid'    => $unzerShipment->getId(),
-            'oxaction'  => 'ship',
+            'oxaction'  => 'shipped',
             'shortid'   => $unzerShipment->getShortId(),
             'traceid'   => $unzerShipment->getTraceId(),
             'metadata'  => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
