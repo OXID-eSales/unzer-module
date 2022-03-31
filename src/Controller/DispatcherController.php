@@ -79,7 +79,14 @@ class DispatcherController extends FrontendController
                     }
                 }
 
-                if ($order->initWriteTransactionToDB($unzerPayment)) {
+                $transactionService = $this->getServiceFromContainer(Transaction::class);
+                if (
+                    $transactionService->writeTransactionToDB(
+                        $order->getId(),
+                        $order->getOrderUser()->getId() ?: '',
+                        $unzerPayment
+                    )
+                ) {
                     $result = sprintf(
                         $translator->translate('oscunzer_TRANSACTION_CHANGE'),
                         $unzerPayment->getStateName(),

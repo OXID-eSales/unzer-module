@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\SepaSecured;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
@@ -284,11 +285,20 @@ class Payment
         $blSuccess = false;
 
         if ($sPaymentId) {
+            $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
+
             $unzerPayment = $this->getUnzerSDK()->fetchPayment($sPaymentId);
 
             if ($unzerPayment->getPaymentType() instanceof InstallmentSecured) {
                 $this->setInstallmentDueDate($unzerPayment);
             }
+
+            $shipment = $this->getUnzerSDK()->ship(
+                $unzerPayment,
+                $sInvoiceNr,
+                $oOrder->getId()
+            );
+            $unzerPayment->addShipment($shipment);
 
             foreach ($unzerPayment->getShipments() as $unzShipment) {
                 if ($unzShipment->isSuccess()) {
@@ -297,7 +307,6 @@ class Payment
             }
 
             if (!$blSuccess && $unzerPayment->getAmount()->getRemaining() === 0.0) {
-                $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
                 try {
                     $blSuccess = $this->transactionService->writeTransactionToDB(
                         $oOrder->getId(),

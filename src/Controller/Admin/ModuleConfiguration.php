@@ -46,7 +46,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         if ($this->_sModuleId == Module::MODULE_ID) {
             try {
-                $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+                $moduleSettings = $this->getModuleSettings();
                 $pubKey = $moduleSettings->getShopPublicKey();
                 $privKey = $moduleSettings->getShopPrivateKey();
                 $registeredWebhookUrl = $moduleSettings->getRegisteredWebhook();
@@ -223,20 +223,25 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function getApplePayPaymentProcessingKeyExists(): bool
     {
         $keyExists = false;
-        try {
-            $keyExists = $this->getServiceFromContainer(ApiClient::class)
-                ->requestApplePayPaymentCert()
-                ->getStatusCode()
-                === 200;
-        } catch (GuzzleException $guzzleException) {
-            Registry::getUtilsView()->addErrorToDisplay(
-                oxNew(
-                    UnzerException::class,
-                    Registry::getLang()->translateString(
-                        'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY'
+        // if we have an Apple Merchant Key, then the Processing Key should be exists
+        // if not, we inform the Backend-User
+        $moduleSettings = $this->getModuleSettings();
+        if ($moduleSettings->getApplePayMerchantCertKey()) {
+            try {
+                $keyExists = $this->getServiceFromContainer(ApiClient::class)
+                    ->requestApplePayPaymentCert()
+                    ->getStatusCode()
+                    === 200;
+            } catch (GuzzleException $guzzleException) {
+                Registry::getUtilsView()->addErrorToDisplay(
+                    oxNew(
+                        UnzerException::class,
+                        Registry::getLang()->translateString(
+                            'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY'
+                        )
                     )
-                )
-            );
+                );
+            }
         }
         return $keyExists;
     }
@@ -247,20 +252,25 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function getApplePayPaymentProcessingCertExists(): bool
     {
         $certExists = false;
-        try {
-            $certExists = $this->getServiceFromContainer(ApiClient::class)
-                ->requestApplePayPaymentKey()
-                ->getStatusCode()
-                === 200;
-        } catch (GuzzleException $guzzleException) {
-            Registry::getUtilsView()->addErrorToDisplay(
-                oxNew(
-                    UnzerException::class,
-                    Registry::getLang()->translateString(
-                        'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT'
+        $moduleSettings = $this->getModuleSettings();
+        // if we have an Apple Merchant Cert, then the Processing Cert should be exists
+        // if not, we inform the Backend-User
+        if ($moduleSettings->getApplePayMerchantCert()) {
+            try {
+                $certExists = $this->getServiceFromContainer(ApiClient::class)
+                    ->requestApplePayPaymentKey()
+                    ->getStatusCode()
+                    === 200;
+            } catch (GuzzleException $guzzleException) {
+                Registry::getUtilsView()->addErrorToDisplay(
+                    oxNew(
+                        UnzerException::class,
+                        Registry::getLang()->translateString(
+                            'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT'
+                        )
                     )
-                )
-            );
+                );
+            }
         }
         return $certExists;
     }
@@ -274,7 +284,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         parent::saveConfVars();
 
         $request = Registry::getRequest();
-        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+        $moduleSettings = $this->getModuleSettings();
 
         if ($requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
             $moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
@@ -294,5 +304,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $requestApplePayMerchantCertKey
             );
         }
+    }
+
+    protected function getModuleSettings()
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class);
     }
 }
