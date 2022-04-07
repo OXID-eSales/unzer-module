@@ -9,3 +9,15 @@ modules:
         group: unzermerchant
         type: str
         value: SANDBOXUNZERRPRIVATEKEY
+      applepay_payment_certs_processed:
+        group: unzerapplepay
+        type: bool
+        value: true
+      applepay_merchant_identifier:
+        group: unzerapplepay
+        type: str
+        value: APPLEPAYMERCHANTIDENTIFIER
+      applepay_label:
+        group: unzerapplepay
+        type: str
+        value: APPLEPAYLABEL
