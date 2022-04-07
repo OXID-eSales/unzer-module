@@ -301,6 +301,33 @@ class ModuleSettings
     }
 
     /**
+     * @param string $webHook
+     * @return void
+     */
+    public function saveWebhook(string $webHook): void
+    {
+        $this->saveSetting('registeredWebhook', $webHook);
+    }
+
+    /**
+     * @param string $webHookId
+     * @return void
+     */
+    public function saveWebhookId(string $webHookId): void
+    {
+        $this->saveSetting('registeredWebhookId', $webHookId);
+    }
+
+    /**
+     * @param bool $processed
+     * @return void
+     */
+    public function saveApplePayCertsProcessed(bool $processed): void
+    {
+        $this->saveSetting('applepay_payment_certs_processed', $processed);
+    }
+
+    /**
      * @param array $networks
      * @return void
      */

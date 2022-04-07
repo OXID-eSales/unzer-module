@@ -169,11 +169,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     protected function saveWebhookOption($url, $id): void
     {
-        $moduleSettingBridge = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(ModuleSettingBridgeInterface::class);
-        $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
-        $moduleSettingBridge->save('registeredWebhookId', $id, Module::MODULE_ID);
+        $moduleSettings = $this->getModuleSettings();
+        $moduleSettings->saveWebhook($url);
+        $moduleSettings->saveWebhookId($id);
     }
 
     /**
@@ -204,6 +202,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
             }
         }
+
+        $moduleSettings = $this->getModuleSettings();
+        $moduleSettings->saveApplePayCertsProcessed(is_null($errorMessage));
 
         if ($errorMessage) {
             Registry::getUtilsView()->addErrorToDisplay(
