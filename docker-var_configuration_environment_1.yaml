@@ -1,0 +1,11 @@
+modules:
+  osc-unzer:
+    moduleSettings:
+      sandbox-UnzerPublicKey:
+        group: unzermerchant
+        type: str
+        value: SANDBOXUNZERPUBLICKEY
+      sandbox-UnzerPrivateKey:
+        group: unzermerchant
+        type: str
+        value: SANDBOXUNZERRPRIVATEKEY
