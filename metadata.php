@@ -219,33 +219,9 @@ $aModule = [
         ],
         [
             'group' => 'unzerapplepay',
-            'name' => 'applepay_payment_certs_processed',
-            'type' => 'bool',
-            'value' => '0'
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_identifier',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_cert',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_cert_key',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_label',
-            'type' => 'str',
-            'value' => ''
+            'name' => 'applepay_merchant_capabilities',
+            'type' => 'aarr',
+            'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
         ],
         [
             'group' => 'unzerapplepay',
@@ -255,9 +231,57 @@ $aModule = [
         ],
         [
             'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_capabilities',
-            'type' => 'aarr',
-            'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
+            'name' => 'applepay_label',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'sandbox-applepay_payment_certs_processed',
+            'type' => 'bool',
+            'value' => '0'
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'sandbox-applepay_merchant_identifier',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'sandbox-applepay_merchant_cert',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'sandbox-applepay_merchant_cert_key',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'production-applepay_payment_certs_processed',
+            'type' => 'bool',
+            'value' => '0'
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'production-applepay_merchant_identifier',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'production-applepay_merchant_cert',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'production-applepay_merchant_cert_key',
+            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'unzerother',

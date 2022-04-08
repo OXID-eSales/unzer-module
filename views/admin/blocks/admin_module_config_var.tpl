@@ -42,81 +42,7 @@
             </dl>
         [{/if}]
     [{elseif $var_group eq "unzerapplepay"}]
-        [{if $module_var eq "applepay_payment_certs_processed"}]
-            [{assign var="hidePaymentProcessingTextareas" value=false}]
-            [{if $oView->getApplePayPaymentProcessingCertExists() && $oView->getApplePayPaymentProcessingKeyExists()}]
-                [{assign var="hidePaymentProcessingTextareas" value=true}]
-            [{/if}]
-            <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none"[{/if}]>
-                <dt>
-                        <textarea class="txt"
-                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
-                                  name="applePayPaymentProcessingCert"></textarea>
-                </dt>
-                <dd>
-                    [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT"}]
-                </dd>
-                <div class="spacer"></div>
-            </dl>
-            <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none"[{/if}]>
-                <dt>
-                        <textarea class="txt"
-                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
-                                  name="applePayPaymentProcessingCertKey"></textarea>
-                </dt>
-                <dd>
-                    [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT_KEY"}]
-                </dd>
-                <div class="spacer"></div>
-            </dl>
-            <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none;"[{/if}]>
-                <dt>
-                    <input type="submit" class="confinput" name="transferApplePayPaymentProcessingData"
-                           value="[{oxmultilang ident="SHOP_MODULE_TRANSFER_APPLE_PAY_PAYMENT_DATA"}]"
-                           style="margin-bottom: 25px;"
-                           onClick="Javascript:document.module_configuration.fnc.value='transferApplePayPaymentProcessingData'" [{$readonly}]>
-                </dt>
-                <div class="spacer"></div>
-            </dl>
-            <dl class="js-show-payment-cert-list" style="[{if !$hidePaymentProcessingTextareas}]display: none;[{else}]margin-bottom: 25px;"[{/if}]>
-                <dd style="color: green; padding-left: 5px;">
-                    [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_CERTS_PROCESSED"}]
-                </dd>
-                <dt>
-                    <input class="js-show-payment-certs confinput" type="submit" value="[{oxmultilang ident="SHOP_MODULE_RETRANSFER_APPLE_PAY_PAYMENT_DATA"}]">
-                </dt>
-                <div class="spacer"></div>
-            </dl>
-            <script>
-                document.querySelector('.js-show-payment-certs').addEventListener('click', e => {
-                    e.preventDefault();
-
-                    document.querySelectorAll('.js-payment-cert-list').forEach(el => {
-                        el.style.display = '';
-                    })
-                    document.querySelector('.js-show-payment-cert-list').style.display = 'none';
-                })
-            </script>
-        [{elseif $module_var eq "applepay_merchant_cert_key" or $module_var eq "applepay_merchant_cert"}]
-            <dl>
-                <dt>
-                    [{if $module_var eq "applepay_merchant_cert_key"}]
-                        <textarea class="txt"
-                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
-                                  name="applePayMerchantCertKey" [{$readonly}]>[{$applePayMerchantCertKey}]</textarea>
-                    [{else}]
-                        <textarea class="txt"
-                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
-                                  name="applePayMerchantCert" [{$readonly}]>[{$applePayMerchantCert}]</textarea>
-                    [{/if}]
-                    [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
-                </dt>
-                <dd>
-                    [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]
-                </dd>
-            </dl>
-            <div class="spacer"></div>
-        [{elseif $module_var eq "applepay_merchant_capabilities" or $module_var eq "applepay_networks"}]
+        [{if $module_var eq "applepay_merchant_capabilities" or $module_var eq "applepay_networks"}]
             <dl>
                 <dd>
                     [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]
@@ -150,6 +76,80 @@
                 [{/if}]
                 <div class="spacer"></div>
             </dl>
+        [{elseif $module_var eq $systemMode|cat:"-applepay_payment_certs_processed"}]
+            [{assign var="hidePaymentProcessingTextareas" value=false}]
+            [{if $oView->getApplePayPaymentProcessingCertExists() && $oView->getApplePayPaymentProcessingKeyExists()}]
+                [{assign var="hidePaymentProcessingTextareas" value=true}]
+            [{/if}]
+            <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none"[{/if}]>
+                <dt>
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
+                                  name="[{$systemMode}]-applePayPaymentProcessingCert"></textarea>
+                </dt>
+                <dd>
+                    [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT" args=$systemMode}]
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+            <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none"[{/if}]>
+                <dt>
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
+                                  name="[{$systemMode}]-applePayPaymentProcessingCertKey"></textarea>
+                </dt>
+                <dd>
+                    [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT_KEY" args=$systemMode}]
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+            <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none;"[{/if}]>
+                <dt>
+                    <input type="submit" class="confinput" name="transferApplePayPaymentProcessingData"
+                           value="[{oxmultilang ident="SHOP_MODULE_TRANSFER_APPLE_PAY_PAYMENT_DATA" args=$systemMode}]"
+                           style="margin-bottom: 25px;"
+                           onClick="Javascript:document.module_configuration.fnc.value='transferApplePayPaymentProcessingData'" [{$readonly}]>
+                </dt>
+                <div class="spacer"></div>
+            </dl>
+            <dl class="js-show-payment-cert-list" style="[{if !$hidePaymentProcessingTextareas}]display: none;[{else}]margin-bottom: 25px;"[{/if}]>
+                <dd style="color: green; padding-left: 5px;">
+                    [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_CERTS_PROCESSED" args=$systemMode}]
+                </dd>
+                <dt>
+                    <input class="js-show-payment-certs confinput" type="submit" value="[{oxmultilang ident="SHOP_MODULE_RETRANSFER_APPLE_PAY_PAYMENT_DATA" args=$systemMode}]">
+                </dt>
+                <div class="spacer"></div>
+            </dl>
+            <script>
+                document.querySelector('.js-show-payment-certs').addEventListener('click', e => {
+                    e.preventDefault();
+
+                    document.querySelectorAll('.js-payment-cert-list').forEach(el => {
+                        el.style.display = '';
+                    })
+                    document.querySelector('.js-show-payment-cert-list').style.display = 'none';
+                })
+            </script>
+        [{elseif $module_var eq "applepay_merchant_cert_key" or $module_var eq "applepay_merchant_cert"}]
+            <dl>
+                <dt>
+                    [{if $module_var eq "applepay_merchant_cert_key"}]
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
+                                  name="applePayMerchantCertKey" [{$readonly}]>[{$applePayMerchantCertKey}]</textarea>
+                    [{else}]
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;border: 1px solid #ccc;border-radius: 4px;box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset;color: #555;min-height: 15px;line-height: 1.42857;padding: 3px;font-size: 12px;transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;background: #fff;"
+                                  name="applePayMerchantCert" [{$readonly}]>[{$applePayMerchantCert}]</textarea>
+                    [{/if}]
+                    [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
+                </dt>
+                <dd>
+                    [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]
+                </dd>
+            </dl>
+            <div class="spacer"></div>
         [{else}]
             [{$smarty.block.parent}]
         [{/if}]

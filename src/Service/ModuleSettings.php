@@ -23,27 +23,14 @@ class ModuleSettings
     public const PAYMENT_AUTHORIZE = 'authorize';
 
     public const APPLE_PAY_MERCHANT_CAPABILITIES = [
-        'supportsCredit' => '0',
-        'supportsDebit' => '0',
-        'supportsEMV' => '0'
+        'supportsCredit' => '1',
+        'supportsDebit' => '1'
     ];
 
     public const APPLE_PAY_NETWORKS = [
-        'amex' => '0',
-        'cartesBancaires' => '0',
-        'chinaUnionPay' => '0',
-        'discover' => '0',
-        'eftpos' => '0',
-        'electron' => '0',
-        'elo' => '0',
-        'interac' => '0',
-        'jcb' => '0',
-        'mada' => '0',
-        'maestro' => '0',
-        'masterCard' => '0',
-        'privateLabel' => '0',
-        'visa' => '0',
-        'vPay' => '0'
+        'maestro' => '1',
+        'masterCard' => '1',
+        'visa' => '1'
     ];
 
     /** @var ModuleSettingBridgeInterface */
@@ -268,7 +255,11 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertFilePath(): string
     {
-        return $this->getFilesPath() . '/.applepay_merchant_cert.' . Registry::getConfig()->getShopId();
+        return $this->getFilesPath()
+            . '/.applepay_merchant_cert.'
+            . $this->getSystemMode()
+            . '.'
+            . Registry::getConfig()->getShopId();
     }
 
     /**
@@ -277,7 +268,11 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertKeyFilePath(): string
     {
-        return $this->getFilesPath() . '/.applepay_merchant_cert_key.' . Registry::getConfig()->getShopId();
+        return $this->getFilesPath()
+            . '/.applepay_merchant_cert_key.'
+            . $this->getSystemMode()
+            . '.'
+            . Registry::getConfig()->getShopId();
     }
 
     /**
@@ -324,7 +319,7 @@ class ModuleSettings
      */
     public function saveApplePayCertsProcessed(bool $processed): void
     {
-        $this->saveSetting('applepay_payment_certs_processed', $processed);
+        $this->saveSetting($this->getSystemMode() . '-applepay_payment_certs_processed', $processed);
     }
 
     /**
@@ -336,7 +331,7 @@ class ModuleSettings
         $this->saveSetting('applepay_networks', $networks);
     }
 
-    private function saveSetting(string $name, array $setting): void
+    private function saveSetting(string $name, $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }

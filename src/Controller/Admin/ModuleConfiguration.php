@@ -98,6 +98,11 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($key = $moduleSettings->getApplePayMerchantCertKey()) {
                     $this->_aViewData['applePayMerchantCertKey'] = $key;
                 }
+
+                if ($systemMode = $moduleSettings->getSystemMode()) {
+                    $this->_aViewData['systemMode'] = $systemMode;
+                }
+
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
                     $this->translator->translateCode(
