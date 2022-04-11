@@ -62,4 +62,6 @@ $aLang = [
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht übertragen',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht abgleichen',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht abgleichen',
+    'OSCUNZER_sandbox' => 'Sandbox',
+    'OSCUNZER_production' => 'Livebetrieb'
 ];

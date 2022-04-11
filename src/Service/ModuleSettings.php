@@ -209,7 +209,7 @@ class ModuleSettings
      */
     public function getApplePayMerchantIdentifier(): string
     {
-        return $this->getSettingValue('applepay_merchant_identifier');
+        return $this->getSettingValue($this->getSystemMode() . '-applepay_merchant_identifier');
     }
 
     /**

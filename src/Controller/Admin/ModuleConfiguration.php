@@ -185,6 +185,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function transferApplePayPaymentProcessingData(): void
     {
+        $moduleSettings = $this->getModuleSettings();
+
         $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
         $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
         $errorMessage = null;
@@ -193,22 +195,30 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
         }
 
+        $apiClient = $this->getServiceFromContainer(ApiClient::class);
+
         if (is_null($errorMessage)) {
-            $apiClient = $this->getServiceFromContainer(ApiClient::class);
-            $response = $apiClient->uploadApplePayPaymentKey($key);
-            if ($response->getStatusCode() !== 200) {
+            try {
+                $response = $apiClient->uploadApplePayPaymentKey($key);
+                if ($response->getStatusCode() !== 201) {
+                    $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
+                }
+            } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
             }
         }
 
         if (is_null($errorMessage)) {
-            $response = $apiClient->uploadApplePayPaymentCertificate($cert);
-            if ($response->getStatusCode() !== 200) {
+            try {
+                $response = $apiClient->uploadApplePayPaymentCertificate($cert);
+                if ($response->getStatusCode() !== 201) {
+                    $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
+                }
+            } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
             }
         }
 
-        $moduleSettings = $this->getModuleSettings();
         $moduleSettings->saveApplePayCertsProcessed(is_null($errorMessage));
 
         if ($errorMessage) {
