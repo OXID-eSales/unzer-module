@@ -46,7 +46,18 @@ php /var/www/oxideshop/vendor/bin/oe-eshop-doctrine_migration migrations:migrate
 #to be able to have a default configuration, the server does have a mount of the default config file to
 #/var/www/oxideshop/var/configuration/environment/1.yaml.default. that is why I copy this file for oxid,
 #so oxid admin still works when saving configuration but it will be overwritten on deployment
-cp /var/www/oxideshop/var/configuration/environment/1.yaml.default /var/www/oxideshop/var/configuration/environment/1.yaml
+mkdir -p /var/www/oxideshop/var/configuration/environment
+cp /var/www/oxideshop/project-modules/module-under-test/docker-var_configuration_environment_1.yaml /var/www/oxideshop/var/configuration/environment/1.yaml
+sed -ri 's!SANDBOXUNZERPUBLICKEY!'$SANDBOXUNZERPUBLICKEY'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
+sed -ri 's!SANDBOXUNZERRPRIVATEKEY!'$SANDBOXUNZERRPRIVATEKEY'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
+sed -ri 's!APPLEPAYMERCHANTIDENTIFIER!'$APPLEPAYMERCHANTIDENTIFIER'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
+sed -ri 's!APPLEPAYLABEL!'$APPLEPAYLABEL'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
+
+mkdir -p /var/module/osc-unzer/certs
+cp /var/www/oxideshop/project-modules/module-under-test/docker-applepay_merchant_cert_key.yaml /var/module/osc-unzer/certs/.applepay_merchant_cert_key.1
+echo $APPLEPAYMERCHANTCERTKEY | base64 --decode > /var/module/osc-unzer/certs/.applepay_merchant_cert_key.1
+cp /var/www/oxideshop/project-modules/module-under-test/docker-applepay_merchant_cert.yaml /var/module/osc-unzer/certs/.applepay_merchant_cert.1
+echo $APPLEPAYMERCHANTCERT | base64 --decode > /var/module/osc-unzer/certs/.applepay_merchant_cert.1
 
 /var/www/oxideshop/vendor/bin/oe-console oe:module:apply-configuration;
 

@@ -5,14 +5,21 @@ services:
     ports: 
       - '80:80'
     environment:
-      - MYSQL_HOST=db
-      - MYSQL_DATABASE=oxid
-      - MYSQL_USER=oxid
-      - MYSQL_PASSWORD=oxid
-      - OXID_EDITION=ce
-      - SHOP_URL=http://localhost
-      - HTA_USER=user
-      - HTA_PW=password
+      MYSQL_HOST: db
+      MYSQL_DATABASE: oxid
+      MYSQL_USER: oxid
+      MYSQL_PASSWORD: oxid
+      OXID_EDITION: ce
+      SHOP_URL: http://localhost
+      HTA_USER: user
+      HTA_PW: password
+      SANDBOXUNZERPUBLICKEY: 
+      SANDBOXUNZERRPRIVATEKEY: 
+      APPLEPAYMERCHANTIDENTIFIER: 
+      APPLEPAYLABEL: 
+      APPLEPAYMERCHANTCERTKEY: 
+      APPLEPAYMERCHANTCERT: 
+      
   db:
     image: mariadb
     ports:
