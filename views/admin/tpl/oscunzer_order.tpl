@@ -147,9 +147,19 @@
                                     <option value="CREDIT">[{oxmultilang ident="OSCUNZER_REASON_CREDIT"}]</option>
                                 </select>
                             </td>
-                            <td><input type="text" name="amount" id="amount_[{$oUnzerCharge.chargeId}]" value="[{$oUnzerCharge.chargedAmount|string_format:"%.2f"}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]> [{$uzrCurrency}]</td>
-                            <td><input type="submit" id="submit_[{$oUnzerCharge.chargeId}]" [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
-                                       value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
+                            <td>
+                                <input type="text"
+                                    name="amount"
+                                    id="amount_[{$oUnzerCharge.chargeId}]"
+                                    value="[{math equation="x - y" x=$oUnzerCharge.chargedAmount y=$oUnzerCharge.cancelledAmount format="%.2f"}]"
+                                    [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]>
+                                [{$uzrCurrency}]
+                            </td>
+                            <td>
+                                <input type="submit"
+                                    id="submit_[{$oUnzerCharge.chargeId}]"
+                                    [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
+                                    value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
                             </td>
                             [{capture assign="cancelConfirm"}]
                             const inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
@@ -191,7 +201,7 @@
                     <tr>
                         <td>[{$oUnzerCancel.cancelDate|escape}]</td>
                         <td>[{$oUnzerCancel.cancellationId|escape}]</td>
-                        <td>[{$oUnzerCancel.cancelledAmount|escape}]</td>
+                        <td>[{$oUnzerCancel.cancelledAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                         <td>[{$oUnzerCancel.cancelReason|escape}]</td>
                     </tr>
                 [{/foreach}]

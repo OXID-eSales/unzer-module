@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -61,8 +62,11 @@ class AdminOrderController extends AdminDetailsController
         if ($this->isUnzerOrder()) {
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
-            $oPayment = oxNew(Payment::class);
-            if ($oPayment->load($oOrder->oxorder__oxpaymenttype->value) && $oPayment->isUnzerSecuredPayment()) {
+
+            if (
+                $oOrder->oxorder__oxpaymenttype->value == UnzerDefinitions::INVOICE_SECURED_UNZER_PAYMENT_ID ||
+                $oOrder->oxorder__oxpaymenttype->value == UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID
+            ) {
                 $this->_aViewData["blShipment"] = true;
             }
 

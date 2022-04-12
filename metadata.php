@@ -150,32 +150,32 @@ $aModule = [
         [
             'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPublicKey',
-            'type' => 'str'
+            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPrivateKey',
-            'type' => 'str'
+            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'unzermerchant',
             'name' => 'production-UnzerPublicKey',
-            'type' => 'str'
+            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'unzermerchant',
             'name' => 'production-UnzerPrivateKey',
-            'type' => 'str'
+            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'unzermerchant',
             'name' => 'registeredWebhook',
             'type' => 'str',
-        ],
-        [
-            'group' => '',
-            'name' => 'registeredWebhookId',
-            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'unzerenvironment',
@@ -219,33 +219,9 @@ $aModule = [
         ],
         [
             'group' => 'unzerapplepay',
-            'name' => 'applepay_payment_certs_processed',
-            'type' => 'bool',
-            'value' => '0'
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_identifier',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_cert',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_cert_key',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerapplepay',
-            'name' => 'applepay_label',
-            'type' => 'str',
-            'value' => ''
+            'name' => 'applepay_merchant_capabilities',
+            'type' => 'aarr',
+            'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
         ],
         [
             'group' => 'unzerapplepay',
@@ -255,16 +231,83 @@ $aModule = [
         ],
         [
             'group' => 'unzerapplepay',
-            'name' => 'applepay_merchant_capabilities',
-            'type' => 'aarr',
-            'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
+            'name' => 'applepay_label',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'sandbox-applepay_merchant_identifier',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'sandbox-applepay_merchant_cert',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'sandbox-applepay_merchant_cert_key',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'production-applepay_merchant_identifier',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'production-applepay_merchant_cert',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerapplepay',
+            'name' => 'production-applepay_merchant_cert_key',
+            'type' => 'str',
+            'value' => ''
         ],
         [
             'group' => 'unzerother',
             'name' => 'UnzerjQuery',
             'type' => 'bool',
             'value' => '0',
-        ]
+        ],
+        // this options are invisible because of missing group
+        [
+            'group' => '',
+            'name' => 'registeredWebhookId',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => '',
+            'name' => 'sandboxApplePayPaymentKeyId',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => '',
+            'name' => 'sandboxApplePayPaymentCertificateId',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => '',
+            'name' => 'productionApplePayPaymentKeyId',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => '',
+            'name' => 'productionApplePayPaymentCertificateId',
+            'type' => 'str',
+            'value' => ''
+        ],
     ],
     'events' => [
         'onActivate' => '\OxidSolutionCatalysts\Unzer\Core\Events::onActivate',

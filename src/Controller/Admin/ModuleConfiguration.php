@@ -98,6 +98,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($key = $moduleSettings->getApplePayMerchantCertKey()) {
                     $this->_aViewData['applePayMerchantCertKey'] = $key;
                 }
+
+                if ($systemMode = $moduleSettings->getSystemMode()) {
+                    $this->_aViewData['systemMode'] = $systemMode;
+                }
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
                     $this->translator->translateCode(
@@ -169,11 +173,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     protected function saveWebhookOption($url, $id): void
     {
-        $moduleSettingBridge = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(ModuleSettingBridgeInterface::class);
-        $moduleSettingBridge->save('registeredWebhook', $url, Module::MODULE_ID);
-        $moduleSettingBridge->save('registeredWebhookId', $id, Module::MODULE_ID);
+        $moduleSettings = $this->getModuleSettings();
+        $moduleSettings->saveWebhook($url);
+        $moduleSettings->saveWebhookId($id);
     }
 
     /**
@@ -182,6 +184,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function transferApplePayPaymentProcessingData(): void
     {
+        $moduleSettings = $this->getModuleSettings();
+
         $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
         $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
         $errorMessage = null;
@@ -190,18 +194,52 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
         }
 
+        $apiClient = $this->getServiceFromContainer(ApiClient::class);
+        $applePayPaymentKeyId = null;
+        $applePayPaymentCertificateId = null;
+
+        // Upload Key
         if (is_null($errorMessage)) {
-            $apiClient = $this->getServiceFromContainer(ApiClient::class);
-            $response = $apiClient->uploadApplePayPaymentKey($key);
-            if ($response->getStatusCode() !== 200) {
+            try {
+                $response = $apiClient->uploadApplePayPaymentKey($key);
+                if ($response->getStatusCode() !== 201) {
+                    $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
+                } else {
+                    $responseBody = json_decode($response->getBody()->__toString());
+                    $applePayPaymentKeyId = $responseBody->id;
+                }
+            } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
             }
         }
 
-        if (is_null($errorMessage)) {
-            $response = $apiClient->uploadApplePayPaymentCertificate($cert);
-            if ($response->getStatusCode() !== 200) {
+        // Upload Certificate
+        if ($applePayPaymentKeyId && is_null($errorMessage)) {
+            try {
+                $response = $apiClient->uploadApplePayPaymentCertificate($cert, $applePayPaymentKeyId);
+                if ($response->getStatusCode() !== 201) {
+                    $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
+                } else {
+                    $responseBody = json_decode($response->getBody()->__toString());
+                    $applePayPaymentCertificateId = $responseBody->id;
+                }
+            } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
+            }
+        }
+
+        // Activate Certificate
+        if ($applePayPaymentKeyId && $applePayPaymentCertificateId && is_null($errorMessage)) {
+            try {
+                $response = $apiClient->activateApplePayPaymentCertificate($applePayPaymentCertificateId);
+                if ($response->getStatusCode() !== 200) {
+                    $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
+                } else {
+                    $moduleSettings->saveApplePayPaymentKeyId($applePayPaymentKeyId);
+                    $moduleSettings->saveApplePayPaymentCertificateId($applePayPaymentCertificateId);
+                }
+            } catch (Throwable $loggerException) {
+                $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
             }
         }
 
@@ -223,13 +261,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function getApplePayPaymentProcessingKeyExists(): bool
     {
         $keyExists = false;
-        // if we have an Apple Merchant Key, then the Processing Key should be exists
-        // if not, we inform the Backend-User
         $moduleSettings = $this->getModuleSettings();
-        if ($moduleSettings->getApplePayMerchantCertKey()) {
+        $keyId = $moduleSettings->getApplePayPaymentKeyId();
+        if ($moduleSettings->getApplePayMerchantCertKey() && $keyId) {
             try {
                 $keyExists = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentCert()
+                    ->requestApplePayPaymentKey($keyId)
                     ->getStatusCode()
                     === 200;
             } catch (GuzzleException $guzzleException) {
@@ -253,12 +290,11 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         $certExists = false;
         $moduleSettings = $this->getModuleSettings();
-        // if we have an Apple Merchant Cert, then the Processing Cert should be exists
-        // if not, we inform the Backend-User
-        if ($moduleSettings->getApplePayMerchantCert()) {
+        $certId = $moduleSettings->getApplePayPaymentCertificateId();
+        if ($moduleSettings->getApplePayMerchantCert() && $certId) {
             try {
                 $certExists = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentKey()
+                    ->requestApplePayPaymentCert($certId)
                     ->getStatusCode()
                     === 200;
             } catch (GuzzleException $guzzleException) {

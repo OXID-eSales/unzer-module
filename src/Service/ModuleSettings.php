@@ -23,27 +23,14 @@ class ModuleSettings
     public const PAYMENT_AUTHORIZE = 'authorize';
 
     public const APPLE_PAY_MERCHANT_CAPABILITIES = [
-        'supportsCredit' => '0',
-        'supportsDebit' => '0',
-        'supportsEMV' => '0'
+        'supportsCredit' => '1',
+        'supportsDebit' => '1'
     ];
 
     public const APPLE_PAY_NETWORKS = [
-        'amex' => '0',
-        'cartesBancaires' => '0',
-        'chinaUnionPay' => '0',
-        'discover' => '0',
-        'eftpos' => '0',
-        'electron' => '0',
-        'elo' => '0',
-        'interac' => '0',
-        'jcb' => '0',
-        'mada' => '0',
-        'maestro' => '0',
-        'masterCard' => '0',
-        'privateLabel' => '0',
-        'visa' => '0',
-        'vPay' => '0'
+        'maestro' => '1',
+        'masterCard' => '1',
+        'visa' => '1'
     ];
 
     /** @var ModuleSettingBridgeInterface */
@@ -222,7 +209,7 @@ class ModuleSettings
      */
     public function getApplePayMerchantIdentifier(): string
     {
-        return $this->getSettingValue('applepay_merchant_identifier');
+        return $this->getSettingValue($this->getSystemMode() . '-applepay_merchant_identifier');
     }
 
     /**
@@ -268,7 +255,11 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertFilePath(): string
     {
-        return $this->getFilesPath() . '/.applepay_merchant_cert.' . Registry::getConfig()->getShopId();
+        return $this->getFilesPath()
+            . '/.applepay_merchant_cert.'
+            . $this->getSystemMode()
+            . '.'
+            . Registry::getConfig()->getShopId();
     }
 
     /**
@@ -277,7 +268,11 @@ class ModuleSettings
      */
     public function getApplePayMerchantCertKeyFilePath(): string
     {
-        return $this->getFilesPath() . '/.applepay_merchant_cert_key.' . Registry::getConfig()->getShopId();
+        return $this->getFilesPath()
+            . '/.applepay_merchant_cert_key.'
+            . $this->getSystemMode()
+            . '.'
+            . Registry::getConfig()->getShopId();
     }
 
     /**
@@ -301,6 +296,58 @@ class ModuleSettings
     }
 
     /**
+     * @param string $webHook
+     * @return void
+     */
+    public function saveWebhook(string $webHook): void
+    {
+        $this->saveSetting('registeredWebhook', $webHook);
+    }
+
+    /**
+     * @param string $webHookId
+     * @return void
+     */
+    public function saveWebhookId(string $webHookId): void
+    {
+        $this->saveSetting('registeredWebhookId', $webHookId);
+    }
+
+    /**
+     * @param string $id
+     * @return void
+     */
+    public function saveApplePayPaymentKeyId(string $id): void
+    {
+        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentKeyId', $id);
+    }
+
+    /**
+     * @param string $id
+     * @return void
+     */
+    public function saveApplePayPaymentCertificateId(string $id): void
+    {
+        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentCertificateId', $id);
+    }
+
+    /**
+     * @return string
+     */
+    public function getApplePayPaymentKeyId(): string
+    {
+        return $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentKeyId');
+    }
+
+    /**
+     * @return string
+     */
+    public function getApplePayPaymentCertificateId(): string
+    {
+        return $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentCertificateId');
+    }
+
+    /**
      * @param array $networks
      * @return void
      */
@@ -309,7 +356,7 @@ class ModuleSettings
         $this->saveSetting('applepay_networks', $networks);
     }
 
-    private function saveSetting(string $name, array $setting): void
+    private function saveSetting(string $name, $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }
