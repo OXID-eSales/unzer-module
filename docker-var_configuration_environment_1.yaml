@@ -9,10 +9,6 @@ modules:
         group: unzermerchant
         type: str
         value: SANDBOXUNZERRPRIVATEKEY
-      applepay_payment_certs_processed:
-        group: unzerapplepay
-        type: bool
-        value: true
       applepay_merchant_identifier:
         group: unzerapplepay
         type: str
@@ -21,3 +17,9 @@ modules:
         group: unzerapplepay
         type: str
         value: APPLEPAYLABEL
+      sandboxApplePayPaymentKeyId:
+        type: str
+        value: s-key-17
+      sandboxApplePayPaymentCertificateId:
+        type: str
+        value: s-crt-6
