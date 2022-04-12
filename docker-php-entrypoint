@@ -56,9 +56,9 @@ sed -ri 's!APPLEPAYLABEL!'$APPLEPAYLABEL'!g' /var/www/oxideshop/var/configuratio
 
 mkdir -p /var/www/oxideshop/var/module/osc-unzer/certs
 cp /var/www/oxideshop/project-modules/module-under-test/docker-applepay_merchant_cert_key /var/www/oxideshop/var/module/osc-unzer/certs/.applepay_merchant_cert_key.sandbox.1
-echo $APPLEPAYMERCHANTCERTKEY | base64 --decode > /var/www/oxideshop/var/module/osc-unzer/certs/.applepay_merchant_cert_key.1
+echo $APPLEPAYMERCHANTCERTKEY | base64 --decode > /var/www/oxideshop/var/module/osc-unzer/certs/.applepay_merchant_cert_key.sandbox.1
 cp /var/www/oxideshop/project-modules/module-under-test/docker-applepay_merchant_cert /var/www/oxideshop/var/module/osc-unzer/certs/.applepay_merchant_cert.sandbox.1
-echo $APPLEPAYMERCHANTCERT | base64 --decode > /var/www/oxideshop/var/module/osc-unzer/certs/.applepay_merchant_cert.1
+echo $APPLEPAYMERCHANTCERT | base64 --decode > /var/www/oxideshop/var/module/osc-unzer/certs/.applepay_merchant_cert.sandbox.1
 
 /var/www/oxideshop/vendor/bin/oe-console oe:module:apply-configuration;
 
