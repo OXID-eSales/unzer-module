@@ -102,7 +102,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($systemMode = $moduleSettings->getSystemMode()) {
                     $this->_aViewData['systemMode'] = $systemMode;
                 }
-
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
                     $this->translator->translateCode(
@@ -205,8 +204,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $response = $apiClient->uploadApplePayPaymentKey($key);
                 if ($response->getStatusCode() !== 201) {
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
-                }
-                else {
+                } else {
                     $responseBody = json_decode($response->getBody()->__toString());
                     $applePayPaymentKeyId = $responseBody->id;
                 }
@@ -221,8 +219,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $response = $apiClient->uploadApplePayPaymentCertificate($cert, $applePayPaymentKeyId);
                 if ($response->getStatusCode() !== 201) {
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
-                }
-                else {
+                } else {
                     $responseBody = json_decode($response->getBody()->__toString());
                     $applePayPaymentCertificateId = $responseBody->id;
                 }
@@ -237,8 +234,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $response = $apiClient->activateApplePayPaymentCertificate($applePayPaymentCertificateId);
                 if ($response->getStatusCode() !== 200) {
                     $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
-                }
-                else {
+                } else {
                     $moduleSettings->saveApplePayPaymentKeyId($applePayPaymentKeyId);
                     $moduleSettings->saveApplePayPaymentCertificateId($applePayPaymentCertificateId);
                 }

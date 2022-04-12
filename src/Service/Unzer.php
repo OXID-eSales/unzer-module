@@ -194,7 +194,7 @@ class Unzer
             1
         );
         $unzerBasketItem->setType('shipment');
-        $unzerBasketItem->setVat( $deliveryCosts->getVat());
+        $unzerBasketItem->setVat($deliveryCosts->getVat());
         $unzerBasketItem->setAmountVat($deliveryCosts->getVatValue());
         $unzerBasketItem->setAmountGross($deliveryCosts->getBruttoPrice());
 
@@ -209,7 +209,7 @@ class Unzer
             1
         );
         $unzerBasketItem->setType('voucher');
-        $unzerBasketItem->setVat( $discounts->getVat());
+        $unzerBasketItem->setVat($discounts->getVat());
         $unzerBasketItem->setAmountVat($discounts->getVatValue());
         $unzerBasketItem->setAmountGross($discounts->getBruttoPrice());
 
