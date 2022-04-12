@@ -31,6 +31,7 @@ fi
 if [ "${HTA_USER}" != test ] && [ "${HTA_PW}" != test ]
 then
 echo 'AuthType Basic\nAuthName "Passwortgesch�tzter Bereich"\nAuthUserFile /var/www/oxideshop/.htpasswd\nRequire valid-user' >> /var/www/oxideshop/source/.htaccess
+echo 'Order deny,allow\nDeny from all\nAllow from 3.120.62.83,18.196.35.212,35.157.10.171,18.197.240.190\nSatisfy any' >> /var/www/oxideshop/source/.htaccess
 htpasswd -bc /var/www/oxideshop/.htpasswd ${HTA_USER} ${HTA_PW}
 fi
 
