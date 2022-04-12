@@ -60,6 +60,7 @@ $aLang = [
     'OSCUNZER_PAYOUT' => 'Payout',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY' => 'Transmitting key failed',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'Transmitting certificate failed',
+    'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT' => 'Activating certificate failed',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'Getting key failed',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Getting certificate failed',
     'OSCUNZER_sandbox' => 'Sandbox',

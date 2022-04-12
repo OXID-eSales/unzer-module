@@ -42,20 +42,23 @@ class ApiClient
     }
 
     /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function requestApplePayPaymentCert(): ResponseInterface
-    {
-        return $this->request('keypair/applepay/certificates/s-crt-1');
-    }
-
-    /**
+     * @param string $certificateId
      * @return ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function requestApplePayPaymentKey(): ResponseInterface
+    public function requestApplePayPaymentCert(string $certificateId): ResponseInterface
     {
-        return $this->request('keypair/applepay/privatekeys/s-key-1');
+        return $this->request('keypair/applepay/certificates/' . $certificateId);
+    }
+
+    /**
+     * @param string $keyId
+     * @return ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function requestApplePayPaymentKey(string $keyId): ResponseInterface
+    {
+        return $this->request('keypair/applepay/privatekeys/' . $keyId);
     }
 
     /**
@@ -75,18 +78,30 @@ class ApiClient
 
     /**
      * @param string $certificate
+     * @param string $privateKeyId (getting from upload of ApplePayPaymentKey)
      * @return ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
-    public function uploadApplePayPaymentCertificate(string $certificate): ResponseInterface
+    public function uploadApplePayPaymentCertificate(string $certificate, string $privateKeyId): ResponseInterface
     {
         return $this->request('keypair/applepay/certificates', 'POST', [
             'format' => 'PEM',
             'type' => 'certificate',
-            'private-key' => 's-key-1',
+            'private-key' => $privateKeyId,
             'certificate' => $certificate,
         ]);
+    }
+
+    /**
+     * @param string $certificateId
+     * @return ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     */
+    public function activateApplePayPaymentCertificate(string $certificateId): ResponseInterface
+    {
+        return $this->request('keypair/applepay/certificates/' . $certificateId . '/activate', 'POST');
     }
 
     /**

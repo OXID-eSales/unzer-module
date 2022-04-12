@@ -58,10 +58,11 @@ $aLang = [
     'OSCUNZER_REASON_RETURN' => 'Kunde sendet Ware zurück',
     'OSCUNZER_REASON_CREDIT' => 'Kunde bekommt Geld zurück, Ware kann er behalten',
     'OSCUNZER_PAYOUT' => 'Rückzahlung',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht übertragen',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht übertragen',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht abgleichen',
-    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht abgleichen',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht übertragen',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht übertragen',
+    'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht aktivieren',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY' => 'Konnte privaten Schlüssel zur Zahlungsabwicklung nicht abgleichen',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht abgleichen',
     'OSCUNZER_sandbox' => 'Sandbox',
     'OSCUNZER_production' => 'Livebetrieb'
 ];

@@ -77,7 +77,27 @@
                 [{/if}]
                 <div class="spacer"></div>
             </dl>
-        [{elseif $module_var eq $systemMode|cat:"-applepay_payment_certs_processed"}]
+        [{elseif $module_var eq $systemMode|cat:"-applepay_merchant_cert_key" or $module_var eq $systemMode|cat:"-applepay_merchant_cert"}]
+            <dl>
+                <dt>
+                    [{if $module_var eq $systemMode|cat:"-applepay_merchant_cert_key"}]
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;"
+                                  name="[{$systemMode}]-applePayMerchantCertKey" [{$readonly}]>[{$applePayMerchantCertKey}]</textarea>
+                    [{else}]
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;"
+                                  name="[{$systemMode}]-applePayMerchantCert" [{$readonly}]>[{$applePayMerchantCert}]</textarea>
+                    [{/if}]
+                    [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`" args=$systemModeTrans}]
+                </dt>
+                <dd>
+                    [{oxmultilang ident="SHOP_MODULE_`$module_var`" args=$systemModeTrans}]
+                </dd>
+            </dl>
+            <div class="spacer"></div>
+        [{elseif $module_var eq $systemMode|cat:"-applepay_merchant_identifier"}]
+            [{* before we check the applepay_merchant_identifier, we have a upload-function for payment-key and payment-cert *}]
             [{assign var="hidePaymentProcessingTextareas" value=false}]
             [{if $oView->getApplePayPaymentProcessingCertExists() && $oView->getApplePayPaymentProcessingKeyExists()}]
                 [{assign var="hidePaymentProcessingTextareas" value=true}]
@@ -132,26 +152,6 @@
                     document.querySelector('.js-show-payment-cert-list').style.display = 'none';
                 })
             </script>
-        [{elseif $module_var eq $systemMode|cat:"-applepay_merchant_cert_key" or $module_var eq $systemMode|cat:"-applepay_merchant_cert"}]
-            <dl>
-                <dt>
-                    [{if $module_var eq $systemMode|cat:"-applepay_merchant_cert_key"}]
-                        <textarea class="txt"
-                                  style="width: 250px; height: 200px;"
-                                  name="[{$systemMode}]-applePayMerchantCertKey" [{$readonly}]>[{$applePayMerchantCertKey}]</textarea>
-                    [{else}]
-                        <textarea class="txt"
-                                  style="width: 250px; height: 200px;"
-                                  name="[{$systemMode}]-applePayMerchantCert" [{$readonly}]>[{$applePayMerchantCert}]</textarea>
-                    [{/if}]
-                    [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`" args=$systemModeTrans}]
-                </dt>
-                <dd>
-                    [{oxmultilang ident="SHOP_MODULE_`$module_var`" args=$systemModeTrans}]
-                </dd>
-            </dl>
-            <div class="spacer"></div>
-        [{elseif $module_var eq $systemMode|cat:"-applepay_merchant_identifier"}]
             <dl>
                 <dt>
                     <input type=text  class="txt" style="width: 250px;" name="confstrs[[{$module_var}]]" value="[{$confstrs.$module_var}]" [{$readonly}]>

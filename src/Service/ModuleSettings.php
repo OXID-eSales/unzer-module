@@ -314,12 +314,37 @@ class ModuleSettings
     }
 
     /**
-     * @param bool $processed
+     * @param string $id
      * @return void
      */
-    public function saveApplePayCertsProcessed(bool $processed): void
+    public function saveApplePayPaymentKeyId(string $id): void
     {
-        $this->saveSetting($this->getSystemMode() . '-applepay_payment_certs_processed', $processed);
+        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentKeyId', $id);
+    }
+
+    /**
+     * @param string $id
+     * @return void
+     */
+    public function saveApplePayPaymentCertificateId(string $id): void
+    {
+        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentCertificateId', $id);
+    }
+
+    /**
+     * @return string
+     */
+    public function getApplePayPaymentKeyId(): string
+    {
+        return $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentKeyId');
+    }
+
+    /**
+     * @return string
+     */
+    public function getApplePayPaymentCertificateId(): string
+    {
+        return $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentCertificateId');
     }
 
     /**
