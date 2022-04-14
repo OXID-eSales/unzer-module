@@ -48,11 +48,13 @@ php /var/www/oxideshop/vendor/bin/oe-eshop-doctrine_migration migrations:migrate
 #/var/www/oxideshop/var/configuration/environment/1.yaml.default. that is why I copy this file for oxid,
 #so oxid admin still works when saving configuration but it will be overwritten on deployment
 mkdir -p /var/www/oxideshop/var/configuration/environment
-cp /var/www/oxideshop/project-modules/module-under-test/docker-var_configuration_environment_1.yaml /var/www/oxideshop/var/configuration/environment/1.yaml
-sed -ri 's!SANDBOXUNZERPUBLICKEY!'$SANDBOXUNZERPUBLICKEY'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
-sed -ri 's!SANDBOXUNZERRPRIVATEKEY!'$SANDBOXUNZERRPRIVATEKEY'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
-sed -ri 's!APPLEPAYMERCHANTIDENTIFIER!'$APPLEPAYMERCHANTIDENTIFIER'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
-sed -ri 's!APPLEPAYLABEL!'$APPLEPAYLABEL'!g' /var/www/oxideshop/var/configuration/environment/1.yaml
+awk -v SANDBOXUNZERPUBLICKEY="$SANDBOXUNZERPUBLICKEY" -v SANDBOXUNZERRPRIVATEKEY="$SANDBOXUNZERRPRIVATEKEY" -v APPLEPAYMERCHANTIDENTIFIER="$APPLEPAYMERCHANTIDENTIFIER" -v APPLEPAYLABEL="$APPLEPAYLABEL" '{
+    sub(/SANDBOXUNZERPUBLICKEY/, SANDBOXUNZERPUBLICKEY);
+    sub(/SANDBOXUNZERRPRIVATEKEY/, SANDBOXUNZERRPRIVATEKEY);
+    sub(/APPLEPAYMERCHANTIDENTIFIER/, APPLEPAYMERCHANTIDENTIFIER);
+    sub(/APPLEPAYLABEL/, APPLEPAYLABEL);
+    print;
+}' /var/www/oxideshop/project-modules/module-under-test/docker-var_configuration_environment_1.yaml > /var/www/oxideshop/var/configuration/environment/1.yaml
 chown -R www-data:www-data /var/www/oxideshop/var/configuration/
 
 mkdir -p /var/www/oxideshop/var/module/osc-unzer/certs
