@@ -9,7 +9,7 @@ modules:
         group: unzermerchant
         type: str
         value: SANDBOXUNZERRPRIVATEKEY
-      applepay_merchant_identifier:
+      sandbox-applepay_merchant_identifier:
         group: unzerapplepay
         type: str
         value: APPLEPAYMERCHANTIDENTIFIER
@@ -19,7 +19,10 @@ modules:
         value: APPLEPAYLABEL
       sandboxApplePayPaymentKeyId:
         type: str
-        value: s-key-17
+        value: s-key-13
       sandboxApplePayPaymentCertificateId:
         type: str
         value: s-crt-6
+      registeredWebhookId:
+        type: str
+        value: s-whk-100023329
