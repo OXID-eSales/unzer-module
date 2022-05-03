@@ -10,10 +10,8 @@ on:
     - cron: '16 6 * * *'
   push:
     branches: [ b-6.3.x ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
-  #pull_request:
-  #  branches: [ b-6.3.x ]
+  repository_dispatch:
+    types: [docker-build]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -31,7 +29,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Checkout dockerfiles
+        uses: actions/checkout@v3
+        with:
+          repository: OXID-eSales/module-demoshop-images
+          token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains your PAT
+          path: dockerfiles
+
+      - name: move dockerfiles to root folder
+        run: mv dockerfiles/unzer/* .
 
       - name: downcase REPO
         run: |
