@@ -26,6 +26,8 @@ class OrderController extends OrderController_parent
 
     protected $blSepaMandateConfirmError = null;
 
+    protected $actualOrder = null;
+
     /**
      * @inerhitDoc
      */
@@ -52,6 +54,9 @@ class OrderController extends OrderController_parent
                 'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
             ])->sendJson();
         }
+        else if ($this->isSepaPayment()) {
+            $this->getActualOrder()->markUnzerOrderAsPaid();
+        }
 
         return $ret;
     }
@@ -66,9 +71,8 @@ class OrderController extends OrderController_parent
         $oBasket = $this->getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
             try {
-                $oOrder = oxNew(Order::class);
+                $oOrder = $this->getActualOrder();
 
-                $oOrder->load(Registry::getSession()->getVariable('sess_challenge'));
                 //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
                 $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
@@ -100,12 +104,20 @@ class OrderController extends OrderController_parent
     /**
      * @return bool|null
      */
-    public function isSepaConfirmed(): ?bool
+    public function isSepaPayment(): ?bool
     {
-        if (
+        return (
             $this->getPayment()->getId() === UnzerDefinitions::SEPA_UNZER_PAYMENT_ID
             || $this->getPayment()->getId() === UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID
-        ) {
+        );
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isSepaConfirmed(): ?bool
+    {
+        if ($this->isSepaPayment()) {
             $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
             if (!$blSepaMandateConfirm) {
                 $this->blSepaMandateConfirmError = true;
@@ -120,10 +132,7 @@ class OrderController extends OrderController_parent
      */
     public function saveUnzerTransaction(): void
     {
-        $oOrder = oxNew(Order::class);
-        if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
-            $oOrder->initWriteTransactionToDB();
-        }
+        $this->getActualOrder()->initWriteTransactionToDB();
     }
 
     public function getApplePayLabel()
@@ -147,5 +156,14 @@ class OrderController extends OrderController_parent
         $country->load(Registry::getSession()->getUser()->oxuser__oxcountryid->value);
 
         return $country->oxcountry__oxisoalpha2->value;
+    }
+
+    public function getActualOrder(): Order
+    {
+        if (is_null($this->actualOrder)) {
+            $this->actualOrder = oxNew(Order::class);
+            $this->actualOrder->load(Registry::getSession()->getVariable('sess_challenge'));
+        }
+        return $this->actualOrder;
     }
 }
