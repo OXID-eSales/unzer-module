@@ -233,6 +233,23 @@ class AdminOrderController extends AdminDetailsController
     }
 
     /**
+     * @return void
+     */
+    public function doUnzerAuthorizationCancel()
+    {
+        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
+
+        $translator = $this->getServiceFromContainer(Translator::class);
+
+        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $oStatus = $paymentService->doUnzerAuthorizationCancel($this->getEditObject(), $unzerid);
+
+        if ($oStatus instanceof UnzerApiException) {
+            $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
+        }
+    }
+
+    /**
      * Method checks is order was made with unzer payment
      *
      * @return bool

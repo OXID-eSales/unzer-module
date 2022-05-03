@@ -271,6 +271,34 @@ class Payment
 
     /**
      * @param Order|null $oOrder
+     * @param string $unzerid
+     * @return UnzerApiException|bool
+     */
+    public function doUnzerAuthorizationCancel($oOrder, $unzerid)
+    {
+        if (!$oOrder) {
+            return false;
+        }
+
+        try {
+            $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
+
+            /** @psalm-suppress InvalidArgument */
+            $charge = $unzerPayment->getAuthorization()->cancel();
+            $blSuccess = $this->transactionService->writeTransactionToDB(
+                $oOrder->getId(),
+                $oOrder->oxorder__oxuserid->value,
+                $unzerPayment
+            );
+        } catch (UnzerApiException $e) {
+            return $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Order|null $oOrder
      * @param string $sPaymentId
      * @return UnzerApiException|bool
      */

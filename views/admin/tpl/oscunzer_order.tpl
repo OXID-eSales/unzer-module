@@ -81,11 +81,8 @@
     [{/block}]
     [{block name="unzer_collect"}]
         [{if $AuthId}]
-            <h3>[{oxmultilang ident="OSCUNZER_AUTHORIZATION"}]</h3>
-            <b>[{oxmultilang ident="OSCUNZER_REMAING_AMOUNT" suffix="COLON"}]</b>[{$AuthAmountRemaining}] [{$AuthCur}]<br>
-            <b>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT" suffix="COLON"}]</b>[{$AuthAmount|string_format:"%.2f"}] [{$AuthCur}]<br>
-
             [{if $AuthAmountRemaining > 0}]
+                <h3>[{oxmultilang ident="OSCUNZER_AUTHORIZATION"}]</h3>
                 <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerCollect">
@@ -94,9 +91,29 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td><input type="text" name="amount" value="[{$AuthAmountRemaining}]"> [{$AuthCur}]</td>
+                                <td>
+                                    <b>[{oxmultilang ident="OSCUNZER_REMAING_AMOUNT" suffix="COLON"}]</b>[{$AuthAmountRemaining|string_format:"%.2f"}] [{$AuthCur}]<br>
+                                    <b>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT" suffix="COLON"}]</b>[{$AuthAmount|string_format:"%.2f"}] [{$AuthCur}]<br>
+                                </td>
+                                <td><input type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
                                 <td><button type="submit">[{oxmultilang ident="OSCUNZER_CHARGE_COLLECT"}]</button></td>
                             </tr>
+                        </tbody>
+                    </table>
+                </form>
+            [{/if}]
+            [{if $AuthAmountRemaining == $AuthAmount}]
+                <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
+                    <input type="hidden" name="cl" value="unzer_admin_order">
+                    <input type="hidden" name="fnc" value="doUnzerAuthorizationCancel">
+                    <input type="hidden" name="oxid" value="[{$oxid}]">
+                    <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE"}]</td>
+                            <td><button type="submit">[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL"}]</button></td>
+                        </tr>
                         </tbody>
                     </table>
                 </form>
