@@ -10,16 +10,13 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
-use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\PaymentTypes\InvoiceSecured;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -102,11 +99,6 @@ class AdminOrderController extends AdminDetailsController
                 $paymentType instanceof InstallmentSecured
             );
 
-            $blHasBankData = (
-                $paymentType instanceof Prepayment ||
-                $paymentType->isInvoiceType()
-            );
-
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
@@ -132,7 +124,7 @@ class AdminOrderController extends AdminDetailsController
                 $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
             }
             $charges = [];
-            $bankData = '';
+
             if (!$unzerPayment->isCanceled()) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
@@ -147,10 +139,6 @@ class AdminOrderController extends AdminDetailsController
                     $aRv['chargeDate'] = $charge->getDate();
 
                     $charges [] = $aRv;
-                    if (!$bankData && $blHasBankData) {
-                        $paymentService = $this->getServiceFromContainer(UnzerService::class);
-                        $bankData = $paymentService->getBankDataFromCharge($charge);
-                    }
                 }
             }
 
@@ -172,7 +160,6 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['aCharges'] = $charges;
             $this->_aViewData['aCancellations'] = $cancellations;
             $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
-            $this->_aViewData['bankData'] = $bankData;
         } catch (\Exception $e) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $e->getMessage()

@@ -237,12 +237,6 @@
             </table>
         [{/if}]
     [{/block}]
-    [{block name="unzer_bankdata"}]
-        [{if $bankData}]
-            <h3>[{oxmultilang ident="OSCUNZER_BANK_DETAILS"}]</h3>
-            <p>[{$bankData}]</p>
-        [{/if}]
-    [{/block}]
 </div>
 
 [{include file="bottomnaviitem.tpl"}]
