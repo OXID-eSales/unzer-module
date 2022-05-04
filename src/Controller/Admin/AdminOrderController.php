@@ -10,7 +10,6 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -18,6 +17,8 @@ use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
+use UnzerSDK\Resources\PaymentTypes\InvoiceSecured;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -63,13 +64,6 @@ class AdminOrderController extends AdminDetailsController
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
 
-            if (
-                $oOrder->oxorder__oxpaymenttype->value == UnzerDefinitions::INVOICE_SECURED_UNZER_PAYMENT_ID ||
-                $oOrder->oxorder__oxpaymenttype->value == UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID
-            ) {
-                $this->_aViewData["blShipment"] = true;
-            }
-
             $this->_aViewData['oOrder'] = $oOrder;
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
@@ -97,6 +91,13 @@ class AdminOrderController extends AdminDetailsController
             $fCancelled = 0.0;
             $fCharged = 0.0;
 
+            $paymentType = $unzerPayment->getPaymentType();
+
+            $this->_aViewData["blShipment"] = (
+                $paymentType instanceof InvoiceSecured ||
+                $paymentType instanceof InstallmentSecured
+            );
+
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
@@ -122,6 +123,7 @@ class AdminOrderController extends AdminDetailsController
                 $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
             }
             $charges = [];
+
             if (!$unzerPayment->isCanceled()) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
@@ -229,6 +231,23 @@ class AdminOrderController extends AdminDetailsController
 
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errCancel'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function doUnzerAuthorizationCancel()
+    {
+        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
+
+        $translator = $this->getServiceFromContainer(Translator::class);
+
+        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $oStatus = $paymentService->doUnzerAuthorizationCancel($this->getEditObject(), $unzerid);
+
+        if ($oStatus instanceof UnzerApiException) {
+            $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
         }
     }
 
