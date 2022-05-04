@@ -53,8 +53,7 @@ class OrderController extends OrderController_parent
             $response->setData([
                 'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
             ])->sendJson();
-        }
-        else if ($this->isSepaPayment()) {
+        } elseif ($this->isSepaPayment()) {
             $this->getActualOrder()->markUnzerOrderAsPaid();
         }
 
