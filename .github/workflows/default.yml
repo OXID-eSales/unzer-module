@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload log artifact
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: TestsLog
           path: |
@@ -181,7 +181,7 @@ jobs:
 
       - name: Save psalm logs
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: TestsLog
           path: source/test-module/logs/psalm.sonarqube.json
