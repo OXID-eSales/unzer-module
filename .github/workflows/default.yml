@@ -52,7 +52,7 @@ jobs:
         run: docker-compose exec -T php composer update --no-interaction
 
       - name: Checkout current module
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: source/test-module
 
@@ -153,7 +153,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout current module
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: source/test-module
 
@@ -192,7 +192,7 @@ jobs:
     if: always()
     steps:
       - name: Checkout current module
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download fixed artifacts
         uses: actions/download-artifact@v3
