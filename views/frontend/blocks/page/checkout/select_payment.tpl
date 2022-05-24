@@ -2,6 +2,7 @@
     [{if $sPaymentID == 'oscunzer_applepay'}]
         [{* We include it as template, so that it can be modified in custom themes *}]
         [{include file="modules/osc/unzer/payment/applepay_availibility_check.tpl"}]
+        [{$smarty.block.parent}]
     [{elseif $paymentmethod->isUnzerPayment() && $paymentmethod->isUnzerPaymentTypeAllowed()}]
         [{include file="modules/osc/unzer/payment/payment_unzer.tpl"}]
     [{else}]

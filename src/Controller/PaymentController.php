@@ -46,7 +46,7 @@ class PaymentController extends PaymentController_parent
                 }
                 $paymentList[$key] = $payment;
             }
-
+        } else {
             // check ApplePay Eligibility
             if (!$this->getServiceFromContainer(ModuleSettings::class)->isApplePayEligibility()) {
                 unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
