@@ -30,7 +30,7 @@ class PaymentController extends PaymentController_parent
      */
     public function getPaymentList()
     {
-        $paymentList = parent::getPaymentList();
+        $paymentList = (array)parent::getPaymentList();
 
         $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
         $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
