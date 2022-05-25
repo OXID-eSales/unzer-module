@@ -134,10 +134,10 @@ class AdminOrderController extends AdminDetailsController
                         $aRv['chargeId'] = $charge->getId();
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                         $fCharged += $charge->getAmount();
-                    }
-                    $aRv['chargeDate'] = $charge->getDate();
+                        $aRv['chargeDate'] = $charge->getDate();
 
-                    $charges [] = $aRv;
+                        $charges [] = $aRv;
+                    }
                 }
             }
 
@@ -151,8 +151,8 @@ class AdminOrderController extends AdminDetailsController
                     $aRv['cancellationId'] = $cancellation->getId();
                     $aRv['cancelReason'] = $cancellation->getReasonCode();
                     $fCancelled += $cancellation->getAmount();
+                    $cancellations[] = $aRv;
                 }
-                $cancellations[] = $aRv;
             }
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;
