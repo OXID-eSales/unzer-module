@@ -7,9 +7,13 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Core\Registry;
 
 class PaymentController extends PaymentController_parent
 {
@@ -21,6 +25,15 @@ class PaymentController extends PaymentController_parent
     public function doSomething(): bool
     {
         return true;
+    }
+
+    /**
+     * Executes parent method parent::render().
+     */
+    public function render()
+    {
+        $this->checkForUnzerPaymentErrors();
+        return parent::render();
     }
 
     /**
@@ -54,5 +67,22 @@ class PaymentController extends PaymentController_parent
         }
 
         return $paymentList;
+    }
+
+    protected function checkForUnzerPaymentErrors()
+    {
+        $payment = oxNew(Payment::class);
+        if (
+            $this->getPaymentError() &&
+            ($actualPaymentId = $this->getCheckedPaymentId()) &&
+            $payment->load($actualPaymentId) &&
+            $payment->isUnzerPayment()
+        ) {
+            $session = Registry::getSession();
+            $orderId = $session->getVariable('sess_challenge');
+            $order = oxNew(Order::class);
+            $order->delete($orderId);
+            $session->deleteVariable('sess_challenge');
+        }
     }
 }
