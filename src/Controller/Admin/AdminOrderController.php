@@ -127,12 +127,12 @@ class AdminOrderController extends AdminDetailsController
             if (!$unzerPayment->isCanceled()) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
-                    $aRv = [];
-                    $aRv['chargedAmount'] = $charge->getAmount();
-                    $aRv['cancelledAmount'] = $charge->getCancelledAmount();
-                    $aRv['chargeId'] = $charge->getId();
-                    $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                     if ($charge->isSuccess()) {
+                        $aRv = [];
+                        $aRv['chargedAmount'] = $charge->getAmount();
+                        $aRv['cancelledAmount'] = $charge->getCancelledAmount();
+                        $aRv['chargeId'] = $charge->getId();
+                        $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                         $fCharged += $charge->getAmount();
                     }
                     $aRv['chargeDate'] = $charge->getDate();
@@ -144,13 +144,12 @@ class AdminOrderController extends AdminDetailsController
             $cancellations = [];
             /** @var Cancellation $cancellation */
             foreach ($unzerPayment->getCancellations() as $cancellation) {
-                $aRv = [];
-                $aRv['cancelledAmount'] = $cancellation->getAmount();
-                $aRv['cancelDate'] = $cancellation->getDate();
-                $aRv['cancellationId'] = $cancellation->getId();
-                $aRv['cancelReason'] = $cancellation->getReasonCode();
-
                 if ($cancellation->isSuccess()) {
+                    $aRv = [];
+                    $aRv['cancelledAmount'] = $cancellation->getAmount();
+                    $aRv['cancelDate'] = $cancellation->getDate();
+                    $aRv['cancellationId'] = $cancellation->getId();
+                    $aRv['cancelReason'] = $cancellation->getReasonCode();
                     $fCancelled += $cancellation->getAmount();
                 }
                 $cancellations[] = $aRv;
