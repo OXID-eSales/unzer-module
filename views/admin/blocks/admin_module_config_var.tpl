@@ -162,6 +162,8 @@
                 </dd>
                 <div class="spacer"></div>
             </dl>
+        [{else}]
+            [{$smarty.block.parent}]
         [{/if}]
     [{else}]
         [{$smarty.block.parent}]
