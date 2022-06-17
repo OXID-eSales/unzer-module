@@ -25,7 +25,11 @@
 [{else}]
     [{assign var="iBirthdayYear" value=0}]
 [{/if}]
-
+[{if $oxcmp_user->oxuser__oxcompany->value || ($deladr && $deladr->oxaddress__oxcompany->value)}]
+    [{assign var="isCompany" value=true}]
+[{else}]
+    [{assign var="isCompany" value=false}]
+[{/if}]
 [{block name="unzer_inv_secured_birthdate"}]
     <form id="payment-form-invoice-secured" class="js-oxValidate form-horizontal" novalidate="novalidate">
         <div class="form-group row oxDate [{if !$iBirthdayMonth || !$iBirthdayDay || !$iBirthdayYear}]text-danger[{/if}]">
@@ -54,83 +58,64 @@
                 </div>
             </div>
         </div>
-        [{if $oxcmp_user->oxuser__oxcompany->value || ($deladr && $deladr->oxaddress__oxcompany->value)}]
-            <div class="form-group row">
-                <label class="col-12 col-lg-3 req" for="unzerIndustry">[{oxmultilang ident="OSCUNZER_INDUSTRY"}]</label>
+        [{if $isCompany}]
+            <div class="form-group row unzerCommercialSector text-danger">
+                <label class="col-12 col-lg-3  req" for="unzer_commercial_sector">[{oxmultilang ident="OSCUNZER_COMMERCIAL_SECTOR"}]</label>
                 <div class="col-12 col-lg-9">
-                    <select id="unzer_industry" class="form-control selectpicker" required>
+                    <select id="unzer_commercial_sector" class="form-control selectpicker" required>
                         <option value="" label="-">-</option>
-                        [{foreach from=$oView->getUnzerInvoiceSecuredIndustries() item=title key=value}]
+                        [{foreach from=$oView->getUnzerCommercialSectors() item=title key=value}]
                             <option value="[{$value}]" label="[{$title}]">[{$title}]</option>
                         [{/foreach}]
                     </select>
                 </div>
+            </div>
+            <div class="form-group row text-danger">
+                <label class="col-12 col-lg-3 req" for="unzer_commercial_register_number">[{oxmultilang ident="OSCUNZER_COMMERCIAL_REGISTER_NUMBER"}]</label>
+                <div class="col-12 col-lg-9">
+                    <input id="unzer_commercial_register_number" class="form-control" type="text" maxlength="20" value=""
+                           placeholder="[{oxmultilang ident="OSCUNZER_COMMERCIAL_REGISTER_NUMBER"}]" required>
+                </div>
                 <div class="offset-lg-3 col-lg-9 col-12">
                     <div class="help-block">
-                        <p class="text-danger [{if $iBirthdayMonth && $iBirthdayDay && $iBirthdayYear}]d-none hidden[{/if}]">[{oxmultilang ident="DD_FORM_VALIDATION_REQUIRED"}]</p>
+                        <p class="text-danger">[{oxmultilang ident="OSCUNZER_COMMERCIAL_HELP"}]</p>
                     </div>
                 </div>
             </div>
         [{/if}]
-        <div id="unzer-invoice-secured-customer" class="field">
-            <!-- The customer form UI element will be inserted here -->
-        </div>
     </form>
     [{capture assign="unzerInvSecuredJS"}]
-/*
-        */
-    // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('[{$unzerpub}]');
-
-    // Create an Invoice Secured instance
-    let InvoiceSecured = unzerInstance.InvoiceSecured();
-
-    // Create a customer instance and render the customer form
-    let Customer = unzerInstance.Customer();
-    Customer.create({
-        containerId: 'unzer-invoice-secured-customer'
-    });
 
     // Handle payment form submission.
     $( "#payment-form-invoice-secured" ).submit(function( event ) {
         event.preventDefault();
             setTimeout(function(){
             if(!$( '.oxDate' ).hasClass("text-danger")
-
+                [{if $isCompany}]
+                && !$( '.unzerCommercialSector' ).hasClass("text-danger")
+                [{/if}]
             ){
-                let InvoiceSecuredPromise = InvoiceSecured.createResource();
-                let customerPromise = Customer.createCustomer();
-                Promise.all([InvoiceSecuredPromise, customerPromise])
-                .then(function(values) {
-                    let paymentType = values[0];
-                    let customer = values[1];
-                    let hiddenInputPaymentTypeId = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'paymentTypeId')
-                    .val(paymentType.id);
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputPaymentTypeId);
+                [{if $isCompany}]
+                let hiddenInputCommercialSector = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'unzer_commercial_sector')
+                .val($('#unzer_commercial_sector').val());
+                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputCommercialSector);
 
-                    let hiddenInputCustomerId = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'customerId')
-                    .val(customer.id);
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputCustomerId);
+                let hiddenInputRegistrationNumber = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'unzer_commercial_register_number')
+                .val($('#unzer_commercial_register_number').val());
+                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputRegistrationNumber);
+                [{/if}]
+                let hiddenInputBirthdate = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'birthdate')
+                .val($('#birthdate_year').val()+'-'+$('#birthdate_month').val()+'-'+$('#birthdate_day').val());
+                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputBirthdate);
 
-                    let hiddenInputBirthdate = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'birthdate')
-                    .val($('#birthdate_year').val()+'-'+$('#birthdate_month').val()+'-'+$('#birthdate_day').val());
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputBirthdate);
-
-                    $('#orderConfirmAgbBottom' ).addClass("submitable");
-                    $("#orderConfirmAgbBottom" ).submit();
-                })
-                .catch(function(error) {
-                    $('#error-holder').html(error.message);
-                    $('html, body').animate({
-                    scrollTop: $("#orderPayment").offset().top - 150
-                    }, 350);
-                })
+                $('#orderConfirmAgbBottom' ).addClass("submitable");
+                $("#orderConfirmAgbBottom" ).submit();
             }else{
                 $('html, body').animate({
                     scrollTop: $("#orderPayment").offset().top - 150

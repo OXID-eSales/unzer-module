@@ -40,7 +40,6 @@ class Order extends Order_parent
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus != "ERROR") {
-
             if (!$this->oxorder__oxordernr->value) {
                 $this->_setNumber();
             }

@@ -520,7 +520,7 @@ final class UnzerDefinitions
     ];
 
     /** @var array[] */
-    private const UNZER_INVOICE_SECURED_INDUSTRIES = [
+    private const UNZER_COMMERCIAL_SECTORS = [
         'OTHER',
         'WHOLESALE_TRADE_EXCEPT_VEHICLE_TRADE',
         'RETAIL_TRADE_EXCEPT_VEHICLE_TRADE',
@@ -579,8 +579,8 @@ final class UnzerDefinitions
         return self::PAYPAL_STATIC_CONTENTS;
     }
 
-    public static function getUnzerInvoiceSecuredIndustries()
+    public static function getUnzerCommercialSectors()
     {
-        return self::PAYPAL_STATIC_CONTENTS;
+        return self::UNZER_COMMERCIAL_SECTORS;
     }
 }

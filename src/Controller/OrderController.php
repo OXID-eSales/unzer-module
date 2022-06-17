@@ -29,7 +29,7 @@ class OrderController extends OrderController_parent
 
     protected $actualOrder = null;
 
-    protected $invoiceSecuredIndustries = null;
+    protected $commercialSectors = null;
 
     /**
      * @inerhitDoc
@@ -169,15 +169,15 @@ class OrderController extends OrderController_parent
         return $this->actualOrder;
     }
 
-    public function getUnzerInvoiceSecuredIndustries(): array
+    public function getUnzerCommercialSectors(): array
     {
-        if (is_null($this->invoiceSecuredIndustries)) {
-            $this->invoiceSecuredIndustries = [];
+        if (is_null($this->commercialSectors)) {
+            $this->commercialSectors = [];
             $translator = $this->getServiceFromContainer(Translator::class);
-            foreach (UnzerDefinitions::getUnzerInvoiceSecuredIndustries() as $value) {
-                $this->invoiceSecuredIndustries[$value] = $translator->translate($value);
+            foreach (UnzerDefinitions::getUnzerCommercialSectors() as $value) {
+                $this->commercialSectors[$value] = $translator->translate('OSCUNZER_COMMERCIAL_SECTOR_' . $value);
             }
         }
-        return $this->invoiceSecuredIndustries;
+        return $this->commercialSectors;
     }
 }

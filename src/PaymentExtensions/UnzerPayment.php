@@ -79,9 +79,15 @@ abstract class UnzerPayment
         User $userModel,
         Basket $basketModel
     ): bool {
+        $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
 
-        $customer = $this->unzerService->getUnzerCustomer($userModel);
+        $customer = $this->unzerService->getUnzerCustomer(
+            $userModel,
+            null,
+            $request->getRequestParameter('unzer_commercial_sector', ''),
+            $request->getRequestParameter('unzer_commercial_register_number', '')
+        );
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
@@ -98,7 +104,7 @@ abstract class UnzerPayment
 
         $this->unzerService->setSessionVars($transaction);
 
-        if (Registry::getRequest()->getRequestParameter('birthdate')) {
+        if ($request->getRequestParameter('birthdate')) {
             $userModel->save();
         }
 
