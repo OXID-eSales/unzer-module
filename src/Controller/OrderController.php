@@ -16,6 +16,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
+use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
@@ -27,6 +28,8 @@ class OrderController extends OrderController_parent
     protected $blSepaMandateConfirmError = null;
 
     protected $actualOrder = null;
+
+    protected $invoiceSecuredIndustries = null;
 
     /**
      * @inerhitDoc
@@ -164,5 +167,17 @@ class OrderController extends OrderController_parent
             $this->actualOrder->load(Registry::getSession()->getVariable('sess_challenge'));
         }
         return $this->actualOrder;
+    }
+
+    public function getUnzerInvoiceSecuredIndustries(): array
+    {
+        if (is_null($this->invoiceSecuredIndustries)) {
+            $this->invoiceSecuredIndustries = [];
+            $translator = $this->getServiceFromContainer(Translator::class);
+            foreach (UnzerDefinitions::getUnzerInvoiceSecuredIndustries() as $value) {
+                $this->invoiceSecuredIndustries[$value] = $translator->translate($value);
+            }
+        }
+        return $this->invoiceSecuredIndustries;
     }
 }

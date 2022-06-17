@@ -1,6 +1,7 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
 
 [{assign var="invadr" value=$oView->getInvoiceAddress()}]
+[{assign var="deladr" value=$oView->getDelAddress()}]
 [{if isset( $invadr.oxuser__oxbirthdate.month )}]
     [{assign var="iBirthdayMonth" value=$invadr.oxuser__oxbirthdate.month}]
 [{elseif $oxcmp_user->oxuser__oxbirthdate->value && $oxcmp_user->oxuser__oxbirthdate->value != "0000-00-00"}]
@@ -26,7 +27,7 @@
 [{/if}]
 
 [{block name="unzer_inv_secured_birthdate"}]
-    <form id="inv_secured_birthdate" class="js-oxValidate form-horizontal" novalidate="novalidate">
+    <form id="payment-form-invoice-secured" class="js-oxValidate form-horizontal" novalidate="novalidate">
         <div class="form-group row oxDate [{if !$iBirthdayMonth || !$iBirthdayDay || !$iBirthdayYear}]text-danger[{/if}]">
             <label class="col-12 col-lg-3 req" for="oxDay">[{oxmultilang ident="BIRTHDATE"}]</label>
             <div class="col-3 col-lg-3">
@@ -53,19 +54,67 @@
                 </div>
             </div>
         </div>
+        [{if $oxcmp_user->oxuser__oxcompany->value || ($deladr && $deladr->oxaddress__oxcompany->value)}]
+            <div class="form-group row">
+                <label class="col-12 col-lg-3 req" for="unzerIndustry">[{oxmultilang ident="OSCUNZER_INDUSTRY"}]</label>
+                <div class="col-12 col-lg-9">
+                    <select id="unzer_industry" class="form-control selectpicker" required>
+                        <option value="" label="-">-</option>
+                        [{foreach from=$oView->getUnzerInvoiceSecuredIndustries() item=title key=value}]
+                            <option value="[{$value}]" label="[{$title}]">[{$title}]</option>
+                        [{/foreach}]
+                    </select>
+                </div>
+                <div class="offset-lg-3 col-lg-9 col-12">
+                    <div class="help-block">
+                        <p class="text-danger [{if $iBirthdayMonth && $iBirthdayDay && $iBirthdayYear}]d-none hidden[{/if}]">[{oxmultilang ident="DD_FORM_VALIDATION_REQUIRED"}]</p>
+                    </div>
+                </div>
+            </div>
+        [{/if}]
+        <div id="unzer-invoice-secured-customer" class="field">
+            <!-- The customer form UI element will be inserted here -->
+        </div>
     </form>
     [{capture assign="unzerInvSecuredJS"}]
-        $('#orderConfirmAgbBottom').submit(function( event ) {
-            if(!$('#orderConfirmAgbBottom').hasClass("submitable")){
-                event.preventDefault();
-                $("#inv_secured_birthdate").submit();
-            }
-        });
+/*
+        */
+    // Create an Unzer instance with your public key
+    let unzerInstance = new unzer('[{$unzerpub}]');
 
-        $( "#inv_secured_birthdate" ).submit(function( event ) {
-            event.preventDefault();
-                setTimeout(function(){
-                if(!$( '.oxDate' ).hasClass("text-danger")){
+    // Create an Invoice Secured instance
+    let InvoiceSecured = unzerInstance.InvoiceSecured();
+
+    // Create a customer instance and render the customer form
+    let Customer = unzerInstance.Customer();
+    Customer.create({
+        containerId: 'unzer-invoice-secured-customer'
+    });
+
+    // Handle payment form submission.
+    $( "#payment-form-invoice-secured" ).submit(function( event ) {
+        event.preventDefault();
+            setTimeout(function(){
+            if(!$( '.oxDate' ).hasClass("text-danger")
+
+            ){
+                let InvoiceSecuredPromise = InvoiceSecured.createResource();
+                let customerPromise = Customer.createCustomer();
+                Promise.all([InvoiceSecuredPromise, customerPromise])
+                .then(function(values) {
+                    let paymentType = values[0];
+                    let customer = values[1];
+                    let hiddenInputPaymentTypeId = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentTypeId')
+                    .val(paymentType.id);
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputPaymentTypeId);
+
+                    let hiddenInputCustomerId = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'customerId')
+                    .val(customer.id);
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputCustomerId);
 
                     let hiddenInputBirthdate = $(document.createElement('input'))
                     .attr('type', 'hidden')
@@ -73,17 +122,30 @@
                     .val($('#birthdate_year').val()+'-'+$('#birthdate_month').val()+'-'+$('#birthdate_day').val());
                     $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputBirthdate);
 
-
-                    $( '#orderConfirmAgbBottom' ).addClass("submitable");
-                    $( "#orderConfirmAgbBottom" ).submit();
-
-                }else{
+                    $('#orderConfirmAgbBottom' ).addClass("submitable");
+                    $("#orderConfirmAgbBottom" ).submit();
+                })
+                .catch(function(error) {
+                    $('#error-holder').html(error.message);
                     $('html, body').animate({
-                        scrollTop: $("#orderPayment").offset().top - 150
+                    scrollTop: $("#orderPayment").offset().top - 150
                     }, 350);
-                }
-            }, 100);
-        });
+                })
+            }else{
+                $('html, body').animate({
+                    scrollTop: $("#orderPayment").offset().top - 150
+                }, 350);
+            }
+        }, 100);
+    });
+
+    $('#orderConfirmAgbBottom').submit(function( event ) {
+        if(!$('#orderConfirmAgbBottom').hasClass("submitable")){
+            event.preventDefault();
+            $("#payment-form-invoice-secured").submit();
+        }
+    });
+
     [{/capture}]
     [{oxscript add=$unzerInvSecuredJS}]
 [{/block}]
