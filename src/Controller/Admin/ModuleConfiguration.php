@@ -34,7 +34,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function __construct()
     {
         parent::__construct();
-        $this->translator = oxNew(Translator::class, Registry::getLang());
+        $this->translator = $this->getServiceFromContainer(Translator::class);
     }
 
     /**
@@ -247,7 +247,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             Registry::getUtilsView()->addErrorToDisplay(
                 oxNew(
                     UnzerException::class,
-                    Registry::getLang()->translateString(
+                    $this->translator->translate(
                         $errorMessage
                     )
                 )
@@ -273,7 +273,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 Registry::getUtilsView()->addErrorToDisplay(
                     oxNew(
                         UnzerException::class,
-                        Registry::getLang()->translateString(
+                        $this->translator->translate(
                             'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY'
                         )
                     )
@@ -301,7 +301,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 Registry::getUtilsView()->addErrorToDisplay(
                     oxNew(
                         UnzerException::class,
-                        Registry::getLang()->translateString(
+                        $this->translator->translate(
                             'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT'
                         )
                     )

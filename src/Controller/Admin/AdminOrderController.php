@@ -73,7 +73,8 @@ class AdminOrderController extends AdminDetailsController
                 $this->getUnzerViewData($this->sPaymentId);
             }
         } else {
-            $this->_aViewData['sMessage'] = Registry::getLang()->translateString("OSCUNZER_NO_UNZER_ORDER");
+            $translator = $this->getServiceFromContainer(Translator::class);
+            $this->_aViewData['sMessage'] = $translator->translate("OSCUNZER_NO_UNZER_ORDER");
         }
 
         return "oscunzer_order.tpl";
@@ -81,8 +82,6 @@ class AdminOrderController extends AdminDetailsController
 
     protected function getUnzerViewData(string $sPaymentId): void
     {
-        $translator = oxNew(Translator::class, Registry::getLang());
-
         try {
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
             $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
