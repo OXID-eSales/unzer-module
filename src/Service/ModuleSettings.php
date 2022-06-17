@@ -51,6 +51,18 @@ class ModuleSettings
     }
 
     /**
+     * Checks if module configurations are valid
+     */
+    public function checkHealth(): bool
+    {
+        return (
+            $this->getShopPublicKey() &&
+            $this->getShopPrivateKey() &&
+            $this->getRegisteredWebhookId()
+        );
+    }
+
+    /**
      * @return bool
      */
     public function isDebugMode(): bool

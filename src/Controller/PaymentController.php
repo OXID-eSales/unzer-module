@@ -44,12 +44,9 @@ class PaymentController extends PaymentController_parent
     public function getPaymentList()
     {
         $paymentList = (array)parent::getPaymentList();
+        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
 
-        $pubKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
-        $privKey = $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
-        $registeredWebhook = $this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhook();
-
-        if (!$pubKey || !$privKey || !$registeredWebhook) {
+        if (!$moduleSettings->checkHealth()) {
             $paymentListRaw = $paymentList;
             $paymentList = [];
 
@@ -61,7 +58,7 @@ class PaymentController extends PaymentController_parent
             }
         } else {
             // check ApplePay Eligibility
-            if (!$this->getServiceFromContainer(ModuleSettings::class)->isApplePayEligibility()) {
+            if (!$moduleSettings->isApplePayEligibility()) {
                 unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
             }
         }
