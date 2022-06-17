@@ -26,6 +26,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     use ServiceContainer;
 
     protected $translator;
+    protected $moduleSettings;
     protected string $_sModuleId; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
     /**
@@ -34,7 +35,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function __construct()
     {
         parent::__construct();
+        /** @var Translator $this->translator */
         $this->translator = $this->getServiceFromContainer(Translator::class);
+        /** @var ModuleSettings $this->moduleSettings */
+        $this->moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
     }
 
     /**
@@ -46,11 +50,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         if ($this->_sModuleId == Module::MODULE_ID) {
             try {
-                $moduleSettings = $this->getModuleSettings();
-                $pubKey = $moduleSettings->getShopPublicKey();
-                $privKey = $moduleSettings->getShopPrivateKey();
-                $registeredWebhookUrl = $moduleSettings->getRegisteredWebhook();
-                $registeredWebhookId = $moduleSettings->getRegisteredWebhookId();
+                $pubKey = $this->moduleSettings->getShopPublicKey();
+                $privKey = $this->moduleSettings->getShopPrivateKey();
+                $registeredWebhookUrl = $this->moduleSettings->getRegisteredWebhook();
+                $registeredWebhookId = $this->moduleSettings->getRegisteredWebhookId();
                 $proposedWebhookUrl = $this->getProposedWebhookForActualShop();
 
                 if ($pubKey && $privKey) {
@@ -83,25 +86,24 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                     $this->_aViewData["showWebhookButtons"] = true;
                 }
 
-                if ($capabilities = $moduleSettings->getApplePayMerchantCapabilities()) {
+                if ($capabilities = $this->moduleSettings->getApplePayMerchantCapabilities()) {
                     $this->_aViewData['applePayMC'] = $capabilities;
                 }
 
-                if ($networks = $moduleSettings->getApplePayNetworks()) {
+                if ($networks = $this->moduleSettings->getApplePayNetworks()) {
                     $this->_aViewData['applePayNetworks'] = $networks;
                 }
 
-                if ($cert = $moduleSettings->getApplePayMerchantCert()) {
+                if ($cert = $this->moduleSettings->getApplePayMerchantCert()) {
                     $this->_aViewData['applePayMerchantCert'] = $cert;
                 }
 
-                if ($key = $moduleSettings->getApplePayMerchantCertKey()) {
+                if ($key = $this->moduleSettings->getApplePayMerchantCertKey()) {
                     $this->_aViewData['applePayMerchantCertKey'] = $key;
                 }
 
-                if ($systemMode = $moduleSettings->getSystemMode()) {
-                    $this->_aViewData['systemMode'] = $systemMode;
-                }
+                $this->_aViewData['systemMode'] = $this->moduleSettings->getSystemMode();
+
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
                     $this->translator->translateCode(
@@ -122,8 +124,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         /** @var Unzer $unzer */
         try {
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $registeredWebhookId = $this->getServiceFromContainer(ModuleSettings::class)
-                ->getRegisteredWebhookId();
+            $registeredWebhookId = $this->moduleSettings->getRegisteredWebhookId();
 
             if ($webhooks = $unzer->fetchAllWebhooks()) {
                 foreach ($webhooks as $webhook) {
@@ -145,8 +146,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     protected function getProposedWebhookForActualShop(): string
     {
+        $withXDebug = ($this->moduleSettings->isSandboxMode() && $this->moduleSettings->isDebugMode());
         return Registry::getConfig()->getSslShopUrl()
-            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus';
+            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus'
+            . ($withXDebug ? '&XDEBUG_SESSION_START' : '');
     }
 
     /**
@@ -173,9 +176,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     protected function saveWebhookOption($url, $id): void
     {
-        $moduleSettings = $this->getModuleSettings();
-        $moduleSettings->saveWebhook($url);
-        $moduleSettings->saveWebhookId($id);
+        $this->moduleSettings->saveWebhook($url);
+        $this->moduleSettings->saveWebhookId($id);
     }
 
     /**
@@ -184,8 +186,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function transferApplePayPaymentProcessingData(): void
     {
-        $moduleSettings = $this->getModuleSettings();
-
         $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
         $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
         $errorMessage = null;
@@ -235,8 +235,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($response->getStatusCode() !== 200) {
                     $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
                 } else {
-                    $moduleSettings->saveApplePayPaymentKeyId($applePayPaymentKeyId);
-                    $moduleSettings->saveApplePayPaymentCertificateId($applePayPaymentCertificateId);
+                    $this->moduleSettings->saveApplePayPaymentKeyId($applePayPaymentKeyId);
+                    $this->moduleSettings->saveApplePayPaymentCertificateId($applePayPaymentCertificateId);
                 }
             } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
@@ -261,9 +261,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function getApplePayPaymentProcessingKeyExists(): bool
     {
         $keyExists = false;
-        $moduleSettings = $this->getModuleSettings();
-        $keyId = $moduleSettings->getApplePayPaymentKeyId();
-        if ($moduleSettings->getApplePayMerchantCertKey() && $keyId) {
+        $keyId = $this->moduleSettings->getApplePayPaymentKeyId();
+        if ($this->moduleSettings->getApplePayMerchantCertKey() && $keyId) {
             try {
                 $keyExists = $this->getServiceFromContainer(ApiClient::class)
                     ->requestApplePayPaymentKey($keyId)
@@ -289,9 +288,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function getApplePayPaymentProcessingCertExists(): bool
     {
         $certExists = false;
-        $moduleSettings = $this->getModuleSettings();
-        $certId = $moduleSettings->getApplePayPaymentCertificateId();
-        if ($moduleSettings->getApplePayMerchantCert() && $certId) {
+        $certId = $this->moduleSettings->getApplePayPaymentCertificateId();
+        if ($this->moduleSettings->getApplePayMerchantCert() && $certId) {
             try {
                 $certExists = $this->getServiceFromContainer(ApiClient::class)
                     ->requestApplePayPaymentCert($certId)
@@ -320,30 +318,24 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         parent::saveConfVars();
 
         $request = Registry::getRequest();
-        $moduleSettings = $this->getModuleSettings();
 
         if ($requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
-            $moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
+            $this->moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
         }
         if ($requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')) {
-            $moduleSettings->saveApplePayNetworks($requestApplePayNetworks);
+            $this->moduleSettings->saveApplePayNetworks($requestApplePayNetworks);
         }
         if ($requestApplePayMerchantCert = $request->getRequestEscapedParameter('applePayMerchantCert')) {
             file_put_contents(
-                $moduleSettings->getApplePayMerchantCertFilePath(),
+                $this->moduleSettings->getApplePayMerchantCertFilePath(),
                 $requestApplePayMerchantCert
             );
         }
         if ($requestApplePayMerchantCertKey = $request->getRequestEscapedParameter('applePayMerchantCertKey')) {
             file_put_contents(
-                $moduleSettings->getApplePayMerchantCertKeyFilePath(),
+                $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
                 $requestApplePayMerchantCertKey
             );
         }
-    }
-
-    protected function getModuleSettings()
-    {
-        return $this->getServiceFromContainer(ModuleSettings::class);
     }
 }

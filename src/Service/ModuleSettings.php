@@ -71,6 +71,14 @@ class ModuleSettings
     }
 
     /**
+     * @return bool
+     */
+    public function isSandboxMode(): bool
+    {
+        return $this->getSystemMode() === self::SYSTEM_MODE_SANDBOX;
+    }
+
+    /**
      * @return string
      */
     public function getSystemMode(): string

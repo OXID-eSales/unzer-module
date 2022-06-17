@@ -28,6 +28,19 @@ class ViewConfig extends ViewConfig_parent
      */
     protected $isWaveCompatibleTheme = null;
 
+    protected $moduleSettings;
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        /** @var ModuleSettings $this->moduleSettings */
+        $this->moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+    }
+
     /**
      * Returns System Mode live|sandbox.
      *
@@ -35,7 +48,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerSystemMode(): string
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getSystemMode();
+        return $this->moduleSettings->getSystemMode();
     }
 
     /**
@@ -43,7 +56,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isUnzerDebugMode(): bool
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->isDebugMode();
+        return $this->moduleSettings->isDebugMode();
     }
 
     /**
@@ -53,7 +66,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPubKey(): string
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey();
+        return $this->moduleSettings->getShopPublicKey();
     }
 
     /**
@@ -63,7 +76,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPrivKey(): string
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey();
+        return $this->moduleSettings->getShopPrivateKey();
     }
 
     /**
@@ -83,7 +96,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerInstallmentRate(): float
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->getInstallmentRate();
+        return $this->moduleSettings->getInstallmentRate();
     }
 
     /**
@@ -93,7 +106,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function useModuleJQueryInFrontend(): bool
     {
-        return $this->getServiceFromContainer(ModuleSettings::class)->useModuleJQueryInFrontend();
+        return $this->moduleSettings->useModuleJQueryInFrontend();
     }
 
     /**
