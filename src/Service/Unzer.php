@@ -146,8 +146,6 @@ class Unzer
      */
     public function getUnzerBasket(string $unzerOrderId, BasketModel $basketModel): Basket
     {
-        $lang = Registry::getLang();
-
         $basket = new Basket(
             $unzerOrderId,
             $basketModel->getBruttoSum(),
@@ -188,7 +186,7 @@ class Unzer
         // Add DeliveryCosts
         $deliveryCosts = $basketModel->getDeliveryCost();
         $unzerBasketItem = new BasketItem(
-            $lang->translateString('SHIPPING_COST'),
+            $this->translator->translate('SHIPPING_COST'),
             $deliveryCosts->getNettoPrice(),
             $deliveryCosts->getNettoPrice(),
             1
@@ -203,7 +201,7 @@ class Unzer
         // Add Discounts
         $discounts = $basketModel->getTotalDiscount();
         $unzerBasketItem = new BasketItem(
-            $lang->translateString('DISCOUNT'),
+            $this->translator->translate('DISCOUNT'),
             $discounts->getNettoPrice(),
             $discounts->getNettoPrice(),
             1
