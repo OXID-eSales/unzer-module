@@ -10,24 +10,17 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-final class PaymentsAvailableCest extends BaseCest
+class InvoiceCest extends BaseCest
 {
-    private $paymentMethods = [
-        "SEPA Direct Debit",
-        "SEPA Direct Debit with Unzer",
-        "Invoice",
-        "Prepayment"
-    ];
-
     /**
      * @param AcceptanceTester $I
      */
-    public function checkPaymentsAvailable(AcceptanceTester $I)
-    {
-        $I->wantToTest('Test payment methods are available');
+    public function checkPaymentWorks(AcceptanceTester $I) {
+        $I->wantToTest('Test Invoice payment works');
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($I);
@@ -37,10 +30,16 @@ final class PaymentsAvailableCest extends BaseCest
         $clientData = Fixtures::get('client');
         $homePage->loginUser($clientData['username'], $clientData['password']);
 
-        $homePage->openMiniBasket()->openCheckout();
+        $paymentSelection = $homePage->openMiniBasket()->openCheckout();
 
-        foreach ($this->paymentMethods as $onePaymentMethod) {
-            $I->waitForText($onePaymentMethod);
-        }
+        $sepaPaymentLabel = "//label[@for='payment_oscunzer_invoice']";
+        $I->waitForElement($sepaPaymentLabel);
+        $I->click($sepaPaymentLabel);
+
+        $orderPage = $paymentSelection->goToNextStep();
+
+        $orderPage->submitOrder();
+
+        $I->waitForText(Translator::translate('THANK_YOU'));
     }
 }
