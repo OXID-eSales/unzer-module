@@ -19,7 +19,6 @@ class InvoiceCest extends BaseCest
 {
     /**
      * @param AcceptanceTester $I
-     * @group testing
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
