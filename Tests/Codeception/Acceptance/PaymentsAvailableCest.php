@@ -10,16 +10,18 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
+use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 final class PaymentsAvailableCest extends BaseCest
 {
     private $paymentMethods = [
-        "SEPA Direct Debit",
-        "SEPA Direct Debit with Unzer",
-        "Invoice",
-        "Prepayment"
+        'OSCUNZER_PAYMENT_METHOD_SEPA',
+        'OSCUNZER_PAYMENT_METHOD_SEPA-SECURED',
+        'OSCUNZER_PAYMENT_METHOD_INVOICE',
+        'OSCUNZER_PAYMENT_METHOD_PREPAYMENT'
     ];
 
     /**
@@ -39,8 +41,10 @@ final class PaymentsAvailableCest extends BaseCest
 
         $homePage->openMiniBasket()->openCheckout();
 
+        $translator = ContainerFactory::getInstance()->getContainer()->get(Translator::class);
+        $translator->setLanguage(1);
         foreach ($this->paymentMethods as $onePaymentMethod) {
-            $I->waitForText($onePaymentMethod);
+            $I->waitForText($translator->translate($onePaymentMethod));
         }
     }
 }

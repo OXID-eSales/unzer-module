@@ -23,4 +23,10 @@ return [
         "username" => "unzeruser@oxid-esales.dev",
         "password" => "useruser",
     ],
+
+    //User for testing Aipay
+    'alipay_client' => [
+        "username" => "keychain",
+        "password" => "123",
+    ],
 ];
