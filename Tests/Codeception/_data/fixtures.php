@@ -12,6 +12,10 @@ return [
     'product' => [
         'id' => 'dc5ffdf380e15674b56dd562a7cb6aec',
         'title' => 'Kuyichi leather belt JEVER',
+        'bruttoprice_single' => '29.90',
+        'nettoprice_single' => '25.13',
+        'shipping_cost' => '3.90',
+        'currency' => '€'
     ],
 
     // User for testing
