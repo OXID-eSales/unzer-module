@@ -23,6 +23,7 @@ class InvoiceCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Invoice payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
         $amount = 1;
 
         $basketItem = Fixtures::get('product');
