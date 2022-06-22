@@ -9,10 +9,6 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
-use Codeception\Util\Fixtures;
-use OxidSolutionCatalysts\Unzer\Service\Translator;
-use OxidEsales\Codeception\Step\Basket as BasketSteps;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 final class PaymentsAvailableCest extends BaseCest
@@ -21,35 +17,22 @@ final class PaymentsAvailableCest extends BaseCest
         'OSCUNZER_PAYMENT_METHOD_SEPA',
         'OSCUNZER_PAYMENT_METHOD_SEPA-SECURED',
         'OSCUNZER_PAYMENT_METHOD_INVOICE',
-        'OSCUNZER_PAYMENT_METHOD_PREPAYMENT'
+        'OSCUNZER_PAYMENT_METHOD_PREPAYMENT',
+        'OSCUNZER_PAYMENT_METHOD_ALIPAY',
     ];
 
     /**
      * @param AcceptanceTester $I
+     * @group PaymentAvailableTest
      */
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {
         $I->wantToTest('Test payment methods are available');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_invoice']);
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_prepayment']);
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_sepa']);
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_sepa-secured']);
+        $this->_setAcceptance($I);
+        $this->_initializeTest();
 
-        $basketItem = Fixtures::get('product');
-        $basketSteps = new BasketSteps($I);
-        $basketSteps->addProductToBasket($basketItem['id'], 1);
-
-        $homePage = $I->openShop();
-        $clientData = Fixtures::get('client');
-        $homePage->loginUser($clientData['username'], $clientData['password']);
-
-        $homePage->openMiniBasket()->openCheckout();
-
-        $translator = ContainerFactory::getInstance()->getContainer()->get(Translator::class);
-        $translator->setLanguage(1);
         foreach ($this->paymentMethods as $onePaymentMethod) {
-            $I->waitForText($translator->translate($onePaymentMethod));
+            $I->waitForText($this->_getTranslator()->translate($onePaymentMethod));
         }
     }
 }

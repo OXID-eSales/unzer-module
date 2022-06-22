@@ -10,42 +10,31 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
-use OxidEsales\Codeception\Module\Translation\Translator;
-use OxidEsales\Codeception\Step\Basket as BasketSteps;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 final class SEPADirectDebitCest extends BaseCest
 {
+    private $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa']";
+    private $IBANInput = "//input[contains(@id, 'unzer-iban-input')]";
+
     /**
      * @param AcceptanceTester $I
+     * @group SEPADirectPaymentTest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_sepa']);
+        $this->_setAcceptance($I);
+        $this->_initializeTest();
+        $orderPage = $this->_choosePayment($this->sepaPaymentLabel);
 
-        $basketItem = Fixtures::get('product');
-        $basketSteps = new BasketSteps($I);
-        $basketSteps->addProductToBasket($basketItem['id'], 1);
-
-        $homePage = $I->openShop();
-        $clientData = Fixtures::get('client');
-        $homePage->loginUser($clientData['username'], $clientData['password']);
-
-        $paymentSelection = $homePage->openMiniBasket()->openCheckout();
-
-        $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa']";
-        $I->waitForElement($sepaPaymentLabel);
-        $I->click($sepaPaymentLabel);
-
-        $orderPage = $paymentSelection->goToNextStep();
-
-        $I->fillField("//input[contains(@id, 'unzer-iban-input')]", "DE89370400440532013000");
+        $payment = Fixtures::get('sepa_payment');
+        $I->fillField($this->IBANInput, $payment['IBAN']);
         $I->click("#oscunzersepaagreement");
         $I->wait(1);
 
         $orderPage->submitOrder();
 
-        $I->waitForText(Translator::translate('THANK_YOU'));
+        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
     }
 }

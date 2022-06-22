@@ -29,4 +29,9 @@ return [
         "username" => "keychain",
         "password" => "123",
     ],
+
+    // Payment data for SEPA
+    'sepa_payment' => [
+        "IBAN" => "DE89370400440532013000",
+    ]
 ];
