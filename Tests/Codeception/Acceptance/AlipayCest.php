@@ -25,6 +25,7 @@ class AlipayCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Alipay payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($I);
@@ -68,6 +69,7 @@ class AlipayCest extends BaseCest
     public function checkSomeLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Alipay Some LPM payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($I);
@@ -111,6 +113,7 @@ class AlipayCest extends BaseCest
     public function checkAnotherLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Another LPM Alipay payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($I);
@@ -154,6 +157,7 @@ class AlipayCest extends BaseCest
     public function checkOneMoreLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test One more LPM Alipay payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($I);

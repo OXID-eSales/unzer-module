@@ -23,8 +23,8 @@ final class PrepaymentCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Prepayment payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_prepayment']);
         $amount = 1;
-        $I->saveShopConfVar('str', 'sDefaultLang', 1);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($I);

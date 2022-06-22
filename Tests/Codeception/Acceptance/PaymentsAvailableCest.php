@@ -30,6 +30,11 @@ final class PaymentsAvailableCest extends BaseCest
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {
         $I->wantToTest('Test payment methods are available');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_invoice']);
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_prepayment']);
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_sepa']);
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_sepa-secured']);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($I);
