@@ -21,7 +21,6 @@ class AlipayCest extends BaseCest
     private $amount = 1;
     /**
      * @param AcceptanceTester $I
-     * @group testing
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
@@ -65,7 +64,6 @@ class AlipayCest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
-     * @group testing
      */
     public function checkSomeLPMPaymentWorks(AcceptanceTester $I)
     {
@@ -109,7 +107,6 @@ class AlipayCest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
-     * @group testing
      */
     public function checkAnotherLPMPaymentWorks(AcceptanceTester $I)
     {
@@ -153,7 +150,6 @@ class AlipayCest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
-     * @group testing
      */
     public function checkOneMoreLPMPaymentWorks(AcceptanceTester $I)
     {
