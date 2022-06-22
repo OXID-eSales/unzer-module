@@ -9,7 +9,6 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment;
