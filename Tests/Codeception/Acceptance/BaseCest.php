@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Codeception\Page\Page;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
@@ -84,7 +85,7 @@ abstract class BaseCest
     {
         if (!isset($this->translator)) {
             if (!ContainerFactory::getInstance()->getContainer()->has(Translator::class)) {
-                $this->translator = oxNew(Translator::class);
+                $this->translator = oxNew(Translator::class, Registry::getLang());
             } else {
                 $this->translator = ContainerFactory::getInstance()->getContainer()->get(Translator::class);
             }
