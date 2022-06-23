@@ -33,5 +33,26 @@ return [
     // Payment data for SEPA
     'sepa_payment' => [
         "IBAN" => "DE89370400440532013000",
-    ]
+    ],
+
+    // Payment data for Credit card using Mastercard
+    'mastercard_payment' => [
+        "cardnumber" => "5453010000059543",
+        "CVC" => "123",
+        "3DSpassword" => "secret3"
+    ],
+
+    // Payment data for Credit card using Visa
+    'visa_payment' => [
+        "cardnumber" => "4012001037461114",
+        "CVC" => "123",
+        "3DSpassword" => "secret3"
+    ],
+
+    // Payment data for Credit card using Mastercard
+    'maestro_payment' => [
+        "cardnumber" => "6799851000000032",
+        "CVC" => "123",
+        "3DSpassword" => "secret3"
+    ],
 ];

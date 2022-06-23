@@ -19,6 +19,7 @@ final class PaymentsAvailableCest extends BaseCest
         'OSCUNZER_PAYMENT_METHOD_INVOICE',
         'OSCUNZER_PAYMENT_METHOD_PREPAYMENT',
         'OSCUNZER_PAYMENT_METHOD_ALIPAY',
+        'OSCUNZER_PAYMENT_METHOD_CARD'
     ];
 
     /**
