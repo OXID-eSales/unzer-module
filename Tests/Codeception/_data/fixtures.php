@@ -55,4 +55,15 @@ return [
         "CVC" => "123",
         "3DSpassword" => "secret3"
     ],
+
+    // Payment data for Giropay
+    'giropay_payment' => [
+        "bank_number" => "12345679",
+        "account_number" => "0000000300",
+        "IBAN" => "DE46940594210000012345",
+        "BIC" => "TESTDETT421",
+        "USER" => "chiptanscatest2",
+        "USER_PIN" => "12345",
+        "USER_TAN" => "123456",
+    ],
 ];
