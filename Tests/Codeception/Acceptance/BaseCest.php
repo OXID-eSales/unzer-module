@@ -50,6 +50,22 @@ abstract class BaseCest
     }
 
     /**
+     * @return void
+     */
+    protected function _initializeSecuredTest()
+    {
+        $basketItem = Fixtures::get('product');
+        $basketSteps = new BasketSteps($this->I);
+        $basketSteps->addProductToBasket($basketItem['id'], $this->amount);
+
+        $homePage = $this->I->openShop();
+        $clientData = Fixtures::get('secured_client');
+        $homePage->loginUser($clientData['username'], $clientData['password']);
+
+        $this->paymentSelection = $homePage->openMiniBasket()->openCheckout();
+    }
+
+    /**
      * @param string $label
      * @return Page
      */

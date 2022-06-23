@@ -24,7 +24,13 @@ return [
         "password" => "useruser",
     ],
 
-    //User for testing Aipay
+    // User for testing secured payment
+    'secured_client' => [
+        "username" => "unzersecureuser@oxid-esales.dev",
+        "password" => "useruser",
+    ],
+
+    //User for testing Alipay
     'alipay_client' => [
         "username" => "keychain",
         "password" => "123",
