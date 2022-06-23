@@ -21,6 +21,7 @@ final class PaymentsAvailableCest extends BaseCest
         'OSCUNZER_PAYMENT_METHOD_ALIPAY',
         'OSCUNZER_PAYMENT_METHOD_CARD',
         'OSCUNZER_PAYMENT_METHOD_GIROPAY',
+        'OSCUNZER_PAYMENT_METHOD_PAYPAL',
     ];
 
     /**

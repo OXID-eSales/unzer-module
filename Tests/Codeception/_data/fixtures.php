@@ -66,4 +66,10 @@ return [
         "USER_PIN" => "12345",
         "USER_TAN" => "123456",
     ],
+
+    // Payment data for PayPal
+    'paypal_payment' => [
+        "username" => "paypal-buyer@unzer.com",
+        "password" => "unzer1234",
+    ],
 ];
