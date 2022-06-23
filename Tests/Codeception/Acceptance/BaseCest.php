@@ -34,9 +34,9 @@ abstract class BaseCest
     }
 
     /**
-     *
+     * @return void
      */
-    public function _initializeTest()
+    protected function _initializeTest()
     {
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($this->I);
@@ -53,7 +53,7 @@ abstract class BaseCest
      * @param string $label
      * @return Page
      */
-    public function _choosePayment(string $label): Page
+    protected function _choosePayment(string $label): Page
     {
         $this->I->waitForElement($label);
         $this->I->click($label);
@@ -65,7 +65,7 @@ abstract class BaseCest
      * @param AcceptanceTester $I
      * @return void
      */
-    public function _setAcceptance(AcceptanceTester $I)
+    protected function _setAcceptance(AcceptanceTester $I)
     {
         $this->I = $I;
     }
@@ -73,7 +73,7 @@ abstract class BaseCest
     /**
      * @return AcceptanceTester
      */
-    public function _getAcceptance(): AcceptanceTester
+    protected function _getAcceptance(): AcceptanceTester
     {
         return $this->I;
     }
@@ -81,7 +81,7 @@ abstract class BaseCest
     /**
      * @return Translator
      */
-    public function _getTranslator(): Translator
+    protected function _getTranslator(): Translator
     {
         if (!isset($this->translator)) {
             if (!ContainerFactory::getInstance()->getContainer()->has(Translator::class)) {
@@ -99,7 +99,7 @@ abstract class BaseCest
     /**
      * @return string price of order
      */
-    public function _getPrice(): string
+    protected function _getPrice(): string
     {
         $basketItem = Fixtures::get('product');
         return $this->_getTranslator()->formatCurrency(
@@ -110,7 +110,7 @@ abstract class BaseCest
     /**
      * @return string currency
      */
-    public function _getCurrency(): string
+    protected function _getCurrency(): string
     {
         $basketItem = Fixtures::get('product');
         return $basketItem['currency'];

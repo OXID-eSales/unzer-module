@@ -21,7 +21,7 @@ class AlipayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group AlipayPaymentTest
      */
-    public function _prepareAlipayTest(AcceptanceTester $I)
+    private function _prepareAlipayTest(AcceptanceTester $I)
     {
         $this->_setAcceptance($I);
         $this->_initializeTest();
@@ -33,7 +33,7 @@ class AlipayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group AlipayPaymentTest
      */
-    public function _checkAlipayPayment(int $methodNumber)
+    private function _checkAlipayPayment(int $methodNumber)
     {
         $price = str_replace($this->_getPrice(), ',', '.');
         $alipayClientData = Fixtures::get('alipay_client');
