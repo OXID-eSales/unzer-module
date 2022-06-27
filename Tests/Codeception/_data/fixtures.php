@@ -85,6 +85,14 @@ return [
         "password" => "unzer1234",
     ],
 
+    // Payment data for Sofort
+    'sofort_payment' => [
+        "bank_number" => "00000",
+        "account_number" => "0000000300",
+        "USER_PIN" => "123456",
+        "USER_TAN" => "12345",
+    ],
+
     // Payment data for iDEAL
     'ideal_payment' => [
         "account_bankname" => "ING_TEST",
