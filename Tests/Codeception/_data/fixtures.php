@@ -84,4 +84,15 @@ return [
         "username" => "paypal-buyer@unzer.com",
         "password" => "unzer1234",
     ],
+
+    // Payment data for iDEAL
+    'ideal_payment' => [
+        "account_bankname" => "ING_TEST",
+        "bank_number" => "00000",
+        "account_number" => "123456",
+        "USER_PIN" => "123456",
+        "USER_TAN" => '12345',
+        "option" => "INGBNL2A"
+    ],
+
 ];
