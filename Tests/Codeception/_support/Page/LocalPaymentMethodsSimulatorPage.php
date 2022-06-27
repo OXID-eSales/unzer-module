@@ -11,15 +11,13 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Page;
 
 use OxidEsales\Codeception\Page\Page;
 
-class AlipayPage extends Page
+class LocalPaymentMethodsSimulatorPage extends Page
 {
     private $usernameField = "//input[@name='username']";
     private $passwordField = "//input[@name='password']";
-    private $loginButton = 'Login';
+    private $nextButton = "//button[@class='btn btn-primary']";
     private $paymentMethodSelect = '#payment-method-select';
-    private $makePaymentButton = 'Make Payment';
     private $paymentSuccessful = 'PAYMENT SUCCESSFUL';
-    private $comeFrom = "Back to where you came from";
 
     /**
      * @param string $username login for alipay
@@ -35,7 +33,7 @@ class AlipayPage extends Page
         $I->waitForElement($this->usernameField);
         $I->fillField($this->usernameField, $username);
         $I->fillField($this->passwordField, $password);
-        $I->click($this->loginButton);
+        $I->click($this->nextButton);
     }
 
     /**
@@ -48,7 +46,7 @@ class AlipayPage extends Page
 
         $I->waitForElement($this->paymentMethodSelect);
         $I->selectOption($this->paymentMethodSelect, $methodNumber);
-        $I->click($this->makePaymentButton);
+        $I->click($this->nextButton);
     }
 
     /**
@@ -61,6 +59,7 @@ class AlipayPage extends Page
 
         $I->waitForText($price);
         $I->waitForText($this->paymentSuccessful);
-        $I->click($this->comeFrom);
+        $I->waitForElement($this->nextButton);
+        $I->click($this->nextButton);
     }
 }

@@ -50,6 +50,6 @@ class PayPalCest extends BaseCest
         $I->waitForElement($this->submitButton);
         $I->pressKey($this->submitButton, "\n");
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'), 20);
     }
 }

@@ -11,7 +11,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
-use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\AlipayPage;
+use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimulatorPage;
 
 class WeChatPayCest extends BaseCest
 {
@@ -21,7 +21,7 @@ class WeChatPayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group WechatpayPaymentTest
      */
-    private function _prepareAlipayTest(AcceptanceTester $I)
+    private function _prepareWechatpayTest(AcceptanceTester $I)
     {
         $this->_setAcceptance($I);
         $this->_initializeTest();
@@ -33,15 +33,15 @@ class WeChatPayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group WechatpayPaymentTest
      */
-    private function _checkAlipayPayment(int $methodNumber)
+    private function _checkWechatpayPayment(int $methodNumber)
     {
         $price = str_replace($this->_getPrice(), ',', '.');
         $wechatpayClientData = Fixtures::get('wechatpay_client');
-        $alipayPage = new AlipayPage($this->_getAcceptance());
+        $WechatpayPage = new LocalPaymentMethodsSimulatorPage($this->_getAcceptance());
 
-        $alipayPage->login($wechatpayClientData['username'], $wechatpayClientData['password'], $price);
-        $alipayPage->choosePaymentMethod($methodNumber);
-        $alipayPage->paymentSuccessful($price);
+        $WechatpayPage->login($wechatpayClientData['username'], $wechatpayClientData['password'], $price);
+        $WechatpayPage->choosePaymentMethod($methodNumber);
+        $WechatpayPage->paymentSuccessful($price);
 
         $this->_getAcceptance()->waitForText($this->_getTranslator()->translate('THANK_YOU'));
     }
@@ -53,8 +53,8 @@ class WeChatPayCest extends BaseCest
     public function checkWalletBalancePaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test WeChatPay Wallet Balance payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(1);
+        $this->_prepareWechatpayTest($I);
+        $this->_checkWechatpayPayment(1);
     }
 
     /**
@@ -64,8 +64,8 @@ class WeChatPayCest extends BaseCest
     public function checkSomeLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test WeChatPay Some LPM payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(2);
+        $this->_prepareWechatpayTest($I);
+        $this->_checkWechatpayPayment(2);
     }
 
     /**
@@ -74,9 +74,9 @@ class WeChatPayCest extends BaseCest
      */
     public function checkAnotherLPMPaymentWorks(AcceptanceTester $I)
     {
-        $I->wantToTest('Test WeChatPay Another LPM Alipay payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(3);
+        $I->wantToTest('Test WeChatPay Another LPM Wechatpay payment works');
+        $this->_prepareWechatpayTest($I);
+        $this->_checkWechatpayPayment(3);
     }
 
     /**
@@ -85,8 +85,8 @@ class WeChatPayCest extends BaseCest
      */
     public function checkOneMoreLPMPaymentWorks(AcceptanceTester $I)
     {
-        $I->wantToTest('Test WeChatPay One more LPM Alipay payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(4);
+        $I->wantToTest('Test WeChatPay One more LPM Wechatpay payment works');
+        $this->_prepareWechatpayTest($I);
+        $this->_checkWechatpayPayment(4);
     }
 }

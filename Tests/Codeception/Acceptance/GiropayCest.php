@@ -16,7 +16,7 @@ class GiropayCest extends BaseCest
 {
     private $giropayPaymentLabel = "//label[@for='payment_oscunzer_giropay']";
     private $banknameInput = "//input[@id='tags']";
-    private $banknameA = "//a[@id='ui-id-2']";
+    private $banknameA = "//ul[@class='ui-menu ui-widget ui-widget-content ui-autocomplete ui-front']";
     private $continueButton = "//input[@name='continueBtn']";
     private $accountLabel = "//input[@name='account/addition[@name=benutzerkennung]']";
     private $PINLabel = "//input[@name='ticket/pin']";
@@ -44,7 +44,8 @@ class GiropayCest extends BaseCest
         $I->waitForElement($this->banknameInput);
         $I->fillField($this->banknameInput, $giropayPaymentData['BIC']);
         $I->waitForElement($this->banknameA);
-        $I->click($this->banknameA);
+        $I->wait(2);
+        $I->canSeeAndClick($this->banknameA);
         $I->click($this->continueButton);
 
         // accept using of cache
