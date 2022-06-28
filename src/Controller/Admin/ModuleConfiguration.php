@@ -103,7 +103,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 }
 
                 $this->_aViewData['systemMode'] = $this->moduleSettings->getSystemMode();
-
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
                     $this->translator->translateCode(
