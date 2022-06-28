@@ -14,11 +14,9 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\SepaSecured;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
-use UnzerSDK\Resources\PaymentTypes\Applepay;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -63,6 +61,7 @@ class Payment
      * @param Translator $translator
      * @param Unzer $unzerService
      * @param UnzerSDKLoader $unzerSDKLoader
+     * @param TransactionService $transactionService
      */
     public function __construct(
         Session $session,
@@ -138,15 +137,9 @@ class Payment
      */
     public function removeTemporaryOrder(): bool
     {
-        $result = false;
-        $sessionOrderId = $this->session->getVariable('sess_challenge');
-
         $orderModel = oxNew(Order::class);
-        if ($orderModel->load($sessionOrderId)) {
-            $result = $orderModel->delete();
-        }
-
-        return $result;
+        $sessionOrderId = $this->session->getVariable('sess_challenge');
+        return $orderModel->delete($sessionOrderId);
     }
 
     /**

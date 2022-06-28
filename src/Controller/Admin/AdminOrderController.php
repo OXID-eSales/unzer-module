@@ -73,7 +73,8 @@ class AdminOrderController extends AdminDetailsController
                 $this->getUnzerViewData($this->sPaymentId);
             }
         } else {
-            $this->_aViewData['sMessage'] = Registry::getLang()->translateString("OSCUNZER_NO_UNZER_ORDER");
+            $translator = $this->getServiceFromContainer(Translator::class);
+            $this->_aViewData['sMessage'] = $translator->translate("OSCUNZER_NO_UNZER_ORDER");
         }
 
         return "oscunzer_order.tpl";
@@ -81,8 +82,6 @@ class AdminOrderController extends AdminDetailsController
 
     protected function getUnzerViewData(string $sPaymentId): void
     {
-        $translator = oxNew(Translator::class, Registry::getLang());
-
         try {
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
             $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
@@ -127,33 +126,32 @@ class AdminOrderController extends AdminDetailsController
             if (!$unzerPayment->isCanceled()) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
-                    $aRv = [];
-                    $aRv['chargedAmount'] = $charge->getAmount();
-                    $aRv['cancelledAmount'] = $charge->getCancelledAmount();
-                    $aRv['chargeId'] = $charge->getId();
-                    $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                     if ($charge->isSuccess()) {
+                        $aRv = [];
+                        $aRv['chargedAmount'] = $charge->getAmount();
+                        $aRv['cancelledAmount'] = $charge->getCancelledAmount();
+                        $aRv['chargeId'] = $charge->getId();
+                        $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                         $fCharged += $charge->getAmount();
-                    }
-                    $aRv['chargeDate'] = $charge->getDate();
+                        $aRv['chargeDate'] = $charge->getDate();
 
-                    $charges [] = $aRv;
+                        $charges [] = $aRv;
+                    }
                 }
             }
 
             $cancellations = [];
             /** @var Cancellation $cancellation */
             foreach ($unzerPayment->getCancellations() as $cancellation) {
-                $aRv = [];
-                $aRv['cancelledAmount'] = $cancellation->getAmount();
-                $aRv['cancelDate'] = $cancellation->getDate();
-                $aRv['cancellationId'] = $cancellation->getId();
-                $aRv['cancelReason'] = $cancellation->getReasonCode();
-
                 if ($cancellation->isSuccess()) {
+                    $aRv = [];
+                    $aRv['cancelledAmount'] = $cancellation->getAmount();
+                    $aRv['cancelDate'] = $cancellation->getDate();
+                    $aRv['cancellationId'] = $cancellation->getId();
+                    $aRv['cancelReason'] = $cancellation->getReasonCode();
                     $fCancelled += $cancellation->getAmount();
+                    $cancellations[] = $aRv;
                 }
-                $cancellations[] = $aRv;
             }
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;

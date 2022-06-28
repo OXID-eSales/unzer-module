@@ -22,6 +22,7 @@ use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use UnzerSDK\Resources\EmbeddedResources\CompanyInfo;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
@@ -71,8 +72,12 @@ class Unzer
      * @param Order|null $oOrder
      * @return Customer
      */
-    public function getUnzerCustomer(User $oUser, ?Order $oOrder = null): Customer
-    {
+    public function getUnzerCustomer(
+        User $oUser,
+        ?Order $oOrder = null,
+        string $commercialSector = '',
+        string $commercialRegisterNumber = ''
+    ): Customer {
         $customer = CustomerFactory::createCustomer(
             $oUser->getFieldData('oxfname'),
             $oUser->getFieldData('oxlname')
@@ -136,6 +141,15 @@ class Unzer
             $shippingAddress->setCountry($deliveryCountryIso);
         }
 
+        if ($commercialRegisterNumber || $commercialSector) {
+            $companyInfo = new CompanyInfo();
+            $companyInfo->setCommercialRegisterNumber($commercialRegisterNumber);
+            $companyInfo->setCommercialSector($commercialSector);
+            $companyInfo->setRegistrationType($commercialRegisterNumber ? 'registered' : 'not_registered');
+            $companyInfo->setFunction(!$commercialRegisterNumber ? 'OWNER' : '');
+            $customer->setCompanyInfo($companyInfo);
+        }
+
         return $customer;
     }
 
@@ -146,8 +160,6 @@ class Unzer
      */
     public function getUnzerBasket(string $unzerOrderId, BasketModel $basketModel): Basket
     {
-        $lang = Registry::getLang();
-
         $basket = new Basket(
             $unzerOrderId,
             $basketModel->getBruttoSum(),
@@ -188,7 +200,7 @@ class Unzer
         // Add DeliveryCosts
         $deliveryCosts = $basketModel->getDeliveryCost();
         $unzerBasketItem = new BasketItem(
-            $lang->translateString('SHIPPING_COST'),
+            $this->translator->translate('SHIPPING_COST'),
             $deliveryCosts->getNettoPrice(),
             $deliveryCosts->getNettoPrice(),
             1
@@ -203,7 +215,7 @@ class Unzer
         // Add Discounts
         $discounts = $basketModel->getTotalDiscount();
         $unzerBasketItem = new BasketItem(
-            $lang->translateString('DISCOUNT'),
+            $this->translator->translate('DISCOUNT'),
             $discounts->getNettoPrice(),
             $discounts->getNettoPrice(),
             1

@@ -51,11 +51,31 @@ class ModuleSettings
     }
 
     /**
+     * Checks if module configurations are valid
+     */
+    public function checkHealth(): bool
+    {
+        return (
+            $this->getShopPublicKey() &&
+            $this->getShopPrivateKey() &&
+            $this->getRegisteredWebhookId()
+        );
+    }
+
+    /**
      * @return bool
      */
     public function isDebugMode(): bool
     {
         return $this->getSettingValue('UnzerDebug') === true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSandboxMode(): bool
+    {
+        return $this->getSystemMode() === self::SYSTEM_MODE_SANDBOX;
     }
 
     /**

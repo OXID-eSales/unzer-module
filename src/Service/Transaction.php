@@ -240,10 +240,8 @@ class Transaction
      */
     protected function getInitOrderOxid(array $params): string
     {
-        unset($params['oxactiondate']);
-        unset($params['serialized_basket']);
         $params['oxaction'] = "init";
-        return md5(json_encode($params));
+        return $this->prepareTransactionOxid($params);
     }
 
     /**
