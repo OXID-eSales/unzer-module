@@ -29,6 +29,7 @@ class CreditCardCest extends BaseCest
      */
     private function _prepareCreditCardTest(AcceptanceTester $I)
     {
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_card']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
     }

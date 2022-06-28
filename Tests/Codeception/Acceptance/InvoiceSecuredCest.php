@@ -22,6 +22,7 @@ class InvoiceSecuredCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Invoice payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_invoice-secured']);
         $this->_setAcceptance($I);
         $this->_initializeSecuredTest();
         $orderPage = $this->_choosePayment($this->invoicePaymentLabel);

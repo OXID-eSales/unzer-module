@@ -24,6 +24,7 @@ final class SEPADirectDebitSecuredCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_sepa-secured']);
         $this->_setAcceptance($I);
         $this->_initializeSecuredTest();
         $orderPage = $this->_choosePayment($this->sepaPaymentLabel);

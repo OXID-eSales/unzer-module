@@ -23,6 +23,7 @@ class WeChatPayCest extends BaseCest
      */
     private function _prepareWechatpayTest(AcceptanceTester $I)
     {
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_wechatpay']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->wechatpayPaymentLabel);

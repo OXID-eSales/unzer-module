@@ -23,6 +23,7 @@ class AlipayCest extends BaseCest
      */
     private function _prepareAlipayTest(AcceptanceTester $I)
     {
+        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_alipay']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->alipayPaymentLabel);
