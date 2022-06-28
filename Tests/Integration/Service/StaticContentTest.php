@@ -81,7 +81,10 @@ final class StaticContentTest extends TestCase
     public function testExistingPaymentsAreNotChanged(): void
     {
         $payment = oxNew(EshopModelPayment::class);
-        $payment->loadInLang(0, UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID);
+        if (!$payment->loadInLang(0, UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID)) {
+            $payment->setId(UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID);
+            $payment->setLanguage(0);
+        }
         $payment->assign(
             [
                 'oxdesc' => 'test_desc_de',
@@ -132,21 +135,21 @@ final class StaticContentTest extends TestCase
             $payment->loadInLang(0, $paymentId);
             $this->assertEquals(
                 UnzerDefinitions::getUnzerDefinitions()[$paymentId]['descriptions']['de']['desc'],
-                $payment->getFieldData('oxdesc')
+                $payment->getRawFieldData('oxdesc')
             );
             $this->assertEquals(
                 UnzerDefinitions::getUnzerDefinitions()[$paymentId]['descriptions']['de']['longdesc'],
-                $payment->getFieldData('oxlongdesc')
+                $payment->getRawFieldData('oxlongdesc')
             );
 
             $payment->loadInLang(1, $paymentId);
             $this->assertEquals(
                 UnzerDefinitions::getUnzerDefinitions()[$paymentId]['descriptions']['en']['desc'],
-                $payment->getFieldData('oxdesc')
+                $payment->getRawFieldData('oxdesc')
             );
             $this->assertEquals(
                 UnzerDefinitions::getUnzerDefinitions()[$paymentId]['descriptions']['en']['longdesc'],
-                $payment->getFieldData('oxlongdesc')
+                $payment->getRawFieldData('oxlongdesc')
             );
 
             $this->assertNotEmpty($payment->getCountries(), $paymentId);
