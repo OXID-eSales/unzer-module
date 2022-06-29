@@ -103,4 +103,11 @@ return [
         "option" => "INGBNL2A"
     ],
 
+    // Payment data for PIS
+    'pis_payment' => [
+        "bank_number" => "88888888",
+        "account_number" => "0000000300",
+        "USER_PIN" => "12345",
+        "USER_TAN" => "2357",
+    ],
 ];
