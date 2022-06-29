@@ -110,4 +110,11 @@ return [
         "USER_PIN" => "12345",
         "USER_TAN" => "2357",
     ],
+
+    // Payment data for EPS
+    'eps_payment' => [
+        "username" => "1003993",
+        "password" => "rX/'PvZzIW?&",
+        "option" => "STZZATWWXXX",
+    ],
 ];
