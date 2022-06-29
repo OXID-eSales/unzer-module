@@ -36,7 +36,7 @@ class WeChatPayCest extends BaseCest
      */
     private function _checkWechatpayPayment(int $methodNumber)
     {
-        $price = str_replace($this->_getPrice(), ',', '.');
+        $price = str_replace(',', '.', $this->_getPrice());
         $wechatpayClientData = Fixtures::get('wechatpay_client');
         $WechatpayPage = new LocalPaymentMethodsSimulatorPage($this->_getAcceptance());
 

@@ -35,7 +35,7 @@ class IDEALCest extends BaseCest
         $orderPage = $this->_choosePayment($this->idealPaymentLabel);
 
         $idealPaymentData = Fixtures::get('ideal_payment');
-        $price = str_replace($this->_getPrice(), ',', '.');
+        $price = str_replace(',', '.', $this->_getPrice());
 
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
@@ -64,6 +64,6 @@ class IDEALCest extends BaseCest
         $I->waitForElement($this->nextButton);
         $I->click($this->nextButton);
 
-        $this->_getAcceptance()->waitForText($this->_getTranslator()->translate('THANK_YOU'), 20);
+        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'), 20);
     }
 }

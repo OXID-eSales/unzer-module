@@ -54,7 +54,6 @@ class EPSCest extends BaseCest
         $I->click($this->submitInput);
 
         // second page : check data
-        $I->waitForText(str_replace($this->_getPrice(), ',', '.'));
         $I->waitForElement($this->submitInput);
         $I->click("//input[@type='submit' and @value=' TAN ANFORDERN ']");
 

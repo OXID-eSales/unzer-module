@@ -42,7 +42,7 @@ class BancontactCest extends BaseCest
      */
     private function _submitBancontactPayment(string $name)
     {
-        $price = str_replace($this->_getPrice(), ',', '.');
+        $price = str_replace(',', '.', $this->_getPrice());
         $fixtures = Fixtures::get($name);
 
         $this->_getAcceptance()->waitForText($price);

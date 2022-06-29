@@ -21,7 +21,6 @@ class PISCest extends BaseCest
     private $userpinInput = "//input[@id='XS2A-USER_PIN']";
     private $usertanInput = "//input[@id='XS2A-TAN']";
     private $finishButton = "//a[@class='ui blue button back-btn']";
-    private $backlinkDiv = "//div[@class='button']";
 
     /**
      * @param AcceptanceTester $I
@@ -39,7 +38,7 @@ class PISCest extends BaseCest
         $pisPaymentData = Fixtures::get('pis_payment');
 
         // first page : choose bank
-        $I->waitForText($this->_getCurrency() . ' ' . $this->_getPrice());
+        $I->waitForText($this->_getPrice());
         $I->waitForElement($this->banknameInput);
         $I->fillField($this->banknameInput, $pisPaymentData['bank_number']);
         $I->click($this->continueButton);
@@ -48,6 +47,7 @@ class PISCest extends BaseCest
         $I->waitForElement($this->usernameInput);
         $I->fillField($this->usernameInput, $pisPaymentData['account_number']);
         $I->fillField($this->userpinInput, $pisPaymentData['USER_PIN']);
+        $I->wait(1);
         $I->click($this->continueButton);
 
         // third page : confirm payment

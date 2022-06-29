@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
+use Codeception\Extension\Logger;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimulatorPage;
@@ -36,7 +37,7 @@ class AlipayCest extends BaseCest
      */
     private function _checkAlipayPayment(int $methodNumber)
     {
-        $price = str_replace($this->_getPrice(), ',', '.');
+        $price = str_replace(',', '.', $this->_getPrice());
         $alipayClientData = Fixtures::get('alipay_client');
         $alipayPage = new LocalPaymentMethodsSimulatorPage($this->_getAcceptance());
 

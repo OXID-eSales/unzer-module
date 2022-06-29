@@ -35,10 +35,10 @@ class CreditCardCest extends BaseCest
     }
 
     /**
-     * @param Fixtures $fixtures
+     * @param string $name Fixtures name
      * @return void
      */
-    private function _submitCreditCardPatment(string $name)
+    private function _submitCreditCardPayment(string $name)
     {
         $orderPage = $this->_choosePayment($this->cardPaymentLabel);
 
@@ -59,7 +59,6 @@ class CreditCardCest extends BaseCest
 
     /**
      * @return void
-     * @throws \Exception
      */
     private function _checkCreditCardPayment()
     {
@@ -78,7 +77,7 @@ class CreditCardCest extends BaseCest
         $I->wantToTest('Test Credit Card payment using Mastercard works');
         $this->_prepareCreditCardTest($I);
 
-        $this->_submitCreditCardPatment('mastercard_payment');
+        $this->_submitCreditCardPayment('mastercard_payment');
         $this->_checkCreditCardPayment();
     }
 
@@ -91,7 +90,7 @@ class CreditCardCest extends BaseCest
         $I->wantToTest('Test Credit Card payment using Visa works');
         $this->_prepareCreditCardTest($I);
 
-        $this->_submitCreditCardPatment('visa_payment');
+        $this->_submitCreditCardPayment('visa_payment');
         $this->_checkCreditCardPayment();
     }
 
