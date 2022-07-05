@@ -314,9 +314,13 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function saveConfVars()
     {
-        parent::saveConfVars();
-
         $request = Registry::getRequest();
+
+        // the systemMode is very important, so we set it first ...
+        $systemMode = $request->getRequestEscapedParameter('confselects')['UnzerSystemMode'];
+        $this->moduleSettings->setSystemMode($systemMode);
+
+        $this->resetContentCache();
 
         if ($requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
             $this->moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
@@ -336,5 +340,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $requestApplePayMerchantCertKey
             );
         }
+
+        parent::saveConfVars();
     }
 }

@@ -148,6 +148,19 @@ $aModule = [
     ],
     'settings' => [
         [
+            'group' => 'unzerenvironment',
+            'name' => 'UnzerSystemMode',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1'
+        ],
+        [
+            'group' => 'unzerenvironment',
+            'name' => 'UnzerDebug',
+            'type' => 'bool',
+            'value' => '0',
+        ],
+        [
             'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPublicKey',
             'type' => 'str',
@@ -176,19 +189,6 @@ $aModule = [
             'name' => 'registeredWebhook',
             'type' => 'str',
             'value' => ''
-        ],
-        [
-            'group' => 'unzerenvironment',
-            'name' => 'UnzerSystemMode',
-            'type' => 'select',
-            'value' => '0',
-            'constraints' => '0|1'
-        ],
-        [
-            'group' => 'unzerenvironment',
-            'name' => 'UnzerDebug',
-            'type' => 'bool',
-            'value' => '0',
         ],
         [
             'group' => 'unzercard',
