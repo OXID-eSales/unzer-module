@@ -90,6 +90,15 @@ class ModuleSettings
     }
 
     /**
+     * @param string $systemMode
+     * @return void
+     */
+    public function setSystemMode(string $systemMode): void
+    {
+        $this->saveSetting('UnzerSystemMode', $systemMode);
+    }
+
+    /**
      * @return string
      */
     public function getShopPublicKey(): string
