@@ -12,15 +12,22 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class PISCest extends BaseCest
+final class PISCest extends BaseCest
 {
     private $pisLabel = "//label[@for='payment_oscunzer_pis']";
+    private $countrySelect = "//select[@id='XS2A-country_id']";
     private $banknameInput = "//input[@id='XS2A-bank_code']";
+    private $banknameOptionDiv = "//div[@class='xs2a-completion-result']";
     private $continueButton = "//button[@class='xs2a-submit']";
     private $usernameInput = "//input[@id='XS2A-USER_NAME']";
     private $userpinInput = "//input[@id='XS2A-USER_PIN']";
     private $usertanInput = "//input[@id='XS2A-TAN']";
     private $finishButton = "//a[@class='ui blue button back-btn']";
+
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_pis';
+    }
 
     /**
      * @param AcceptanceTester $I
@@ -28,8 +35,7 @@ class PISCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
-        $I->wantToTest('Test PayPal payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_pis']);
+        $I->wantToTest('Test PIS payment works');
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->pisLabel);
@@ -39,13 +45,20 @@ class PISCest extends BaseCest
 
         // first page : choose bank
         $I->waitForText($this->_getPrice());
+        $I->waitForElement($this->countrySelect);
+        $I->selectOption($this->countrySelect, "DE");
         $I->waitForElement($this->banknameInput);
         $I->fillField($this->banknameInput, $pisPaymentData['bank_number']);
+        /*$I->wait(1);
+        $I->waitForElement($this->banknameOptionDiv);
+        $I->click($this->banknameOptionDiv);*/
         $I->click($this->continueButton);
 
         // second page : log in
+        //$I->wait(30);
         $I->waitForElement($this->usernameInput);
         $I->fillField($this->usernameInput, $pisPaymentData['account_number']);
+        $I->waitForElement($this->userpinInput);
         $I->fillField($this->userpinInput, $pisPaymentData['USER_PIN']);
         $I->wait(1);
         $I->click($this->continueButton);
@@ -59,6 +72,6 @@ class PISCest extends BaseCest
         $I->waitForElement($this->finishButton);
         $I->click($this->finishButton);
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->_checkSuccessfulPayment();
     }
 }

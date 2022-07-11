@@ -12,7 +12,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class BancontactCest extends BaseCest
+final class BancontactCest extends BaseCest
 {
     private $bancontactLabel = "//label[@for='payment_oscunzer_bancontact']";
     private $cardNumberInput = "//input[@name='cardNumber']";
@@ -22,13 +22,17 @@ class BancontactCest extends BaseCest
     private $cardHolderNameInput = "//input[@name='cardHolderName']";
     private $continueButton = "//button[@class='btn btn-primary']";
 
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_bancontact';
+    }
+
     /**
      * @param AcceptanceTester $I
      * @return void
      */
     private function _prepareBancontactTest(AcceptanceTester $I)
     {
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_bancontact']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
 
@@ -53,6 +57,7 @@ class BancontactCest extends BaseCest
         $this->_getAcceptance()->fillField($this->cvvCodeInput, $fixtures['CVC']);
         $this->_getAcceptance()->click($this->continueButton);
 
+        $this->_getAcceptance()->waitForPageLoad();
         $this->_getAcceptance()->waitForText($price);
         $this->_getAcceptance()->waitForElement($this->continueButton);
         $this->_getAcceptance()->click($this->continueButton);
@@ -63,7 +68,7 @@ class BancontactCest extends BaseCest
      */
     private function _checkBancontactPayment()
     {
-        $this->_getAcceptance()->waitForText($this->_getTranslator()->translate('THANK_YOU'), 30);
+        $this->_checkSuccessfulPayment();
     }
 
     /**

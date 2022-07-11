@@ -12,7 +12,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class GiropayCest extends BaseCest
+final class GiropayCest extends BaseCest
 {
     private $giropayPaymentLabel = "//label[@for='payment_oscunzer_giropay']";
     private $banknameInput = "//input[@id='tags']";
@@ -26,6 +26,11 @@ class GiropayCest extends BaseCest
     private $TANLabel = "//input[@name='ticket/tan']";
     private $yesButton = "//button[@id='yes']";
 
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_giropay';
+    }
+
      /**
      * @param AcceptanceTester $I
      * @group GiropayPaymentTest
@@ -33,7 +38,6 @@ class GiropayCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Giropay payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_giropay']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->giropayPaymentLabel);
@@ -79,6 +83,6 @@ class GiropayCest extends BaseCest
         $I->fillField($this->TANLabel, $giropayPaymentData['USER_TAN']);
         $I->click($this->payNowButton);
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->_checkSuccessfulPayment();
     }
 }

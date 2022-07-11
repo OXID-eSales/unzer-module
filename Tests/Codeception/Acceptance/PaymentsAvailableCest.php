@@ -34,26 +34,10 @@ final class PaymentsAvailableCest extends BaseCest
         'OSCUNZER_PAYMENT_METHOD_WECHATPAY',
     ];
 
-    private $idPaymentMethods = [
-        'oscunzer_alipay',
-        //'oscunzer_applepay',
-        'oscunzer_bancontact',
-        'oscunzer_card',
-        //'oscunzer_eps',
-        'oscunzer_giropay',
-        'oscunzer_ideal',
-        'oscunzer_installment',
-        'oscunzer_invoice',
-        'oscunzer_invoice-secured',
-        'oscunzer_paypal',
-        'oscunzer_pis',
-        'oscunzer_prepayment',
-        'oscunzer_przelewy24',
-        'oscunzer_sepa',
-        'oscunzer_sepa-secured',
-        'oscunzer_sofort',
-        'oscunzer_wechatpay',
-    ];
+    protected function _getOXID(): string
+    {
+        return '';
+    }
 
     /**
      * @param AcceptanceTester $I
@@ -62,10 +46,6 @@ final class PaymentsAvailableCest extends BaseCest
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {
         $I->wantToTest('Test payment methods are available');
-        foreach ($this->idPaymentMethods as $oneIdPaymentMethod) {
-            $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => $oneIdPaymentMethod]);
-        }
-
         $this->_setAcceptance($I);
         $this->_initializeTest();
 

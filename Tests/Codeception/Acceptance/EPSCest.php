@@ -12,16 +12,33 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class EPSCest extends BaseCest
+final class EPSCest extends BaseCest
 {
     private $epsLabel = "//label[@for='payment_oscunzer_eps']";
     private $paymentMethodForm = "//form[@id='payment-form']";
     private $usernameInput = "//input[@id='username']";
     private $passwordInput = "//input[@id='passwort']";
     private $submitInput = "//input[@type='submit']";
+    private $submitDataInput = "//input[@type='submit' and @value=' TAN ANFORDERN ']";
+    private $submitPaymentInput = "//input[@type='submit' and @value=' TAN SENDEN ']";
     private $tanSpan = "//span[@id='tan']";
     private $tanInput = "//input[@id='usrtan']";
     private $backlinkDiv = "//div[@class='button']";
+
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_eps';
+    }
+
+    public function _before(AcceptanceTester $I): void
+    {
+        parent::_before($I);
+        $I->updateInDatabase(
+            'oxobject2payment',
+            ['OXOBJECTID' => '	a7c40f631fc920687.20179984'],
+            ['OXPAYMENTID' => 'oscunzer_eps', 'OXTYPE' => 'oxcountry']
+        );
+    }
 
     /**
      * @param AcceptanceTester $I
@@ -29,13 +46,7 @@ class EPSCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
-        $I->wantToTest('Test PayPal payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_eps']);
-        $I->updateInDatabase(
-            'oxobject2payment',
-            ['OXOBJECTID' => '	a7c40f631fc920687.20179984'],
-            ['OXPAYMENTID' => 'oscunzer_eps', 'OXTYPE' => 'oxcountry']
-        );
+        $I->wantToTest('Test EPS payment works');
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->epsLabel);
@@ -48,22 +59,26 @@ class EPSCest extends BaseCest
         $orderPage->submitOrder();
 
         // first page : login
-        $I->waitForElement($this->usernameInput, 20);
+        $I->waitForElement($this->usernameInput);
         $I->fillField($this->usernameInput, $epsPaymentData["username"]);
+        $I->waitForElement($this->passwordInput);
         $I->fillField($this->passwordInput, $epsPaymentData["password"]);
         $I->click($this->submitInput);
 
         // second page : check data
-        $I->waitForElement($this->submitInput);
-        $I->click("//input[@type='submit' and @value=' TAN ANFORDERN ']");
+        $I->waitForElement($this->submitDataInput);
+        $I->click($this->submitDataInput);
+        $I->wait(1);
 
         // third page : confirm button
         $I->waitForElement($this->tanSpan);
         $tan = $I->grabTextFrom($this->tanSpan);
         $I->fillField($this->tanInput, $tan);
-        $I->click($this->submitInput);
+        $I->waitForElement($this->submitPaymentInput);
+        $I->click($this->submitPaymentInput);
 
+        $I->waitForPageLoad();
         $I->click($this->backlinkDiv);
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->_checkSuccessfulPayment();
     }
 }

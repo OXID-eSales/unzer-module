@@ -13,9 +13,14 @@ use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimulatorPage;
 
-class WeChatPayCest extends BaseCest
+final class WeChatPayCest extends BaseCest
 {
     private $wechatpayPaymentLabel = "//label[@for='payment_oscunzer_wechatpay']";
+
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_wechatpay';
+    }
 
     /**
      * @param AcceptanceTester $I
@@ -23,7 +28,6 @@ class WeChatPayCest extends BaseCest
      */
     private function _prepareWechatpayTest(AcceptanceTester $I)
     {
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_wechatpay']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->wechatpayPaymentLabel);
@@ -44,7 +48,7 @@ class WeChatPayCest extends BaseCest
         $WechatpayPage->choosePaymentMethod($methodNumber);
         $WechatpayPage->paymentSuccessful($price);
 
-        $this->_getAcceptance()->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->_checkSuccessfulPayment();
     }
 
     /**

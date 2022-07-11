@@ -27,10 +27,16 @@ abstract class BaseCest
 
     public function _before(AcceptanceTester $I): void
     {
+        $I->updateInDatabase(
+            'oxpayments',
+            ['OXACTIVE' => 1],
+            empty($this->_getOXID()) ? array() : ['OXID' => $this->_getOXID()]
+        );
     }
 
     public function _after(AcceptanceTester $I): void
     {
+        //$I->clearShopCache();
     }
 
     /**
@@ -75,6 +81,15 @@ abstract class BaseCest
         $this->I->click($label);
 
         return $this->paymentSelection->goToNextStep();
+    }
+
+    /**
+     * @return void
+     */
+    protected function _checkSuccessfulPayment()
+    {
+        $this->I->waitForPageLoad();
+        $this->I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
     }
 
     /**
@@ -131,4 +146,6 @@ abstract class BaseCest
         $basketItem = Fixtures::get('product');
         return $basketItem['currency'];
     }
+
+    abstract protected function _getOXID() : string;
 }

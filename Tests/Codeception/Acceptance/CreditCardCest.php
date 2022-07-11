@@ -12,7 +12,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class CreditCardCest extends BaseCest
+final class CreditCardCest extends BaseCest
 {
     private $cardPaymentLabel = "//label[@for='payment_oscunzer_card']";
     private $cardNumberIframe = "//iframe[contains(@id, 'unzer-number-iframe')]";
@@ -23,13 +23,17 @@ class CreditCardCest extends BaseCest
     private $CVCInput = "//input[@id='card-ccv']";
     private $toCompleteAuthentication = "Click here to complete authentication.";
 
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_card';
+    }
+
     /**
      * @param AcceptanceTester $I
      * @return void
      */
     private function _prepareCreditCardTest(AcceptanceTester $I)
     {
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_card']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
     }
@@ -65,7 +69,7 @@ class CreditCardCest extends BaseCest
         $this->_getAcceptance()->waitForText($this->toCompleteAuthentication, 30);
         $this->_getAcceptance()->click($this->toCompleteAuthentication);
 
-        $this->_getAcceptance()->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->_checkSuccessfulPayment();
     }
 
     /**

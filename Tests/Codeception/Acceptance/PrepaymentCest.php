@@ -15,6 +15,11 @@ final class PrepaymentCest extends BaseCest
 {
     private $prePaymentLabel = "//label[@for='payment_oscunzer_prepayment']";
 
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_prpayment';
+    }
+
     /**
      * @param AcceptanceTester $I
      * @group PrepaymentTest
@@ -22,14 +27,12 @@ final class PrepaymentCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Prepayment payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_prpayment']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->prePaymentLabel);
         $orderPage->submitOrder();
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
-
+        $this->_checkSuccessfulPayment();
         $I->waitForText(rtrim(strip_tags(sprintf(
             $this->_getTranslator()->translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
             $this->_getPrice(),

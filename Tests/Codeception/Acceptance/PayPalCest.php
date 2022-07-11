@@ -12,7 +12,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class PayPalCest extends BaseCest
+final class PayPalCest extends BaseCest
 {
     private $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
     private $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
@@ -21,6 +21,11 @@ class PayPalCest extends BaseCest
     private $loginButton = "//button[@id='btnLogin']";
     private $submitButton = "//button[@id='payment-submit-btn']";
 
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_paypal';
+    }
+
     /**
      * @param AcceptanceTester $I
      * @group PaypalPaymentTest
@@ -28,7 +33,6 @@ class PayPalCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test PayPal payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_paypal']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->paypalPaymentLabel);
@@ -51,6 +55,6 @@ class PayPalCest extends BaseCest
         $I->waitForElement($this->submitButton);
         $I->pressKey($this->submitButton, "\n");
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'), 20);
+        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
     }
 }

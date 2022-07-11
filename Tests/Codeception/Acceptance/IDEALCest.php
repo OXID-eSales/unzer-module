@@ -12,7 +12,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class IDEALCest extends BaseCest
+final class IDEALCest extends BaseCest
 {
     private $idealPaymentLabel = "//label[@for='payment_oscunzer_ideal']";
     private $paymentMethodForm = "//form[@id='payment-form']";
@@ -22,6 +22,11 @@ class IDEALCest extends BaseCest
     private $usePINInput = "//input[@name='userPIN']";
     private $tanInput = "//input[@name='tan']";
 
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_ideal';
+    }
+
     /**
      * @param AcceptanceTester $I
      * @group iDEALPaymentTest
@@ -29,7 +34,6 @@ class IDEALCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test iDEAL payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_ideal']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->idealPaymentLabel);
@@ -60,10 +64,11 @@ class IDEALCest extends BaseCest
         $I->click($this->nextButton);
 
         // forth page : successful
+        $I->waitForPageLoad();
         $I->waitForText($price);
         $I->waitForElement($this->nextButton);
         $I->click($this->nextButton);
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'), 20);
+        $this->_checkSuccessfulPayment();
     }
 }

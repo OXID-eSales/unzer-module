@@ -12,7 +12,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class SofortCest extends BaseCest
+final class SofortCest extends BaseCest
 {
     private $sofortPaymentLabel = "//label[@for='payment_oscunzer_sofort']";
     private $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
@@ -23,6 +23,11 @@ class SofortCest extends BaseCest
     private $kontoOptionInput = "//input[@id='account-1']";
     private $TANInput = "//input[@id='BackendFormTan']";
 
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_sofort';
+    }
+
     /**
      * @param AcceptanceTester $I
      * @group SofortPaymentTest
@@ -30,7 +35,6 @@ class SofortCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Sofort payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_sofort']);
         $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->sofortPaymentLabel);
@@ -40,10 +44,11 @@ class SofortCest extends BaseCest
 
         //accept cookies
         $I->waitForElement($this->cookiesAcceptButton);
-        $I->wait(2);
+        $I->wait(1);
         $I->canSeeAndClick($this->cookiesAcceptButton);
 
         // first page : choose bank
+        $I->wait(1);
         $I->waitForText($this->_getPrice() . ' ' . $this->_getCurrency());
         $I->waitForElement($this->bankLabel);
         $I->clickWithLeftButton($this->bankLabel);
@@ -65,6 +70,6 @@ class SofortCest extends BaseCest
         $I->fillField($this->TANInput, $sofortPaymentData['USER_TAN']);
         $I->click($this->continueButton);
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->_checkSuccessfulPayment();
     }
 }

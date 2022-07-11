@@ -12,12 +12,47 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
-class Przelewy24Cest extends BaseCest
+final class Przelewy24Cest extends BaseCest
 {
     private $przelewy24PaymentLabel = "//label[@for='payment_oscunzer_przelewy24']";
     private $bankLink = "//a[@data-search='mBank - mTransfer 25']";
     private $submitButton = "//button[@type='submit']";
     private $payButton = "//button[@id='pay_by_link_pay']";
+
+    protected function _getOXID(): string
+    {
+        return 'oscunzer_przelewy24';
+    }
+
+    public function _before(AcceptanceTester $I): void
+    {
+        parent::_before($I);
+        $oConfig = Registry::getConfig();
+        $oConfig->saveSystemConfigParameter(
+            'arr',
+            'aCurrencies',
+            [0 => 'PLN@ 4.66@ ,@ @ zł@ 2']
+        );
+        $oConfig->setActShopCurrency(0);
+    }
+
+    public function _after(AcceptanceTester $I): void
+    {
+        parent::_after($I);
+        $oConfig = Registry::getConfig();
+        $oConfig->saveSystemConfigParameter(
+            'arr',
+            'aCurrencies',
+            [
+                0 => 'EUR@ 1.00@ ,@ .@ €@ 2',
+                1 => 'GBP@ 0.8565@ .@  @ £@ 2',
+                2 => 'CHF@ 1.4326@ ,@ .@ <small>CHF</small>@ 2',
+                3 => 'USD@ 1.2994@ .@  @ $@ 2',
+            ]
+        );
+        $oConfig->setActShopCurrency(0);
+
+    }
 
     /**
      * @param AcceptanceTester $I
@@ -26,14 +61,9 @@ class Przelewy24Cest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Giropay payment works');
-        $I->updateInDatabase('oxpayments', ['OXACTIVE' => 1], ['OXID' => 'oscunzer_przelewy24']);
-        $oConfig = Registry::getConfig();
-        $oConfig->saveSystemConfigParameter('arr', 'aCurrencies', [0 => 'PLN@ 4.66@ ,@ @ zł@ 2']);
-        $oConfig->setActShopCurrency(0);
 
         $this->_setAcceptance($I);
         $this->_initializeTest();
-
 
         $orderPage = $this->_choosePayment($this->przelewy24PaymentLabel);
         $orderPage->submitOrder();
@@ -50,6 +80,6 @@ class Przelewy24Cest extends BaseCest
         $I->waitForElement($this->payButton);
         $I->click($this->payButton);
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->_checkSuccessfulPayment();
     }
 }
