@@ -30,7 +30,7 @@ abstract class BaseCest
         $I->updateInDatabase(
             'oxpayments',
             ['OXACTIVE' => 1],
-            empty($this->_getOXID()) ? array() : ['OXID' => $this->_getOXID()]
+            empty($this->_getOXID()) ? [] : ['OXID' => $this->_getOXID()]
         );
     }
 
@@ -147,5 +147,5 @@ abstract class BaseCest
         return $basketItem['currency'];
     }
 
-    abstract protected function _getOXID() : string;
+    abstract protected function _getOXID(): string;
 }

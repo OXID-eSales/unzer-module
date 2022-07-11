@@ -21,7 +21,7 @@ final class AlipayCest extends BaseCest
     /**
      * @return string
      */
-    protected function _getOXID() : string
+    protected function _getOXID(): string
     {
         return 'oscunzer_alipay';
     }

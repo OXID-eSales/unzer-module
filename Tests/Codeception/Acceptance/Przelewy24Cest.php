@@ -51,7 +51,6 @@ final class Przelewy24Cest extends BaseCest
             ]
         );
         $oConfig->setActShopCurrency(0);
-
     }
 
     /**
