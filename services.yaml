@@ -9,6 +9,7 @@ services:
 
   OxidEsales\Eshop\Core\Config:
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getConfig' ]
+    public: true
 
   OxidEsales\Eshop\Core\Session:
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getSession' ]
