@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use Symfony\Component\Console\Output\BufferedOutput;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\StaticContent;
@@ -54,7 +55,14 @@ class Events
     private static function executeModuleMigrations(): void
     {
         $migrations = (new MigrationsBuilder())->build();
-        $migrations->execute('migrations:migrate', 'osc-unzer');
+
+        $output = new BufferedOutput();
+        $migrations->setOutput($output);
+        $neeedsUpdate = $migrations->execute('migrations:up-to-date', 'osc-unzer');
+
+        if ($neeedsUpdate) {
+            $migrations->execute('migrations:migrate', 'osc-unzer');
+        }
     }
 
     /**
