@@ -38,7 +38,6 @@ final class Przelewy24Cest extends BaseCest
 
     public function _after(AcceptanceTester $I): void
     {
-        parent::_after($I);
         $oConfig = Registry::getConfig();
         $oConfig->saveSystemConfigParameter(
             'arr',
@@ -51,6 +50,7 @@ final class Przelewy24Cest extends BaseCest
             ]
         );
         $oConfig->setActShopCurrency(0);
+        parent::_after($I);
     }
 
     /**

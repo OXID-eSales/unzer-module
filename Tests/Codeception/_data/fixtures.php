@@ -56,7 +56,7 @@ return [
 
     // Payment data for Credit card using Visa
     'visa_payment' => [
-        "cardnumber" => "4012001037461114",
+        "cardnumber" => "4711100000000000",
         "CVC" => "123",
         "3DSpassword" => "secret3"
     ],

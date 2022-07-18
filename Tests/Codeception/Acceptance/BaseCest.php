@@ -36,7 +36,7 @@ abstract class BaseCest
 
     public function _after(AcceptanceTester $I): void
     {
-        //$I->clearShopCache();
+        $I->clearShopCache();
     }
 
     /**

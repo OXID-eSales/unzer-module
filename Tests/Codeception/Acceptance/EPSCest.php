@@ -59,6 +59,7 @@ final class EPSCest extends BaseCest
         $orderPage->submitOrder();
 
         // first page : login
+        $I->waitForPageLoad();
         $I->waitForElement($this->usernameInput);
         $I->fillField($this->usernameInput, $epsPaymentData["username"]);
         $I->waitForElement($this->passwordInput);

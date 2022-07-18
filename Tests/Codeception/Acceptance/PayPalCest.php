@@ -53,8 +53,9 @@ final class PayPalCest extends BaseCest
         // card choose page
         $I->waitForText($this->_getPrice());
         $I->waitForElement($this->submitButton);
-        $I->pressKey($this->submitButton, "\n");
+        $I->executeJS("document.getElementById('payment-submit-btn').click();");
 
-        $I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $I->wait(5);
+        $this->_checkSuccessfulPayment();
     }
 }

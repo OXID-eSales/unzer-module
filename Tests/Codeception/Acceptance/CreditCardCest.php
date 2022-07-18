@@ -47,6 +47,7 @@ final class CreditCardCest extends BaseCest
         $orderPage = $this->_choosePayment($this->cardPaymentLabel);
 
         $fixtures = Fixtures::get($name);
+        $this->_getAcceptance()->waitForPageLoad();
         $this->_getAcceptance()->waitForElement($this->cardNumberIframe);
         $this->_getAcceptance()->switchToIFrame($this->cardNumberIframe);
         $this->_getAcceptance()->fillField($this->cardNumberInput, $fixtures['cardnumber']);
@@ -56,7 +57,7 @@ final class CreditCardCest extends BaseCest
         $this->_getAcceptance()->switchToNextTab(1);
         $this->_getAcceptance()->switchToIFrame($this->CVCIframe);
         $this->_getAcceptance()->fillField($this->CVCInput, $fixtures['CVC']);
-        $this->_getAcceptance()->switchToWindow();
+        $this->_getAcceptance()->switchToFrame(null);
 
         $orderPage->submitOrder();
     }
@@ -66,7 +67,7 @@ final class CreditCardCest extends BaseCest
      */
     private function _checkCreditCardPayment()
     {
-        $this->_getAcceptance()->waitForText($this->toCompleteAuthentication, 30);
+        $this->_getAcceptance()->waitForText($this->toCompleteAuthentication, 60);
         $this->_getAcceptance()->click($this->toCompleteAuthentication);
 
         $this->_checkSuccessfulPayment();

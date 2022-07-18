@@ -49,14 +49,12 @@ final class PISCest extends BaseCest
         $I->selectOption($this->countrySelect, "DE");
         $I->waitForElement($this->banknameInput);
         $I->fillField($this->banknameInput, $pisPaymentData['bank_number']);
-        /*$I->wait(1);
-        $I->waitForElement($this->banknameOptionDiv);
-        $I->click($this->banknameOptionDiv);*/
+        $I->wait(1);
         $I->click($this->continueButton);
 
         // second page : log in
-        //$I->wait(30);
         $I->waitForElement($this->usernameInput);
+        $I->wait(1);
         $I->fillField($this->usernameInput, $pisPaymentData['account_number']);
         $I->waitForElement($this->userpinInput);
         $I->fillField($this->userpinInput, $pisPaymentData['USER_PIN']);
