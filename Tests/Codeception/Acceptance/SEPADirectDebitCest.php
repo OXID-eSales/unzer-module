@@ -14,6 +14,9 @@ use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class SEPADirectDebitCest extends BaseCest
 {
     /**

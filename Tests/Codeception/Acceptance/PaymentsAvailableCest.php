@@ -13,6 +13,9 @@ use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class PaymentsAvailableCest extends BaseCest
 {
     private $paymentMethods = [
