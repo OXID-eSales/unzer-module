@@ -46,6 +46,9 @@ services:
     exclude: 'src/Service/{DebugHandler}'
     public: true
 
+  OxidSolutionCatalysts\Unzer\Core\Response:
+    public: true
+
   OxidSolutionCatalysts\Unzer\Service\DebugHandler:
     class: OxidSolutionCatalysts\Unzer\Service\DebugHandler
     public: true
