@@ -398,7 +398,7 @@ class ModuleSettings
     {
         $result = '';
         try {
-            $result = (string) $this->moduleSettingBridge->get($key, Module::MODULE_ID);
+            $result = $this->moduleSettingBridge->get($key, Module::MODULE_ID);
         } catch (ModuleConfigurationNotFoundException $exception) {
             //todo: improve
         }
