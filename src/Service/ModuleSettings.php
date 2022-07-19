@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
@@ -238,7 +239,7 @@ class ModuleSettings
      */
     public function getApplePayMerchantIdentifier(): string
     {
-        return $this->getSettingValue($this->getSystemMode() . '-applepay_merchant_identifier');
+        return (string) $this->getSettingValue($this->getSystemMode() . '-applepay_merchant_identifier');
     }
 
     /**
@@ -395,7 +396,13 @@ class ModuleSettings
      */
     private function getSettingValue(string $key)
     {
-        return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
+        $result = '';
+        try {
+            $result = (string) $this->moduleSettingBridge->get($key, Module::MODULE_ID);
+        } catch (ModuleConfigurationNotFoundException $exception) {
+            //todo: improve
+        }
+        return $result;
     }
 
     /**
