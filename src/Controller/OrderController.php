@@ -111,7 +111,7 @@ class OrderController extends OrderController_parent
         $payment = $this->getPayment();
 
         return (
-        $payment ?
+        is_object($payment) ?
             ( $payment->getId() === UnzerDefinitions::SEPA_UNZER_PAYMENT_ID
             || $payment->getId() === UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
         );
