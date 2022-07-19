@@ -17,3 +17,21 @@ REPLACE INTO `oxuser` SET
     OXBIRTHDATE = '1985-02-05 14:42:42',
     OXCREATE = '2021-02-05 14:42:42',
     OXREGISTER = '2021-02-05 14:42:42';
+
+REPLACE INTO `oxuser` SET
+    OXID = 'unzersecureuser',
+    OXACTIVE = 1,
+    OXRIGHTS = 'user',
+    OXUSERNAME = 'unzersecureuser@oxid-esales.dev',
+    OXPASSWORD = '$2y$10$tJd1YkFr2y4kUmojqa6NPuHrcMzZmxc9mh4OWQcLONfHg4WXzbtlu',
+    OXPASSSALT = '',
+    OXFNAME = 'Maximilian',
+    OXLNAME = 'Mustermann',
+    OXSTREET = 'Hugo-Junkers-Str.',
+    OXSTREETNR = '3',
+    OXCITY = 'Frankfurt am Main',
+    OXZIP = '60386',
+    OXCOUNTRYID = 'a7c40f631fc920687.20179984',
+    OXBIRTHDATE = '1980-11-22',
+    OXCREATE = '2021-02-05 14:42:42',
+    OXREGISTER = '2021-02-05 14:42:42';
