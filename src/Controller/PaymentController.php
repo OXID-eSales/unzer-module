@@ -50,7 +50,7 @@ class PaymentController extends PaymentController_parent
             $paymentList = [];
 
             foreach ($paymentListRaw as $key => $payment) {
-                if ($payment->isUnzerPayment()) {
+                if (is_object($payment) && $payment->isUnzerPayment()) {
                     continue;
                 }
                 $paymentList[$key] = $payment;
