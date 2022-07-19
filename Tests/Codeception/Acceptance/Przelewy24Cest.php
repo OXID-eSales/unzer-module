@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class Przelewy24Cest extends BaseCest
 {
     private $przelewy24PaymentLabel = "//label[@for='payment_oscunzer_przelewy24']";
@@ -61,7 +64,6 @@ final class Przelewy24Cest extends BaseCest
     {
         $I->wantToTest('Test Giropay payment works');
 
-        $this->_setAcceptance($I);
         $this->_initializeTest();
 
         $orderPage = $this->_choosePayment($this->przelewy24PaymentLabel);

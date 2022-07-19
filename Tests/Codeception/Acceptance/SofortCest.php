@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class SofortCest extends BaseCest
 {
     private $sofortPaymentLabel = "//label[@for='payment_oscunzer_sofort']";
@@ -35,7 +38,6 @@ final class SofortCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Sofort payment works');
-        $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->sofortPaymentLabel);
         $orderPage->submitOrder();

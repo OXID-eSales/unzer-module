@@ -32,7 +32,6 @@ final class SEPADirectDebitCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
-        $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->sepaPaymentLabel);
 

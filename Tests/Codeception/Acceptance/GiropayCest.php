@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class GiropayCest extends BaseCest
 {
     private $giropayPaymentLabel = "//label[@for='payment_oscunzer_giropay']";
@@ -38,7 +41,6 @@ final class GiropayCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Giropay payment works');
-        $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->giropayPaymentLabel);
         $orderPage->submitOrder();

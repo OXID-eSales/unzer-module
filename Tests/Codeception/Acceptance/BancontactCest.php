@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class BancontactCest extends BaseCest
 {
     private $bancontactLabel = "//label[@for='payment_oscunzer_bancontact']";
@@ -33,7 +36,6 @@ final class BancontactCest extends BaseCest
      */
     private function _prepareBancontactTest(AcceptanceTester $I)
     {
-        $this->_setAcceptance($I);
         $this->_initializeTest();
 
         $orderPage = $this->_choosePayment($this->bancontactLabel);

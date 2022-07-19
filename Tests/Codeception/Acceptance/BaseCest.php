@@ -32,11 +32,14 @@ abstract class BaseCest
             ['OXACTIVE' => 1],
             empty($this->_getOXID()) ? [] : ['OXID' => $this->_getOXID()]
         );
+
+        $this->I = $I;
     }
 
     public function _after(AcceptanceTester $I): void
     {
         $I->clearShopCache();
+        $I->cleanUp();
     }
 
     /**
@@ -44,6 +47,8 @@ abstract class BaseCest
      */
     protected function _initializeTest()
     {
+        $this->I->openShop();
+
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($this->I);
         $basketSteps->addProductToBasket($basketItem['id'], $this->amount);
@@ -60,6 +65,8 @@ abstract class BaseCest
      */
     protected function _initializeSecuredTest()
     {
+        $this->I->openShop();
+
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($this->I);
         $basketSteps->addProductToBasket($basketItem['id'], $this->amount);
@@ -119,9 +126,8 @@ abstract class BaseCest
                 $this->translator = oxNew(Translator::class, Registry::getLang());
             } else {
                 $this->translator = ContainerFactory::getInstance()->getContainer()->get(Translator::class);
+                $this->translator->setLanguage($this->language);
             }
-
-            $this->translator->setLanguage($this->language);
         }
 
         return $this->translator;

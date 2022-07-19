@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class PISCest extends BaseCest
 {
     private $pisLabel = "//label[@for='payment_oscunzer_pis']";
@@ -36,7 +39,6 @@ final class PISCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test PIS payment works');
-        $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->pisLabel);
         $orderPage->submitOrder();

@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class SEPADirectDebitSecuredCest extends BaseCest
 {
     private $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa-secured']";
@@ -29,7 +32,6 @@ final class SEPADirectDebitSecuredCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
-        $this->_setAcceptance($I);
         $this->_initializeSecuredTest();
         $orderPage = $this->_choosePayment($this->sepaPaymentLabel);
 

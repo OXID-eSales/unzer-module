@@ -49,7 +49,6 @@ final class PaymentsAvailableCest extends BaseCest
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {
         $I->wantToTest('Test payment methods are available');
-        $this->_setAcceptance($I);
         $this->_initializeTest();
 
         foreach ($this->paymentMethods as $onePaymentMethod) {

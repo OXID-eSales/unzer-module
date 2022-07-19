@@ -11,6 +11,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class InvoiceCest extends BaseCest
 {
     private $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice']";
@@ -27,7 +30,6 @@ final class InvoiceCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Invoice payment works');
-        $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
         $orderPage->submitOrder();

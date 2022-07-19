@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class CreditCardCest extends BaseCest
 {
     private $cardPaymentLabel = "//label[@for='payment_oscunzer_card']";
@@ -34,7 +37,6 @@ final class CreditCardCest extends BaseCest
      */
     private function _prepareCreditCardTest(AcceptanceTester $I)
     {
-        $this->_setAcceptance($I);
         $this->_initializeTest();
     }
 

@@ -14,6 +14,9 @@ use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimulatorPage;
 
+/**
+ * @group unzer_module
+ */
 final class AlipayCest extends BaseCest
 {
     private $alipayPaymentLabel = "//label[@for='payment_oscunzer_alipay']";
@@ -32,7 +35,6 @@ final class AlipayCest extends BaseCest
      */
     private function _prepareAlipayTest(AcceptanceTester $I)
     {
-        $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->alipayPaymentLabel);
         $orderPage->submitOrder();

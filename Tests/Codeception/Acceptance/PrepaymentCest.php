@@ -11,6 +11,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class PrepaymentCest extends BaseCest
 {
     private $prePaymentLabel = "//label[@for='payment_oscunzer_prepayment']";
@@ -27,7 +30,6 @@ final class PrepaymentCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Prepayment payment works');
-        $this->_setAcceptance($I);
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->prePaymentLabel);
         $orderPage->submitOrder();
