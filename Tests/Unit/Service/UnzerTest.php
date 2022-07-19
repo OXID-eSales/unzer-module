@@ -95,7 +95,9 @@ class UnzerTest extends TestCase
     {
         return new Unzer(
             $this->createPartialMock(Session::class, []),
-            $this->createPartialMock(Translator::class, []),
+            $this->getMockBuilder(Translator::class)
+                ->disableOriginalConstructor()
+                ->getMock(),
             $this->createPartialMock(Context::class, []),
             $settings[ModuleSettings::class] ?:
                 $this->createPartialMock(ModuleSettings::class, []),
@@ -109,10 +111,14 @@ class UnzerTest extends TestCase
         $currency = new \stdClass();
         $currency->name = 'EUR';
 
+        $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
+
         $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
             'getNettoSum' => 123.45,
             'getBruttoSum' => 234.56,
-            'getBasketCurrency' => $currency
+            'getBasketCurrency' => $currency,
+            'getTotalDiscount' => $price,
+            'getDeliveryCost' => $price
         ]);
 
         $sut = $this->getSut();
@@ -128,6 +134,8 @@ class UnzerTest extends TestCase
     {
         $currency = new \stdClass();
         $currency->name = 'EUR';
+
+        $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
 
         $basketItem1 = $this->createConfiguredMock(BasketItem::class, [
             'getTitle' => 'basket item title 1',
@@ -148,12 +156,14 @@ class UnzerTest extends TestCase
             'getBruttoSum' => 234.56,
             'getBasketCurrency' => $currency,
             'getContents' => [$basketItem1, $basketItem2],
+            'getTotalDiscount' => $price,
+            'getDeliveryCost' => $price
         ]);
 
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);
 
-        $this->assertSame(2, $result->getItemCount());
+        $this->assertSame(3, $result->getItemCount()); //two goods, one delivery
 
         /** @var \UnzerSDK\Resources\EmbeddedResources\BasketItem[] $items */
         $items = $result->getBasketItems();

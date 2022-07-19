@@ -12,6 +12,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class SEPADirectDebitCest extends BaseCest
 {
     private $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa']";

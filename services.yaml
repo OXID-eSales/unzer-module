@@ -9,6 +9,7 @@ services:
 
   OxidEsales\Eshop\Core\Config:
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getConfig' ]
+    public: true
 
   OxidEsales\Eshop\Core\Session:
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getSession' ]
@@ -44,6 +45,9 @@ services:
   OxidSolutionCatalysts\Unzer\Service\:
     resource: 'src/Service/*'
     exclude: 'src/Service/{DebugHandler}'
+    public: true
+
+  OxidSolutionCatalysts\Unzer\Core\Response:
     public: true
 
   OxidSolutionCatalysts\Unzer\Service\DebugHandler:

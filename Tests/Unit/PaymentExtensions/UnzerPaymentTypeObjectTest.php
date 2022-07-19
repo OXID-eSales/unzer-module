@@ -25,7 +25,7 @@ class UnzerPaymentTypeObjectTest extends TestCase
 
         $sut = new $extensionClass(
             $sdkMock,
-            $this->createPartialMock(UnzerService::class, [])
+            $this->getMockBuilder(UnzerService::class)->disableOriginalConstructor()->getMock()
         );
 
         $result = $sut->getUnzerPaymentTypeObject();

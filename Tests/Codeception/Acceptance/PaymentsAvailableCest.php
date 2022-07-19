@@ -11,6 +11,9 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class PaymentsAvailableCest extends BaseCest
 {
     private $paymentMethods = [
