@@ -25,7 +25,7 @@ class ModuleSettingsTest extends TestCase
             $this->getMockBuilder(ModuleConfigurationDaoBridgeInterface::class)
                 ->disableOriginalConstructor()
                 ->getMock()
-    );
+        );
         $this->assertSame($settingValue, $sut->$settingMethod());
     }
 
