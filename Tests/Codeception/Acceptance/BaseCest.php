@@ -14,11 +14,16 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Codeception\Page\Page;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 abstract class BaseCest
 {
+    use ServiceContainer;
+
     private int $amount = 1;
     private int $language = 1;
     private Translator $translator;
@@ -27,6 +32,11 @@ abstract class BaseCest
 
     public function _before(AcceptanceTester $I): void
     {
+        echo("\n");
+        echo($this->getServiceFromContainer(ModuleSettings::class)->getShopPublicKey() . "\n");
+        echo($this->getServiceFromContainer(ModuleSettings::class)->getShopPrivateKey() . "\n");
+        echo($this->getServiceFromContainer(ModuleSettings::class)->getRegisteredWebhookId() . "\n");
+
         $I->updateInDatabase(
             'oxpayments',
             ['OXACTIVE' => 1],
