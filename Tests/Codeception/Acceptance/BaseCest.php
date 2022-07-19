@@ -25,7 +25,6 @@ abstract class BaseCest
     use ServiceContainer;
 
     private int $amount = 1;
-    private int $language = 1;
     private Translator $translator;
     private AcceptanceTester $I;
     private Page $paymentSelection;
@@ -136,7 +135,7 @@ abstract class BaseCest
                 $this->translator = oxNew(Translator::class, Registry::getLang());
             } else {
                 $this->translator = ContainerFactory::getInstance()->getContainer()->get(Translator::class);
-                $this->translator->setLanguage($this->language);
+                $this->translator->setLanguage(Registry::getLang()->getBaseLanguage());
             }
         }
 
