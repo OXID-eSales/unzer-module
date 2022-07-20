@@ -201,7 +201,7 @@ jobs:
           sleep 2
 
   sonarcloud:
-    needs: [ styles, unit_tests ]
+    needs: [ unit_tests ]
     if: always()
     runs-on: ubuntu-latest
     steps:
