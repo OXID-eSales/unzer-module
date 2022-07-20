@@ -18,9 +18,8 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 final class Przelewy24Cest extends BaseCest
 {
     private $przelewy24PaymentLabel = "//label[@for='payment_oscunzer_przelewy24']";
-    private $bankLink = "//a[@data-search='mBank - mTransfer 25']";
-    private $submitButton = "//button[@type='submit']";
-    private $payButton = "//button[@id='pay_by_link_pay']";
+    private $bankLink = "//div[@data-for='MBANK_-_MTRANSFER-0-0-tip']";
+    private $submitButton = "//button[@id='user_account_pbl_correct']";
 
     protected function _getOXID(): string
     {
@@ -73,13 +72,12 @@ final class Przelewy24Cest extends BaseCest
         $I->waitForElement($this->bankLink);
         $I->click($this->bankLink);
 
-        // second page : log in
+        // second page : payment
         $I->waitForElement($this->submitButton);
         $I->click($this->submitButton);
 
-        // third page : payment
-        $I->waitForElement($this->payButton);
-        $I->click($this->payButton);
+        // third page : expect end
+        $I->wait(20);
 
         $this->_checkSuccessfulPayment();
     }
