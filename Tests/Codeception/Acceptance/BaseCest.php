@@ -13,16 +13,12 @@ use Codeception\Util\Fixtures;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Codeception\Page\Page;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
-
-use OxidEsales\Codeception\Module\Translation\Translator as BaseTranslator;
+use OxidEsales\Codeception\Module\Translation\Translator;
 
 abstract class BaseCest
 {
     private int $amount = 1;
-    private Translator $translator;
     private AcceptanceTester $I;
     private Page $paymentSelection;
 
@@ -97,7 +93,7 @@ abstract class BaseCest
     protected function _checkSuccessfulPayment()
     {
         $this->I->waitForPageLoad();
-        $this->I->waitForText(BaseTranslator::translate('THANK_YOU'));
+        $this->I->waitForText(Translator::translate('THANK_YOU'));
     }
 
     /**
@@ -123,7 +119,7 @@ abstract class BaseCest
     protected function _getPrice(): string
     {
         $basketItem = Fixtures::get('product');
-        return ContainerFactory::getInstance()->getContainer()->get(Translator::class)->formatCurrency(
+        return Registry::getLang()->formatCurrency(
             $basketItem['bruttoprice_single'] * $this->amount + $basketItem['shipping_cost']
         );
     }
