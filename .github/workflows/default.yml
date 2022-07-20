@@ -76,6 +76,13 @@ jobs:
           docker-compose exec -T \
             php composer require ${{ env.PACKAGE_NAME }}:* --no-interaction --no-update
 
+      - name: Put module settings
+        continue-on-error: true
+        run: |
+          mkdir -p source/var/configuration/environment/
+          echo "${{ secrets.MODULE_SETTINGS }}" > source/var/configuration/environment/1.yaml
+          docker-compose exec -T php php bin/oe-console oe:module:apply-configuration
+
       - name: Install dependencies and reset shop
         run: |
           docker-compose exec -T php composer update --no-interaction
