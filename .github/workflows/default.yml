@@ -125,7 +125,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ env.PHP }}
+          php-version: ${{ matrix.php }}
           coverage: xdebug
 
       - name: Install module dependencies
