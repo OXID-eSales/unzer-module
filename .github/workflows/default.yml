@@ -151,12 +151,6 @@ jobs:
           name: TestsLog
           path: source/test-module/logs/psalm.sonarqube.json
 
-      - name: Stop containers
-        if: always()
-        run: |
-          docker-compose down
-          sleep 2
-
       - name: Upload log artifact
         if: always()
         uses: actions/upload-artifact@v2
