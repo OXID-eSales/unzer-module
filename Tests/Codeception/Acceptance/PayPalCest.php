@@ -57,7 +57,7 @@ final class PayPalCest extends BaseCest
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
 
-        $I->wait(5);
+        $I->wait(10);
         $this->_checkSuccessfulPayment();
     }
 }
