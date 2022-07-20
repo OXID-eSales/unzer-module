@@ -112,45 +112,44 @@ jobs:
             data/php/logs/error_log.txt
 
   styles:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         php: [ '8.0' ]
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout current module
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: source/test-module
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ env.PHP }}
           coverage: xdebug
-          extensions: gd, zip
 
       - name: Install module dependencies
-        id: dependencies
-        working-directory: source/test-module
-        run: composer install
+        run: |
+          cd source/test-module
+          composer install
+
+      - name: Run psalm
+        run: |
+          cd source/test-module
+          php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
 
       - name: Run phpcs
-        id: phpcs
         if: always()
-        working-directory: source/test-module
-        run: composer phpcs
+        run: |
+          cd source/test-module
+          composer phpcs
 
-      - name: Run phpstan
-        id: phpstan
+      - name: Save psalm logs
         if: always()
-        working-directory: source/test-module
-        run: composer phpstan-report || composer phpstan
-
-      - name: Run phpmd
-        id: phpmd
-        if: always()
-        working-directory: source/test-module
-        run: composer phpmd-report || composer phpmd
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestsLog
+          path: source/test-module/logs/psalm.sonarqube.json
 
       - name: Stop containers
         if: always()
@@ -164,8 +163,7 @@ jobs:
         with:
           name: StylesLog-${{ matrix.php }}
           path: |
-            source/test-module/phpstan.report.json
-            source/test-module/phpmd.report.json
+            source/test-module/psalm.sonarqube.json
 
   unit_tests:
     strategy:
@@ -290,11 +288,6 @@ jobs:
           name: StylesLog-8.0
           path: ./styles/
 
-      - name: Fix paths in styles logs
-        continue-on-error: true
-        run: |
-          sed -i 's+\/home\/runner\/work\/.*?\/.*?\/source\/test-module\/++' styles/phpstan.report.json
-
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         env:
@@ -308,6 +301,6 @@ jobs:
             -Dsonar.tests=Tests
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.php.coverage.reportPaths=tests/coverage.xml
-            -Dsonar.php.phpstan.reportPaths=styles/phpstan.report.json
+            -Dsonar.php.psalm.reportPaths=styles/psalm.sonarqube.json
             -Dsonar.cpd.php.minimumTokens=25
             -Dsonar.cpd.php.minimumLines=5
