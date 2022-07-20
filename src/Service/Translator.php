@@ -63,13 +63,4 @@ class Translator
     {
         return $this->language->formatCurrency($amount);
     }
-
-    /**
-     * @param int $iLang Language id
-     * @return void
-     */
-    public function setLanguage(int $iLang)
-    {
-        $this->language->setBaseLanguage($iLang);
-    }
 }

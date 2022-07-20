@@ -17,6 +17,8 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+use OxidEsales\Codeception\Module\Translation\Translator as BaseTranslator;
+
 abstract class BaseCest
 {
     private int $amount = 1;
@@ -95,7 +97,7 @@ abstract class BaseCest
     protected function _checkSuccessfulPayment()
     {
         $this->I->waitForPageLoad();
-        $this->I->waitForText($this->_getTranslator()->translate('THANK_YOU'));
+        $this->I->waitForText(BaseTranslator::translate('THANK_YOU'));
     }
 
     /**
@@ -116,29 +118,12 @@ abstract class BaseCest
     }
 
     /**
-     * @return Translator
-     */
-    protected function _getTranslator(): Translator
-    {
-        if (!isset($this->translator)) {
-            if (!ContainerFactory::getInstance()->getContainer()->has(Translator::class)) {
-                $this->translator = oxNew(Translator::class, Registry::getLang());
-            } else {
-                $this->translator = ContainerFactory::getInstance()->getContainer()->get(Translator::class);
-                $this->translator->setLanguage(Registry::getLang()->getBaseLanguage());
-            }
-        }
-
-        return $this->translator;
-    }
-
-    /**
      * @return string price of order
      */
     protected function _getPrice(): string
     {
         $basketItem = Fixtures::get('product');
-        return $this->_getTranslator()->formatCurrency(
+        return ContainerFactory::getInstance()->getContainer()->get(Translator::class)->formatCurrency(
             $basketItem['bruttoprice_single'] * $this->amount + $basketItem['shipping_cost']
         );
     }
