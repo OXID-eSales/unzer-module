@@ -119,10 +119,12 @@ jobs:
           key: development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
           restore-keys: |
             development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
+
       - name: Start containers
         run: |
           make up
           sleep 2
+
       - name: Run tests
         run: |
           docker-compose exec -T \
@@ -131,17 +133,19 @@ jobs:
             -e RUN_TESTS_FOR_SHOP=0 \
             -e RUN_TESTS_FOR_MODULES=0 \
             -e XDEBUG_MODE=coverage \
-            -e ADDITIONAL_TEST_PATHS='/var/www/vendor/${{ env.PACKAGE_NAME }}/tests' \
+            -e ADDITIONAL_TEST_PATHS='/var/www/vendor/${{ env.PACKAGE_NAME }}/Tests' \
             php php vendor/bin/runtests \
               --coverage-clover=/var/www/coverage.xml \
               --coverage-text \
               --log-junit=/var/www/phpunit.xml \
               AllTestsUnit
+
       - name: Stop containers
         if: always()
         run: |
           docker-compose down
           sleep 2
+
       - name: Upload log artifact
         if: always()
         uses: actions/upload-artifact@v2
