@@ -111,6 +111,62 @@ jobs:
             source/config.inc.php
             data/php/logs/error_log.txt
 
+  styles:
+    strategy:
+      matrix:
+        php: [ '8.0' ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current module
+        uses: actions/checkout@v2
+        with:
+          path: source/test-module
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+          extensions: gd, zip
+
+      - name: Install module dependencies
+        id: dependencies
+        working-directory: source/test-module
+        run: composer install
+
+      - name: Run phpcs
+        id: phpcs
+        if: always()
+        working-directory: source/test-module
+        run: composer phpcs
+
+      - name: Run phpstan
+        id: phpstan
+        if: always()
+        working-directory: source/test-module
+        run: composer phpstan-report || composer phpstan
+
+      - name: Run phpmd
+        id: phpmd
+        if: always()
+        working-directory: source/test-module
+        run: composer phpmd-report || composer phpmd
+
+      - name: Stop containers
+        if: always()
+        run: |
+          docker-compose down
+          sleep 2
+
+      - name: Upload log artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: StylesLog-${{ matrix.php }}
+          path: |
+            source/test-module/phpstan.report.json
+            source/test-module/phpmd.report.json
+
   unit_tests:
     strategy:
       matrix:
@@ -208,7 +264,7 @@ jobs:
           sleep 2
 
   sonarcloud:
-    needs: [ unit_tests ]
+    needs: [ styles, unit_tests ]
     if: always()
     runs-on: ubuntu-latest
     steps:
