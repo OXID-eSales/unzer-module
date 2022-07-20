@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
@@ -36,7 +37,7 @@ final class InvoiceSecuredCest extends BaseCest
 
         $this->_checkSuccessfulPayment();
         $I->waitForText(rtrim(strip_tags(sprintf(
-            $this->_getTranslator()->translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
             $this->_getPrice(),
             $this->_getCurrency()
         ))));

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
@@ -52,7 +53,7 @@ final class PaymentsAvailableCest extends BaseCest
         $this->_initializeTest();
 
         foreach ($this->paymentMethods as $onePaymentMethod) {
-            $I->waitForText($this->_getTranslator()->translate($onePaymentMethod));
+            $I->waitForText(Translator::translate($onePaymentMethod));
         }
     }
 }
