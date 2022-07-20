@@ -154,3 +154,97 @@ jobs:
           path: |
             source/coverage.xml
             source/phpunit.xml
+
+  codeception_tests:
+    strategy:
+      matrix:
+        php: [ '7.4' ]
+        group:
+          - 'oe_moduletemplate'
+    needs: [ install_shop_with_module ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load current installation from cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./*
+          key: development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
+          restore-keys: |
+            development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
+
+      - name: Start containers
+        run: |
+          make up
+          sleep 2
+
+      - name: Install codeception dependencies
+        run: |
+          docker-compose exec -T php composer require codeception/module-rest:^1.4.2 --dev --no-update
+          docker-compose exec -T php composer require codeception/module-phpbrowser:^1.0.2 --dev --no-update
+          docker-compose exec -T php composer update
+
+      - name: Run tests
+        run: |
+          docker-compose exec -T \
+            -e PARTIAL_MODULE_PATHS=${{ env.MODULE_PATH }} \
+            -e ACTIVATE_ALL_MODULES=1 \
+            -e RUN_TESTS_FOR_SHOP=0 \
+            -e RUN_TESTS_FOR_MODULES=0 \
+            -e ADDITIONAL_TEST_PATHS='/var/www/vendor/${{ env.PACKAGE_NAME }}/Tests' \
+            php php vendor/bin/runtests-codeception
+
+      - name: Stop containers
+        if: always()
+        run: |
+          docker-compose down
+          sleep 2
+
+  sonarcloud:
+    needs: [ styles, unit_tests ]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current module
+        uses: actions/checkout@v2
+
+      - name: Download phpunit artifacts
+        continue-on-error: true
+        uses: actions/download-artifact@v2
+        with:
+          name: TestsLog-7.4
+          path: ./tests/
+
+      - name: Fix paths in unit logs
+        continue-on-error: true
+        run: |
+          sed -i 's+/var/www/test-module/++' tests/coverage.xml
+          sed -i 's+/var/www/test-module/++' tests/phpunit.xml
+
+      - name: Download styles artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: StylesLog-8.0
+          path: ./styles/
+
+      - name: Fix paths in styles logs
+        continue-on-error: true
+        run: |
+          sed -i 's+\/home\/runner\/work\/.*?\/.*?\/source\/test-module\/++' styles/phpstan.report.json
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=${{ env.SONARCLOUD_ORGANIZATION }}
+            -Dsonar.projectKey=${{ env.SONARCLOUD_PROJECT_KEY }}
+            -Dsonar.sources=src
+            -Dsonar.tests=Tests
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.php.coverage.reportPaths=tests/coverage.xml
+            -Dsonar.php.phpstan.reportPaths=styles/phpstan.report.json
+            -Dsonar.cpd.php.minimumTokens=25
+            -Dsonar.cpd.php.minimumLines=5
