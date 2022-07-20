@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone development environment v3.0.0
-        run: git clone https://github.com/Fresh-Advance/development . && git reset --hard v3.0.0
+        run: git clone https://github.com/OXID-eSales/docker-eshop-sdk.git .
 
       - name: Clone the shop
-        run: git clone --depth 1 https://github.com/OXID-eSales/oxideshop_ce.git --branch b-6.4.x --single-branch source
+        run: git clone --depth 1 https://github.com/OXID-eSales/oxideshop_ce.git --branch b-6.5.x --single-branch source
 
       - name: Cache current installation
         uses: actions/cache@v3
