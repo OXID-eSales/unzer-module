@@ -19,9 +19,9 @@ final class InvoiceCest extends BaseCest
 {
     private $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_invoice';
+        return ['oscunzer_invoice'];
     }
 
     /**

@@ -25,9 +25,9 @@ final class BancontactCest extends BaseCest
     private $cardHolderNameInput = "//input[@name='cardHolderName']";
     private $continueButton = "//button[@class='btn btn-primary']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_bancontact';
+        return ['oscunzer_bancontact'];
     }
 
     /**

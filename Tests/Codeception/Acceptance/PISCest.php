@@ -27,9 +27,9 @@ final class PISCest extends BaseCest
     private $usertanInput = "//input[@id='XS2A-TAN']";
     private $finishButton = "//a[@class='ui blue button back-btn']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_pis';
+        return ['oscunzer_pis'];
     }
 
     /**

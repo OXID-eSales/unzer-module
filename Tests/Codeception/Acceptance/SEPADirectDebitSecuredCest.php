@@ -20,9 +20,9 @@ final class SEPADirectDebitSecuredCest extends BaseCest
     private $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa-secured']";
     private $IBANInput = "//input[contains(@id, 'unzer-iban-input')]";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_sepa-secured';
+        return ['oscunzer_sepa-secured'];
     }
 
     /**

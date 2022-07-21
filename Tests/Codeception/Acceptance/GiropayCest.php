@@ -29,9 +29,9 @@ final class GiropayCest extends BaseCest
     private $TANLabel = "//input[@name='ticket/tan']";
     private $yesButton = "//button[@id='yes']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_giropay';
+        return ['oscunzer_giropay'];
     }
 
      /**

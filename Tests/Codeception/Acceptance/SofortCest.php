@@ -26,9 +26,9 @@ final class SofortCest extends BaseCest
     private $kontoOptionInput = "//input[@id='account-1']";
     private $TANInput = "//input[@id='BackendFormTan']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_sofort';
+        return ['oscunzer_sofort'];
     }
 
     /**

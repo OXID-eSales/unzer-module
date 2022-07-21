@@ -20,9 +20,9 @@ final class WeChatPayCest extends BaseCest
 {
     private $wechatpayPaymentLabel = "//label[@for='payment_oscunzer_wechatpay']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_wechatpay';
+        return ['oscunzer_wechatpay'];
     }
 
     /**

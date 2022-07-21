@@ -24,11 +24,22 @@ abstract class BaseCest
 
     public function _before(AcceptanceTester $I): void
     {
-        $I->updateInDatabase(
-            'oxpayments',
-            ['OXACTIVE' => 1],
-            empty($this->_getOXID()) ? [] : ['OXID' => $this->_getOXID()]
-        );
+        foreach ($this->_getOXID() as $payment ) {
+            $I->updateInDatabase(
+                'oxpayments',
+                ['OXACTIVE' => 1],
+                ['OXID' => $payment]
+            );
+
+            $I->haveInDatabase(
+                'oxobject2payment',
+                ['OXID' => 'test' . $payment,
+                    'OXOBJECTID' => 'a7c40f631fc920687.20179984',
+                    'OXPAYMENTID' => $payment,
+                    'OXTYPE' => 'oxcountry'
+                ]
+            );
+        }
 
         $this->I = $I;
     }
@@ -133,5 +144,5 @@ abstract class BaseCest
         return $basketItem['currency'];
     }
 
-    abstract protected function _getOXID(): string;
+    abstract protected function _getOXID(): array;
 }

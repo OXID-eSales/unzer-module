@@ -31,16 +31,31 @@ final class PaymentsAvailableCest extends BaseCest
         'OSCUNZER_PAYMENT_METHOD_PAYPAL',
         'OSCUNZER_PAYMENT_METHOD_PIS',
         'OSCUNZER_PAYMENT_METHOD_PREPAYMENT',
-        'OSCUNZER_PAYMENT_METHOD_PRZELEWY24',
+        //'OSCUNZER_PAYMENT_METHOD_PRZELEWY24',
         'OSCUNZER_PAYMENT_METHOD_SEPA',
         'OSCUNZER_PAYMENT_METHOD_SEPA-SECURED',
         'OSCUNZER_PAYMENT_METHOD_SOFORT',
         'OSCUNZER_PAYMENT_METHOD_WECHATPAY',
     ];
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return '';
+        return [
+            'oscunzer_alipay',
+            'oscunzer_bancontact',
+            'oscunzer_card',
+            'oscunzer_giropay',
+            'oscunzer_ideal',
+            'oscunzer_invoice',
+            'oscunzer_invoice-secured',
+            'oscunzer_paypal',
+            'oscunzer_pis',
+            'oscunzer_prpayment',
+            'oscunzer_sepa',
+            'oscunzer_sepa-secured',
+            'oscunzer_sofort',
+            'oscunzer_wechatpay'
+        ];
     }
 
     /**

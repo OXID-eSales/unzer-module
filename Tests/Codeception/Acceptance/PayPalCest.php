@@ -23,10 +23,11 @@ final class PayPalCest extends BaseCest
     private $passwordInput = "//input[@id='password']";
     private $loginButton = "//button[@id='btnLogin']";
     private $submitButton = "//button[@id='payment-submit-btn']";
+    private $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_paypal';
+        return ['oscunzer_paypal'];
     }
 
     /**
@@ -56,8 +57,9 @@ final class PayPalCest extends BaseCest
         $I->waitForText($this->_getPrice());
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
+        $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
+        $I->waitForDocumentReadyState();
 
-        $I->wait(10);
         $this->_checkSuccessfulPayment();
     }
 }

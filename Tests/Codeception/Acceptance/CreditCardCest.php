@@ -26,9 +26,9 @@ final class CreditCardCest extends BaseCest
     private $CVCInput = "//input[@id='card-ccv']";
     private $toCompleteAuthentication = "Click here to complete authentication.";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_card';
+        return ['oscunzer_card'];
     }
 
     /**

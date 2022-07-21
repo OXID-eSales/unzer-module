@@ -25,9 +25,9 @@ final class IDEALCest extends BaseCest
     private $usePINInput = "//input[@name='userPIN']";
     private $tanInput = "//input[@name='tan']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_ideal';
+        return ['oscunzer_ideal'];
     }
 
     /**

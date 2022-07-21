@@ -19,9 +19,9 @@ final class PrepaymentCest extends BaseCest
 {
     private $prePaymentLabel = "//label[@for='payment_oscunzer_prepayment']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_prpayment';
+        return ['oscunzer_prpayment'];
     }
 
     /**

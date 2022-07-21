@@ -17,9 +17,9 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class ShopCest extends BaseCest
 {
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return '';
+        return [];
     }
 
     /**
