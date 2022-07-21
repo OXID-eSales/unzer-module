@@ -263,6 +263,13 @@ jobs:
           docker-compose down
           sleep 2
 
+      - name: Upload log artifact
+          if: always()
+          uses: actions/upload-artifact@v2
+          with:
+            name: TestsLog-${{ matrix.php }}
+            path: |
+              source/modules/osc/unzer/Tests/Codeception/_output
   sonarcloud:
     needs: [ styles, unit_tests ]
     if: always()
