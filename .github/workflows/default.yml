@@ -269,7 +269,7 @@ jobs:
         with:
           name: CodeceptionTestsLog-${{ matrix.php }}
           path: |
-            source/modules/osc/unzer/Tests/Codeception/_output/
+            source/vendor/${{ env.PACKAGE_NAME }}/Tests/Codeception/_output/
 
   sonarcloud:
     needs: [ styles, unit_tests ]
