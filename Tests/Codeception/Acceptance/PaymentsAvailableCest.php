@@ -43,6 +43,7 @@ final class PaymentsAvailableCest extends BaseCest
             'oscunzer_alipay',
             'oscunzer_bancontact',
             'oscunzer_card',
+            'oscunzer_eps',
             'oscunzer_giropay',
             'oscunzer_ideal',
             'oscunzer_installment',

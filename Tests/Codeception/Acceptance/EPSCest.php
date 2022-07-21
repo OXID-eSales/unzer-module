@@ -28,9 +28,9 @@ final class EPSCest extends BaseCest
     private $tanInput = "//input[@id='usrtan']";
     private $backlinkDiv = "//div[@class='button']";
 
-    protected function _getOXID(): string
+    protected function _getOXID(): array
     {
-        return 'oscunzer_eps';
+        return ['oscunzer_eps'];
     }
 
     public function _before(AcceptanceTester $I): void
