@@ -24,7 +24,7 @@ abstract class BaseCest
 
     public function _before(AcceptanceTester $I): void
     {
-        foreach ($this->_getOXID() as $payment ) {
+        foreach ($this->_getOXID() as $payment) {
             $I->updateInDatabase(
                 'oxpayments',
                 ['OXACTIVE' => 1],

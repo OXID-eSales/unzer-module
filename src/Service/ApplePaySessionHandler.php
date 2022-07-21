@@ -35,7 +35,7 @@ class ApplePaySessionHandler
             '/'
         );
         $this->session = new ApplepaySession(
-            (string) $this->moduleSettingsService->getApplePayMerchantIdentifier(),
+            $this->moduleSettingsService->getApplePayMerchantIdentifier(),
             (string) $this->moduleSettingsService->getApplePayLabel(),
             $domainName
         );
