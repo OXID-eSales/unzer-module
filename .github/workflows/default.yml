@@ -244,8 +244,8 @@ jobs:
             -g SEPADirectSecuredPaymentTest \
             -g SofortPaymentTest \
             -g WechatpayPaymentTest',
-            'EPSPaymentTest \
-            -g PaypalPaymentTest \
+            'EPSPaymentTest \\n
+            -g PaypalPaymentTest \\n
             -g Przelewey24PaymentTest'
           ]
     needs: [ install_shop_with_module ]
