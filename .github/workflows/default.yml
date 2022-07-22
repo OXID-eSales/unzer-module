@@ -236,6 +236,7 @@ jobs:
             'HeavyOutShopPaymentsTest'
           ]
     needs: [ install_shop_with_module ]
+    if: always()
     runs-on: self-hosted
     steps:
       - name: Login to Docker Hub
@@ -265,7 +266,6 @@ jobs:
           docker-compose exec -T php composer update
 
       - name: Run tests
-        continue-on-error: true
         run: |
           docker-compose exec -T \
             -e PARTIAL_MODULE_PATHS=${{ env.MODULE_PATH }} \
