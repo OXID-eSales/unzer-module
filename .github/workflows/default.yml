@@ -230,7 +230,7 @@ jobs:
         php: [ '7.4' ]
         group:
           [
-            'ShopOpenTest \
+            "ShopOpenTest \
             -g PaymentAvailableTest \
             -g AlipayPaymentTest \
             -g BancontactPaymentTest \
@@ -243,7 +243,7 @@ jobs:
             -g SEPADirectPaymentTest \
             -g SEPADirectSecuredPaymentTest \
             -g SofortPaymentTest \
-            -g WechatpayPaymentTest',
+            -g WechatpayPaymentTest'"
             'EPSPaymentTest -g PaypalPaymentTest -g Przelewey24PaymentTest'
           ]
     needs: [ install_shop_with_module ]
