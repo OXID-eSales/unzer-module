@@ -226,6 +226,7 @@ jobs:
 
   codeception_tests:
     strategy:
+      fail-fast: true
       matrix:
         php: [ '7.4' ]
         group:
@@ -236,7 +237,6 @@ jobs:
             'HeavyOutShopPaymentsTest'
           ]
     needs: [ install_shop_with_module ]
-    if: always()
     runs-on: self-hosted
     steps:
       - name: Login to Docker Hub
