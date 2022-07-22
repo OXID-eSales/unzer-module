@@ -61,7 +61,7 @@ final class Przelewy24Cest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
-        $I->wantToTest('Test Giropay payment works');
+        $I->wantToTest('Test Przelewy24 payment works');
 
         $this->_initializeTest();
 
