@@ -219,6 +219,7 @@ jobs:
             source/phpunit.xml
 
   codeception_tests:
+    continueOnError: true
     strategy:
       matrix:
         php: [ '7.4' ]
