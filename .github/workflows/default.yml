@@ -174,12 +174,6 @@ jobs:
     needs: [ install_shop_with_module ]
     runs-on: self-hosted
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
       - name: Load current installation from cache
         uses: actions/cache@v3
         with:
@@ -188,6 +182,12 @@ jobs:
           key: development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
           restore-keys: |
             development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Start containers
         run: |
@@ -239,12 +239,6 @@ jobs:
     needs: [ install_shop_with_module ]
     runs-on: self-hosted
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
       - name: Load current installation from cache
         uses: actions/cache@v3
         with:
@@ -253,6 +247,12 @@ jobs:
           key: development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
           restore-keys: |
             development-${{ matrix.php }}-${{ github.run_number }}-${{ github.run_attempt }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Start containers
         run: |
