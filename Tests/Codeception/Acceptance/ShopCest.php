@@ -24,6 +24,7 @@ final class ShopCest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
+     * @group ShopOpenTest
      */
     public function shopStartPageLoads(AcceptanceTester $I)
     {
