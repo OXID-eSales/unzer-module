@@ -14,6 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
+ * @group HeavyOutShopPaymentsTest
  */
 final class Przelewy24Cest extends BaseCest
 {
@@ -70,14 +71,16 @@ final class Przelewy24Cest extends BaseCest
 
         // first page : choose bank
         $I->waitForElement($this->bankLink);
+        $I->wait(5);
         $I->click($this->bankLink);
 
         // second page : payment
         $I->waitForElement($this->submitButton);
+        $I->wait(5);
         $I->click($this->submitButton);
 
         // third page : expect end
-        $I->waitForJS("return !!window.jQuery", 20);
+        $I->waitForJS("return !!window.jQuery", 60);
 
         $this->_checkSuccessfulPayment();
     }

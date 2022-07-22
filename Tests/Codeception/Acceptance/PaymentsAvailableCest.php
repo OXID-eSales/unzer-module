@@ -14,6 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
+ * @group PaymentAvailableTest
  */
 final class PaymentsAvailableCest extends BaseCest
 {
@@ -60,7 +61,6 @@ final class PaymentsAvailableCest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
-     * @group PaymentAvailableTest
      */
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {

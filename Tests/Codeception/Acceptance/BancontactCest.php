@@ -14,6 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
+ * @group InShopPaymentsTest
  */
 final class BancontactCest extends BaseCest
 {
@@ -22,7 +23,6 @@ final class BancontactCest extends BaseCest
     private $monthExpiredSelect = "//select[@class='expirationSelect']";
     private $yearExpiredSelect = ".panel-body .form-row select.expirationSelect:last-of-type";
     private $cvvCodeInput = "//input[@name='cvvCode']";
-    private $cardHolderNameInput = "//input[@name='cardHolderName']";
     private $continueButton = "//button[@class='btn btn-primary']";
 
     protected function _getOXID(): array
