@@ -28,7 +28,7 @@ final class InvoiceSecuredCest extends BaseCest
      * @param AcceptanceTester $I
      * @group InvoiceSecuredPaymentTest
      */
-    public function checkPaymentWorks(AcceptanceTester $I)
+    public function _checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Invoice payment works');
         $this->_initializeSecuredTest();
