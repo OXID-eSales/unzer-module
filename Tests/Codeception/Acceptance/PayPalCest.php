@@ -58,6 +58,7 @@ final class PayPalCest extends BaseCest
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
+        $I->wait(5);
         $I->waitForDocumentReadyState();
 
         $this->_checkSuccessfulPayment();

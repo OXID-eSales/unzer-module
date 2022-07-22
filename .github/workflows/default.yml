@@ -174,6 +174,12 @@ jobs:
     needs: [ install_shop_with_module ]
     runs-on: self-hosted
     steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }
+
       - name: Load current installation from cache
         uses: actions/cache@v3
         with:
@@ -224,27 +230,33 @@ jobs:
         php: [ '7.4' ]
         group:
           [
-            'ShopOpenTest',
-            'PaymentAvailableTest',
-            'AlipayPaymentTest',
-            'BancontactPaymentTest',
-            'CreditCardPaymentTest',
+            'ShopOpenTest \
+            -g PaymentAvailableTest \
+            -g AlipayPaymentTest \
+            -g BancontactPaymentTest \
+            -g CreditCardPaymentTest \
+            -g GiropayPaymentTest \
+            -g iDEALPaymentTest \
+            -g InvoicePaymentTest \
+            -g PisPaymentTest \
+            -g PrepaymentTest \
+            -g SEPADirectPaymentTest \
+            -g SEPADirectSecuredPaymentTest \
+            -g SofortPaymentTest \
+            -g WechatpayPaymentTest',
             'EPSPaymentTest',
-            'GiropayPaymentTest',
-            'iDEALPaymentTest',
-            'InvoicePaymentTest',
             'PaypalPaymentTest',
-            'PisPaymentTest',
-            'PrepaymentTest',
-            'Przelewey24PaymentTest',
-            'SEPADirectPaymentTest',
-            'SEPADirectSecuredPaymentTest',
-            'SofortPaymentTest',
-            'WechatpayPaymentTest'
+            'Przelewey24PaymentTest'
           ]
     needs: [ install_shop_with_module ]
     runs-on: self-hosted
     steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }
+
       - name: Load current installation from cache
         uses: actions/cache@v3
         with:
