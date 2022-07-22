@@ -219,7 +219,6 @@ jobs:
             source/phpunit.xml
 
   codeception_tests:
-    continueOnError: true
     strategy:
       matrix:
         php: [ '7.4' ]
@@ -267,6 +266,7 @@ jobs:
           docker-compose exec -T php composer update
 
       - name: Run tests
+        continue-on-error: true
         run: |
           docker-compose exec -T \
             -e PARTIAL_MODULE_PATHS=${{ env.MODULE_PATH }} \
