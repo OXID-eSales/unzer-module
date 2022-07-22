@@ -223,7 +223,25 @@ jobs:
       matrix:
         php: [ '7.4' ]
         group:
-          - 'oe_moduletemplate'
+          [
+            'ShopOpenTest',
+            'PaymentAvailableTest',
+            'AlipayPaymentTest',
+            'BancontactPaymentTest',
+            'CreditCardPaymentTest',
+            'EPSPaymentTest',
+            'GiropayPaymentTest',
+            'iDEALPaymentTest',
+            'InvoicePaymentTest',
+            'PaypalPaymentTest',
+            'PisPaymentTest',
+            'PrepaymentTest',
+            'Przelewey24PaymentTest',
+            'SEPADirectPaymentTest',
+            'SEPADirectSecuredPaymentTest',
+            'SofortPaymentTest',
+            'WechatpayPaymentTest'
+          ]
     needs: [ install_shop_with_module ]
     runs-on: self-hosted
     steps:
@@ -255,7 +273,7 @@ jobs:
             -e RUN_TESTS_FOR_SHOP=0 \
             -e RUN_TESTS_FOR_MODULES=0 \
             -e ADDITIONAL_TEST_PATHS='/var/www/vendor/${{ env.PACKAGE_NAME }}/Tests' \
-            php php vendor/bin/runtests-codeception
+            php php vendor/bin/runtests-codeception -g ${{ matrix.group }}
 
       - name: Stop containers
         if: always()
