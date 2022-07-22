@@ -244,9 +244,9 @@ jobs:
             -g SEPADirectSecuredPaymentTest \
             -g SofortPaymentTest \
             -g WechatpayPaymentTest',
-            'EPSPaymentTest',
-            'PaypalPaymentTest',
-            'Przelewey24PaymentTest'
+            'EPSPaymentTest \
+            -g PaypalPaymentTest \
+            -g Przelewey24PaymentTest'
           ]
     needs: [ install_shop_with_module ]
     runs-on: self-hosted
