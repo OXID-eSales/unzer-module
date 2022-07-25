@@ -232,9 +232,9 @@ jobs:
         group:
           [
             'PaymentAvailableTest',
-            'InShopPaymentsTest',
-            'EasyOutShopPaymentsTest',
-            'HeavyOutShopPaymentsTest'
+            'FirstGroup',
+            'SecondGroup',
+            'ThirdGroup',
           ]
     needs: [ install_shop_with_module ]
     runs-on: self-hosted

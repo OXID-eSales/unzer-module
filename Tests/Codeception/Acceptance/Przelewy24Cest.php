@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @group HeavyOutShopPaymentsTest
+ * @grpup ThirdGroup
  */
 final class Przelewy24Cest extends BaseCest
 {

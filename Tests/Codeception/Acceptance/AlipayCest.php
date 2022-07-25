@@ -16,7 +16,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimula
 
 /**
  * @group unzer_module
- * @group EasyOutShopPaymentsTest
+ * @group FirstGroup
  */
 final class AlipayCest extends BaseCest
 {

@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @group InShopPaymentsTest
+ * @group ThirdGroup
  */
 final class BancontactCest extends BaseCest
 {

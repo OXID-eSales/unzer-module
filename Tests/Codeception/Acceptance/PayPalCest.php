@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @group HeavyOutShopPaymentsTest
+ * @group SecondGroup
  */
 final class PayPalCest extends BaseCest
 {

@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @grouo HeavyOutShopPaymentsTest
+ * @grouo ThirdGroup
  */
 final class GiropayCest extends BaseCest
 {

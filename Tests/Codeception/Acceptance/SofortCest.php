@@ -48,7 +48,7 @@ final class SofortCest extends BaseCest
 
         $sofortPaymentData = Fixtures::get('sofort_payment');
 
-        //accept cookies
+        // accept cookies
         $I->waitForElement($this->cookiesAcceptButton);
         $I->wait(1);
         $I->canSeeAndClick($this->cookiesAcceptButton);
