@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @group FirstGroup
+ * @group ThirdGroup
  */
 final class CreditCardCest extends BaseCest
 {

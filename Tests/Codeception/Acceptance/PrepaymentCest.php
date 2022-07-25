@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @group ThirdGroup
+ * @group FirstGroup
  */
 final class PrepaymentCest extends BaseCest
 {
