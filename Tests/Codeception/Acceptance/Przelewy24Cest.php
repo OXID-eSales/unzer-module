@@ -20,7 +20,7 @@ final class Przelewy24Cest extends BaseCest
 {
     private $przelewy24PaymentLabel = "//label[@for='payment_oscunzer_przelewy24']";
     private $bankLink = "//div[@data-for='MBANK_-_MTRANSFER-0-0-tip']";
-    private $submitButton = "//button[@id='user_account_pbl_correct']";
+    private $submitButton = "#user_account_pbl_correct";
 
     protected function _getOXID(): array
     {
