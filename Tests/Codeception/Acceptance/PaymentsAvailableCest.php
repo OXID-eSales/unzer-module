@@ -52,6 +52,7 @@ final class PaymentsAvailableCest extends BaseCest
             'oscunzer_paypal',
             'oscunzer_pis',
             'oscunzer_prepayment',
+            'oscunzer_przelewy24',
             'oscunzer_sepa',
             'oscunzer_sepa-secured',
             'oscunzer_sofort',
