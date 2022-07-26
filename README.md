@@ -4,37 +4,16 @@ Unzer Payment integration for OXID eShop 6.3 and above.
 
 ## Documentation
 
-* official german Unzer Payment checkout for OXID [Documentation](https://docs.oxid-esales.com/modules/unzer/de/latest/).
-* official english Unzer Payment checkout for OXID [Documentation](https://docs.oxid-esales.com/modules/unzer/en/latest/).
+* Official German Unzer Payment checkout for OXID [documentation](https://docs.oxid-esales.com/modules/unzer/de/latest/).
+* Official English Unzer Payment checkout for OXID [documentation](https://docs.oxid-esales.com/modules/unzer/en/latest/).
 
 ## Compatibility
 
-* b-6.3.x module branch is compatible with OXID eShop compilations 6.3 and 6.4
+* b-6.3.x module branch is compatible with OXID eShop compilations >=6.3
 
-## Install
+## Install for OXID
 
-```bash
-
-# Add Repository source
-$ composer config repositories.oscunzer composer https://unzer-module.packages.oxid-esales.com/
-# Install desired version of oxid-solution-catalysts/unzer module
-$ composer require oxid-solution-catalysts/unzer ^1.0.0
-# Run install
-$ composer install
-# Activate the module
-$ ./vendor/bin/oe-console oe:module:install-configuration source/modules/osc/unzer
-$ ./vendor/bin/oe-console oe:module:apply-configuration
-```
-
-**NOTE:** The location of the oe-console script depends on whether your root package
-is the oxideshop_ce (```./bin/oe-console```) or if the shop was installed from
-an OXID eShop edition metapackage (```./vendor/bin/oe-console```).
-
-After requiring the module, you need to activate it, either via OXID eShop admin or CLI.
-
-```bash
-$ ./vendor/bin/oe-console oe:module:activate osc-unzer
-```
+* see Official documentation
 
 ## Limitations
 
