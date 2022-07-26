@@ -18,7 +18,10 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 final class SofortCest extends BaseCest
 {
     private $sofortPaymentLabel = "//label[@for='payment_oscunzer_sofort']";
+    private $landSelect = "//select[@id='MultipaysSessionSenderCountryId']";
     private $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
+    private $bankSearchInput = "//input[@id='BankCodeSearch']";
+    private $banksearchresultDiv = "//div[@id='BankSearcherResults']";
     private $bankLabel = "//input[@id='account-88888888']";
     private $accountNumberLabel = "//input[@id='BackendFormLOGINNAMEUSERID']";
     private $PINNumberLabel = "//input[@id='BackendFormUSERPIN']";
@@ -50,8 +53,12 @@ final class SofortCest extends BaseCest
         $I->canSeeAndClick($this->cookiesAcceptButton);
 
         // first page : choose bank
-        $I->wait(1);
+        $I->waitForPageLoad();
         $I->waitForText($this->_getPrice() . ' ' . $this->_getCurrency());
+        $I->selectOption($this->landSelect, 'DE');
+        $I->waitForElement($this->bankSearchInput);
+        $I->fillField($this->bankSearchInput, "Demo Bank");
+        $I->wait(1);
         $I->waitForElement($this->bankLabel);
         $I->clickWithLeftButton($this->bankLabel);
 
