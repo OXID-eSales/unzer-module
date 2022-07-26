@@ -75,10 +75,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                             }
                         }
                         if ($webhookUrl && $webhookId) {
-                            $this->saveWebhookOption($webhookUrl, $webhookId);
                             $registeredWebhookUrl = $webhookUrl;
                         } else {
-                            $this->saveWebhookOption('', '');
                             $registeredWebhookUrl = '';
                         }
                     }
