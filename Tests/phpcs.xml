@@ -28,6 +28,7 @@
         <exclude-pattern>../translations</exclude-pattern>
         <exclude-pattern>../migration</exclude-pattern>
         <exclude-pattern>../src/Core/Events.php</exclude-pattern>
+        <exclude-pattern>../src/Core/UnzerDefinitions.php</exclude-pattern>
     </rule>
 
     <!-- code coverage ignore comment breaks the rule -->
