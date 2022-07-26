@@ -45,6 +45,7 @@ final class PayPalCest extends BaseCest
         $paypalPaymentData = Fixtures::get('paypal_payment');
 
         // accept cookies
+        $I->waitForDocumentReadyState();
         $I->waitForElement($this->acceptAllCookiesButton);
         $I->click($this->acceptAllCookiesButton);
 
@@ -55,6 +56,7 @@ final class PayPalCest extends BaseCest
         $I->click($this->loginButton);
 
         // card choose page
+        $I->waitForDocumentReadyState();
         $I->waitForText($this->_getPrice());
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
