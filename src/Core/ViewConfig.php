@@ -60,6 +60,16 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
+     * Checks if module configurations are valid
+     *
+     * @return bool
+     */
+    public function checkUnzerHealth(): bool
+    {
+        return $this->moduleSettings->checkHealth();
+    }
+
+    /**
      * Returns unzer public key.
      *
      * @return string
