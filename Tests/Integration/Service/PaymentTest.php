@@ -28,7 +28,8 @@ class PaymentTest extends UnitTestCase
         $order->setId('temporaryOrderId');
         $order->save();
 
-        $sessionMock = $this->createPartialMock(Session::class, ['getVariable']);
+        $sessionMock = $this->getMockBuilder(Session::class)
+            ->getMock();
         $sessionMock->method('getVariable')
             ->with('sess_challenge')
             ->willReturn($sessionValue);
@@ -50,7 +51,7 @@ class PaymentTest extends UnitTestCase
         return [
             ['temporaryOrderId', true],
             ['badOrderId', false],
-            [null, false],
+            ['', false],
         ];
     }
 }

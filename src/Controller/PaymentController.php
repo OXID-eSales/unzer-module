@@ -9,7 +9,6 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment;
@@ -51,7 +50,7 @@ class PaymentController extends PaymentController_parent
             $paymentList = [];
 
             foreach ($paymentListRaw as $key => $payment) {
-                if ($payment->isUnzerPayment()) {
+                if (is_object($payment) && $payment->isUnzerPayment()) {
                     continue;
                 }
                 $paymentList[$key] = $payment;

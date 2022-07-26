@@ -108,9 +108,12 @@ class OrderController extends OrderController_parent
      */
     public function isSepaPayment(): ?bool
     {
+        $payment = $this->getPayment();
+
         return (
-            $this->getPayment()->getId() === UnzerDefinitions::SEPA_UNZER_PAYMENT_ID
-            || $this->getPayment()->getId() === UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID
+        is_object($payment) ?
+            ( $payment->getId() === UnzerDefinitions::SEPA_UNZER_PAYMENT_ID
+            || $payment->getId() === UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
         );
     }
 

@@ -33,15 +33,9 @@ class UnzerPaymentTest extends TestCase
         ]);
         $unzerBasket = $this->createPartialMock(Basket::class, []);
 
-        $unzerServiceMock = $this->createPartialMock(UnzerService::class, [
-            'getPaymentProcedure',
-            'prepareOrderRedirectUrl',
-            'getUnzerCustomer',
-            'getShopMetadata',
-            'setSessionVars',
-            'generateUnzerOrderId',
-            'getUnzerBasket'
-        ]);
+        $unzerServiceMock = $this->getMockBuilder(UnzerService::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $unzerServiceMock->method('getPaymentProcedure')->willReturn('charge');
         $unzerServiceMock->method('prepareOrderRedirectUrl')->willReturn('someRedirectUrl');

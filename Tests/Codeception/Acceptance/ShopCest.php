@@ -12,8 +12,16 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 use OxidEsales\Codeception\Page\Home;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
+/**
+ * @group unzer_module
+ */
 final class ShopCest extends BaseCest
 {
+    protected function _getOXID(): array
+    {
+        return [];
+    }
+
     /**
      * @param AcceptanceTester $I
      */

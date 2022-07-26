@@ -20,7 +20,7 @@ class PaymentGateway extends PaymentGateway_parent
     /**
      * @inerhitDoc
      */
-    public function executePayment($dAmount, &$oOrder): bool
+    public function executePayment($dAmount, &$oOrder)
     {
         $oPayment = oxNew(PaymentModel::class);
         if ($oPayment->load($oOrder->getFieldData('oxpaymenttype'))) {

@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
@@ -19,7 +20,12 @@ class ModuleSettingsTest extends TestCase
      */
     public function testSettings($values, $settingMethod, $settingValue): void
     {
-        $sut = new ModuleSettings($this->getBridgeStub($values));
+        $sut = new ModuleSettings(
+            $this->getBridgeStub($values),
+            $this->getMockBuilder(ModuleConfigurationDaoBridgeInterface::class)
+                ->disableOriginalConstructor()
+                ->getMock()
+        );
         $this->assertSame($settingValue, $sut->$settingMethod());
     }
 
@@ -123,10 +129,9 @@ class ModuleSettingsTest extends TestCase
 
     private function getBridgeStub($valueMap): ModuleSettingBridgeInterface
     {
-        $bridgeStub = $this->createPartialMock(
-            ModuleSettingBridgeInterface::class,
-            ['save', 'get']
-        );
+        $bridgeStub = $this->getMockBuilder(ModuleSettingBridgeInterface::class)
+           ->onlyMethods(['save', 'get'])
+           ->getMock();
         $bridgeStub->method('get')->willReturnMap($valueMap);
 
         return $bridgeStub;
