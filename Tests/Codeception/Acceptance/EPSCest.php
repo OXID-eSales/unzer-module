@@ -56,6 +56,7 @@ final class EPSCest extends BaseCest
 
         $epsPaymentData = Fixtures::get('eps_payment');
 
+        $I->waitForDocumentReadyState();
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
         $I->click("//div[@data-value='" . $epsPaymentData["option"] . "']");
