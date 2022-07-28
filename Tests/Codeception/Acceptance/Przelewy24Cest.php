@@ -58,7 +58,7 @@ final class Przelewy24Cest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
-     * @group Przelewey24PaymentTest
+     * @group Przelewy24PaymentTest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
@@ -70,16 +70,19 @@ final class Przelewy24Cest extends BaseCest
         $orderPage->submitOrder();
 
         // first page : choose bank
+        $I->waitForDocumentReadyState();
         $I->waitForElement($this->bankLink);
         $I->wait(5);
         $I->click($this->bankLink);
 
         // second page : payment
+        $I->waitForDocumentReadyState();
         $I->waitForElement($this->submitButton);
         $I->wait(5);
         $I->click($this->submitButton);
 
         // third page : expect end
+        $I->waitForDocumentReadyState();
         $I->waitForJS("return !!window.jQuery", 60);
 
         $this->_checkSuccessfulPayment();

@@ -63,6 +63,7 @@ final class EPSCest extends BaseCest
 
         // first page : login
         $I->waitForPageLoad();
+        $I->waitForDocumentReadyState();
         $I->wait(5);
         $I->waitForElement($this->usernameInput);
         $I->fillField($this->usernameInput, $epsPaymentData["username"]);
@@ -71,11 +72,13 @@ final class EPSCest extends BaseCest
         $I->click($this->submitInput);
 
         // second page : check data
+        $I->waitForDocumentReadyState();
         $I->waitForElement($this->submitDataInput);
         $I->click($this->submitDataInput);
         $I->wait(1);
 
         // third page : confirm button
+        $I->waitForDocumentReadyState();
         $I->waitForElement($this->tanSpan);
         $tan = $I->grabTextFrom($this->tanSpan);
         $I->fillField($this->tanInput, $tan);
@@ -83,6 +86,7 @@ final class EPSCest extends BaseCest
         $I->click($this->submitPaymentInput);
 
         $I->waitForPageLoad();
+        $I->waitForDocumentReadyState();
         $I->click($this->backlinkDiv);
         $this->_checkSuccessfulPayment();
     }
