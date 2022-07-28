@@ -59,6 +59,7 @@ final class EPSCest extends BaseCest
         $I->waitForDocumentReadyState();
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
+        $I->waitForDocumentReadyState();
         $I->click("//div[@data-value='" . $epsPaymentData["option"] . "']");
         $orderPage->submitOrder();
 

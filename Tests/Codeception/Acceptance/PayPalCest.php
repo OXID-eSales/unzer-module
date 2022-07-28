@@ -54,6 +54,7 @@ final class PayPalCest extends BaseCest
         $I->waitForElement($this->loginInput);
         $I->fillField($this->loginInput, $paypalPaymentData['username']);
         $I->fillField($this->passwordInput, $paypalPaymentData['password']);
+        $I->waitForDocumentReadyState();
         $I->click($this->loginButton);
 
         // card choose page
