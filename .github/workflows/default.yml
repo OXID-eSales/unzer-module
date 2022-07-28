@@ -29,7 +29,7 @@ jobs:
         run: git clone --depth 1 https://github.com/OXID-eSales/oxideshop_ce.git --branch b-6.5.x --single-branch source
 
       - name: Cache current installation
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ./*
@@ -46,7 +46,8 @@ jobs:
           perl -pi\
             -e 's#display_errors =.*#display_errors = false#g;'\
             -e 'print "xdebug.max_nesting_level=1000\nxdebug.mode=coverage\n\n"'\
-            containers/php-fpm/custom.ini
+            containers/php/custom.ini
+
           perl -pi\
             -e 's#/var/www/#/var/www/source/#g;'\
             containers/httpd/project.conf
@@ -71,7 +72,7 @@ jobs:
           sleep 2
 
       - name: Checkout current module
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: source/test-module
 
@@ -160,7 +161,7 @@ jobs:
 
       - name: Upload log artifact
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: StylesLog-${{ matrix.php }}
           path: |
@@ -174,7 +175,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Load current installation from cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ./*
@@ -210,7 +211,7 @@ jobs:
 
       - name: Upload log artifact
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: TestsLog-${{ matrix.php }}
           path: |
@@ -227,7 +228,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Load current installation from cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ./*
@@ -268,11 +269,11 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Checkout current module
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download phpunit artifacts
         continue-on-error: true
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: TestsLog-7.4
           path: ./tests/
@@ -284,7 +285,7 @@ jobs:
           sed -i 's+/var/www/test-module/++' tests/phpunit.xml
 
       - name: Download styles artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: StylesLog-8.0
           path: ./styles/
