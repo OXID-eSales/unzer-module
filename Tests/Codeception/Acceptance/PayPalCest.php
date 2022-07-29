@@ -20,10 +20,10 @@ final class PayPalCest extends BaseCest
 {
     private $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
     private $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
-    private $loginInput = "//input[@id='email']";
-    private $passwordInput = "//input[@id='password']";
-    private $loginButton = "//button[@id='btnLogin']";
-    private $submitButton = "//button[@id='payment-submit-btn']";
+    private $loginInput = "#email";
+    private $passwordInput = "#password";
+    private $loginButton = "#btnLogin";
+    private $submitButton = "#payment-submit-btn";
     private $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
 
     protected function _getOXID(): array
