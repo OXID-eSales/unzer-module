@@ -51,12 +51,12 @@ final class PayPalCest extends BaseCest
 
         // login page
         $I->waitForDocumentReadyState();
-        $I->waitForPageLoad();
         $I->waitForElement($this->loginInput);
         $I->fillField($this->loginInput, $paypalPaymentData['username']);
         $I->fillField($this->passwordInput, $paypalPaymentData['password']);
         $I->waitForDocumentReadyState();
         $I->click($this->loginButton);
+        $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
 
         // card choose page
         $I->waitForDocumentReadyState();
@@ -64,6 +64,7 @@ final class PayPalCest extends BaseCest
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
+        $I->wait(10);
 
         $I->waitForDocumentReadyState();
         $this->_checkSuccessfulPayment();

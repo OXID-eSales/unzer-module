@@ -74,12 +74,14 @@ final class EPSCest extends BaseCest
         $I->click($this->submitInput);
 
         // second page : check data
+        $I->waitForPageLoad();
         $I->waitForDocumentReadyState();
         $I->waitForElement($this->submitDataInput);
         $I->click($this->submitDataInput);
         $I->wait(1);
 
         // third page : confirm button
+        $I->waitForPageLoad();
         $I->waitForDocumentReadyState();
         $I->waitForElement($this->tanSpan);
         $tan = $I->grabTextFrom($this->tanSpan);
