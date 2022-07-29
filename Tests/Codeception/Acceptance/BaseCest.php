@@ -103,6 +103,7 @@ abstract class BaseCest
     protected function _checkSuccessfulPayment()
     {
         $this->I->waitForPageLoad();
+        $this->I->waitForDocumentReadyState();
         $this->I->waitForText(Translator::translate('THANK_YOU'));
     }
 

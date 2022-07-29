@@ -66,7 +66,6 @@ final class PayPalCest extends BaseCest
         $I->waitForDocumentReadyState();
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
 
-        $I->waitForDocumentReadyState();
         $this->_checkSuccessfulPayment();
     }
 }
