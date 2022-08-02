@@ -14,6 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
+ * @group EasyOutShopPaymentsTest
  */
 final class SofortCest extends BaseCest
 {
@@ -47,7 +48,7 @@ final class SofortCest extends BaseCest
 
         $sofortPaymentData = Fixtures::get('sofort_payment');
 
-        //accept cookies
+        // accept cookies
         $I->waitForElement($this->cookiesAcceptButton);
         $I->wait(1);
         $I->canSeeAndClick($this->cookiesAcceptButton);

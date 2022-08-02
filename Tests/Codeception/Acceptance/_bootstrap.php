@@ -7,8 +7,6 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/BaseCest.php';
-
 // This is acceptance bootstrap
 $helper = new \OxidEsales\Codeception\Module\FixturesHelper();
 $helper->loadRuntimeFixtures(__DIR__ . '/../_data/fixtures.php');

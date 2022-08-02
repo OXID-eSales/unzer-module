@@ -14,6 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
+ * @group PaymentAvailableTest
  */
 final class ShopCest extends BaseCest
 {
@@ -24,6 +25,7 @@ final class ShopCest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
+     * @group ShopOpenTest
      */
     public function shopStartPageLoads(AcceptanceTester $I)
     {
