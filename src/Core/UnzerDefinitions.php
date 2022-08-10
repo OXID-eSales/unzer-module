@@ -43,12 +43,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Alipay',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/1fb015ed91/alipay.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/1fb015ed91/alipay.svg"
                         title="Alipay" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'Alipay',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/1fb015ed91/alipay.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/1fb015ed91/alipay.svg"
                         title="Alipay" style="float: left;margin-right: 10px;" />'
                 ]
             ],
@@ -79,12 +81,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Bancontact',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/7f8c94a7dd/bancontact.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/7f8c94a7dd/bancontact.svg"
                         title="Bancontact" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'Bancontact',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/7f8c94a7dd/bancontact.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/7f8c94a7dd/bancontact.svg"
                         title="Bancontact" style="float: left;margin-right: 10px;" />'
                 ]
             ],
@@ -98,12 +102,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Kartenzahlung',
-                    'longdesc' => 'Kartenzahlungen sind auf der ganzen Welt beliebt. Wenn Sie Ihren Warenkorb
+                    'longdesc' => '',
+                    'longdesc_beta' => 'Kartenzahlungen sind auf der ganzen Welt beliebt. Wenn Sie Ihren Warenkorb
                         mit einer Kredit- oder Debitkarte bezahlen möchten, wählen Sie diese Zahlungsmethode.'
                 ],
                 'en' => [
                     'desc' => 'Card',
-                    'longdesc' => 'Card-based payment methods are popular across the globe. If you want to pay
+                    'longdesc' => '',
+                    'longdesc_beta' => 'Card-based payment methods are popular across the globe. If you want to pay
                         your basket with a credit-or debit card, select this payment method.'
                 ]
             ],
@@ -117,7 +123,8 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'EPS',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/02e1135598/eps_uberweisung.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/02e1135598/eps_uberweisung.svg"
                         title="eps" style="float: left;margin-right: 10px;" />
                         Um mit eps zu bezahlen, benötigen Sie ein Online-Banking-Konto bei einer der teilnehmenden
                         Banken. Wählen Sie an der Kasse Ihre Bank aus und loggen Sie sich in den privaten
@@ -126,7 +133,8 @@ final class UnzerDefinitions
                 ],
                 'en' => [
                     'desc' => 'EPS',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/02e1135598/eps_uberweisung.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/02e1135598/eps_uberweisung.svg"
                         title="eps" style="float: left;margin-right: 10px;" />
                         To pay with eps, you need an online banking account at one of the participating banks.
                         At checkout, select your bank and log in to the private online banking area. There you check the
@@ -144,7 +152,8 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Giropay',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/3a1b3dafb0/giro_pay.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/3a1b3dafb0/giro_pay.svg"
                         title="Giropay" style="float: left;margin-right: 10px;" />
                         Kein Eintippen von IBAN, BIC oder Zahlungsgrund: giropay übernimmt die ganze Arbeit
                         für Sie. Sie müssen sich nicht einmal registrieren. Sie benötigen lediglich Ihre
@@ -152,7 +161,8 @@ final class UnzerDefinitions
                 ],
                 'en' => [
                     'desc' => 'Giropay',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/3a1b3dafb0/giro_pay.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/3a1b3dafb0/giro_pay.svg"
                         title="Giropay" style="float: left;margin-right: 10px;" />
                         No typing in IBAN, BIC or reason for payment: giropay does all the hard work for you. You don\'t
                         even have to register. You only need your access data for online banking.
@@ -169,12 +179,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'iDEAL',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/efc1cbe641/ideal.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/efc1cbe641/ideal.svg"
                         title="iDEAL" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'iDEAL',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/efc1cbe641/ideal.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/efc1cbe641/ideal.svg"
                         title="iDEAL" style="float: left;margin-right: 10px;" />'
                 ]
             ],
@@ -188,7 +200,8 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Ratenzahlung',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg"
                         title="Ratenzahlung" style="float: left;margin-right: 10px;" />
                         Viele Kunden ziehen es vor, größere Anschaffungen von mehreren hundert Euro
                         in kleineren Raten zu bezahlen. Wählen Sie diese Methode für eine einfache
@@ -196,7 +209,8 @@ final class UnzerDefinitions
                 ],
                 'en' => [
                     'desc' => 'Installment',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg "
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg "
                         title="Installment" style="float: left;margin-right: 10px;" />
                         Many customers prefer to pay for larger purchases of several hundred euros in
                         smaller installments. Choose this method for comfortable payment in installments.'
@@ -212,13 +226,15 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Kauf auf Rechnung',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
                         Bei dieser Methode zahlen Sie per Kauf auf Rechnung'
                 ],
                 'en' => [
                     'desc' => 'Invoice',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Invoice" style="float: left;margin-right: 10px;" />'
                 ]
             ],
@@ -236,12 +252,14 @@ final class UnzerDefinitions
          *     'descriptions' => [
          *         'de' => [
          *             'desc' => 'Abgesicherter Rechnungskauf',
-         *             'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+         *             'longdesc' => '',
+         *             'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
          *                 title="Abgesicherter Rechnungskauf" style="float: left;margin-right: 10px;" />'
          *         ],
          *         'en' => [
          *             'desc' => 'Invoice with Unzer',
-         *             'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+         *             'longdesc' => '',
+         *             'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
          *                 title="Invoice with Unzer" style="float: left;margin-right: 10px;" />'
          *         ]
          *     ],
@@ -256,14 +274,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'PayPal',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/46364241f0/paypal.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/46364241f0/paypal.svg"
                         title="PayPal" style="float: left;margin-right: 10px;" />
                         PayPal ist der Online-Zahlungsservice, mit dem Sie in Online-Shops sicher,
                         einfach und schnell bezahlen können - für Sie völlig kostenlos.'
                 ],
                 'en' => [
                     'desc' => 'PayPal',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/46364241f0/paypal.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/46364241f0/paypal.svg"
                         title="PayPal" style="float: left;margin-right: 10px;" />
                         PayPal is the online payment service that allows you to pay in online stores securely,
                         easily and quickly - absolutely free of charge for you.'
@@ -279,14 +299,16 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Vorkasse',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/ed7c39ce12/unzer_prepayment.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/ed7c39ce12/unzer_prepayment.svg"
                         title="Vorkasse" style="float: left;margin-right: 10px;" />
                         Bei Vorkasse überweisen Sie das Geld für Ihre Bestellung im Voraus. Erst wenn der Betrag
                         eingegangen ist, wird die Ware an Ihre Lieferadresse verschickt.'
                 ],
                 'en' => [
                     'desc' => 'Prepayment',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/ed7c39ce12/unzer_prepayment.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/ed7c39ce12/unzer_prepayment.svg"
                         title="Prepayment" style="float: left;margin-right: 10px;" />
                         With prepayment you transfer the money for your order in advance. Only when the amount
                         is received, the goods will be shipped to your delivery address.'
@@ -303,12 +325,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'Przelewy24',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/def6433104/przelewy24.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/def6433104/przelewy24.svg"
                         title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'Przelewy24',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/def6433104/przelewy24.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/def6433104/przelewy24.svg"
                         title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ]
             ],
@@ -322,12 +346,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'SEPA-Lastschrift',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/c3ed559dcc/sepa_lastschrift.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/c3ed559dcc/sepa_lastschrift.svg"
                         title="SEPA-Lastschrift" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'SEPA Direct Debit',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/c3ed559dcc/sepa_lastschrift.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/c3ed559dcc/sepa_lastschrift.svg"
                         title="SEPA Direct Debit" style="float: left;margin-right: 10px;" />'
                 ]
             ],
@@ -342,12 +368,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'SEPA Lastschrift (abgesichert durch Unzer)',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
                         title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'SEPA Direct Debit with Unzer',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
                         title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ]
             ],
@@ -396,12 +424,14 @@ final class UnzerDefinitions
             'descriptions' => [
                 'de' => [
                     'desc' => 'WeChat Pay',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/35bad89449/wechat_pay.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/35bad89449/wechat_pay.svg"
                         title="WeChat Pay" style="float: left;margin-right: 10px;" />'
                 ],
                 'en' => [
                     'desc' => 'WeChat Pay',
-                    'longdesc' => '<img src="https://a.storyblok.com/f/91629/x/35bad89449/wechat_pay.svg"
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/35bad89449/wechat_pay.svg"
                         title="WeChat Pay" style="float: left;margin-right: 10px;" />'
                 ]
             ],
