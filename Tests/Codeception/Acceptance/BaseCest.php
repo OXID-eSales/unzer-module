@@ -47,7 +47,6 @@ abstract class BaseCest
     public function _after(AcceptanceTester $I): void
     {
         $I->clearShopCache();
-        $I->cleanUp();
     }
 
     /**
@@ -103,6 +102,7 @@ abstract class BaseCest
      */
     protected function _checkSuccessfulPayment()
     {
+        $this->I->waitForDocumentReadyState();
         $this->I->waitForPageLoad();
         $this->I->waitForText(Translator::translate('THANK_YOU'));
     }

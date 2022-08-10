@@ -23,7 +23,7 @@
     "autoload": {
         "psr-4": {
             "OxidSolutionCatalysts\\Unzer\\": "src",
-            "OxidSolutionCatalysts\\Unzer\\Tests\\": "Tests"
+            "OxidSolutionCatalysts\\Unzer\\Tests\\": "Tests\\"
         }
     },
     "scripts": {

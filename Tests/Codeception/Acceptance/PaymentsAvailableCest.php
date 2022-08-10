@@ -14,6 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
+ * @group PaymentAvailableTest
  */
 final class PaymentsAvailableCest extends BaseCest
 {
@@ -22,7 +23,7 @@ final class PaymentsAvailableCest extends BaseCest
         //'OSCUNZER_PAYMENT_METHOD_APPLEPAY',
         'OSCUNZER_PAYMENT_METHOD_BANCONTACT',
         'OSCUNZER_PAYMENT_METHOD_CARD',
-        //'OSCUNZER_PAYMENT_METHOD_EPS',
+        'OSCUNZER_PAYMENT_METHOD_EPS',
         'OSCUNZER_PAYMENT_METHOD_GIROPAY',
         'OSCUNZER_PAYMENT_METHOD_IDEAL',
         'OSCUNZER_PAYMENT_METHOD_INSTALLMENT',
@@ -30,7 +31,7 @@ final class PaymentsAvailableCest extends BaseCest
         'OSCUNZER_PAYMENT_METHOD_PAYPAL',
         'OSCUNZER_PAYMENT_METHOD_PIS',
         'OSCUNZER_PAYMENT_METHOD_PREPAYMENT',
-        //'OSCUNZER_PAYMENT_METHOD_PRZELEWY24',
+        'OSCUNZER_PAYMENT_METHOD_PRZELEWY24',
         'OSCUNZER_PAYMENT_METHOD_SEPA',
         'OSCUNZER_PAYMENT_METHOD_SEPA-SECURED',
         'OSCUNZER_PAYMENT_METHOD_SOFORT',
@@ -43,6 +44,7 @@ final class PaymentsAvailableCest extends BaseCest
             'oscunzer_alipay',
             'oscunzer_bancontact',
             'oscunzer_card',
+            'oscunzer_eps',
             'oscunzer_giropay',
             'oscunzer_ideal',
             'oscunzer_installment',
@@ -50,6 +52,7 @@ final class PaymentsAvailableCest extends BaseCest
             'oscunzer_paypal',
             'oscunzer_pis',
             'oscunzer_prepayment',
+            'oscunzer_przelewy24',
             'oscunzer_sepa',
             'oscunzer_sepa-secured',
             'oscunzer_sofort',
@@ -59,7 +62,6 @@ final class PaymentsAvailableCest extends BaseCest
 
     /**
      * @param AcceptanceTester $I
-     * @group PaymentAvailableTest
      */
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {
