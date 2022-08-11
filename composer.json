@@ -1,5 +1,5 @@
 {
-    "name": "oxid-solution-catalysts/unzer",
+    "name": "oxid-esales/unzer",
     "description": "OXID eSales unzer payment module for OXID",
     "type": "oxideshop-module",
     "keywords": ["oxid", "modules", "eShop", "unzer", "payment"],

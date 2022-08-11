@@ -3,7 +3,7 @@ name: Development
 on: [ push, pull_request ]
 
 env:
-  PACKAGE_NAME: 'oxid-solution-catalysts/unzer'
+  PACKAGE_NAME: 'oxid-esales/unzer'
   MODULE_PATH: 'osc/unzer'
   SONARCLOUD_ORGANIZATION: 'oxid-esales'
   SONARCLOUD_PROJECT_KEY: 'OXID-eSales_unzer-module'
