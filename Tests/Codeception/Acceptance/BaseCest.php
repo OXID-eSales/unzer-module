@@ -145,4 +145,36 @@ abstract class BaseCest
     }
 
     abstract protected function _getOXID(): array;
+
+    /**
+     * If element is found return the text, if not return false
+     * @param $element
+     * @return bool
+     */
+    protected function _grabTextFromElementWhenPresent($element, $I)
+    {
+        try {
+            $I->seeElement($element);
+            $isFound = $I->grabTextFrom($element);
+        } catch (\Exception $e) {
+            $isFound = false;
+        }
+        return $isFound;
+    }
+
+    /**
+     * @param $element
+     * @return bool
+     */
+    protected function _checkElementExists($element, $I)
+    {
+        try {
+            $isFound = $I->seeElement($element);
+        } catch (\Exception $e) {
+            $isFound = false;
+        }
+        return $isFound;
+    }
+
 }
+

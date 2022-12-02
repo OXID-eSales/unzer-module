@@ -46,8 +46,10 @@ final class PayPalCest extends BaseCest
 
         // accept cookies
         $I->waitForDocumentReadyState();
-        $I->waitForElement($this->acceptAllCookiesButton);
-        $I->click($this->acceptAllCookiesButton);
+        $I->wait(5);
+        if ($this->_checkElementExists($this->acceptAllCookiesButton, $I)) {
+            $I->click($this->acceptAllCookiesButton);
+        }
 
         // login page
         $I->waitForDocumentReadyState();
