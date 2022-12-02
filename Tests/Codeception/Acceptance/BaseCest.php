@@ -175,6 +175,4 @@ abstract class BaseCest
         }
         return $isFound;
     }
-
 }
-
