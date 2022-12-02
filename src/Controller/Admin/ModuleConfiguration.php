@@ -75,6 +75,11 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                             }
                         }
                         if ($webhookUrl && $webhookId) {
+                            // There is a webhook set at Unzer, but it is not yet saved in the shop.
+                            // So save again
+                            if (!$registeredWebhookUrl || !$registeredWebhookId) {
+                                $this->saveWebhookOption($webhookUrl, $webhookId);
+                            }
                             $registeredWebhookUrl = $webhookUrl;
                         } else {
                             $registeredWebhookUrl = '';
