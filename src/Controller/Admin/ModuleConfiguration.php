@@ -318,30 +318,31 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function saveConfVars()
     {
         $request = Registry::getRequest();
+        if ($request->getRequestEscapedParameter('oxid') && $request->getRequestEscapedParameter('oxid') == 'osc-unzer') {
+            // the systemMode is very important, so we set it first ...
+            $systemMode = $request->getRequestEscapedParameter('confselects')['UnzerSystemMode'];
+            $this->moduleSettings->setSystemMode($systemMode);
 
-        // the systemMode is very important, so we set it first ...
-        $systemMode = $request->getRequestEscapedParameter('confselects')['UnzerSystemMode'];
-        $this->moduleSettings->setSystemMode($systemMode);
+            $this->resetContentCache();
 
-        $this->resetContentCache();
-
-        if ($requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
-            $this->moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
-        }
-        if ($requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')) {
-            $this->moduleSettings->saveApplePayNetworks($requestApplePayNetworks);
-        }
-        if ($requestApplePayMerchantCert = $request->getRequestEscapedParameter('applePayMerchantCert')) {
-            file_put_contents(
-                $this->moduleSettings->getApplePayMerchantCertFilePath(),
-                $requestApplePayMerchantCert
-            );
-        }
-        if ($requestApplePayMerchantCertKey = $request->getRequestEscapedParameter('applePayMerchantCertKey')) {
-            file_put_contents(
-                $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
-                $requestApplePayMerchantCertKey
-            );
+            if ($requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
+                $this->moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
+            }
+            if ($requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')) {
+                $this->moduleSettings->saveApplePayNetworks($requestApplePayNetworks);
+            }
+            if ($requestApplePayMerchantCert = $request->getRequestEscapedParameter('applePayMerchantCert')) {
+                file_put_contents(
+                    $this->moduleSettings->getApplePayMerchantCertFilePath(),
+                    $requestApplePayMerchantCert
+                );
+            }
+            if ($requestApplePayMerchantCertKey = $request->getRequestEscapedParameter('applePayMerchantCertKey')) {
+                file_put_contents(
+                    $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
+                    $requestApplePayMerchantCertKey
+                );
+            }
         }
 
         parent::saveConfVars();
