@@ -7,6 +7,11 @@
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
@@ -32,10 +37,8 @@ class Events
         self::executeModuleMigrations();
 
         //add static contents and payment methods
-        //NOTE: this assumes the module's servies.yaml is already in place at the time this method is called
         self::addStaticContents();
     }
-
 
     /**
      * Execute action on deactivate event
@@ -72,13 +75,41 @@ class Events
      */
     private static function addStaticContents(): void
     {
-        /** @var StaticContent $service */
-        $service = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(StaticContent::class);
+        $service = self::getStaticContentService();
 
         $service->ensureStaticContents();
         $service->ensureUnzerPaymentMethods();
         $service->createRdfa();
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private static function getStaticContentService(): StaticContent
+    {
+        /*
+        Normally I would fetch the StaticContents service like this:
+
+        $service = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(StaticContent::class);
+
+        But the services are not ready when the onActivate method is triggered.
+        That's why I build the containers by hand as an exception.:
+        */
+
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()
+            ->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+        /** @var ContextInterface $context */
+        $context = $container->get(ContextInterface::class);
+
+        return new StaticContent(
+            $queryBuilderFactory,
+            $context
+        );
     }
 }
