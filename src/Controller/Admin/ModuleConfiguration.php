@@ -318,7 +318,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function saveConfVars()
     {
         $request = Registry::getRequest();
-        if ($request->getRequestEscapedParameter('oxid') && $request->getRequestEscapedParameter('oxid') == 'osc-unzer') {
+        if (
+            $request->getRequestEscapedParameter('oxid') &&
+            $request->getRequestEscapedParameter('oxid') === 'osc-unzer'
+        ) {
             // the systemMode is very important, so we set it first ...
             $systemMode = $request->getRequestEscapedParameter('confselects')['UnzerSystemMode'];
             $this->moduleSettings->setSystemMode($systemMode);

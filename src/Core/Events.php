@@ -82,10 +82,6 @@ class Events
         $service->createRdfa();
     }
 
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
     private static function getStaticContentService(): StaticContent
     {
         /*
