@@ -100,6 +100,7 @@ class AdminOrderController extends AdminDetailsController
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
+            $blShipped = false;
             /** @var Shipment $shipment */
             foreach ($unzerPayment->getShipments() as $shipment) {
                 $aRv = [];
@@ -107,10 +108,14 @@ class AdminOrderController extends AdminDetailsController
                 $aRv['shipId'] = $shipment->getId();
                 $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
                 $aRv['amount'] = $shipment->getAmount();
-
+                $aRv['success'] = $shipment->isSuccess();
+                if ($shipment->isSuccess()) {
+                    $blShipped = true;
+                }
                 $shipments[] = $aRv;
             }
             $this->_aViewData["aShipments"] = $shipments;
+            $this->_aViewData["blSuccessShipped"] = $blShipped;
 
             if ($unzerPayment->getAuthorization()) {
                 $unzAuthorization = $unzerPayment->getAuthorization();

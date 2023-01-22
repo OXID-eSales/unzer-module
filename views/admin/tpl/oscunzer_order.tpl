@@ -55,16 +55,22 @@
                             <td class="listheader">[{oxmultilang ident="ORDER_MAIN_BILLNUM"}]</td>
                         </tr>
                         [{foreach from=$aShipments item="oUnzerShipment"}]
+                            [{if !$oUnzerShipment.success}]
+                                [{assign var=unzStyle value='class ="listitem3"'}]
+                            [{else}]
+                                [{assign var=unzStyle value=''}]
+                            [{/if}]
                             <tr>
-                                <td>[{$oUnzerShipment.shipingDate|escape}]</td>
-                                <td>[{$oUnzerShipment.shipId|escape}]</td>
-                                <td>[{$oUnzerShipment.amount|escape|string_format:"%.2f"}]</td>
-                                <td>[{$oUnzerShipment.invoiceid|escape}]</td>
+                                <td [{$unzStyle}]>[{$oUnzerShipment.shipingDate|escape}]</td>
+                                <td [{$unzStyle}]>[{$oUnzerShipment.shipId|escape}]</td>
+                                <td [{$unzStyle}]>[{$oUnzerShipment.amount|escape|string_format:"%.2f"}]</td>
+                                <td [{$unzStyle}]>[{$oUnzerShipment.invoiceid|escape}]</td>
                             </tr>
-                        [{/foreach}]
+                            [{/foreach}]
                     </tbody>
                 </table>
-            [{else}]
+            [{/if}]
+            [{if !$blSuccessShipped}]
                 [{oxmultilang ident="OSCUNZER_NOSHIPINGYET"}]<br>
                 <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
