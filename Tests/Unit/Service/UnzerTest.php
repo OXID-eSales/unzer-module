@@ -112,10 +112,12 @@ class UnzerTest extends TestCase
         $currency->name = 'EUR';
 
         $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
-
+        $price1 = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price1->setPrice(234.56);
         $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
             'getNettoSum' => 123.45,
             'getBruttoSum' => 234.56,
+            'getPrice' => $price1,
             'getBasketCurrency' => $currency,
             'getTotalDiscount' => $price,
             'getDeliveryCost' => $price
@@ -150,10 +152,12 @@ class UnzerTest extends TestCase
             'getUnitPrice' => new \OxidEsales\Eshop\Core\Price(10),
             'getAmount' => 4
         ]);
-
+        $price1 = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price1->setPrice(234.56);
         $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
             'getNettoSum' => 123.45,
             'getBruttoSum' => 234.56,
+            'getPrice' => $price1,
             'getBasketCurrency' => $currency,
             'getContents' => [$basketItem1, $basketItem2],
             'getTotalDiscount' => $price,
