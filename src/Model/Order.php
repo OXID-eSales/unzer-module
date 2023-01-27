@@ -68,7 +68,11 @@ class Order extends Order_parent
 
             $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
             // send order by email to shop owner and current user
+
+            // don't let order fail due to stock check while sending out the order mail
+            Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
             $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
+            Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
 
             $this->_setOrderStatus($unzerPaymentStatus);
 

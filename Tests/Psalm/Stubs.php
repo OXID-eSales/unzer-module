@@ -34,6 +34,10 @@ class Order_parent extends \OxidEsales\Eshop\Application\Model\Order
 {
 }
 
+class Article_parent extends \OxidEsales\Eshop\Application\Model\Article
+{
+}
+
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
