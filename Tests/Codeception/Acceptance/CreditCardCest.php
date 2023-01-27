@@ -77,12 +77,43 @@ final class CreditCardCest extends BaseCest
     }
 
     /**
+     * @param $stock int is oxarticles->OXSTOCK
+     * @param $flag int is oxarticles->OXSTOCKFLAG
+     * @return void
+     */
+    private function _updateArticleStockAndFlag($stock, $flag)
+    {
+        $article = Fixtures::get('product');
+        $this->_getAcceptance()->updateInDatabase(
+            'oxarticles',
+            ['OXSTOCK' => $stock, 'OXSTOCKFLAG' => $flag],
+            ['OXID' => $article['id']]
+        );
+    }
+
+    /**
      * @param AcceptanceTester $I
      * @group CreditCardPaymentTest
      */
     public function checkPaymentUsingMastercardWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Credit Card payment using Mastercard works');
+        $this->_updateArticleStockAndFlag(15, 1);
+        $this->_prepareCreditCardTest($I);
+
+        $this->_submitCreditCardPayment('mastercard_payment');
+        $this->_checkCreditCardPayment();
+    }
+
+    /**
+     * @param AcceptanceTester $I
+     * @return void
+     * @group CreditCardPaymentTest
+     */
+    public function checkPaymentUsingMastercardWithLastStockItemWorks(AcceptanceTester $I)
+    {
+        $I->wantToTest('Test Credit Card payment using Mastercard with last stock item works');
+        $this->_updateArticleStockAndFlag(1, 3);
         $this->_prepareCreditCardTest($I);
 
         $this->_submitCreditCardPayment('mastercard_payment');
@@ -96,6 +127,22 @@ final class CreditCardCest extends BaseCest
     public function checkPaymentUsingVisaWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Credit Card payment using Visa works');
+        $this->_updateArticleStockAndFlag(15, 1);
+        $this->_prepareCreditCardTest($I);
+
+        $this->_submitCreditCardPayment('visa_payment');
+        $this->_checkCreditCardPayment();
+    }
+
+    /**
+     * @param AcceptanceTester $I
+     * @return void
+     * @group CreditCardPaymentTest
+     */
+    public function checkPaymentUsingVisaWithLastStockItemWorks(AcceptanceTester $I)
+    {
+        $I->wantToTest('Test Credit Card payment using Visa with last stock item works');
+        $this->_updateArticleStockAndFlag(1, 3);
         $this->_prepareCreditCardTest($I);
 
         $this->_submitCreditCardPayment('visa_payment');
