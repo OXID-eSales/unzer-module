@@ -21,6 +21,9 @@ use OxidSolutionCatalysts\Unzer\Core\Config;
 use OxidSolutionCatalysts\Unzer\Core\ShopControl;
 use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
 use OxidSolutionCatalysts\Unzer\Model\PaymentGateway;
+use OxidSolutionCatalysts\Unzer\Model\Article;
+use OxidSolutionCatalysts\Unzer\Model\Order;
+use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 
@@ -56,13 +59,14 @@ $aModule = [
         \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
         \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
         \OxidEsales\Eshop\Core\Config::class => Config::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class => \OxidSolutionCatalysts\Unzer\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
         \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
-        \OxidEsales\Eshop\Application\Model\Order::class => \OxidSolutionCatalysts\Unzer\Model\Order::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
         \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
+        \OxidEsales\Eshop\Application\Model\Article::class => Article::class,
     ],
     'controllers' => [
         'unzer_admin_order' => AdminOrderController::class,
