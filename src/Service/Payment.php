@@ -313,18 +313,21 @@ class Payment
             if ($unzerPayment->getPaymentType() instanceof InstallmentSecured) {
                 $this->setInstallmentDueDate($unzerPayment);
             }
+            try {
+                $shipment = $this->getUnzerSDK()->ship(
+                    $unzerPayment,
+                    $sInvoiceNr,
+                    $oOrder->getId()
+                );
+                $unzerPayment->addShipment($shipment);
 
-            $shipment = $this->getUnzerSDK()->ship(
-                $unzerPayment,
-                $sInvoiceNr,
-                $oOrder->getId()
-            );
-            $unzerPayment->addShipment($shipment);
-
-            foreach ($unzerPayment->getShipments() as $unzShipment) {
-                if ($unzShipment->isSuccess()) {
-                    $blSuccess = true;
+                foreach ($unzerPayment->getShipments() as $unzShipment) {
+                    if ($unzShipment->isSuccess()) {
+                        $blSuccess = true;
+                    }
                 }
+            } catch (UnzerApiException $e) {
+                $blSuccess = $e;
             }
 
             if (!$blSuccess && $unzerPayment->getAmount()->getRemaining() === 0.0) {

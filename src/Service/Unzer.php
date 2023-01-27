@@ -162,7 +162,7 @@ class Unzer
     {
         $basket = new Basket(
             $unzerOrderId,
-            $basketModel->getBruttoSum(),
+            $basketModel->getPrice()->getBruttoPrice(),
             $basketModel->getBasketCurrency()->name
         );
 
