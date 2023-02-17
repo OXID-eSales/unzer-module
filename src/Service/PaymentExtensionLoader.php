@@ -18,7 +18,6 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\GiroPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Ideal;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Installment;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\InvoiceSecured;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\PayPal;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\PIS;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\PrePayment;
@@ -41,7 +40,6 @@ class PaymentExtensionLoader
         UnzerDefinitions::IDEAL_UNZER_PAYMENT_ID => Ideal::class,
         UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID => Installment::class,
         UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID => Invoice::class,
-        UnzerDefinitions::INVOICE_SECURED_UNZER_PAYMENT_ID => InvoiceSecured::class,
         UnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID => PayPal::class,
         UnzerDefinitions::PIS_UNZER_PAYMENT_ID => PIS::class,
         UnzerDefinitions::PREPAYMENT_UNZER_PAYMENT_ID => PrePayment::class,

@@ -55,8 +55,6 @@
                         [{include file="modules/osc/unzer/unzer_ideal.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_installment"}]
                         [{include file="modules/osc/unzer/unzer_installment.tpl"}]
-                    [{elseif $sPaymentID == "oscunzer_invoice-secured"}]
-                        [{include file="modules/osc/unzer/unzer_invoice_secured.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_paypal"}]
                         [{include file="modules/osc/unzer/unzer_paypal.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_applepay"}]
