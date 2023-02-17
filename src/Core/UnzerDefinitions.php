@@ -19,7 +19,6 @@ final class UnzerDefinitions
     public const IDEAL_UNZER_PAYMENT_ID = 'oscunzer_ideal';
     public const INSTALLMENT_UNZER_PAYMENT_ID = 'oscunzer_installment';
     public const INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice';
-    public const INVOICE_SECURED_UNZER_PAYMENT_ID = 'oscunzer_invoice-secured';
     public const PAYPAL_UNZER_PAYMENT_ID = 'oscunzer_paypal';
     public const PIS_UNZER_PAYMENT_ID = 'oscunzer_pis';
     public const PREPAYMENT_UNZER_PAYMENT_ID = 'oscunzer_prepayment';
@@ -243,31 +242,6 @@ final class UnzerDefinitions
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS
         ],
-
-        //Unzer Invoice Secured lets you issue an invoice and then collect the payment, your payment is secured.
-        /*
-         * deactivated for first release because payment is deprecated on unzer-side, new API will coming soon (2022-07-26)
-         *
-         * self::INVOICE_SECURED_UNZER_PAYMENT_ID => [
-         *     'descriptions' => [
-         *         'de' => [
-         *             'desc' => 'Abgesicherter Rechnungskauf',
-         *             'longdesc' => '',
-         *             'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
-         *                 title="Abgesicherter Rechnungskauf" style="float: left;margin-right: 10px;" />'
-         *         ],
-         *         'en' => [
-         *             'desc' => 'Invoice with Unzer',
-         *             'longdesc' => '',
-         *             'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
-         *                 title="Invoice with Unzer" style="float: left;margin-right: 10px;" />'
-         *         ]
-         *     ],
-         *     'active' => true,
-         *     'countries' => ['DE', 'AT'],
-         *     'constraints' => self::PAYMENT_CONSTRAINTS
-         * ],
-         */
 
         //PayPal is one of the world’s most popular online payment systems.
         self::PAYPAL_UNZER_PAYMENT_ID => [

@@ -86,7 +86,6 @@ $aModule = [
         'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
         'modules/osc/unzer/unzer_installment_confirm_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
         'modules/osc/unzer/unzer_installment_confirm_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
-        'modules/osc/unzer/unzer_invoice_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice_secured.tpl',
         'modules/osc/unzer/unzer_applepay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl',
         'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
         'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
