@@ -120,7 +120,15 @@ class Unzer
         $billingAddress->setCity(trim($oUser->getFieldData('oxcity')));
         $billingAddress->setCountry($billingCountryIso);
 
-        if ($oOrder && $oDelAddress = $oOrder->getDelAddressInfo()) {
+        $oDelAddress = null;
+        if ($oOrder) {
+            $oDelAddress = $oOrder->getDelAddressInfo();
+        }
+        elseif (Registry::getSession()->getVariable('blshowshipaddress')) {
+            $oDelAddress = $oUser->getSelectedAddress();
+        }
+
+        if ($oDelAddress) {
             $shippingAddress = $customer->getShippingAddress();
             $deliveryCountryIso = $oCountry->load($oDelAddress->getFieldData('oxcountryid'))
                 ? $oDelAddress->getFieldData('oxisoalpha2')
@@ -224,6 +232,8 @@ class Unzer
         $unzerBasketItem->setVat($discounts->getVat());
         $unzerBasketItem->setAmountVat($discounts->getVatValue());
         $unzerBasketItem->setAmountGross($discounts->getBruttoPrice());
+
+        $unzerBasketItems[] = $unzerBasketItem;
 
         $basket->setBasketItems($unzerBasketItems);
 
