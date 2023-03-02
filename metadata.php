@@ -276,7 +276,6 @@ $aModule = [
             'value' => ''
         ],
         // unzer invoice keypairs
-        // B2C EUR
         [
             'group' => 'unzerinvoice',
             'name' => 'sandbox-UnzerPublicKeyB2CEUR',
@@ -286,6 +285,42 @@ $aModule = [
         [
             'group' => 'unzerinvoice',
             'name' => 'sandbox-UnzerPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2BCHF',
             'type' => 'str',
             'value' => ''
         ],
@@ -301,19 +336,6 @@ $aModule = [
             'type' => 'str',
             'value' => ''
         ],
-        // B2B EUR
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2BEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2BEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
         [
             'group' => 'unzerinvoice',
             'name' => 'production-UnzerPublicKeyB2BEUR',
@@ -326,19 +348,7 @@ $aModule = [
             'type' => 'str',
             'value' => ''
         ],
-        // B2C CHF
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
+
         [
             'group' => 'unzerinvoice',
             'name' => 'production-UnzerPublicKeyB2CCHF',
@@ -348,19 +358,6 @@ $aModule = [
         [
             'group' => 'unzerinvoice',
             'name' => 'production-UnzerPrivateKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        // B2B CHF
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2BCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2BCHF',
             'type' => 'str',
             'value' => ''
         ],
