@@ -421,14 +421,10 @@ class ModuleSettings
      */
     public function isInvoiceEligibility(): bool
     {
-        if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
-            return (($this->getShopPublicKeyB2CInvoiceCHF() && $this->getShopPrivateKeyB2CInvoiceCHF()) ||
-                ($this->getShopPublicKeyB2BInvoiceCHF() && $this->getShopPrivateKeyB2BInvoiceCHF()));
-        }
-
-        return (($this->getShopPublicKeyB2CInvoiceEUR() && $this->getShopPrivateKeyB2CInvoiceEUR()) ||
-            ($this->getShopPublicKeyB2BInvoiceEUR() && $this->getShopPrivateKeyB2BInvoiceEUR()));
-
+        return (
+            $this->isB2CInvoiceEligibility() ||
+            $this->isB2BInvoiceEligibility()
+        );
     }
 
     /**
@@ -436,11 +432,16 @@ class ModuleSettings
      */
     public function isB2CInvoiceEligibility(): bool
     {
-        if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
-            return ($this->getShopPublicKeyB2CInvoiceCHF() && $this->getShopPrivateKeyB2CInvoiceCHF());
-        }
-
-        return ($this->getShopPublicKeyB2CInvoiceEUR() && $this->getShopPrivateKeyB2CInvoiceEUR());
+        return (
+            $this->isBasketCurrencyCHF() &&
+            $this->getShopPublicKeyB2CInvoiceCHF() &&
+            $this->getShopPrivateKeyB2CInvoiceCHF()
+        ) ||
+        (
+            $this->isBasketCurrencyEUR() &&
+            $this->getShopPublicKeyB2CInvoiceEUR() &&
+            $this->getShopPrivateKeyB2CInvoiceEUR()
+        );
     }
 
     /**
@@ -448,11 +449,16 @@ class ModuleSettings
      */
     public function isB2BInvoiceEligibility(): bool
     {
-        if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
-            return ($this->getShopPublicKeyB2BInvoiceCHF() && $this->getShopPrivateKeyB2BInvoiceCHF());
-        }
-
-        return ($this->getShopPublicKeyB2BInvoiceEUR() && $this->getShopPrivateKeyB2BInvoiceEUR());
+        return (
+            $this->isBasketCurrencyCHF() &&
+            $this->getShopPublicKeyB2BInvoiceCHF() &&
+            $this->getShopPrivateKeyB2BInvoiceCHF()
+        ) ||
+        (
+            $this->isBasketCurrencyEUR() &&
+            $this->getShopPublicKeyB2BInvoiceEUR() &&
+            $this->getShopPrivateKeyB2BInvoiceEUR()
+        );
     }
 
     /**
@@ -525,7 +531,7 @@ class ModuleSettings
     public function getShopPublicKeyInvoice(): string
     {
         if ($this->isB2CInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPublicKeyB2CInvoiceCHF();
             }
 
@@ -533,7 +539,7 @@ class ModuleSettings
         }
 
         if ($this->isB2BInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPublicKeyB2BInvoiceCHF();
             }
 
@@ -549,7 +555,7 @@ class ModuleSettings
     public function getShopPrivateKeyInvoice(): string
     {
         if ($this->isB2CInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPrivateKeyB2CInvoiceCHF();
             }
 
@@ -557,7 +563,7 @@ class ModuleSettings
         }
 
         if ($this->isB2BInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPrivateKeyB2BInvoiceCHF();
             }
 
@@ -565,5 +571,20 @@ class ModuleSettings
         }
 
         return '';
+    }
+
+    public function isBasketCurrencyCHF(): bool
+    {
+        return $this->getBasketCurrency() === 'CHF';
+    }
+
+    public function isBasketCurrencyEUR(): bool
+    {
+        return $this->getBasketCurrency() === 'EUR';
+    }
+
+    public function getBasketCurrency(): string
+    {
+        return Registry::getSession()->getBasket()->getBasketCurrency()->name;
     }
 }
