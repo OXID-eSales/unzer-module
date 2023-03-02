@@ -127,11 +127,6 @@ $aModule = [
             'block' => 'select_payment',
             'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
         ],
-        [
-            'template' => 'page/checkout/thankyou.tpl',
-            'block' => 'checkout_thankyou_info',
-            'file' => 'views/frontend/blocks/page/checkout/checkout_thankyou_info.tpl'
-        ],
         //admin
         [
             'template' => 'module_config.tpl',
