@@ -233,6 +233,8 @@ class Unzer
         $unzerBasketItem->setAmountVat($discounts->getVatValue());
         $unzerBasketItem->setAmountGross($discounts->getBruttoPrice());
 
+        $unzerBasketItems[] = $unzerBasketItem;
+
         $basket->setBasketItems($unzerBasketItems);
 
         return $basket;
