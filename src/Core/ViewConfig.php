@@ -76,6 +76,10 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPubKey(): string
     {
+        if (Registry::getSession()->getBasket()->getPaymentId() === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+            return $this->moduleSettings->getShopPublicKeyInvoice();
+        }
+
         return $this->moduleSettings->getShopPublicKey();
     }
 
@@ -86,6 +90,10 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerPrivKey(): string
     {
+        if (Registry::getSession()->getBasket()->getPaymentId() === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+            return $this->moduleSettings->getShopPrivateKeyInvoice();
+        }
+
         return $this->moduleSettings->getShopPrivateKey();
     }
 
@@ -167,5 +175,21 @@ class ViewConfig extends ViewConfig_parent
             }
         }
         return $result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isB2CInvoiceEligibility(): bool
+    {
+        return $this->moduleSettings->isB2CInvoiceEligibility();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isB2BInvoiceEligibility(): bool
+    {
+        return $this->moduleSettings->isB2BInvoiceEligibility();
     }
 }
