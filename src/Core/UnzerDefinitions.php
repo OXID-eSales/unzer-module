@@ -224,14 +224,14 @@ final class UnzerDefinitions
         self::INVOICE_UNZER_PAYMENT_ID => [
             'descriptions' => [
                 'de' => [
-                    'desc' => 'Kauf auf Rechnung',
+                    'desc' => 'Unzer Rechnung (Paylater)',
                     'longdesc' => '',
                     'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
                         Bei dieser Methode zahlen Sie per Kauf auf Rechnung'
                 ],
                 'en' => [
-                    'desc' => 'Invoice',
+                    'desc' => 'Unzer Invoice (Paylater)',
                     'longdesc' => '',
                     'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Invoice" style="float: left;margin-right: 10px;" />'

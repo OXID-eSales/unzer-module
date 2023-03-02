@@ -15,7 +15,7 @@ $aLang = [
     'SHOP_MODULE_GROUP_unzerpaypal' => 'additional options for PayPal',
     'SHOP_MODULE_GROUP_unzerinstallment' => 'additional options for Installment',
     'SHOP_MODULE_GROUP_unzerapplepay' => 'additional options for ApplePay',
-    'SHOP_MODULE_GROUP_unzerinvoice' => 'additional options for Invoice',
+    'SHOP_MODULE_GROUP_unzerinvoice' => 'additional options for Unzer Invoice (Paylater)',
     'SHOP_MODULE_GROUP_unzerother' => 'Other',
 
     'SHOP_MODULE_sandbox-UnzerPublicKey' => 'Sandbox Public-Key',

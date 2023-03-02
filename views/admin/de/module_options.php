@@ -15,7 +15,7 @@ $aLang = [
     'SHOP_MODULE_GROUP_unzerpaypal' => 'zusätzliche Optionen für PayPal',
     'SHOP_MODULE_GROUP_unzerinstallment' => 'zusätzliche Optionen für Ratenzahlung',
     'SHOP_MODULE_GROUP_unzerapplepay' => 'zusätzliche Optionen für ApplePay',
-    'SHOP_MODULE_GROUP_unzerinvoice' => 'zusätzliche Optionen für Rechnungskauf',
+    'SHOP_MODULE_GROUP_unzerinvoice' => 'zusätzliche Optionen für Unzer Rechnung (Paylater)',
     'SHOP_MODULE_GROUP_unzerother' => 'Sonstiges',
 
     'SHOP_MODULE_sandbox-UnzerPublicKey' => 'Sandbox öffentlicher Schlüssel',
