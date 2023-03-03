@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;
@@ -21,12 +22,14 @@ class ModuleSettingsTest extends TestCase
     public function testSettings($values, $settingMethod, $settingValue): void
     {
         $session = $this->createConfiguredMock(Session::class, []);
+        $config = $this->createConfiguredMock(Config::class, []);
         $sut = new ModuleSettings(
             $this->getBridgeStub($values),
             $this->getMockBuilder(ModuleConfigurationDaoBridgeInterface::class)
                 ->disableOriginalConstructor()
                 ->getMock(),
-            $session
+            $session,
+            $config
         );
         $this->assertSame($settingValue, $sut->$settingMethod());
     }
