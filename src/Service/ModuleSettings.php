@@ -7,7 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
@@ -40,15 +40,20 @@ class ModuleSettings
     /** @var ModuleConfigurationDaoBridgeInterface */
     private $moduleInfoBridge;
 
+    /** @var Session */
+    private Session $session;
+
     /**
      * @param ModuleSettingBridgeInterface $moduleSettingBridge
      */
     public function __construct(
         ModuleSettingBridgeInterface $moduleSettingBridge,
-        ModuleConfigurationDaoBridgeInterface $moduleInfoBridge
+        ModuleConfigurationDaoBridgeInterface $moduleInfoBridge,
+        Session $session
     ) {
         $this->moduleSettingBridge = $moduleSettingBridge;
         $this->moduleInfoBridge = $moduleInfoBridge;
+        $this->session = $session;
     }
 
     /**
@@ -187,7 +192,7 @@ class ModuleSettings
     public function getApplePayLabel()
     {
         return $this->getSettingValue('applepay_label') ?:
-            Registry::getConfig()->getActiveShop()->oxshops__oxcompany->value;
+            $this->session->getActiveShop()->oxshops__oxcompany->value;
     }
 
     /**
@@ -289,7 +294,7 @@ class ModuleSettings
             . '/.applepay_merchant_cert.'
             . $this->getSystemMode()
             . '.'
-            . Registry::getConfig()->getShopId();
+            . $this->session->getShopId();
     }
 
     /**
@@ -302,7 +307,7 @@ class ModuleSettings
             . '/.applepay_merchant_cert_key.'
             . $this->getSystemMode()
             . '.'
-            . Registry::getConfig()->getShopId();
+            . $this->session->getShopId();
     }
 
     /**
@@ -421,7 +426,7 @@ class ModuleSettings
      */
     public function isInvoiceEligibility(): bool
     {
-        if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+        if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
             return (($this->getShopPublicKeyB2CInvoiceCHF() && $this->getShopPrivateKeyB2CInvoiceCHF()) ||
                 ($this->getShopPublicKeyB2BInvoiceCHF() && $this->getShopPrivateKeyB2BInvoiceCHF()));
         }
@@ -436,7 +441,7 @@ class ModuleSettings
      */
     public function isB2CInvoiceEligibility(): bool
     {
-        if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+        if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
             return ($this->getShopPublicKeyB2CInvoiceCHF() && $this->getShopPrivateKeyB2CInvoiceCHF());
         }
 
@@ -448,7 +453,7 @@ class ModuleSettings
      */
     public function isB2BInvoiceEligibility(): bool
     {
-        if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+        if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
             return ($this->getShopPublicKeyB2BInvoiceCHF() && $this->getShopPrivateKeyB2BInvoiceCHF());
         }
 
@@ -525,7 +530,7 @@ class ModuleSettings
     public function getShopPublicKeyInvoice(): string
     {
         if ($this->isB2CInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
                 return $this->getShopPublicKeyB2CInvoiceCHF();
             }
 
@@ -533,7 +538,7 @@ class ModuleSettings
         }
 
         if ($this->isB2BInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
                 return $this->getShopPublicKeyB2BInvoiceCHF();
             }
 
@@ -549,7 +554,7 @@ class ModuleSettings
     public function getShopPrivateKeyInvoice(): string
     {
         if ($this->isB2CInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
                 return $this->getShopPrivateKeyB2CInvoiceCHF();
             }
 
@@ -557,7 +562,7 @@ class ModuleSettings
         }
 
         if ($this->isB2BInvoiceEligibility()) {
-            if (Registry::getSession()->getBasket()->getBasketCurrency()->name === 'CHF') {
+            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
                 return $this->getShopPrivateKeyB2BInvoiceCHF();
             }
 

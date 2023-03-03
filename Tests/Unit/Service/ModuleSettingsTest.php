@@ -20,11 +20,13 @@ class ModuleSettingsTest extends TestCase
      */
     public function testSettings($values, $settingMethod, $settingValue): void
     {
+        $session = $this->createConfiguredMock(Session::class, []);
         $sut = new ModuleSettings(
             $this->getBridgeStub($values),
             $this->getMockBuilder(ModuleConfigurationDaoBridgeInterface::class)
                 ->disableOriginalConstructor()
-                ->getMock()
+                ->getMock(),
+            $session
         );
         $this->assertSame($settingValue, $sut->$settingMethod());
     }
