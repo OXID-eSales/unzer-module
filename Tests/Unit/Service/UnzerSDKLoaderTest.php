@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
+use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -55,7 +56,8 @@ class UnzerSDKLoaderTest extends TestCase
     {
         $moduleSettings = $this->createConfiguredMock(ModuleSettings::class, $moduleSettingValues);
         $debugHandler = $this->createPartialMock(DebugHandler::class, []);
+        $session = $this->createConfiguredMock(Session::class, []);
 
-        return new UnzerSDKLoader($moduleSettings, $debugHandler);
+        return new UnzerSDKLoader($moduleSettings, $debugHandler, $session);
     }
 }

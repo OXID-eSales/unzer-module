@@ -14,7 +14,7 @@ class Invoice extends UnzerPayment
 {
     protected $paymentMethod = 'invoice';
 
-    protected $allowedCurrencies = ['EUR'];
+    protected $allowedCurrencies = ['EUR', 'CHF'];
 
     /**
      * @return BasePaymentType
@@ -23,7 +23,7 @@ class Invoice extends UnzerPayment
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(
-            new \UnzerSDK\Resources\PaymentTypes\Invoice()
+            new \UnzerSDK\Resources\PaymentTypes\PaylaterInvoice()
         );
     }
 }

@@ -51,7 +51,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.0.1',
+    'version' => '1.1.0',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -86,6 +86,7 @@ $aModule = [
         'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
         'modules/osc/unzer/unzer_installment_confirm_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
         'modules/osc/unzer/unzer_installment_confirm_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
+        'modules/osc/unzer/unzer_invoice.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice.tpl',
         'modules/osc/unzer/unzer_applepay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl',
         'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
         'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
@@ -125,11 +126,6 @@ $aModule = [
             'template' => 'page/checkout/payment.tpl',
             'block' => 'select_payment',
             'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
-        ],
-        [
-            'template' => 'page/checkout/thankyou.tpl',
-            'block' => 'checkout_thankyou_info',
-            'file' => 'views/frontend/blocks/page/checkout/checkout_thankyou_info.tpl'
         ],
         //admin
         [
@@ -271,6 +267,104 @@ $aModule = [
         [
             'group' => 'unzerapplepay',
             'name' => 'production-applepay_merchant_cert_key',
+            'type' => 'str',
+            'value' => ''
+        ],
+        // unzer invoice keypairs
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPublicKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPublicKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPrivateKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPublicKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPrivateKeyB2BCHF',
             'type' => 'str',
             'value' => ''
         ],

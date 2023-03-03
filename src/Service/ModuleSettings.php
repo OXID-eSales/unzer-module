@@ -7,7 +7,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
@@ -34,21 +35,27 @@ class ModuleSettings
         'visa' => '1'
     ];
 
-    /** @var ModuleSettingBridgeInterface */
-    private $moduleSettingBridge;
+    private ModuleSettingBridgeInterface $moduleSettingBridge;
 
-    /** @var ModuleConfigurationDaoBridgeInterface */
-    private $moduleInfoBridge;
+    private ModuleConfigurationDaoBridgeInterface $moduleInfoBridge;
+
+    private Session $session;
+
+    private Config $config;
 
     /**
      * @param ModuleSettingBridgeInterface $moduleSettingBridge
      */
     public function __construct(
         ModuleSettingBridgeInterface $moduleSettingBridge,
-        ModuleConfigurationDaoBridgeInterface $moduleInfoBridge
+        ModuleConfigurationDaoBridgeInterface $moduleInfoBridge,
+        Session $session,
+        Config $config
     ) {
         $this->moduleSettingBridge = $moduleSettingBridge;
         $this->moduleInfoBridge = $moduleInfoBridge;
+        $this->session = $session;
+        $this->config = $config;
     }
 
     /**
@@ -187,7 +194,7 @@ class ModuleSettings
     public function getApplePayLabel()
     {
         return $this->getSettingValue('applepay_label') ?:
-            Registry::getConfig()->getActiveShop()->oxshops__oxcompany->value;
+            $this->config->getActiveShop()->oxshops__oxcompany->value;
     }
 
     /**
@@ -289,7 +296,7 @@ class ModuleSettings
             . '/.applepay_merchant_cert.'
             . $this->getSystemMode()
             . '.'
-            . Registry::getConfig()->getShopId();
+            . $this->config->getShopId();
     }
 
     /**
@@ -302,7 +309,7 @@ class ModuleSettings
             . '/.applepay_merchant_cert_key.'
             . $this->getSystemMode()
             . '.'
-            . Registry::getConfig()->getShopId();
+            . $this->config->getShopId();
     }
 
     /**
@@ -414,5 +421,194 @@ class ModuleSettings
     private static function isActiveSetting($active): bool
     {
         return $active === '1';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInvoiceEligibility(): bool
+    {
+        return (
+            $this->isB2CInvoiceEligibility() ||
+            $this->isB2BInvoiceEligibility()
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function isB2CInvoiceEligibility(): bool
+    {
+        return (
+            $this->isBasketCurrencyCHF() &&
+            $this->getShopPublicKeyB2CInvoiceCHF() &&
+            $this->getShopPrivateKeyB2CInvoiceCHF()
+        ) ||
+        (
+            $this->isBasketCurrencyEUR() &&
+            $this->getShopPublicKeyB2CInvoiceEUR() &&
+            $this->getShopPrivateKeyB2CInvoiceEUR()
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function isB2BInvoiceEligibility(): bool
+    {
+        return (
+            $this->isBasketCurrencyCHF() &&
+            $this->getShopPublicKeyB2BInvoiceCHF() &&
+            $this->getShopPrivateKeyB2BInvoiceCHF()
+        ) ||
+        (
+            $this->isBasketCurrencyEUR() &&
+            $this->getShopPublicKeyB2BInvoiceEUR() &&
+            $this->getShopPrivateKeyB2BInvoiceEUR()
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPublicKeyB2CInvoiceEUR(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CEUR');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPrivateKeyB2CInvoiceEUR(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CEUR');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPublicKeyB2BInvoiceEUR(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BEUR');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPrivateKeyB2BInvoiceEUR(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BEUR');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPublicKeyB2CInvoiceCHF(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CCHF');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPrivateKeyB2CInvoiceCHF(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CCHF');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPublicKeyB2BInvoiceCHF(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BCHF');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPrivateKeyB2BInvoiceCHF(): string
+    {
+        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BCHF');
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPublicKeyInvoice(): string
+    {
+        $result = '';
+
+        if ($this->isB2CInvoiceEligibility()) {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPublicKeyB2CInvoiceCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPublicKeyB2CInvoiceEUR();
+            }
+        }
+
+        if ($this->isB2BInvoiceEligibility()) {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPublicKeyB2BInvoiceCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPublicKeyB2BInvoiceEUR();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopPrivateKeyInvoice(): string
+    {
+        $result = '';
+
+        if ($this->isB2CInvoiceEligibility()) {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPrivateKeyB2CInvoiceCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPrivateKeyB2CInvoiceEUR();
+            }
+        }
+
+        if ($this->isB2BInvoiceEligibility()) {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPrivateKeyB2BInvoiceCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPrivateKeyB2BInvoiceEUR();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBasketCurrencyCHF(): bool
+    {
+        return $this->getBasketCurrency() === 'CHF';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBasketCurrencyEUR(): bool
+    {
+        return $this->getBasketCurrency() === 'EUR';
+    }
+
+    /**
+     * @return string
+     */
+    public function getBasketCurrency(): string
+    {
+        return $this->session->getBasket()->getBasketCurrency()->name;
     }
 }

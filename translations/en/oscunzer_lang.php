@@ -19,6 +19,9 @@ $aLang = [
     'OSCUNZER_BANK_DETAILS_IBAN' => 'IBAN: %s<br/>',
     'OSCUNZER_BANK_DETAILS_BIC' => 'BIC: %s<br/><br/>',
     'OSCUNZER_BANK_DETAILS_DESCRIPTOR' => 'Please use only this identification number as the descriptor: <br/>%s',
+    'OSCUNZER_CONSUMER_TARGET' => 'Invoice as a ...',
+    'OSCUNZER_CONSUMER_TARGET_B2B' => 'Company',
+    'OSCUNZER_CONSUMER_TARGET_B2C' => 'Private person',
 
     // Invoice Secured B2B
     'OSCUNZER_COMMERCIAL_SECTOR' => 'Wirtschaftszweig',

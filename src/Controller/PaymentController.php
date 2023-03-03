@@ -60,6 +60,11 @@ class PaymentController extends PaymentController_parent
             if (!$moduleSettings->isApplePayEligibility()) {
                 unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
             }
+
+            //check Invoice Eligibility
+            if (!$moduleSettings->isInvoiceEligibility()) {
+                unset($paymentList[UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID]);
+            }
         }
 
         return $paymentList;

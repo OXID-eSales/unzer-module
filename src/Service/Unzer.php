@@ -124,7 +124,7 @@ class Unzer
         if ($oOrder) {
             $oDelAddress = $oOrder->getDelAddressInfo();
         }
-        elseif (Registry::getSession()->getVariable('blshowshipaddress')) {
+        if (Registry::getSession()->getVariable('blshowshipaddress')) {
             $oDelAddress = $oUser->getSelectedAddress();
         }
 
