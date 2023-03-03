@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
@@ -86,14 +87,17 @@ class Payment
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         try {
+            /** @var AbstractUnzerPayment $paymentExtension */
             $paymentExtension = $this->paymentExtensionLoader->getPaymentExtension($paymentModel);
             $paymentExtension->execute(
                 $this->session->getUser(),
                 $this->session->getBasket()
             );
 
+            /** @var string $sess_challenge */
+            $sess_challenge = $this->session->getVariable('sess_challenge');
             $this->transactionService->writeTransactionToDB(
-                $this->session->getVariable('sess_challenge'),
+                $sess_challenge,
                 $this->session->getUser()->getId(),
                 $this->getSessionUnzerPayment()
             );
@@ -114,7 +118,7 @@ class Payment
 
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
-                    isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
+                    $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
                 ),
                 $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
             );
@@ -123,7 +127,7 @@ class Payment
 
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
-                    isset($paymentExtension) ? $paymentExtension->redirectUrlNeedPending() : false
+                    $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
                 ),
                 $e->getMessage()
             );
@@ -138,6 +142,7 @@ class Payment
     public function removeTemporaryOrder(): bool
     {
         $orderModel = oxNew(Order::class);
+        /** @var string $sessionOrderId */
         $sessionOrderId = $this->session->getVariable('sess_challenge');
         return $orderModel->delete($sessionOrderId);
     }
@@ -159,16 +164,19 @@ class Payment
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
                 if ($transaction instanceof Authorization) {
-                    $this->pdfLink = $transaction->getPDFLink();
+                    /** @var string $pdfLink */
+                    $pdfLink = $transaction->getPDFLink();
+                    $this->pdfLink = $pdfLink;
                 }
                 if ($this->isPdfSession()) {
-                    $this->pdfLink = null;
+                    $this->pdfLink = '';
                 }
                 $result = self::STATUS_OK;
             } elseif ($transaction->isPending()) {
                 $result = self::STATUS_NOT_FINISHED;
-
-                $this->redirectUrl = $transaction->getRedirectUrl();
+                /** @var string $redirectUrl */
+                $redirectUrl = $transaction->getRedirectUrl();
+                $this->redirectUrl = $redirectUrl;
             } elseif ($transaction->isError()) {
                 throw new Exception($this->translator->translateCode(
                     $transaction->getMessage()->getCode(),
@@ -194,7 +202,8 @@ class Payment
      */
     public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
     {
-        if ($paymentId = $this->session->getVariable('PaymentId')) {
+        if (/** @var string $paymentId */
+            $paymentId = $this->session->getVariable('PaymentId')) {
             return $this->getUnzerSDK()->fetchPayment($paymentId);
         }
 
@@ -217,7 +226,7 @@ class Payment
             $cancellation = $unzerPayment->cancel($amount, $reason);
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
-                $oOrder->oxorder__oxuserid->value,
+                $oOrder->getFieldData('oxuserid'),
                 $cancellation
             );
         } catch (UnzerApiException $e) {

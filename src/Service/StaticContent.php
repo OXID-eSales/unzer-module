@@ -214,6 +214,9 @@ class StaticContent
 
     protected function getActiveDeliverySetIds(): array
     {
+        /** @var array $result */
+        $result = null;
+
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->queryBuilderFactory->create();
         $fromDb = $queryBuilder
@@ -223,6 +226,7 @@ class StaticContent
             ->execute()
             ->fetchAll(PDO::FETCH_ASSOC);
 
+        /** @var array $row */
         foreach ($fromDb as $row) {
             $result[$row['oxid']] = $row['oxid'];
         }
@@ -251,6 +255,7 @@ class StaticContent
             ->execute()
             ->fetchAll(PDO::FETCH_ASSOC);
 
+        /** @var array $row */
         foreach ($fromDb as $row) {
             $result[$row['oxid']] = $row['oxisoalpha2'];
         }

@@ -18,13 +18,13 @@ class ViewConfig extends ViewConfig_parent
 
     /**
      * is this a "Flow"-Theme Compatible Theme?
-     * @param boolean
+     * @param bool
      */
     protected $isFlowCompatibleTheme = null;
 
     /**
      * is this a "Wave"-Theme Compatible Theme?
-     * @param boolean
+     * @param bool
      */
     protected $isWaveCompatibleTheme = null;
 

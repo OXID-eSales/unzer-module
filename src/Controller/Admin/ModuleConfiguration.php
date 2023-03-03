@@ -25,8 +25,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 {
     use ServiceContainer;
 
-    protected $translator;
-    protected $moduleSettings;
+    /** @var Translator $translator */
+    protected $translator = null;
+    /** @var ModuleSettings $moduleSettings */
+    protected $moduleSettings = null;
     protected string $_sModuleId; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
     /**
@@ -35,9 +37,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function __construct()
     {
         parent::__construct();
-        /** @var Translator $this->translator */
         $this->translator = $this->getServiceFromContainer(Translator::class);
-        /** @var ModuleSettings $this->moduleSettings */
         $this->moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
     }
 
@@ -123,8 +123,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function deleteWebhook(): void
     {
-        /** @var Unzer $unzer */
         try {
+            /** @var Unzer $unzer */
             $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
             $registeredWebhookId = $this->moduleSettings->getRegisteredWebhookId();
 
@@ -165,7 +165,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $url = $this->getProposedWebhookForActualShop();
 
             $result = $unzer->createWebhook($url, "payment");
-            $this->saveWebhookOption($url, $result->getId());
+            /** @var string $resultId */
+            $resultId = $result->getId();
+            $this->saveWebhookOption($url, $resultId);
         } catch (Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $this->translator->translateCode(
@@ -176,7 +178,12 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    protected function saveWebhookOption($url, $id): void
+    /**
+     * @param string $url
+     * @param string $id
+     * @return void
+     */
+    protected function saveWebhookOption(string $url, string $id): void
     {
         $this->moduleSettings->saveWebhook($url);
         $this->moduleSettings->saveWebhookId($id);
@@ -188,7 +195,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function transferApplePayPaymentProcessingData(): void
     {
+        /** @var string $key */
         $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
+        /** @var string $cert */
         $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
         $errorMessage = null;
 
@@ -207,6 +216,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($response->getStatusCode() !== 201) {
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
                 } else {
+                    /** @var Object $responseBody */
                     $responseBody = json_decode($response->getBody()->__toString());
                     $applePayPaymentKeyId = $responseBody->id;
                 }
@@ -323,15 +333,20 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $request->getRequestEscapedParameter('oxid') === 'osc-unzer'
         ) {
             // the systemMode is very important, so we set it first ...
-            $systemMode = $request->getRequestEscapedParameter('confselects')['UnzerSystemMode'];
+            /** @var array $confselects */
+            $confselects = $request->getRequestEscapedParameter('confselects');
+            /** @var string $systemMode */
+            $systemMode = $confselects['UnzerSystemMode'];
             $this->moduleSettings->setSystemMode($systemMode);
 
             $this->resetContentCache();
 
-            if ($requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
+            if (/** @var array $requestApplePayMC */
+                $requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
                 $this->moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
             }
-            if ($requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')) {
+            if (/** @var array $requestApplePayNetworks */
+                $requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')) {
                 $this->moduleSettings->saveApplePayNetworks($requestApplePayNetworks);
             }
             if ($requestApplePayMerchantCert = $request->getRequestEscapedParameter('applePayMerchantCert')) {

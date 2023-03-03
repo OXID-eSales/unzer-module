@@ -20,9 +20,9 @@ class ApplePayCallbackController extends FrontendController
      */
     public function validateMerchant(): void
     {
-        $merchantValidationUrl = urldecode(
-            Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl')
-        );
+        /** @var string $merchantValidationUrlRaw */
+        $merchantValidationUrlRaw = Registry::getRequest()->getRequestEscapedParameter('merchantValidationUrl');
+        $merchantValidationUrl = urldecode($merchantValidationUrlRaw);
 
         $responseHandler = $this->getServiceFromContainer(ResponseHandler::class);
 

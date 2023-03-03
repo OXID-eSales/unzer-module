@@ -50,7 +50,7 @@ class Translator
      * @param string $message
      * @return string
      */
-    public function translate(string $message): string
+    public function translate(string $message)
     {
         return $this->language->translateString($message, null, false);
     }

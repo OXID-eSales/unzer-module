@@ -82,11 +82,15 @@ abstract class UnzerPayment
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
 
+        /** @var string $unzerCommercialSector */
+        $unzerCommercialSector = $request->getRequestParameter('unzer_commercial_sector', '');
+        /** @var string $unzerCommercialRegisterNumber */
+        $unzerCommercialRegisterNumber = $request->getRequestParameter('unzer_commercial_register_number', '');
         $customer = $this->unzerService->getUnzerCustomer(
             $userModel,
             null,
-            $request->getRequestParameter('unzer_commercial_sector', ''),
-            $request->getRequestParameter('unzer_commercial_register_number', '')
+            $unzerCommercialSector,
+            $unzerCommercialRegisterNumber
         );
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);

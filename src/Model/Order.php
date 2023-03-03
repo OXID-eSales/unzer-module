@@ -23,6 +23,7 @@ class Order extends Order_parent
 {
     use ServiceContainer;
 
+    /** @var bool $isRedirectOrder */
     protected $isRedirectOrder = false;
 
     /**
@@ -40,7 +41,7 @@ class Order extends Order_parent
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus != "ERROR") {
-            if (!$this->oxorder__oxordernr->value) {
+            if (!$this->getFieldData('oxordernr')) {
                 $this->_setNumber();
             }
             // else {
@@ -118,8 +119,8 @@ class Order extends Order_parent
     public function initWriteTransactionToDB($unzerPayment = null): bool
     {
         if (
-            $this->oxorder__oxtransstatus->value == "OK"
-            && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
+            $this->getFieldData('oxtransstatus') == "OK"
+            && strpos($this->getFieldData('oxpaymenttype'), "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             return $transactionService->writeTransactionToDB(
@@ -158,6 +159,7 @@ class Order extends Order_parent
             $oUser->load($rs['OXUSERID']);
             if (
                 $oUser->isLoaded() &&
+                /** @var Basket $oBasket */
                 $oBasket = unserialize(base64_decode($rs['SERIALIZED_BASKET']))
             ) {
                 return $this->finalizeOrder($oBasket, $oUser, true);
@@ -181,6 +183,7 @@ class Order extends Order_parent
         $transactionList = oxNew(TransactionList::class);
         $transactionList->getTransactionList($sOxId);
         if ($transactionList->count()) {
+            /** @var Transaction $transaction */
             foreach ($transactionList as $transaction) {
                 $transaction->delete();
             }

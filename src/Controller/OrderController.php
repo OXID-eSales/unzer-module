@@ -25,10 +25,13 @@ class OrderController extends OrderController_parent
 {
     use ServiceContainer;
 
+    /** @var bool $blSepaMandateConfirmError */
     protected $blSepaMandateConfirmError = null;
 
+    /** @var Order $actualOrder */
     protected $actualOrder = null;
 
+    /** @var array $commercialSectors */
     protected $commercialSectors = null;
 
     /**
@@ -37,7 +40,7 @@ class OrderController extends OrderController_parent
     public function execute()
     {
         if (!$this->isSepaConfirmed()) {
-            return;
+            return null;
         }
 
         $ret = parent::execute();

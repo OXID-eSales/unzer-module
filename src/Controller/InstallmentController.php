@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Application\Model\Basket;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
@@ -56,14 +57,14 @@ class InstallmentController extends FrontendController
 
         $myConfig = Registry::getConfig();
 
-        if (!$oBasket || ($oBasket && !$oBasket->getProductsCount())) {
+        if (!($oBasket instanceOf Basket) || !$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
         }
 
         // can we proceed with ordering ?
         if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
-        } elseif (!$oBasket || !$oUser || ($oBasket && !$oBasket->getProductsCount())) {
+        } elseif (!($oBasket instanceOf Basket) || !$oUser || !$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl(), false, 302);
         }
 
@@ -73,9 +74,10 @@ class InstallmentController extends FrontendController
             Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', true, 302);
         }
 
+        /** @var string $sPdfLink */
         $sPdfLink = Registry::getSession()->getVariable('UzrPdfLink');
 
-        if (!$sPdfLink || $sPdfLink === '') {
+        if (empty($sPdfLink)) {
             // redirecting to payment step on error ..
             Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', false, 302);
         }
@@ -105,8 +107,6 @@ class InstallmentController extends FrontendController
     public function getPayment()
     {
         if ($this->oxPayment === null) {
-            $this->oxPayment = false;
-
             $oBasket = Registry::getSession()->getBasket();
             $oUser = Registry::getSession()->getUser();
 
@@ -117,11 +117,11 @@ class InstallmentController extends FrontendController
             if (
                 $sPaymentid && $oPayment->load($sPaymentid) &&
                 $oPayment->isValidPayment(
-                    Registry::getSession()->getVariable('dynvalue'),
+                    (array)Registry::getSession()->getVariable('dynvalue'),
                     (string) $this->getConfig()->getShopId(),
                     $oUser,
                     $oBasket->getPriceForPayment(),
-                    Registry::getSession()->getVariable('sShipSet')
+                    (string)Registry::getSession()->getVariable('sShipSet')
                 )
             ) {
                 $this->oxPayment = $oPayment;
@@ -167,6 +167,7 @@ class InstallmentController extends FrontendController
     public function confirmInstallment(): void
     {
         $unzerPayment = $this->getUnzerSessionPayment();
+        /** @var Order $oOrder */
         $oOrder = oxNew(Order::class);
 
         if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {

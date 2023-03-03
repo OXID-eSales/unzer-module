@@ -49,6 +49,9 @@ class PaymentController extends PaymentController_parent
             $paymentListRaw = $paymentList;
             $paymentList = [];
 
+            /**
+             * @var Payment $payment
+             */
             foreach ($paymentListRaw as $key => $payment) {
                 if (is_object($payment) && $payment->isUnzerPayment()) {
                     continue;
@@ -70,8 +73,12 @@ class PaymentController extends PaymentController_parent
         return $paymentList;
     }
 
-    protected function checkForUnzerPaymentErrors()
+    /**
+     * @return void
+     */
+    protected function checkForUnzerPaymentErrors(): void
     {
+        /** @var Payment $payment */
         $payment = oxNew(Payment::class);
         if (
             $this->getPaymentError() &&
@@ -80,6 +87,7 @@ class PaymentController extends PaymentController_parent
             $payment->isUnzerPayment()
         ) {
             $session = Registry::getSession();
+            /** @var string $orderId */
             $orderId = $session->getVariable('sess_challenge');
             $order = oxNew(Order::class);
             $order->delete($orderId);
