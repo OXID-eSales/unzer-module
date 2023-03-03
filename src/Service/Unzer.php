@@ -175,7 +175,9 @@ class Unzer
         );
 
         // additional: Total Discounts
-        $basket->setAmountTotalDiscount($basketModel->getTotalDiscount()->getBruttoPrice());
+        $basket->setAmountTotalDiscount(0.0);
+        // we add the "voucher" with this amount later. Prepayment will complain if it finds "voucher" AND the total
+        // discount amount here (PayPal or creditcard will NOT!)
 
         // additional: Total Vat
         $amountTotalVat = 0;
