@@ -426,14 +426,6 @@ class ModuleSettings
      */
     public function isInvoiceEligibility(): bool
     {
-        if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
-            return (($this->getShopPublicKeyB2CInvoiceCHF() && $this->getShopPrivateKeyB2CInvoiceCHF()) ||
-                ($this->getShopPublicKeyB2BInvoiceCHF() && $this->getShopPrivateKeyB2BInvoiceCHF()));
-        }
-
-        return (($this->getShopPublicKeyB2CInvoiceEUR() && $this->getShopPrivateKeyB2CInvoiceEUR()) ||
-            ($this->getShopPublicKeyB2BInvoiceEUR() && $this->getShopPrivateKeyB2BInvoiceEUR()));
-
         return (
             $this->isB2CInvoiceEligibility() ||
             $this->isB2BInvoiceEligibility()
@@ -445,11 +437,6 @@ class ModuleSettings
      */
     public function isB2CInvoiceEligibility(): bool
     {
-        if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
-            return ($this->getShopPublicKeyB2CInvoiceCHF() && $this->getShopPrivateKeyB2CInvoiceCHF());
-        }
-
-        return ($this->getShopPublicKeyB2CInvoiceEUR() && $this->getShopPrivateKeyB2CInvoiceEUR());
         return (
             $this->isBasketCurrencyCHF() &&
             $this->getShopPublicKeyB2CInvoiceCHF() &&
@@ -467,11 +454,6 @@ class ModuleSettings
      */
     public function isB2BInvoiceEligibility(): bool
     {
-        if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
-            return ($this->getShopPublicKeyB2BInvoiceCHF() && $this->getShopPrivateKeyB2BInvoiceCHF());
-        }
-
-        return ($this->getShopPublicKeyB2BInvoiceEUR() && $this->getShopPrivateKeyB2BInvoiceEUR());
         return (
             $this->isBasketCurrencyCHF() &&
             $this->getShopPublicKeyB2BInvoiceCHF() &&
@@ -554,7 +536,6 @@ class ModuleSettings
     public function getShopPublicKeyInvoice(): string
     {
         if ($this->isB2CInvoiceEligibility()) {
-            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
             if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPublicKeyB2CInvoiceCHF();
             }
@@ -563,7 +544,6 @@ class ModuleSettings
         }
 
         if ($this->isB2BInvoiceEligibility()) {
-            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
             if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPublicKeyB2BInvoiceCHF();
             }
@@ -580,7 +560,6 @@ class ModuleSettings
     public function getShopPrivateKeyInvoice(): string
     {
         if ($this->isB2CInvoiceEligibility()) {
-            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
             if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPrivateKeyB2CInvoiceCHF();
             }
@@ -589,7 +568,6 @@ class ModuleSettings
         }
 
         if ($this->isB2BInvoiceEligibility()) {
-            if ($this->session->getBasket()->getBasketCurrency()->name === 'CHF') {
             if ($this->isBasketCurrencyCHF()) {
                 return $this->getShopPrivateKeyB2BInvoiceCHF();
             }
@@ -600,18 +578,27 @@ class ModuleSettings
         return '';
     }
 
+    /**
+     * @return bool
+     */
     public function isBasketCurrencyCHF(): bool
     {
         return $this->getBasketCurrency() === 'CHF';
     }
 
+    /**
+     * @return bool
+     */
     public function isBasketCurrencyEUR(): bool
     {
         return $this->getBasketCurrency() === 'EUR';
     }
 
+    /**
+     * @return string
+     */
     public function getBasketCurrency(): string
     {
-        return Registry::getSession()->getBasket()->getBasketCurrency()->name;
+        return $this->session->getBasket()->getBasketCurrency()->name;
     }
 }
