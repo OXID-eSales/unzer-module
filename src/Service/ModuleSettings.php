@@ -441,13 +441,13 @@ class ModuleSettings
     {
         return (
             $this->isBasketCurrencyCHF() &&
-            $this->getShopPublicKeyB2CInvoiceCHF() &&
-            $this->getShopPrivateKeyB2CInvoiceCHF()
+            !empty($this->getShopPublicKeyB2CInvoiceCHF()) &&
+            !empty($this->getShopPrivateKeyB2CInvoiceCHF())
         ) ||
         (
             $this->isBasketCurrencyEUR() &&
-            $this->getShopPublicKeyB2CInvoiceEUR() &&
-            $this->getShopPrivateKeyB2CInvoiceEUR()
+            !empty($this->getShopPublicKeyB2CInvoiceEUR()) &&
+            !empty($this->getShopPrivateKeyB2CInvoiceEUR())
         );
     }
 
@@ -458,13 +458,13 @@ class ModuleSettings
     {
         return (
             $this->isBasketCurrencyCHF() &&
-            $this->getShopPublicKeyB2BInvoiceCHF() &&
-            $this->getShopPrivateKeyB2BInvoiceCHF()
+            !empty($this->getShopPublicKeyB2BInvoiceCHF()) &&
+            !empty($this->getShopPrivateKeyB2BInvoiceCHF())
         ) ||
         (
             $this->isBasketCurrencyEUR() &&
-            $this->getShopPublicKeyB2BInvoiceEUR() &&
-            $this->getShopPrivateKeyB2BInvoiceEUR()
+            !empty($this->getShopPublicKeyB2BInvoiceEUR()) &&
+            !empty($this->getShopPrivateKeyB2BInvoiceEUR())
         );
     }
 
