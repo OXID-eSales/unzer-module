@@ -7,13 +7,19 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use PDO;
+use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\Order as EshopModelOrder;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -151,6 +157,48 @@ class Transaction
         DatabaseProvider::getDb()->Execute(
             "DELETE from oscunzertransaction where OXACTION = 'init' AND OXACTIONDATE < NOW() - INTERVAL 1 DAY"
         );
+    }
+
+    public function cleanUpNotFinishedOrders(): void
+    {
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $parameters = [
+            'oxordernr' => '0',
+            'oxtransstatus' => 'NOT_FINISHED',
+            'oxpaymenttype' => 'oscunzer',
+            'sessiontime' => 600
+        ];
+
+        $queryBuilder->select('oxid')
+            ->from('oxorder')
+            ->where('oxordernr = :oxordernr')
+            ->andWhere('oxtransstatus = :oxtransstatus')
+            ->andWhere($queryBuilder->expr()->like(
+                'oxpaymenttype',
+                $queryBuilder->expr()->literal('%' . $parameters['oxpaymenttype'] . '%')
+            ))
+            ->andWhere('oxorderdate < now() - interval :sessiontime SECOND');
+
+        $ids = $queryBuilder->setParameters($parameters)
+            ->execute()
+            ->fetchAll(PDO::FETCH_COLUMN);
+
+        foreach ($ids as $id) {
+            $order = oxNew(EshopModelOrder::class);
+            if ($order->load($id)) {
+                // storno
+                $order->cancelOrder();
+                // delete
+                $order->delete();
+            }
+        }
     }
 
     /**
@@ -385,6 +433,7 @@ class Transaction
         if ($unzerObject->isPending()) {
             return "pending";
         }
+        return null;
     }
 
     /**
