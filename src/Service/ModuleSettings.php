@@ -111,7 +111,9 @@ class ModuleSettings
      */
     public function getShopPublicKey(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
+        /** @var string $unzerPublicKey */
+        $unzerPublicKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
+        return $unzerPublicKey;
     }
 
     /**
@@ -119,7 +121,9 @@ class ModuleSettings
      */
     public function getInstallmentRate(): float
     {
-        return (float)$this->getSettingValue('UnzerOption_oscunzer_installment_rate');
+        /** @var float $unzerOption */
+        $unzerOption = $this->getSettingValue('UnzerOption_oscunzer_installment_rate');
+        return $unzerOption;
     }
 
     /**
@@ -127,7 +131,9 @@ class ModuleSettings
      */
     public function getShopPrivateKey(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKey');
+        /** @var string $unzerPrivateKey */
+        $unzerPrivateKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKey');
+        return $unzerPrivateKey;
     }
 
     /**
@@ -135,7 +141,9 @@ class ModuleSettings
      */
     public function getRegisteredWebhook(): string
     {
-        return (string) $this->getSettingValue('registeredWebhook');
+        /** @var string $registeredWebhook */
+        $registeredWebhook = $this->getSettingValue('registeredWebhook');
+        return $registeredWebhook;
     }
 
     /**
@@ -143,7 +151,9 @@ class ModuleSettings
      */
     public function getRegisteredWebhookId(): string
     {
-        return (string) $this->getSettingValue('registeredWebhookId');
+        /** @var string $registeredWebhookId */
+        $registeredWebhookId = $this->getSettingValue('registeredWebhookId');
+        return $registeredWebhookId;
     }
 
     /**
@@ -151,7 +161,9 @@ class ModuleSettings
      */
     public function useModuleJQueryInFrontend(): bool
     {
-        return (bool)$this->getSettingValue('UnzerjQuery');
+        /** @var bool $unzerJQuery */
+        $unzerJQuery = $this->getSettingValue('UnzerjQuery');
+        return $unzerJQuery;
     }
 
     /**
@@ -202,9 +214,11 @@ class ModuleSettings
      */
     public function getApplePayMerchantCapabilities(): array
     {
+        /** @var array $applepayMerchantCapabilities */
+        $applepayMerchantCapabilities = $this->getSettingValue('applepay_merchant_capabilities');
         return array_merge(
             self::APPLE_PAY_MERCHANT_CAPABILITIES,
-            $this->getSettingValue('applepay_merchant_capabilities')
+            $applepayMerchantCapabilities
         );
     }
 
@@ -224,9 +238,11 @@ class ModuleSettings
      */
     public function getApplePayNetworks(): array
     {
+        /** @var array $applepayNetworks */
+        $applepayNetworks = $this->getSettingValue('applepay_networks');
         return array_merge(
             self::APPLE_PAY_NETWORKS,
-            $this->getSettingValue('applepay_networks')
+            $applepayNetworks
         );
     }
 
@@ -246,7 +262,10 @@ class ModuleSettings
      */
     public function getApplePayMerchantIdentifier(): string
     {
-        return (string) $this->getSettingValue($this->getSystemMode() . '-applepay_merchant_identifier');
+        /** @var string $applepayMerchantIdentifier */
+        $applepayMerchantIdentifier =
+            $this->getSettingValue($this->getSystemMode() . '-applepay_merchant_identifier');
+        return $applepayMerchantIdentifier;
     }
 
     /**
@@ -257,7 +276,9 @@ class ModuleSettings
     {
         $path = $this->getApplePayMerchantCertFilePath();
         if (file_exists($path)) {
-            return file_get_contents($path);
+            /** @var string $fileContest */
+            $fileContest = file_get_contents($path);
+            return $fileContest;
         }
 
         return '';
@@ -271,7 +292,9 @@ class ModuleSettings
     {
         $path = $this->getApplePayMerchantCertKeyFilePath();
         if (file_exists($path)) {
-            return file_get_contents($path);
+            /** @var string $fileContest */
+            $fileContest = file_get_contents($path);
+            return $fileContest;
         }
 
         return '';
@@ -373,7 +396,9 @@ class ModuleSettings
      */
     public function getApplePayPaymentKeyId(): string
     {
-        return $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentKeyId');
+        /** @var string $applePayPaymentKeyId */
+        $applePayPaymentKeyId = $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentKeyId');
+        return $applePayPaymentKeyId;
     }
 
     /**
@@ -381,7 +406,9 @@ class ModuleSettings
      */
     public function getApplePayPaymentCertificateId(): string
     {
-        return $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentCertificateId');
+        /** @var string $applePayPaymentCertificateId */
+        $applePayPaymentCertificateId = $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentCertificateId');
+        return $applePayPaymentCertificateId;
     }
 
     /**
@@ -393,6 +420,11 @@ class ModuleSettings
         $this->saveSetting('applepay_networks', $networks);
     }
 
+    /**
+     * @param string $name
+     * @param bool|int|string|array $setting
+     * @return void
+     */
     private function saveSetting(string $name, $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
@@ -415,7 +447,7 @@ class ModuleSettings
     /**
      * Intended to be used as callback function
      *
-     * @param $active
+     * @param bool|int|string $active
      * @return bool
      */
     private static function isActiveSetting($active): bool
@@ -473,7 +505,9 @@ class ModuleSettings
      */
     public function getShopPublicKeyB2CInvoiceEUR(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CEUR');
+        /** @var string $unzerPublicKeyB2CEUR */
+        $unzerPublicKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CEUR');
+        return $unzerPublicKeyB2CEUR;
     }
 
     /**
@@ -481,7 +515,9 @@ class ModuleSettings
      */
     public function getShopPrivateKeyB2CInvoiceEUR(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CEUR');
+        /** @var string $unzerPrivateKeyB2CEUR */
+        $unzerPrivateKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CEUR');
+        return $unzerPrivateKeyB2CEUR;
     }
 
     /**
@@ -489,7 +525,9 @@ class ModuleSettings
      */
     public function getShopPublicKeyB2BInvoiceEUR(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BEUR');
+        /** @var string $unzerPublicKeyB2BEUR */
+        $unzerPublicKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BEUR');
+        return $unzerPublicKeyB2BEUR;
     }
 
     /**
@@ -497,7 +535,9 @@ class ModuleSettings
      */
     public function getShopPrivateKeyB2BInvoiceEUR(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BEUR');
+        /** @var string $unzerPrivateKeyB2BEUR */
+        $unzerPrivateKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BEUR');
+        return $unzerPrivateKeyB2BEUR;
     }
 
     /**
@@ -505,7 +545,9 @@ class ModuleSettings
      */
     public function getShopPublicKeyB2CInvoiceCHF(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CCHF');
+        /** @var string $unzerPublicKeyB2CCHF */
+        $unzerPublicKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CCHF');
+        return $unzerPublicKeyB2CCHF;
     }
 
     /**
@@ -513,7 +555,9 @@ class ModuleSettings
      */
     public function getShopPrivateKeyB2CInvoiceCHF(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CCHF');
+        /** @var string $unzerPrivateKeyB2CCHF */
+        $unzerPrivateKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CCHF');
+        return $unzerPrivateKeyB2CCHF;
     }
 
     /**
@@ -521,7 +565,9 @@ class ModuleSettings
      */
     public function getShopPublicKeyB2BInvoiceCHF(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BCHF');
+        /** @var string $unzerPublicKeyB2BCHF */
+        $unzerPublicKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BCHF');
+        return $unzerPublicKeyB2BCHF;
     }
 
     /**
@@ -529,7 +575,9 @@ class ModuleSettings
      */
     public function getShopPrivateKeyB2BInvoiceCHF(): string
     {
-        return (string)$this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BCHF');
+        /** @var string $unzerPrivateKeyB2BCHF */
+        $unzerPrivateKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BCHF');
+        return $unzerPrivateKeyB2BCHF;
     }
 
     /**

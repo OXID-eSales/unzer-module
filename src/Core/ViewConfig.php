@@ -18,16 +18,17 @@ class ViewConfig extends ViewConfig_parent
 
     /**
      * is this a "Flow"-Theme Compatible Theme?
-     * @param bool
+     * @var bool $isFlowCompatibleTheme
      */
     protected $isFlowCompatibleTheme = null;
 
     /**
      * is this a "Wave"-Theme Compatible Theme?
-     * @param bool
+     * @var bool $isWaveCompatibleTheme
      */
     protected $isWaveCompatibleTheme = null;
 
+    /** @var ModuleSettings $moduleSettings */
     protected $moduleSettings;
 
     /**
@@ -36,8 +37,6 @@ class ViewConfig extends ViewConfig_parent
     public function __construct()
     {
         parent::__construct();
-
-        /** @var ModuleSettings $this->moduleSettings */
         $this->moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
     }
 
@@ -104,7 +103,9 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getSessionPaymentInfo(): string
     {
-        return Registry::getSession()->getVariable('additionalPaymentInformation');
+        /** @var string $additionalPaymentInformation */
+        $additionalPaymentInformation = Registry::getSession()->getVariable('additionalPaymentInformation');
+        return $additionalPaymentInformation;
     }
 
     /**
@@ -134,7 +135,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isFlowCompatibleTheme()
     {
-        if (is_null($this->isFlowCompatibleTheme)) {
+        if ($this->isFlowCompatibleTheme) {
             $this->isFlowCompatibleTheme = $this->isCompatibleTheme('flow');
         }
         return $this->isFlowCompatibleTheme;
@@ -147,7 +148,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isWaveCompatibleTheme()
     {
-        if (is_null($this->isWaveCompatibleTheme)) {
+        if ($this->isWaveCompatibleTheme) {
             $this->isWaveCompatibleTheme = $this->isCompatibleTheme('wave');
         }
         return $this->isWaveCompatibleTheme;
@@ -156,7 +157,7 @@ class ViewConfig extends ViewConfig_parent
     /**
      * Template variable getter. Check if is a ??? Theme Compatible Theme
      *
-     * @psalm-suppress InternalMethod
+     * @param string|null $themeId
      *
      * @return boolean
      */

@@ -54,5 +54,5 @@ class_alias(
 
 class_alias(
     \OxidEsales\Eshop\Application\Model\PaymentGateway::class,
-    \OxidSolutionCatalysts\Unzer\Model\PaymentGateway::class
+    \OxidSolutionCatalysts\Unzer\Model\PaymentGateway_parent::class
 );

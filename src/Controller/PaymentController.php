@@ -50,7 +50,7 @@ class PaymentController extends PaymentController_parent
             $paymentList = [];
 
             /**
-             * @var Payment $payment
+             * @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment
              */
             foreach ($paymentListRaw as $key => $payment) {
                 if (is_object($payment) && $payment->isUnzerPayment()) {
@@ -78,7 +78,7 @@ class PaymentController extends PaymentController_parent
      */
     protected function checkForUnzerPaymentErrors(): void
     {
-        /** @var Payment $payment */
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment */
         $payment = oxNew(Payment::class);
         if (
             $this->getPaymentError() &&

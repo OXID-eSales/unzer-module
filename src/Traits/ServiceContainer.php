@@ -13,7 +13,7 @@ trait ServiceContainer
 {
     /**
      * @template T
-     * @psalm-param class-string<T> $serviceName
+     * @param class-string<T> $serviceName
      * @return T
      */
     protected function getServiceFromContainer(string $serviceName)

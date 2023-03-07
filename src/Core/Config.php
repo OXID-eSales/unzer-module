@@ -22,7 +22,7 @@ class Config extends Config_parent
 
         if (/** @var string $paymentid */
             $paymentid = Registry::getSession()->getVariable('paymentid')) {
-            /** @var Payment $oPayment */
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $oPayment */
             $oPayment = oxNew(Payment::class);
             if ($oPayment->load($paymentid) && $oPayment->isUnzerPayment() && !$oPayment->isUnzerPaymentTypeAllowed()) {
                 Registry::getSession()->deleteVariable('paymentid');

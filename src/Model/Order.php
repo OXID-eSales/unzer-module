@@ -118,9 +118,11 @@ class Order extends Order_parent
      */
     public function initWriteTransactionToDB($unzerPayment = null): bool
     {
+        /** @var string $oxpaymenttype */
+        $oxpaymenttype = $this->getFieldData('oxpaymenttype');
         if (
             $this->getFieldData('oxtransstatus') == "OK"
-            && strpos($this->getFieldData('oxpaymenttype'), "oscunzer") !== false
+            && strpos($oxpaymenttype, "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             return $transactionService->writeTransactionToDB(
@@ -138,9 +140,11 @@ class Order extends Order_parent
      */
     public function getUnzerInvoiceNr()
     {
-        return (int)$this->getFieldData('OXINVOICENR') !== 0 ?
+        /** @var int $nr */
+        $nr = $this->getFieldData('OXINVOICENR') !== 0 ?
             $this->getFieldData('OXINVOICENR') :
             $this->getFieldData('OXORDERNR');
+        return $nr;
     }
 
     /**

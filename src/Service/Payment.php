@@ -224,9 +224,11 @@ class Payment
             $unzerPayment = $this->getUnzerSDK()->fetchChargeById($unzerid, $chargeid);
 
             $cancellation = $unzerPayment->cancel($amount, $reason);
+            /** @var string $oxuserid */
+            $oxuserid = $oOrder->getFieldData('oxuserid');
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
-                $oOrder->getFieldData('oxuserid'),
+                $oxuserid,
                 $cancellation
             );
         } catch (UnzerApiException $e) {
@@ -243,18 +245,21 @@ class Payment
      */
     public function doUnzerCollect($oOrder, $unzerid, $amount)
     {
-        if (!$oOrder) {
+        if (!($oOrder instanceof Order)) {
             return false;
         }
 
         try {
             $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
 
-            /** @psalm-suppress InvalidArgument */
-            $charge = $unzerPayment->getAuthorization()->charge($amount);
+            /** @var Authorization $authorization */
+            $authorization = $unzerPayment->getAuthorization();
+            $charge = $authorization->charge($amount);
+            /** @var string $oxuserid */
+            $oxuserid = $oOrder->getFieldData('oxuserid');
             $this->transactionService->writeChargeToDB(
                 $oOrder->getId(),
-                $oOrder->oxorder__oxuserid->value,
+                $oxuserid,
                 $charge
             );
             if (
@@ -278,18 +283,19 @@ class Payment
      */
     public function doUnzerAuthorizationCancel($oOrder, $unzerid)
     {
-        if (!$oOrder) {
+        if (!($oOrder instanceof Order)) {
             return false;
         }
 
         try {
             $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
 
-            /** @psalm-suppress InvalidArgument */
             $charge = $unzerPayment->getAuthorization()->cancel();
+            /** @var string $oxuserid */
+            $oxuserid = $oOrder->getFieldData('oxuserid');
             $blSuccess = $this->transactionService->writeTransactionToDB(
                 $oOrder->getId(),
-                $oOrder->oxorder__oxuserid->value,
+                $oxuserid,
                 $unzerPayment
             );
         } catch (UnzerApiException $e) {
@@ -306,7 +312,7 @@ class Payment
      */
     public function sendShipmentNotification($oOrder, $sPaymentId = null)
     {
-        if (!$oOrder) {
+        if (!($oOrder instanceof Order)) {
             return false;
         }
 
@@ -341,9 +347,11 @@ class Payment
 
             if (!$blSuccess && $unzerPayment->getAmount()->getRemaining() === 0.0) {
                 try {
+                    /** @var string $oxuserid */
+                    $oxuserid = $oOrder->getFieldData('oxuserid');
                     $blSuccess = $this->transactionService->writeTransactionToDB(
                         $oOrder->getId(),
-                        $oOrder->oxorder__oxuserid->value,
+                        $oxuserid,
                         $unzerPayment,
                         $unzerPayment->ship($sInvoiceNr)
                     );

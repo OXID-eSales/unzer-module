@@ -68,10 +68,12 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
-        if ($unzerPayment && !$unzerShipment) {
-            $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
-        } elseif ($unzerShipment) {
-            $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
+        if ($unzerPayment) {
+            if (!$unzerShipment) {
+                $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
+            } else {
+                $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
+            }
         }
 
         if ($unzerPayment && $unzerPayment->getState() == 2) {
@@ -135,12 +137,6 @@ class Transaction
     /**
      * @param (int|mixed|string)[] $params
      *
-     * @psalm-param array{
-     *     oxorderid: mixed|string,
-     *     oxshopid: int|mixed,
-     *     oxuserid: mixed|string,
-     *     oxactiondate: mixed|string
-     * } $params
      */
     public function deleteInitOrder(array $params): void
     {
@@ -419,8 +415,6 @@ class Transaction
      * @param Cancellation|Charge $unzerObject
      *
      * @return null|string
-     *
-     * @psalm-return 'error'|'pending'|'success'|null
      */
     protected static function getUzrStatus($unzerObject)
     {

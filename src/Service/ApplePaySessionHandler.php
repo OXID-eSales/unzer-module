@@ -34,9 +34,11 @@ class ApplePaySessionHandler
             ),
             '/'
         );
+        /** @var string $applePatLabel */
+        $applePatLabel = $this->moduleSettingsService->getApplePayLabel();
         $this->session = new ApplepaySession(
             $this->moduleSettingsService->getApplePayMerchantIdentifier(),
-            (string) $this->moduleSettingsService->getApplePayLabel(),
+            $applePatLabel,
             $domainName
         );
         $this->adapter = new ApplepayAdapter();
@@ -53,15 +55,16 @@ class ApplePaySessionHandler
     public function validateMerchant(string $validationUrl): ?array
     {
         try {
-            return json_decode(
-                $this->adapter->validateApplePayMerchant(
-                    $validationUrl,
-                    $this->session
-                ),
+            /** @var string $validateApplePayMerchant */
+            $validateApplePayMerchant = $this->adapter->validateApplePayMerchant($validationUrl, $this->session);
+            /** @var array $jsonDecoded */
+            $jsonDecoded = json_decode(
+                $validateApplePayMerchant,
                 true,
                 512,
                 JSON_THROW_ON_ERROR
             );
+            return $jsonDecoded;
         } catch (\Throwable $e) {
             Registry::getLogger()->error($e->getMessage());
             return null;

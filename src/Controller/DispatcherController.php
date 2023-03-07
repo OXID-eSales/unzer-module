@@ -55,7 +55,7 @@ class DispatcherController extends FrontendController
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
 
         if ($paymentId = $resource->getId()) {
-            /** @var Order $order */
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
             $order = oxNew(Order::class);
             /** @var array $data */
             $data = $transaction->getTransactionDataByPaymentId($paymentId);

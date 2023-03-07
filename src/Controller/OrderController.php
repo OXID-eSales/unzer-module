@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
+use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -60,7 +61,9 @@ class OrderController extends OrderController_parent
                 'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
             ])->sendJson();
         } elseif ($this->isSepaPayment()) {
-            $this->getActualOrder()->markUnzerOrderAsPaid();
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+            $order = $this->getActualOrder();
+            $order->markUnzerOrderAsPaid();
         }
 
         return $ret;
@@ -76,6 +79,7 @@ class OrderController extends OrderController_parent
         $oBasket = $this->getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
             try {
+                /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
                 $oOrder = $this->getActualOrder();
 
                 //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
@@ -111,10 +115,11 @@ class OrderController extends OrderController_parent
      */
     public function isSepaPayment(): ?bool
     {
+        /** @var Payment $payment */
         $payment = $this->getPayment();
 
         return (
-        is_object($payment) ?
+        ($payment instanceof Payment) ?
             ( $payment->getId() === UnzerDefinitions::SEPA_UNZER_PAYMENT_ID
             || $payment->getId() === UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
         );
@@ -140,44 +145,68 @@ class OrderController extends OrderController_parent
      */
     public function saveUnzerTransaction(): void
     {
-        $this->getActualOrder()->initWriteTransactionToDB();
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+        $order = $this->getActualOrder();
+        $order->initWriteTransactionToDB();
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getApplePayLabel()
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getApplePayLabel();
     }
 
+    /**
+     * @return array
+     */
     public function getSupportedApplepayMerchantCapabilities(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayMerchantCapabilities();
     }
 
+    /**
+     * @return array
+     */
     public function getSupportedApplePayNetworks(): array
     {
         return $this->getServiceFromContainer(ModuleSettings::class)->getActiveApplePayNetworks();
     }
 
+    /**
+     * @return string
+     */
     public function getUserCountryIso(): string
     {
         $country = oxNew(Country::class);
-        $country->load(Registry::getSession()->getUser()->oxuser__oxcountryid->value);
+        /** @var string $oxcountryid */
+        $oxcountryid = Registry::getSession()->getUser()->getFieldData('oxcountryid');
+        $country->load($oxcountryid);
 
-        return $country->oxcountry__oxisoalpha2->value;
+        return $country->getFieldData('oxisoalpha2');
     }
 
+    /**
+     * @return Order
+     */
     public function getActualOrder(): Order
     {
-        if (is_null($this->actualOrder)) {
+        if (!($this->actualOrder instanceof \OxidSolutionCatalysts\Unzer\Model\Order)) {
             $this->actualOrder = oxNew(Order::class);
-            $this->actualOrder->load(Registry::getSession()->getVariable('sess_challenge'));
+            /** @var string $sess_challenge */
+            $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
+            $this->actualOrder->load($sess_challenge);
         }
         return $this->actualOrder;
     }
 
+    /**
+     * @return array
+     */
     public function getUnzerCommercialSectors(): array
     {
-        if (is_null($this->commercialSectors)) {
+        if (!is_array($this->commercialSectors)) {
             $this->commercialSectors = [];
             $translator = $this->getServiceFromContainer(Translator::class);
             foreach (UnzerDefinitions::getUnzerCommercialSectors() as $value) {

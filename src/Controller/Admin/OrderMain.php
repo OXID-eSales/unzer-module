@@ -22,7 +22,7 @@ class OrderMain extends OrderMain_parent
         $sOxid = $this->getEditObjectId();
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         if ($oOrder->load($sOxid)) {
-            /** @var Payment $oPayment */
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $oPayment */
             $oPayment = oxNew(Payment::class);
             /** @var string $paymentType */
             $paymentType = $oOrder->getFieldData('oxpaymenttype');

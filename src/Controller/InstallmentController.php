@@ -17,6 +17,7 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class InstallmentController extends FrontendController
 {
@@ -112,8 +113,10 @@ class InstallmentController extends FrontendController
 
             // payment is set ?
             $sPaymentid = $oBasket->getPaymentId();
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+            $oPayment = oxNew(\OxidSolutionCatalysts\Unzer\Model\Payment::class);
 
+            /** @var string $sShipSet */
+            $sShipSet = Registry::getSession()->getVariable('sShipSet');
             if (
                 $sPaymentid && $oPayment->load($sPaymentid) &&
                 $oPayment->isValidPayment(
@@ -121,7 +124,7 @@ class InstallmentController extends FrontendController
                     (string) $this->getConfig()->getShopId(),
                     $oUser,
                     $oBasket->getPriceForPayment(),
-                    (string)Registry::getSession()->getVariable('sShipSet')
+                    $sShipSet
                 )
             ) {
                 $this->oxPayment = $oPayment;
@@ -141,12 +144,17 @@ class InstallmentController extends FrontendController
         return 'confirmInstallment';
     }
 
+    /**
+     * @return Payment|null
+     */
     protected function getUnzerSessionPayment(): ?Payment
     {
         if ($this->uzrPayment === null) {
-            $this->uzrPayment = $this->getServiceFromContainer(
-                \OxidSolutionCatalysts\Unzer\Service\Payment::class
-            )->getSessionUnzerPayment();
+            /** @var Payment $payment */
+            $payment = $this->uzrPayment = $this->getServiceFromContainer(
+                \OxidSolutionCatalysts\Unzer\Model\Payment::class
+            );
+            $payment->getSessionUnzerPayment();
         }
         return $this->uzrPayment;
     }
@@ -166,16 +174,23 @@ class InstallmentController extends FrontendController
 
     public function confirmInstallment(): void
     {
+        /** @var Payment $unzerPayment */
         $unzerPayment = $this->getUnzerSessionPayment();
-        /** @var Order $oOrder */
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = oxNew(Order::class);
+        /** @var string $sess_challenge */
+        $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
 
-        if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
-            $charge = $unzerPayment->getAuthorization()->charge();
+        if ($oOrder->load($sess_challenge)) {
+            /** @var string $oxuserid */
+            $oxuserid = $oOrder->getFieldData('oxuserid');
+            /** @var Authorization $authorization */
+            $authorization = $unzerPayment->getAuthorization();
+            $charge = $authorization->charge();
             $transactionService = $this->getServiceFromContainer(Transaction::class);
             $transactionService->writeChargeToDB(
                 $oOrder->getId(),
-                $oOrder->oxorder__oxuserid->value,
+                $oxuserid,
                 $charge
             );
             if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {

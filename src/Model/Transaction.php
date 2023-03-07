@@ -85,10 +85,12 @@ class Transaction extends BaseModel
      */
     public function getUnzerMetaData(): ?array
     {
-        /** @var array $json */
+        /** @var string $json */
         $json = $this->getRawField('METADATA');
         if ($json) {
-            return json_decode($json, true);
+            /** @var array $jsonDecode */
+            $jsonDecoded = json_decode($json, true);
+            return $jsonDecoded;
         }
 
         return [];
