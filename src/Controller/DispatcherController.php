@@ -36,6 +36,7 @@ class DispatcherController extends FrontendController
         $jsonRequest = file_get_contents('php://input');
         $aJson = json_decode($jsonRequest, true);
         $url = parse_url($aJson['retrieveUrl']);
+        /** @var Transaction $transaction */
         $transaction = $this->getServiceFromContainer(Transaction::class);
         $aPath = explode("/", $url['path']);
         $typeid = end($aPath);
@@ -97,6 +98,8 @@ class DispatcherController extends FrontendController
                 }
             }
         }
+        $transaction->cleanUpNotFinishedOrders();
+
         Registry::getUtils()->showMessageAndExit($result);
     }
 }
