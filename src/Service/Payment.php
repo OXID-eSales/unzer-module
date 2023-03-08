@@ -265,9 +265,10 @@ class Payment
     /**
      * @param Order|null $oOrder
      * @param string $unzerid
+     * @param float $amount
      * @return UnzerApiException|bool
      */
-    public function doUnzerAuthorizationCancel($oOrder, $unzerid)
+    public function doUnzerAuthorizationCancel($oOrder, $unzerid, $amount)
     {
         if (!$oOrder) {
             return false;
@@ -277,7 +278,7 @@ class Payment
             $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
 
             /** @psalm-suppress InvalidArgument */
-            $charge = $unzerPayment->getAuthorization()->cancel();
+            $charge = $unzerPayment->getAuthorization()->cancel($amount);
             $blSuccess = $this->transactionService->writeTransactionToDB(
                 $oOrder->getId(),
                 $oOrder->oxorder__oxuserid->value,
