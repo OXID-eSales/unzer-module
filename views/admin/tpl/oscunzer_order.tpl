@@ -108,7 +108,7 @@
                     </table>
                 </form>
             [{/if}]
-            [{if $AuthAmountRemaining == $AuthAmount}]
+            [{if $AuthAmountRemaining > 0 && $AuthAmountRemaining <= $AuthAmount}]
                 <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerAuthorizationCancel">
@@ -118,6 +118,7 @@
                         <tbody>
                         <tr>
                             <td>[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE"}]</td>
+                            <td><input type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
                             <td><button type="submit">[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL"}]</button></td>
                         </tr>
                         </tbody>
