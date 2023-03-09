@@ -19,6 +19,7 @@ final class UnzerDefinitions
     public const IDEAL_UNZER_PAYMENT_ID = 'oscunzer_ideal';
     public const INSTALLMENT_UNZER_PAYMENT_ID = 'oscunzer_installment';
     public const INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice';
+    public const OLD_INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice_old';
     public const PAYPAL_UNZER_PAYMENT_ID = 'oscunzer_paypal';
     public const PIS_UNZER_PAYMENT_ID = 'oscunzer_pis';
     public const PREPAYMENT_UNZER_PAYMENT_ID = 'oscunzer_prepayment';
@@ -36,7 +37,27 @@ final class UnzerDefinitions
     ];
 
     private const UNZER_DEFINTIONS = [
-
+        self::OLD_INVOICE_UNZER_PAYMENT_ID => [
+            'descriptions' => [
+                'de' => [
+                    'desc' => 'Kauf auf Rechnung (old)',
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
+                        Bei dieser Methode zahlen Sie per Kauf auf Rechnung'
+                ],
+                'en' => [
+                    'desc' => 'Invoice (old)',
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Invoice" style="float: left;margin-right: 10px;" />'
+                ]
+            ],
+            'active' => true,
+            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
+                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'constraints' => self::PAYMENT_CONSTRAINTS
+        ],
         //Alipay is China’s leading third-party mobile and online payment solution.
         self::ALIPAY_UNZER_PAYMENT_ID => [
             'descriptions' => [
