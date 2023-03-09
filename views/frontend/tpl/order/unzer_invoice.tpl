@@ -52,6 +52,8 @@
                     </select>
                 </div>
             </div>
+        [{else}]
+            <input id="unzer_select_consumer" type="hidden" value="[{if $isB2B}]B2B[{else}]B2C[{/if}]" />
         [{/if}]
         [{if $isB2B && $isCompany}]
             <div id="consumer_b2b" [{if $isBoth}]class="collapse"[{/if}]>
@@ -132,6 +134,7 @@
     $( "#payment-form-invoice" ).submit(function( event ) {
         event.preventDefault();
         setTimeout(function(){
+            let selectConsumer = $( "#unzer_select_consumer" ).val();
             if(
                 (
                     !$( '.oxDate' ).hasClass("text-danger") && selectConsumer == 'B2C'
