@@ -115,7 +115,6 @@ class OrderController extends OrderController_parent
      */
     public function isSepaPayment(): ?bool
     {
-        /** @var Payment $payment */
         $payment = $this->getPayment();
 
         return (
@@ -184,7 +183,9 @@ class OrderController extends OrderController_parent
         $oxcountryid = Registry::getSession()->getUser()->getFieldData('oxcountryid');
         $country->load($oxcountryid);
 
-        return $country->getFieldData('oxisoalpha2');
+        /** @var string $oxisoalpha2 */
+        $oxisoalpha2 = $country->getFieldData('oxisoalpha2');
+        return $oxisoalpha2;
     }
 
     /**

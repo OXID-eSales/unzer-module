@@ -91,7 +91,7 @@ class Unzer
 
         if (/** @var string $birthdate */
             $birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
-            $oUser->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
+            $oUser->_setFieldData('oxbirthdate', $birthdate, FieldAlias::T_RAW);
         }
 
         /** @var string $birthdate */

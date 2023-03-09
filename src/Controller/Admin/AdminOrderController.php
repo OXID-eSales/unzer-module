@@ -183,7 +183,9 @@ class AdminOrderController extends AdminDetailsController
 
         if ($unzerid) {
             $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
-            $oStatus = $paymentService->sendShipmentNotification($this->getEditObject(), $unzerid);
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            $oOrder = $this->getEditObject();
+            $oStatus = $paymentService->sendShipmentNotification($oOrder, $unzerid);
 
             if ($oStatus instanceof UnzerApiException) {
                 $this->_aViewData['errShip'] = $translator->translateCode(
@@ -204,7 +206,9 @@ class AdminOrderController extends AdminDetailsController
         $translator = $this->getServiceFromContainer(Translator::class);
 
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
-        $oStatus = $paymentService->doUnzerCollect($this->getEditObject(), $unzerid, $amount);
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+        $oOrder = $this->getEditObject();
+        $oStatus = $paymentService->doUnzerCollect($oOrder, $unzerid, $amount);
 
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
@@ -264,7 +268,9 @@ class AdminOrderController extends AdminDetailsController
         $translator = $this->getServiceFromContainer(Translator::class);
 
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
-        $oStatus = $paymentService->doUnzerAuthorizationCancel($this->getEditObject(), $unzerid);
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+        $oOrder = $this->getEditObject();
+        $oStatus = $paymentService->doUnzerAuthorizationCancel($oOrder, $unzerid);
 
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());

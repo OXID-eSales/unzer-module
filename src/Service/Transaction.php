@@ -118,7 +118,9 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
-        $params = array_merge($params, $this->getUnzerInitOrderData($unzerPayment, $basketModel));
+        if ($unzerPayment instanceof Payment && $basketModel instanceof Basket) {
+            $params = array_merge($params, $this->getUnzerInitOrderData($unzerPayment, $basketModel));
+        }
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
@@ -200,7 +202,7 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param Cancellation|null $unzerCharge
+     * @param \UnzerSDK\Resources\TransactionTypes\Cancellation|null $unzerCancel
      * @return bool
      * @throws \Exception
      */
@@ -215,8 +217,9 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
-
-        $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
+        if ($unzerCancel instanceof Cancellation) {
+            $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
+        }
 
 
         // building oxid from unique index columns
@@ -236,7 +239,7 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param Charge|null $unzerCharge
+     * @param \UnzerSDK\Resources\TransactionTypes\Charge|null $unzerCharge
      * @throws \Exception
      * @return bool
      */
@@ -251,7 +254,9 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
-        $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
+        if ($unzerCharge instanceof Charge) {
+            $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
+        }
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
@@ -275,7 +280,9 @@ class Transaction
     {
         unset($params['oxactiondate']);
         unset($params['serialized_basket']);
-        return md5(json_encode($params));
+        /** @var string $jsonEncode */
+        $jsonEncode = json_encode($params);
+        return md5($jsonEncode);
     }
 
     /**
@@ -427,6 +434,7 @@ class Transaction
         if ($unzerObject->isPending()) {
             return "pending";
         }
+
         return null;
     }
 
@@ -453,6 +461,11 @@ class Transaction
         return $result;
     }
 
+    /**
+     * @param string $typeid
+     * @return bool
+     * @throws DatabaseConnectionException
+     */
     public function isValidTransactionTypeId($typeid): bool
     {
         if (

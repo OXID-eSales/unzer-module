@@ -95,7 +95,7 @@ class Order extends Order_parent
     {
         $utilsDate = Registry::getUtilsDate();
         $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-        $this->oxorder__oxpaid = new Field($date);
+        $this->_setFieldData('oxpaid', $date);
         $this->save();
     }
 
@@ -112,7 +112,7 @@ class Order extends Order_parent
     }
 
     /**
-     * @param null $unzerPayment
+     * @param \UnzerSDK\Resources\Payment|null $unzerPayment
      * @return bool
      * @throws UnzerApiException
      */
@@ -128,7 +128,9 @@ class Order extends Order_parent
             return $transactionService->writeTransactionToDB(
                 $this->getId(),
                 $this->getOrderUser()->getId() ?: '',
-                $unzerPayment ?? $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
+                $unzerPayment instanceOf \UnzerSDK\Resources\Payment ?
+                    $unzerPayment :
+                    $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
             );
         }
 

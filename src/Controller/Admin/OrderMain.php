@@ -35,6 +35,10 @@ class OrderMain extends OrderMain_parent
         }
     }
 
+    /**
+     * @param \OxidEsales\Eshop\Application\Model\Order $oOrder
+     * @return void
+     */
     public function sendShipmentNotification(\OxidEsales\Eshop\Application\Model\Order $oOrder): void
     {
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);

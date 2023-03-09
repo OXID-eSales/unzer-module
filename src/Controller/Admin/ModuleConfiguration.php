@@ -216,9 +216,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($response->getStatusCode() !== 201) {
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
                 } else {
-                    /** @var Object $responseBody */
+                    /** @var array{'id': string} $responseBody */
                     $responseBody = json_decode($response->getBody()->__toString());
-                    $applePayPaymentKeyId = $responseBody->id;
+                    $applePayPaymentKeyId = $responseBody['id'];
                 }
             } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
@@ -232,8 +232,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if ($response->getStatusCode() !== 201) {
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
                 } else {
+                    /** @var array{'id': string} $responseBody */
                     $responseBody = json_decode($response->getBody()->__toString());
-                    $applePayPaymentCertificateId = $responseBody->id;
+                    $applePayPaymentCertificateId = $responseBody['id'];
                 }
             } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';

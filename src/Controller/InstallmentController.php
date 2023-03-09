@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\Basket;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
@@ -53,12 +54,14 @@ class InstallmentController extends FrontendController
      */
     public function render()
     {
+        /** @var Basket|null $oBasket */
         $oBasket = Registry::getSession()->getBasket();
+        /** @var User|null $oUser */
         $oUser = Registry::getSession()->getUser();
 
         $myConfig = Registry::getConfig();
 
-        if (!($oBasket instanceOf Basket) || !$oBasket->getProductsCount()) {
+        if (!($oBasket instanceof Basket) || !$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
         }
 
@@ -121,7 +124,7 @@ class InstallmentController extends FrontendController
                 $sPaymentid && $oPayment->load($sPaymentid) &&
                 $oPayment->isValidPayment(
                     (array)Registry::getSession()->getVariable('dynvalue'),
-                    (string) $this->getConfig()->getShopId(),
+                    (string)$this->getConfig()->getShopId(),
                     $oUser,
                     $oBasket->getPriceForPayment(),
                     $sShipSet
@@ -150,11 +153,13 @@ class InstallmentController extends FrontendController
     protected function getUnzerSessionPayment(): ?Payment
     {
         if ($this->uzrPayment === null) {
-            /** @var Payment $payment */
-            $payment = $this->uzrPayment = $this->getServiceFromContainer(
-                \OxidSolutionCatalysts\Unzer\Model\Payment::class
+            /** @var \OxidSolutionCatalysts\Unzer\Service\Payment $payment */
+            $payment = $this->getServiceFromContainer(
+                \OxidSolutionCatalysts\Unzer\Service\Payment::class
             );
-            $payment->getSessionUnzerPayment();
+            /** @var Payment $sessionUnzerPayment */
+            $sessionUnzerPayment = $payment->getSessionUnzerPayment();
+            $this->uzrPayment = $sessionUnzerPayment;
         }
         return $this->uzrPayment;
     }
@@ -193,7 +198,9 @@ class InstallmentController extends FrontendController
                 $oxuserid,
                 $charge
             );
-            if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
+            /** @var Payment $payment */
+            $payment = $charge->getPayment();
+            if ($charge->isSuccess() && $payment->getAmount()->getRemaining() == 0) {
                 $oOrder->markUnzerOrderAsPaid();
             }
 

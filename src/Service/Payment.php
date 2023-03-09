@@ -21,6 +21,7 @@ use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
+use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 class Payment
 {
@@ -238,7 +239,7 @@ class Payment
     }
 
     /**
-     * @param Order|null $oOrder
+     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
      * @param string $unzerid
      * @param float $amount
      * @return UnzerApiException|bool
@@ -277,7 +278,7 @@ class Payment
     }
 
     /**
-     * @param Order|null $oOrder
+     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
      * @param string $unzerid
      * @return UnzerApiException|bool
      */
@@ -290,7 +291,9 @@ class Payment
         try {
             $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
 
-            $charge = $unzerPayment->getAuthorization()->cancel();
+            /** @var Authorization $authorization */
+            $authorization = $unzerPayment->getAuthorization();
+            $authorization->cancel();
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
             $blSuccess = $this->transactionService->writeTransactionToDB(
@@ -306,7 +309,7 @@ class Payment
     }
 
     /**
-     * @param Order|null $oOrder
+     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
      * @param string $sPaymentId
      * @return UnzerApiException|bool
      */
@@ -321,6 +324,7 @@ class Payment
         $blSuccess = false;
 
         if ($sPaymentId) {
+            /** @var string $sInvoiceNr */
             $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
 
             $unzerPayment = $this->getUnzerSDK()->fetchPayment($sPaymentId);
@@ -349,11 +353,13 @@ class Payment
                 try {
                     /** @var string $oxuserid */
                     $oxuserid = $oOrder->getFieldData('oxuserid');
+                    /** @var Shipment $shipment */
+                    $shipment = $unzerPayment->ship($sInvoiceNr);
                     $blSuccess = $this->transactionService->writeTransactionToDB(
                         $oOrder->getId(),
                         $oxuserid,
                         $unzerPayment,
-                        $unzerPayment->ship($sInvoiceNr)
+                        $shipment
                     );
                 } catch (UnzerApiException $e) {
                     $blSuccess = $e;
