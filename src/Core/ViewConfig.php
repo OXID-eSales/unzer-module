@@ -97,6 +97,52 @@ class ViewConfig extends ViewConfig_parent
         return $this->moduleSettings->getShopPrivateKey();
     }
 
+    public function getUnzerB2BPubKey(): string
+    {
+        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
+        if ($currency === 'CHF') {
+            return $this->moduleSettings->getShopPublicKeyB2BInvoiceCHF();
+        } elseif ($currency === 'EUR') {
+            return $this->moduleSettings->getShopPublicKeyB2BInvoiceEUR();
+        }
+        return '';
+    }
+
+    public function getUnzerB2BPrivKey(): string
+    {
+        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
+        if ($currency === 'CHF') {
+            return $this->moduleSettings->getShopPrivateKeyB2BInvoiceCHF();
+        } elseif ($currency === 'EUR') {
+            return $this->moduleSettings->getShopPrivateKeyB2BInvoiceEUR();
+        }
+        return '';
+
+    }
+
+    public function getUnzerB2CPubKey(): string
+    {
+        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
+        if ($currency === 'CHF') {
+            return $this->moduleSettings->getShopPublicKeyB2CInvoiceCHF();
+        } elseif ($currency === 'EUR') {
+            return $this->moduleSettings->getShopPublicKeyB2CInvoiceEUR();
+        }
+        return '';
+    }
+
+    public function getUnzerB2CPrivKey(): string
+    {
+        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
+        if ($currency === 'CHF') {
+            return $this->moduleSettings->getShopPrivateKeyB2CInvoiceCHF();
+        } elseif ($currency === 'EUR') {
+            return $this->moduleSettings->getShopPrivateKeyB2CInvoiceEUR();
+        }
+        return '';
+
+    }
+
     /**
      * retrieve additional payment information from session
      *

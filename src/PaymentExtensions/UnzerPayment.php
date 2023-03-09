@@ -9,8 +9,10 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Unzer;
 
@@ -91,6 +93,12 @@ abstract class UnzerPayment
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
+
+        if (!method_exists($paymentType, $paymentProcedure)) {
+            $message = sprintf('Procedure "%s" not found for "%s"', $paymentProcedure, $this->paymentMethod);
+            Registry::getUtilsView()->addErrorToDisplay(new StandardException($message));
+            throw new UnzerApiException($message);
+        }
 
         $transaction = $paymentType->{$paymentProcedure}(
             $basketModel->getPrice()->getPrice(),

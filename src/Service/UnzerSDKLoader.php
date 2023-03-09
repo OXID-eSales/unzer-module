@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use UnzerSDK\Unzer;
@@ -49,7 +50,10 @@ class UnzerSDKLoader
     {
         $key = $this->moduleSettings->getShopPrivateKey();
         if ($this->session->getBasket()->getPaymentId() === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-            $key = $this->moduleSettings->getShopPrivateKeyInvoice();
+            $request = Registry::getRequest();
+            $customerType = $request->getRequestParameter('unzer_customer_type');
+
+            $key = $this->moduleSettings->getShopPrivateKeyInvoice($customerType);
         }
 
         $sdk = oxNew(Unzer::class, $key);
