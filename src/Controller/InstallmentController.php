@@ -68,7 +68,7 @@ class InstallmentController extends FrontendController
         // can we proceed with ordering ?
         if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
-        } elseif (!($oBasket instanceOf Basket) || !$oUser || !$oBasket->getProductsCount()) {
+        } elseif (!($oBasket instanceof Basket) || !$oUser || !$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl(), false, 302);
         }
 

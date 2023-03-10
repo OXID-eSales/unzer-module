@@ -56,7 +56,7 @@ class DispatcherController extends FrontendController
 
         if ($paymentId = $resource->getId()) {
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
-            $order = oxNew(Order::class);
+            $order = oxNew(\OxidSolutionCatalysts\Unzer\Model\Order::class);
             /** @var array $data */
             $data = $transaction->getTransactionDataByPaymentId($paymentId);
 
@@ -70,7 +70,7 @@ class DispatcherController extends FrontendController
                 if ($unzerPayment->getState() == 1 && $oxTransStatus == "OK") {
                     $utilsDate = Registry::getUtilsDate();
                     $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-                    $order->_setFieldData('oxpaid', $date);
+                    $order->setFieldData('oxpaid', $date);
                     $order->save();
                 }
 

@@ -128,7 +128,7 @@ class Order extends Order_parent
             return $transactionService->writeTransactionToDB(
                 $this->getId(),
                 $this->getOrderUser()->getId() ?: '',
-                $unzerPayment instanceOf \UnzerSDK\Resources\Payment ?
+                $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
                     $unzerPayment :
                     $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
             );
@@ -196,5 +196,16 @@ class Order extends Order_parent
         }
 
         return parent::delete($sOxId);
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $value
+     * @param int $dataType
+     * @return false|void
+     */
+    public function setFieldData($fieldName, $value, $dataType = \OxidEsales\Eshop\Core\Field::T_TEXT)
+    {
+        return parent::_setFieldData($fieldName, $value, $dataType);
     }
 }

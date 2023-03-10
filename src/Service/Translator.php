@@ -53,7 +53,7 @@ class Translator
     public function translate(string $message)
     {
         /** @var string $translate */
-        $translate =  $this->language->translateString($message, null, false);
+        $translate = $this->language->translateString($message, null, false);
         return $translate;
     }
 

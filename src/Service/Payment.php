@@ -203,8 +203,10 @@ class Payment
      */
     public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
     {
-        if (/** @var string $paymentId */
-            $paymentId = $this->session->getVariable('PaymentId')) {
+        if (
+/** @var string $paymentId */
+            $paymentId = $this->session->getVariable('PaymentId')
+        ) {
             return $this->getUnzerSDK()->fetchPayment($paymentId);
         }
 

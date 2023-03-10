@@ -20,8 +20,10 @@ class Config extends Config_parent
     public function setActShopCurrency($cur)
     {
 
-        if (/** @var string $paymentid */
-            $paymentid = Registry::getSession()->getVariable('paymentid')) {
+        if (
+/** @var string $paymentid */
+            $paymentid = Registry::getSession()->getVariable('paymentid')
+        ) {
             /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $oPayment */
             $oPayment = oxNew(Payment::class);
             if ($oPayment->load($paymentid) && $oPayment->isUnzerPayment() && !$oPayment->isUnzerPaymentTypeAllowed()) {

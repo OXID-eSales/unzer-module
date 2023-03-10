@@ -342,12 +342,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
             $this->resetContentCache();
 
-            if (/** @var array $requestApplePayMC */
-                $requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')) {
+            if (
+/** @var array $requestApplePayMC */
+                $requestApplePayMC = $request->getRequestEscapedParameter('applePayMC')
+            ) {
                 $this->moduleSettings->saveApplePayMerchantCapabilities($requestApplePayMC);
             }
-            if (/** @var array $requestApplePayNetworks */
-                $requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')) {
+            if (
+/** @var array $requestApplePayNetworks */
+                $requestApplePayNetworks = $request->getRequestEscapedParameter('applePayNetworks')
+            ) {
                 $this->moduleSettings->saveApplePayNetworks($requestApplePayNetworks);
             }
             if ($requestApplePayMerchantCert = $request->getRequestEscapedParameter('applePayMerchantCert')) {

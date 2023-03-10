@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
@@ -25,15 +26,10 @@ class StaticContent
     /** @var QueryBuilderFactoryInterface */
     private $queryBuilderFactory;
 
-    /** @var ContextInterface */
-    private $context;
-
     public function __construct(
-        QueryBuilderFactoryInterface $queryBuilderFactory,
-        ContextInterface $context
+        QueryBuilderFactoryInterface $queryBuilderFactory
     ) {
         $this->queryBuilderFactory = $queryBuilderFactory;
-        $this->context = $context;
     }
 
     public function ensureUnzerPaymentMethods(): void
@@ -219,16 +215,18 @@ class StaticContent
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->queryBuilderFactory->create();
-        $fromDb = $queryBuilder
+        $resultDb = $queryBuilder
             ->select('oxid')
             ->from('oxdeliveryset')
             ->where('oxactive = 1')
-            ->execute()
-            ->fetchAll(PDO::FETCH_ASSOC);
+            ->execute();
 
-        /** @var array $row */
-        foreach ($fromDb as $row) {
-            $result[$row['oxid']] = $row['oxid'];
+        if ($resultDb instanceof Result) {
+            $fromDb = $resultDb->fetchAllAssociative();
+            /** @var array $row */
+            foreach ($fromDb as $row) {
+                $result[$row['oxid']] = $row['oxid'];
+            }
         }
 
         return $result;
@@ -248,16 +246,18 @@ class StaticContent
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->queryBuilderFactory->create();
-        $fromDb = $queryBuilder
+        $resultDb = $queryBuilder
             ->select('oxid, oxisoalpha2')
             ->from('oxcountry')
             ->where('oxactive = 1')
-            ->execute()
-            ->fetchAll(PDO::FETCH_ASSOC);
+            ->execute();
 
-        /** @var array $row */
-        foreach ($fromDb as $row) {
-            $result[$row['oxid']] = $row['oxisoalpha2'];
+        if ($resultDb instanceof Result) {
+            $fromDb = $resultDb->fetchAllAssociative();
+            /** @var array $row */
+            foreach ($fromDb as $row) {
+                $result[$row['oxid']] = $row['oxisoalpha2'];
+            }
         }
 
         return $result;

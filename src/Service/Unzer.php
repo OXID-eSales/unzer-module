@@ -12,7 +12,6 @@ use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
@@ -89,9 +88,11 @@ class Unzer
             $oxlname
         );
 
-        if (/** @var string $birthdate */
-            $birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
-            $oUser->_setFieldData('oxbirthdate', $birthdate, FieldAlias::T_RAW);
+        if (
+/** @var string $birthdate */
+            $birthdate = Registry::getRequest()->getRequestParameter('birthdate')
+        ) {
+            $oUser->assign(['oxuser__oxbirthdate' => $birthdate]);
         }
 
         /** @var string $birthdate */
@@ -404,7 +405,7 @@ class Unzer
         }
 
         // TODO: $charge is not only class of Charge possible here. Investigate and fix.
-        if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
+        if ($charge instanceof Charge && ($paymentType instanceof Prepayment || $paymentType->isInvoiceType())) {
             $this->session->setVariable(
                 'additionalPaymentInformation',
                 $this->getBankDataFromCharge($charge)

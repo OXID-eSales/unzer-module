@@ -229,7 +229,7 @@ class ModuleSettings
     {
         return array_keys(array_filter(
             $this->getApplePayMerchantCapabilities(),
-            'self::isActiveSetting'
+            [$this, 'isActiveSetting']
         ));
     }
 
@@ -253,7 +253,7 @@ class ModuleSettings
     {
         return array_keys(array_filter(
             $this->getApplePayNetworks(),
-            'self::isActiveSetting'
+            [$this, 'isActiveSetting']
         ));
     }
 
@@ -450,7 +450,7 @@ class ModuleSettings
      * @param bool|int|string $active
      * @return bool
      */
-    private static function isActiveSetting($active): bool
+    private function isActiveSetting($active): bool
     {
         return $active === '1';
     }
