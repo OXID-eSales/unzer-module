@@ -99,48 +99,58 @@ class ViewConfig extends ViewConfig_parent
 
     public function getUnzerB2BPubKey(): string
     {
-        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
-        if ($currency === 'CHF') {
+        $key = '';
+        $currencyName = $this->getBasketCurrencyName();
+        if ($currencyName === 'CHF') {
             return $this->moduleSettings->getShopPublicKeyB2BInvoiceCHF();
-        } elseif ($currency === 'EUR') {
+        }
+
+        if ($currencyName === 'EUR') {
             return $this->moduleSettings->getShopPublicKeyB2BInvoiceEUR();
         }
-        return '';
+        return $key;
     }
 
     public function getUnzerB2BPrivKey(): string
     {
-        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
-        if ($currency === 'CHF') {
+        $key = '';
+        $currencyName = $this->getBasketCurrencyName();
+        if ($currencyName === 'CHF') {
             return $this->moduleSettings->getShopPrivateKeyB2BInvoiceCHF();
-        } elseif ($currency === 'EUR') {
+        }
+
+        if ($currencyName === 'EUR') {
             return $this->moduleSettings->getShopPrivateKeyB2BInvoiceEUR();
         }
-        return '';
-
+        return $key;
     }
 
     public function getUnzerB2CPubKey(): string
     {
-        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
-        if ($currency === 'CHF') {
-            return $this->moduleSettings->getShopPublicKeyB2CInvoiceCHF();
-        } elseif ($currency === 'EUR') {
-            return $this->moduleSettings->getShopPublicKeyB2CInvoiceEUR();
+        $key = '';
+        $currencyName = $this->getBasketCurrencyName();
+        if ($currencyName === 'CHF') {
+            $key = $this->moduleSettings->getShopPublicKeyB2CInvoiceCHF();
         }
-        return '';
+
+        if ($currencyName === 'EUR') {
+            $key = $this->moduleSettings->getShopPublicKeyB2CInvoiceEUR();
+        }
+        return $key;
     }
 
     public function getUnzerB2CPrivKey(): string
     {
-        $currency = Registry::getSession()->getBasket()->getBasketCurrency()->name;
-        if ($currency === 'CHF') {
-            return $this->moduleSettings->getShopPrivateKeyB2CInvoiceCHF();
-        } elseif ($currency === 'EUR') {
-            return $this->moduleSettings->getShopPrivateKeyB2CInvoiceEUR();
+        $key = '';
+        $currencyName = $this->getBasketCurrencyName();
+        if ($currencyName === 'CHF') {
+            $key = $this->moduleSettings->getShopPrivateKeyB2CInvoiceCHF();
         }
-        return '';
 
+        if ($currencyName === 'EUR') {
+            $key = $this->moduleSettings->getShopPrivateKeyB2CInvoiceEUR();
+        }
+        return $key;
     }
 
     /**
@@ -237,5 +247,15 @@ class ViewConfig extends ViewConfig_parent
     public function isB2BInvoiceEligibility(): bool
     {
         return $this->moduleSettings->isB2BInvoiceEligibility();
+    }
+
+    public function getBasketCurrencyName(): string
+    {
+        $currencyName = '';
+        $basket = Registry::getSession()->getBasket();
+        if ($basket) {
+            $currencyName = $basket->getBasketCurrency()->name;
+        }
+        return $currencyName;
     }
 }
