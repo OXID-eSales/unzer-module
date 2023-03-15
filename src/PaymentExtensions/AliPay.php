@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Alipay as UnzerAlipay;
 
 class AliPay extends UnzerPayment
 {
@@ -23,7 +24,7 @@ class AliPay extends UnzerPayment
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(
-            new \UnzerSDK\Resources\PaymentTypes\Alipay()
+            new UnzerAlipay()
         );
     }
 }

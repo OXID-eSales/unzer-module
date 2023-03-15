@@ -12,6 +12,9 @@ use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use phpDocumentor\Reflection\Types\True_;
 
+/**
+ * @SuppressWarnings(PHPMD.LongVariable)
+ */
 class ViewConfig extends ViewConfig_parent
 {
     use ServiceContainer;
@@ -103,9 +106,9 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getSessionPaymentInfo(): string
     {
-        /** @var string $additionalPaymentInformation */
-        $additionalPaymentInformation = Registry::getSession()->getVariable('additionalPaymentInformation');
-        return $additionalPaymentInformation;
+        /** @var string $addPaymentInfo */
+        $addPaymentInfo = Registry::getSession()->getVariable('additionalPaymentInformation');
+        return $addPaymentInfo;
     }
 
     /**

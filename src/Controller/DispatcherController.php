@@ -28,6 +28,11 @@ class DispatcherController extends FrontendController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @throws UnzerApiException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function updatePaymentTransStatus(): void
     {
@@ -54,7 +59,8 @@ class DispatcherController extends FrontendController
         $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
 
-        if ($paymentId = $resource->getId()) {
+        $paymentId = $resource->getId();
+        if (is_string($paymentId)) {
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
             $order = oxNew(\OxidSolutionCatalysts\Unzer\Model\Order::class);
             /** @var array $data */

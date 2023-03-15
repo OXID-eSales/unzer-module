@@ -10,14 +10,14 @@ class ApplePaySessionHandler
 {
     private ApplepaySession $session;
     private ApplepayAdapter $adapter;
-    private ModuleSettings $moduleSettingsService;
+    private ModuleSettings $moduleSettings;
 
     /**
      * @param ModuleSettings $moduleSettings
      */
     public function __construct(ModuleSettings $moduleSettings)
     {
-        $this->moduleSettingsService = $moduleSettings;
+        $this->moduleSettings = $moduleSettings;
         $this->initialize();
     }
 
@@ -35,16 +35,16 @@ class ApplePaySessionHandler
             '/'
         );
         /** @var string $applePatLabel */
-        $applePatLabel = $this->moduleSettingsService->getApplePayLabel();
+        $applePatLabel = $this->moduleSettings->getApplePayLabel();
         $this->session = new ApplepaySession(
-            $this->moduleSettingsService->getApplePayMerchantIdentifier(),
+            $this->moduleSettings->getApplePayMerchantIdentifier(),
             $applePatLabel,
             $domainName
         );
         $this->adapter = new ApplepayAdapter();
         $this->adapter->init(
-            $this->moduleSettingsService->getApplePayMerchantCertFilePath(),
-            $this->moduleSettingsService->getApplePayMerchantCertKeyFilePath()
+            $this->moduleSettings->getApplePayMerchantCertFilePath(),
+            $this->moduleSettings->getApplePayMerchantCertKeyFilePath()
         );
     }
 
@@ -55,11 +55,11 @@ class ApplePaySessionHandler
     public function validateMerchant(string $validationUrl): ?array
     {
         try {
-            /** @var string $validateApplePayMerchant */
-            $validateApplePayMerchant = $this->adapter->validateApplePayMerchant($validationUrl, $this->session);
+            /** @var string $validApplePayMerch */
+            $validApplePayMerch = $this->adapter->validateApplePayMerchant($validationUrl, $this->session);
             /** @var array $jsonDecoded */
             $jsonDecoded = json_decode(
-                $validateApplePayMerchant,
+                $validApplePayMerch,
                 true,
                 512,
                 JSON_THROW_ON_ERROR

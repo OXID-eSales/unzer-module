@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Prepayment as UnzerPrepayment;
 
 class PrePayment extends UnzerPayment
 {
@@ -23,7 +24,7 @@ class PrePayment extends UnzerPayment
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(
-            new \UnzerSDK\Resources\PaymentTypes\Prepayment()
+            new UnzerPrepayment()
         );
     }
 }

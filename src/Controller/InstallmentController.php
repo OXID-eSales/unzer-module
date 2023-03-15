@@ -51,24 +51,26 @@ class InstallmentController extends FrontendController
 
     /**
      * @inheritDoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function render()
     {
-        /** @var Basket|null $oBasket */
+        /** @var Basket $oBasket */
         $oBasket = Registry::getSession()->getBasket();
         /** @var User|null $oUser */
         $oUser = Registry::getSession()->getUser();
 
         $myConfig = Registry::getConfig();
 
-        if (!($oBasket instanceof Basket) || !$oBasket->getProductsCount()) {
+        if (!$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
         }
 
         // can we proceed with ordering ?
-        if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
+        if (!$oUser && $oBasket->getProductsCount() > 0) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
-        } elseif (!($oBasket instanceof Basket) || !$oUser || !$oBasket->getProductsCount()) {
+        } elseif (!$oUser || !$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl(), false, 302);
         }
 
@@ -80,7 +82,6 @@ class InstallmentController extends FrontendController
 
         /** @var string $sPdfLink */
         $sPdfLink = Registry::getSession()->getVariable('UzrPdfLink');
-
         if (empty($sPdfLink)) {
             // redirecting to payment step on error ..
             Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', false, 302);

@@ -25,6 +25,9 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 /**
  * Order class wrapper for Unzer module
+ *
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class AdminOrderController extends AdminDetailsController
 {
@@ -50,6 +53,8 @@ class AdminOrderController extends AdminDetailsController
      * @return string
      * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
      * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function render(): string
     {
@@ -96,7 +101,6 @@ class AdminOrderController extends AdminDetailsController
             $paymentType = $unzerPayment->getPaymentType();
 
             $this->_aViewData["blShipment"] = (
-                $paymentType instanceof InvoiceSecured ||
                 $paymentType instanceof InstallmentSecured
             );
 
@@ -114,9 +118,8 @@ class AdminOrderController extends AdminDetailsController
                 $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
                 $aRv['amount'] = $shipment->getAmount();
                 $aRv['success'] = $shipment->isSuccess();
-                if ($shipment->isSuccess()) {
-                    $blShipped = true;
-                }
+
+                $blShipped = $shipment->isSuccess();
                 $shipments[] = $aRv;
             }
             $this->_aViewData["aShipments"] = $shipments;
@@ -132,8 +135,8 @@ class AdminOrderController extends AdminDetailsController
                 $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
                 $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
             }
-            $charges = [];
 
+            $charges = [];
             if (!$unzerPayment->isCanceled()) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
@@ -146,7 +149,7 @@ class AdminOrderController extends AdminDetailsController
                         $fCharged += ($charge->isSuccess()) ? $charge->getAmount() : 0.;
                         $aRv['chargeDate'] = $charge->getDate();
 
-                        $charges [] = $aRv;
+                        $charges[] = $aRv;
                     }
                 }
             }
@@ -307,9 +310,9 @@ class AdminOrderController extends AdminDetailsController
     {
         if (!($this->oPaymnet instanceof Payment)) {
             return false;
-        } else {
-            return $this->oPaymnet->isUnzerSecuredPayment();
         }
+
+        return $this->oPaymnet->isUnzerSecuredPayment();
     }
     /**
      * Returns editable order object

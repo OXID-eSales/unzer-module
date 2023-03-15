@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
@@ -16,7 +17,6 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
-use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 use OxidEsales\Facts\Facts;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Constants\BasketItemTypes;
@@ -30,6 +30,10 @@ use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Unzer
 {
     /** @var Session */
@@ -72,12 +76,18 @@ class Unzer
      * @param User $oUser
      * @param Order|null $oOrder
      * @return Customer
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getUnzerCustomer(
         User $oUser,
         ?Order $oOrder = null,
         string $commercialSector = '',
-        string $commercialRegisterNumber = ''
+        string $comRegNumber = ''
     ): Customer {
         /** @var string $oxfname */
         $oxfname = $oUser->getFieldData('oxfname');
@@ -88,10 +98,8 @@ class Unzer
             $oxlname
         );
 
-        if (
-/** @var string $birthdate */
-            $birthdate = Registry::getRequest()->getRequestParameter('birthdate')
-        ) {
+        $birthdate = Registry::getRequest()->getRequestParameter('birthdate');
+        if (is_string($birthdate)) {
             $oUser->assign(['oxuser__oxbirthdate' => $birthdate]);
         }
 
@@ -185,12 +193,12 @@ class Unzer
             $shippingAddress->setCountry($deliveryCountryIso);
         }
 
-        if ($commercialRegisterNumber || $commercialSector) {
+        if ($comRegNumber || $commercialSector) {
             $companyInfo = new CompanyInfo();
-            $companyInfo->setCommercialRegisterNumber($commercialRegisterNumber);
+            $companyInfo->setCommercialRegisterNumber($comRegNumber);
             $companyInfo->setCommercialSector($commercialSector);
-            $companyInfo->setRegistrationType($commercialRegisterNumber ? 'registered' : 'not_registered');
-            $companyInfo->setFunction(!$commercialRegisterNumber ? 'OWNER' : '');
+            $companyInfo->setRegistrationType($comRegNumber ? 'registered' : 'not_registered');
+            $companyInfo->setFunction(!$comRegNumber ? 'OWNER' : '');
             $customer->setCompanyInfo($companyInfo);
         }
 
@@ -331,6 +339,7 @@ class Unzer
     /**
      * @param bool $addPending
      * @return string
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function prepareOrderRedirectUrl(bool $addPending = false): string
     {
@@ -377,7 +386,7 @@ class Unzer
             return $paymentData['id'];
         }
 
-        throw new \Exception('oscunzer_WRONGPAYMENTID');
+        throw new Exception('oscunzer_WRONGPAYMENTID');
     }
 
     /**
@@ -417,6 +426,7 @@ class Unzer
      * @param string $paymentMethod
      * @return Metadata
      * @throws \Exception
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getShopMetadata(string $paymentMethod): Metadata
     {
@@ -441,6 +451,7 @@ class Unzer
 
     /**
      * @return void
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function setIsAjaxPayment(bool $isAjaxPayment = false): void
     {

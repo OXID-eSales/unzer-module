@@ -17,6 +17,9 @@ use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
 use Exception;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ModuleSettings
 {
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
@@ -214,11 +217,11 @@ class ModuleSettings
      */
     public function getApplePayMerchantCapabilities(): array
     {
-        /** @var array $applepayMerchantCapabilities */
-        $applepayMerchantCapabilities = $this->getSettingValue('applepay_merchant_capabilities');
+        /** @var array $applepayMerchCaps */
+        $applepayMerchCaps = $this->getSettingValue('applepay_merchant_capabilities');
         return array_merge(
             self::APPLE_PAY_MERCHANT_CAPABILITIES,
-            $applepayMerchantCapabilities
+            $applepayMerchCaps
         );
     }
 
@@ -262,10 +265,10 @@ class ModuleSettings
      */
     public function getApplePayMerchantIdentifier(): string
     {
-        /** @var string $applepayMerchantIdentifier */
-        $applepayMerchantIdentifier =
+        /** @var string $applepayMerchId */
+        $applepayMerchId =
             $this->getSettingValue($this->getSystemMode() . '-applepay_merchant_identifier');
-        return $applepayMerchantIdentifier;
+        return $applepayMerchId;
     }
 
     /**
@@ -374,21 +377,21 @@ class ModuleSettings
     }
 
     /**
-     * @param string $id
+     * @param string $paymentKeyId
      * @return void
      */
-    public function saveApplePayPaymentKeyId(string $id): void
+    public function saveApplePayPaymentKeyId(string $paymentKeyId): void
     {
-        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentKeyId', $id);
+        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentKeyId', $paymentKeyId);
     }
 
     /**
-     * @param string $id
+     * @param string $certificateId
      * @return void
      */
-    public function saveApplePayPaymentCertificateId(string $id): void
+    public function saveApplePayPaymentCertificateId(string $certificateId): void
     {
-        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentCertificateId', $id);
+        $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentCertificateId', $certificateId);
     }
 
     /**
@@ -396,9 +399,9 @@ class ModuleSettings
      */
     public function getApplePayPaymentKeyId(): string
     {
-        /** @var string $applePayPaymentKeyId */
-        $applePayPaymentKeyId = $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentKeyId');
-        return $applePayPaymentKeyId;
+        /** @var string $paymentKeyId */
+        $paymentKeyId = $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentKeyId');
+        return $paymentKeyId;
     }
 
     /**
@@ -406,9 +409,9 @@ class ModuleSettings
      */
     public function getApplePayPaymentCertificateId(): string
     {
-        /** @var string $applePayPaymentCertificateId */
-        $applePayPaymentCertificateId = $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentCertificateId');
-        return $applePayPaymentCertificateId;
+        /** @var string $certificateId */
+        $certificateId = $this->getSettingValue($this->getSystemMode() . 'ApplePayPaymentCertificateId');
+        return $certificateId;
     }
 
     /**
@@ -449,6 +452,8 @@ class ModuleSettings
      *
      * @param bool|int|string $active
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
      */
     private function isActiveSetting($active): bool
     {
@@ -503,81 +508,81 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPublicKeyB2CInvoiceEUR(): string
+    private function getShopPublicKeyB2CInvoiceEUR(): string
     {
-        /** @var string $unzerPublicKeyB2CEUR */
-        $unzerPublicKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CEUR');
-        return $unzerPublicKeyB2CEUR;
+        /** @var string $unzerPubKeyB2CEUR */
+        $unzerPubKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CEUR');
+        return $unzerPubKeyB2CEUR;
     }
 
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2CInvoiceEUR(): string
+    private function getShopPrivateKeyB2CInvoiceEUR(): string
     {
-        /** @var string $unzerPrivateKeyB2CEUR */
-        $unzerPrivateKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CEUR');
-        return $unzerPrivateKeyB2CEUR;
+        /** @var string $unzerPrivKeyB2CEUR */
+        $unzerPrivKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CEUR');
+        return $unzerPrivKeyB2CEUR;
     }
 
     /**
      * @return string
      */
-    public function getShopPublicKeyB2BInvoiceEUR(): string
+    private function getShopPublicKeyB2BInvoiceEUR(): string
     {
-        /** @var string $unzerPublicKeyB2BEUR */
-        $unzerPublicKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BEUR');
-        return $unzerPublicKeyB2BEUR;
+        /** @var string $unzerPubKeyB2BEUR */
+        $unzerPubKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BEUR');
+        return $unzerPubKeyB2BEUR;
     }
 
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2BInvoiceEUR(): string
+    private function getShopPrivateKeyB2BInvoiceEUR(): string
     {
-        /** @var string $unzerPrivateKeyB2BEUR */
-        $unzerPrivateKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BEUR');
-        return $unzerPrivateKeyB2BEUR;
+        /** @var string $unzerPrivKeyB2BEUR */
+        $unzerPrivKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BEUR');
+        return $unzerPrivKeyB2BEUR;
     }
 
     /**
      * @return string
      */
-    public function getShopPublicKeyB2CInvoiceCHF(): string
+    private function getShopPublicKeyB2CInvoiceCHF(): string
     {
-        /** @var string $unzerPublicKeyB2CCHF */
-        $unzerPublicKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CCHF');
-        return $unzerPublicKeyB2CCHF;
+        /** @var string $unzerPubKeyB2CCHF */
+        $unzerPubKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CCHF');
+        return $unzerPubKeyB2CCHF;
     }
 
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2CInvoiceCHF(): string
+    private function getShopPrivateKeyB2CInvoiceCHF(): string
     {
-        /** @var string $unzerPrivateKeyB2CCHF */
-        $unzerPrivateKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CCHF');
-        return $unzerPrivateKeyB2CCHF;
+        /** @var string $unzerPrivKeyB2CCHF */
+        $unzerPrivKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CCHF');
+        return $unzerPrivKeyB2CCHF;
     }
 
     /**
      * @return string
      */
-    public function getShopPublicKeyB2BInvoiceCHF(): string
+    private function getShopPublicKeyB2BInvoiceCHF(): string
     {
-        /** @var string $unzerPublicKeyB2BCHF */
-        $unzerPublicKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BCHF');
-        return $unzerPublicKeyB2BCHF;
+        /** @var string $unzerPubKeyB2BCHF */
+        $unzerPubKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BCHF');
+        return $unzerPubKeyB2BCHF;
     }
 
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2BInvoiceCHF(): string
+    private function getShopPrivateKeyB2BInvoiceCHF(): string
     {
-        /** @var string $unzerPrivateKeyB2BCHF */
-        $unzerPrivateKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BCHF');
-        return $unzerPrivateKeyB2BCHF;
+        /** @var string $unzerPrivKeyB2BCHF */
+        $unzerPrivKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BCHF');
+        return $unzerPrivKeyB2BCHF;
     }
 
     /**
@@ -639,7 +644,7 @@ class ModuleSettings
     /**
      * @return bool
      */
-    public function isBasketCurrencyCHF(): bool
+    private function isBasketCurrencyCHF(): bool
     {
         return $this->getBasketCurrency() === 'CHF';
     }
@@ -647,7 +652,7 @@ class ModuleSettings
     /**
      * @return bool
      */
-    public function isBasketCurrencyEUR(): bool
+    private function isBasketCurrencyEUR(): bool
     {
         return $this->getBasketCurrency() === 'EUR';
     }
@@ -655,7 +660,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getBasketCurrency(): string
+    private function getBasketCurrency(): string
     {
         return $this->session->getBasket()->getBasketCurrency()->name;
     }

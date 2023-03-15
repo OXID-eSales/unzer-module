@@ -39,6 +39,8 @@ class PaymentController extends PaymentController_parent
      * Template variable getter. Returns paymentlist
      *
      * @return array<array-key, mixed>|object
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getPaymentList()
     {
@@ -75,14 +77,17 @@ class PaymentController extends PaymentController_parent
 
     /**
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     protected function checkForUnzerPaymentErrors(): void
     {
         /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment */
         $payment = oxNew(Payment::class);
+        $actualPaymentId = $this->getCheckedPaymentId();
         if (
             $this->getPaymentError() &&
-            ($actualPaymentId = $this->getCheckedPaymentId()) &&
+            (is_string($actualPaymentId)) &&
             $payment->load($actualPaymentId) &&
             $payment->isUnzerPayment()
         ) {

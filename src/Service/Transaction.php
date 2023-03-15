@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Doctrine\DBAL\Result;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Application\Model\Basket;
@@ -21,11 +22,18 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Customer;
+use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Transaction
 {
     /** @var Context */
@@ -69,11 +77,9 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
         if ($unzerPayment) {
-            if (!$unzerShipment) {
-                $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
-            } else {
-                $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
-            }
+            $params = $unzerShipment ?
+                array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment)) :
+                array_merge($params, $this->getUnzerPaymentData($unzerPayment));
         }
 
         if ($unzerPayment && $unzerPayment->getState() == 2) {
@@ -184,10 +190,11 @@ class Transaction
             ))
             ->andWhere('oxorderdate < now() - interval :sessiontime SECOND');
 
-        $ids = $queryBuilder->setParameters($parameters)
-            ->execute()
-            ->fetchAll(PDO::FETCH_COLUMN);
+        /** @var Result $result */
+        $result = $queryBuilder->setParameters($parameters)->execute();
+        $ids = $result->fetchAllAssociative();
 
+        /** @var string $id */
         foreach ($ids as $id) {
             $order = oxNew(EshopModelOrder::class);
             if ($order->load($id)) {
@@ -315,20 +322,19 @@ class Transaction
             'traceid'  => $unzerPayment->getTraceId()
         ];
 
-        if (
-            ($initialTransaction = $unzerPayment->getInitialTransaction()) &&
-            $initialTransaction->getShortId() !== null
-        ) {
-            $params['shortid'] = $initialTransaction->getShortId();
-        } else {
-            $params['shortid'] = Registry::getSession()->getVariable('ShortId');
-        }
+        /** @var AbstractTransactionType $initialTransaction */
+        $initialTransaction = $unzerPayment->getInitialTransaction();
+        $params['shortid'] = $initialTransaction->getShortId() !== null ?
+            $initialTransaction->getShortId() :
+            Registry::getSession()->getVariable('ShortId');
 
-        if ($metadata = $unzerPayment->getMetadata()) {
+        $metadata = $unzerPayment->getMetadata();
+        if ($metadata instanceof Metadata) {
             $params['metadata'] = $metadata->jsonSerialize();
         }
 
-        if ($unzerCustomer = $unzerPayment->getCustomer()) {
+        $unzerCustomer = $unzerPayment->getCustomer();
+        if ($unzerCustomer instanceof Customer) {
             $params['customerid'] = $unzerCustomer->getId();
         }
 
@@ -372,7 +378,8 @@ class Transaction
             'metadata'  => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
         ];
 
-        if ($unzerCustomer = $unzerPayment->getCustomer()) {
+        $unzerCustomer = $unzerPayment->getCustomer();
+        if ($unzerCustomer instanceof Customer) {
             $params['customerid'] = $unzerCustomer->getId();
         }
 

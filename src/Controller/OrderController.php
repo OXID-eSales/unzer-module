@@ -22,11 +22,18 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.LongVariable)
+ */
 class OrderController extends OrderController_parent
 {
     use ServiceContainer;
 
-    /** @var bool $blSepaMandateConfirmError */
+    /**
+     * @var bool $blSepaMandateConfirmError
+     */
     protected $blSepaMandateConfirmError = null;
 
     /** @var Order $actualOrder */
@@ -204,6 +211,8 @@ class OrderController extends OrderController_parent
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getUnzerCommercialSectors(): array
     {

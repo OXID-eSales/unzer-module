@@ -23,6 +23,10 @@ use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Payment
 {
     private const STATUS_OK = "OK";
@@ -33,7 +37,7 @@ class Payment
     protected $session;
 
     /** @var PaymentExtensionLoader */
-    protected $paymentExtensionLoader;
+    protected $paymentExtLoader;
 
     /** @var Translator */
     protected $translator;
@@ -59,7 +63,7 @@ class Payment
 
     /**
      * @param Session $session
-     * @param PaymentExtensionLoader $paymentExtensionLoader
+     * @param PaymentExtensionLoader $paymentExtLoader
      * @param Translator $translator
      * @param Unzer $unzerService
      * @param UnzerSDKLoader $unzerSDKLoader
@@ -67,14 +71,14 @@ class Payment
      */
     public function __construct(
         Session $session,
-        PaymentExtensionLoader $paymentExtensionLoader,
+        PaymentExtensionLoader $paymentExtLoader,
         Translator $translator,
         Unzer $unzerService,
         UnzerSDKLoader $unzerSDKLoader,
         TransactionService $transactionService
     ) {
         $this->session = $session;
-        $this->paymentExtensionLoader = $paymentExtensionLoader;
+        $this->paymentExtLoader = $paymentExtLoader;
         $this->translator = $translator;
         $this->unzerService = $unzerService;
         $this->unzerSDKLoader = $unzerSDKLoader;
@@ -89,7 +93,7 @@ class Payment
     {
         try {
             /** @var AbstractUnzerPayment $paymentExtension */
-            $paymentExtension = $this->paymentExtensionLoader->getPaymentExtension($paymentModel);
+            $paymentExtension = $this->paymentExtLoader->getPaymentExtension($paymentModel);
             $paymentExtension->execute(
                 $this->session->getUser(),
                 $this->session->getBasket()
@@ -203,10 +207,8 @@ class Payment
      */
     public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
     {
-        if (
-/** @var string $paymentId */
-            $paymentId = $this->session->getVariable('PaymentId')
-        ) {
+        $paymentId = $this->session->getVariable('PaymentId');
+        if (is_string($paymentId)) {
             return $this->getUnzerSDK()->fetchPayment($paymentId);
         }
 
@@ -265,10 +267,11 @@ class Payment
                 $oxuserid,
                 $charge
             );
+            $payment = $charge->getPayment();
             if (
                 $charge->isSuccess() &&
-                ($o = $charge->getPayment()) &&
-                $o->getAmount()->getRemaining() == 0
+                ($payment instanceof \UnzerSDK\Resources\Payment) &&
+                $payment->getAmount()->getRemaining() == 0
             ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
@@ -298,7 +301,7 @@ class Payment
             $authorization->cancel();
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
-            $blSuccess = $this->transactionService->writeTransactionToDB(
+            $this->transactionService->writeTransactionToDB(
                 $oOrder->getId(),
                 $oxuserid,
                 $unzerPayment
@@ -314,6 +317,8 @@ class Payment
      * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
      * @param string $sPaymentId
      * @return UnzerApiException|bool
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function sendShipmentNotification($oOrder, $sPaymentId = null)
     {

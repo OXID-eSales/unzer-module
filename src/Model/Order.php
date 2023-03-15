@@ -31,6 +31,8 @@ class Order extends Order_parent
      * @param User $oUser
      * @return int|bool
      * @throws \Exception
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function finalizeUnzerOrderAfterRedirect(
         Basket $oBasket,
@@ -91,6 +93,10 @@ class Order extends Order_parent
         return $iRet;
     }
 
+    /**
+     * @return void
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
     public function markUnzerOrderAsPaid(): void
     {
         $utilsDate = Registry::getUtilsDate();
@@ -142,11 +148,11 @@ class Order extends Order_parent
      */
     public function getUnzerInvoiceNr()
     {
-        /** @var int $nr */
-        $nr = $this->getFieldData('OXINVOICENR') !== 0 ?
+        /** @var int $number */
+        $number = $this->getFieldData('OXINVOICENR') !== 0 ?
             $this->getFieldData('OXINVOICENR') :
             $this->getFieldData('OXORDERNR');
-        return $nr;
+        return $number;
     }
 
     /**
@@ -154,20 +160,20 @@ class Order extends Order_parent
      * @throws DatabaseConnectionException
      *
      * @return false|int
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function reinitializeOrder()
     {
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $rs = $oDB->getRow("SELECT OXUSERID, SERIALIZED_BASKET from oscunzertransaction
+        $rowSelect = $oDB->getRow("SELECT OXUSERID, SERIALIZED_BASKET from oscunzertransaction
                             where OXORDERID = :oxorderid AND OXACTION = 'init'", [':oxorderid' => $this->getId()]);
-        if ($rs) {
+        if ($rowSelect) {
             $oUser = oxNew(User::class);
-            $oUser->load($rs['OXUSERID']);
-            if (
-                $oUser->isLoaded() &&
+            $oUser->load($rowSelect['OXUSERID']);
+            if ($oUser->isLoaded()) {
                 /** @var Basket $oBasket */
-                $oBasket = unserialize(base64_decode($rs['SERIALIZED_BASKET']))
-            ) {
+                $oBasket = unserialize(base64_decode($rowSelect['SERIALIZED_BASKET']));
                 return $this->finalizeOrder($oBasket, $oUser, true);
             }
         }
