@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
 
 abstract class UnzerPayment
@@ -87,14 +88,31 @@ abstract class UnzerPayment
         $customer = $this->unzerService->getUnzerCustomer(
             $userModel,
             null,
-            $request->getRequestParameter('unzer_commercial_sector', ''),
-            $request->getRequestParameter('unzer_commercial_register_number', '')
+            $request->getRequestParameter('unzer_company_form', '')
         );
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
 
         if (!method_exists($paymentType, $paymentProcedure)) {
+            // paylater invoice type id - we need it later on I guess
+            $typeId = $request->getRequestParameter('unzer_type_id');
+            $customerObj = $this->unzerSDK->createCustomer($customer);
+            $basketObj = $this->unzerSDK->createBasket($uzrBasket);
+
+            $authObj = new Authorization(
+                $basketModel->getPrice()->getBruttoPrice(),
+                $basketModel->getBasketCurrency()->name,
+                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending())
+            );
+            $performAuth = $this->unzerSDK->performAuthorization(
+                $authObj,
+                $paymentType,
+                $customerObj,
+                null,
+                $basketObj
+            );
+
             $message = sprintf('Procedure "%s" not found for "%s"', $paymentProcedure, $this->paymentMethod);
             Registry::getUtilsView()->addErrorToDisplay(new StandardException($message));
             throw new UnzerApiException($message);
