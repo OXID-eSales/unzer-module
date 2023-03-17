@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use UnzerSDK\Constants\CompanyTypes;
+
 final class UnzerDefinitions
 {
     public const ALIPAY_UNZER_PAYMENT_ID = 'oscunzer_alipay';
@@ -598,11 +600,11 @@ final class UnzerDefinitions
     ];
 
     private const UNZER_COMPANY_TYPES = [
-        'authority',
-        'association',
-        'sole',
-        'company',
-        'other',
+        CompanyTypes::AUTHORITY,
+        CompanyTypes::ASSOCIATION,
+        CompanyTypes::SOLE,
+        CompanyTypes::COMPANY,
+        CompanyTypes::OTHER,
     ];
 
     public static function getUnzerDefinitions()
