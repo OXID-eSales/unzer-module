@@ -19,6 +19,7 @@ use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\PaymentTypes\InvoiceSecured;
+use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -97,6 +98,8 @@ class AdminOrderController extends AdminDetailsController
                 $paymentType instanceof InstallmentSecured
             );
 
+            $isPrepaymentType = ($paymentType instanceof Prepayment);
+
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
@@ -131,13 +134,13 @@ class AdminOrderController extends AdminDetailsController
             if (!$unzerPayment->isCanceled()) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
-                    if ($charge->isSuccess()) {
+                    if ($charge->isSuccess() || ($isPrepaymentType && $charge->isPending())) {
                         $aRv = [];
                         $aRv['chargedAmount'] = $charge->getAmount();
                         $aRv['cancelledAmount'] = $charge->getCancelledAmount();
                         $aRv['chargeId'] = $charge->getId();
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
-                        $fCharged += $charge->getAmount();
+                        $fCharged += ($charge->isSuccess()) ? $charge->getAmount() : 0.;
                         $aRv['chargeDate'] = $charge->getDate();
 
                         $charges [] = $aRv;
