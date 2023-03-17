@@ -28,7 +28,10 @@ class UnzerTest extends TestCase
     {
         $sut = $this->getSut();
 
-        Registry::set(Config::class, $this->createConfiguredMock(Config::class, ['getSslShopUrl' => $shopUrl]));
+        Registry::set(
+            Config::class,
+            $this->createConfiguredMock(Config::class, ['getSslShopUrl' => $shopUrl])
+        );
 
         $this->assertSame(
             $expectedShopUrl,
@@ -93,11 +96,15 @@ class UnzerTest extends TestCase
 
     private function getSut(array $settings = []): Unzer
     {
+        $translatorMock = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translatorMock->expects($this->any())
+            ->method('translate')
+            ->willReturn('Shipping costs');
         return new Unzer(
             $this->createPartialMock(Session::class, []),
-            $this->getMockBuilder(Translator::class)
-                ->disableOriginalConstructor()
-                ->getMock(),
+            $translatorMock,
             $this->createPartialMock(Context::class, []),
             $settings[ModuleSettings::class] ?:
                 $this->createPartialMock(ModuleSettings::class, []),
@@ -167,7 +174,7 @@ class UnzerTest extends TestCase
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);
 
-        $this->assertSame(3, $result->getItemCount()); //two goods, one delivery
+        $this->assertSame(4, $result->getItemCount()); //two goods, one delivery
 
         /** @var \UnzerSDK\Resources\EmbeddedResources\BasketItem[] $items */
         $items = $result->getBasketItems();

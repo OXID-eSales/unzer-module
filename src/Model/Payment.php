@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidSolutionCatalysts\Unzer\Service\PaymentValidator;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use OxidEsales\Eshop\Application\Model\Payment as Payment_parent;
 
 class Payment extends Payment_parent
 {

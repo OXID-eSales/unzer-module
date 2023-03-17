@@ -10,7 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Core;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use phpDocumentor\Reflection\Types\True_;
+use OxidEsales\Eshop\Core\ViewConfig as ViewConfig_parent;
 
 /**
  * @SuppressWarnings(PHPMD.LongVariable)
