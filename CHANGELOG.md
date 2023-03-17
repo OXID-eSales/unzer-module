@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW 
 - New Payment PayLater
 
+### Fixed
+
+* [0007430](https://bugs.oxid-esales.com/view.php?id=7430) Update Basket version to V2
+
 ## [1.0.1] - 2022-12-03
 
 ### FIXED
