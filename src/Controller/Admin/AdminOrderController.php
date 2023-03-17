@@ -19,6 +19,7 @@ use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -88,6 +89,11 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
+    /**
+     * @param string $sPaymentId
+     * @return void
+     * * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function getUnzerViewData(string $sPaymentId): void
     {
         try {
@@ -178,6 +184,9 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
+    /**
+     * @return void
+     */
     public function sendShipmentNotification(): void
     {
         /** @var string $unzerid */
@@ -199,6 +208,9 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
+    /**
+     * @return void
+     */
     public function doUnzerCollect(): void
     {
         /** @var string $unzerid */
