@@ -597,6 +597,14 @@ final class UnzerDefinitions
         'ARTS_ENTERTAINMENT_AND_RECREATION'
     ];
 
+    private const UNZER_COMPANY_TYPES = [
+        'authority',
+        'association',
+        'sole',
+        'company',
+        'other',
+    ];
+
     public static function getUnzerDefinitions()
     {
         return self::UNZER_DEFINTIONS;
@@ -615,5 +623,10 @@ final class UnzerDefinitions
     public static function getUnzerCommercialSectors()
     {
         return self::UNZER_COMMERCIAL_SECTORS;
+    }
+
+    public static function getUnzerCompanyTypes()
+    {
+        return self::UNZER_COMPANY_TYPES;
     }
 }
