@@ -31,6 +31,8 @@ class OrderController extends OrderController_parent
 
     protected $commercialSectors = null;
 
+    protected $companyTypes = null;
+
     /**
      * @inerhitDoc
      */
@@ -182,5 +184,17 @@ class OrderController extends OrderController_parent
             }
         }
         return $this->commercialSectors;
+    }
+
+    public function getUnzerCompanyTypes(): array
+    {
+        if (is_null($this->companyTypes) || empty($this->companyTypes)) {
+            $this->companyTypes = [];
+            $translator = $this->getServiceFromContainer(Translator::class);
+            foreach (UnzerDefinitions::getUnzerCompanyTypes() as $value) {
+                $this->companyTypes[$value] = $translator->translate('OSCUNZER_COMPANY_FORM_' . $value);
+            }
+        }
+        return $this->companyTypes;
     }
 }
