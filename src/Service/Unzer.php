@@ -18,6 +18,7 @@ use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 use OxidEsales\Facts\Facts;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Resources\Customer;
@@ -71,13 +72,13 @@ class Unzer
     /**
      * @param User $oUser
      * @param Order|null $oOrder
+     * @param string $companyType
      * @return Customer
      */
     public function getUnzerCustomer(
         User $oUser,
         ?Order $oOrder = null,
-        string $commercialSector = '',
-        string $commercialRegisterNumber = ''
+        string $companyType = ''
     ): Customer {
         $customer = CustomerFactory::createCustomer(
             $oUser->getFieldData('oxfname'),
@@ -150,12 +151,9 @@ class Unzer
             $shippingAddress->setCountry($deliveryCountryIso);
         }
 
-        if ($commercialRegisterNumber || $commercialSector) {
+        if ($companyType) {
             $companyInfo = new CompanyInfo();
-            $companyInfo->setCommercialRegisterNumber($commercialRegisterNumber);
-            $companyInfo->setCommercialSector($commercialSector);
-            $companyInfo->setRegistrationType($commercialRegisterNumber ? 'registered' : 'not_registered');
-            $companyInfo->setFunction(!$commercialRegisterNumber ? 'OWNER' : '');
+            $companyInfo->setCompanyType($companyType);
             $customer->setCompanyInfo($companyInfo);
         }
 
