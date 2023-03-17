@@ -92,7 +92,7 @@ class AdminOrderController extends AdminDetailsController
     /**
      * @param string $sPaymentId
      * @return void
-     * * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getUnzerViewData(string $sPaymentId): void
     {

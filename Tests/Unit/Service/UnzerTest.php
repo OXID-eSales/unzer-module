@@ -174,7 +174,7 @@ class UnzerTest extends TestCase
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);
 
-        $this->assertSame(4, $result->getItemCount()); //two goods, one delivery
+        $this->assertSame(2, $result->getItemCount()); //two goods, no delivery. no voucher
 
         /** @var \UnzerSDK\Resources\EmbeddedResources\BasketItem[] $items */
         $items = $result->getBasketItems();

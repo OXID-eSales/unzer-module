@@ -102,8 +102,6 @@ final class StaticContentTest extends TestCase
         $this->assertEquals('test_longdesc_de', $payment->getFieldData('oxlongdesc'));
 
         $payment->loadInLang(1, UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID);
-        /*print_r(UnzerDefinitions::getUnzerDefinitions()[UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID]);
-        print_r($payment);*/
         $this->assertEquals(
             UnzerDefinitions::getUnzerDefinitions()
                 [UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID]['descriptions']['en']['desc'],
