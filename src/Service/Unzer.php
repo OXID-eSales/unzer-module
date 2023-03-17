@@ -194,17 +194,16 @@ class Unzer
         // Add Basket-Items
         /** @var \OxidEsales\Eshop\Application\Model\BasketItem $basketItem */
         foreach ($shopBasketContents as $basketItem) {
-            $unzerBasketItem = new BasketItem(
-                $basketItem->getTitle(),
-                $basketItem->getPrice()->getNettoPrice(),
-                $basketItem->getUnitPrice()->getNettoPrice(),
-                (int)$basketItem->getAmount()
-            );
-            $unzerBasketItem->setType(BasketItemTypes::GOODS);
-            $unzerBasketItem->setVat($basketItem->getPrice()->getVat());
-            $unzerBasketItem->setAmountVat($basketItem->getPrice()->getVatValue());
-            $unzerBasketItem->setAmountGross($basketItem->getPrice()->getBruttoPrice());
-            $unzerBasketItem->setAmountPerUnitGross($basketItem->getUnitPrice()->getBruttoPrice());
+            $unzerBasketItem = new BasketItem();
+            $unzerBasketItem->setTitle($basketItem->getTitle())
+                ->setAmountNet($basketItem->getPrice()->getNettoPrice())
+                ->setAmountPerUnit($basketItem->getUnitPrice()->getNettoPrice())
+                ->setQuantity((int)$basketItem->getAmount())
+                ->setType(BasketItemTypes::GOODS)
+                ->setVat($basketItem->getPrice()->getVat())
+                ->setAmountVat($basketItem->getPrice()->getVatValue())
+                ->setAmountGross($basketItem->getPrice()->getBruttoPrice())
+                ->setAmountPerUnitGross($basketItem->getUnitPrice()->getBruttoPrice());
 
             $unzerBasketItems[] = $unzerBasketItem;
         }
@@ -212,17 +211,16 @@ class Unzer
         // Add DeliveryCosts
         $deliveryCosts = $basketModel->getDeliveryCost();
         if ($deliveryCosts->getNettoPrice() > 0.) {
-            $unzerBasketItem = new BasketItem(
-                $this->translator->translate('SHIPPING_COST'),
-                $deliveryCosts->getNettoPrice(),
-                $deliveryCosts->getNettoPrice(),
-                1
-            );
-            $unzerBasketItem->setType(BasketItemTypes::SHIPMENT);
-            $unzerBasketItem->setVat($deliveryCosts->getVat());
-            $unzerBasketItem->setAmountVat($deliveryCosts->getVatValue());
-            $unzerBasketItem->setAmountGross($deliveryCosts->getBruttoPrice());
-            $unzerBasketItem->setAmountPerUnitGross($deliveryCosts->getBruttoPrice());
+            $unzerBasketItem = new BasketItem();
+            $unzerBasketItem->setTitle($this->translator->translate('SHIPPING_COST'))
+                ->setAmountNet($deliveryCosts->getNettoPrice())
+                ->setAmountPerUnit($deliveryCosts->getNettoPrice())
+                ->setQuantity(1)
+                ->setType(BasketItemTypes::SHIPMENT)
+                ->setVat($deliveryCosts->getVat())
+                ->setAmountVat($deliveryCosts->getVatValue())
+                ->setAmountGross($deliveryCosts->getBruttoPrice())
+                ->setAmountPerUnitGross($deliveryCosts->getBruttoPrice());
 
             $unzerBasketItems[] = $unzerBasketItem;
         }
@@ -230,23 +228,22 @@ class Unzer
         // Add Discounts
         $discounts = $basketModel->getTotalDiscount();
         if ($discounts->getNettoPrice() > 0.) {
-            $unzerBasketItem = new BasketItem(
-                $this->translator->translate('DISCOUNT'),
-                $discounts->getNettoPrice(),
-                $discounts->getNettoPrice(),
-                1
-            );
-            $unzerBasketItem->setType(BasketItemTypes::VOUCHER);
-            $unzerBasketItem->setVat($discounts->getVat());
-            $unzerBasketItem->setAmountVat($discounts->getVatValue());
-            $unzerBasketItem->setAmountGross($discounts->getBruttoPrice());
-            $unzerBasketItem->setAmountPerUnitGross($discounts->getBruttoPrice());
+            $unzerBasketItem = new BasketItem();
+            $unzerBasketItem->setTitle($this->translator->translate('DISCOUNT'))
+                ->setAmountNet($discounts->getNettoPrice())
+                ->setAmountPerUnit($discounts->getNettoPrice())
+                ->setQuantity(1)
+                ->setType(BasketItemTypes::VOUCHER)
+                ->setVat($discounts->getVat())
+                ->setAmountVat($discounts->getVatValue())
+                ->setAmountGross($discounts->getBruttoPrice())
+                ->setAmountPerUnitGross($discounts->getBruttoPrice());
 
             $unzerBasketItems[] = $unzerBasketItem;
         }
         $basket->setBasketItems($unzerBasketItems);
-
         $basket->setTotalValueGross($basketModel->getPrice()->getBruttoPrice());
+
         return $basket;
     }
 
