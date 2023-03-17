@@ -169,14 +169,12 @@ class Unzer
      */
     public function getUnzerBasket(string $unzerOrderId, BasketModel $basketModel): Basket
     {
-        $basket = new Basket(
-            $unzerOrderId,
-            $basketModel->getPrice()->getBruttoPrice(),
-            $basketModel->getBasketCurrency()->name
-        );
+        $basket = new Basket();
+        $basket->setOrderId($unzerOrderId)
+            ->setAmountTotalGross($basketModel->getPrice()->getBruttoPrice())
+            ->setCurrencyCode($basketModel->getBasketCurrency()->name)
+            ->setAmountTotalDiscount(0.0);
 
-        // additional: Total Discounts
-        $basket->setAmountTotalDiscount(0.0);
         // we add the "voucher" with this amount later. Prepayment will complain if it finds "voucher" AND the total
         // discount amount here (PayPal or creditcard will NOT!)
 
