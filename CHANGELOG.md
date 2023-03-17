@@ -6,8 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.1.0] - 2023-02-XX
 
-### NEW 
+### NEW
 - New Payment PayLater
+### FIXED
+- [0007436](https://bugs.oxid-esales.com/view.php?id=7436) add option to reverese a prepayment-transaction from the backend
+
+### Fixed
+
+* [0007430](https://bugs.oxid-esales.com/view.php?id=7430) Update Basket version to V2
 
 ## [1.0.1] - 2022-12-03
 
