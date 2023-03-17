@@ -68,60 +68,44 @@
             <!-- Errors will be inserted here -->
         </div>
 
+        <div id="consumer_common" class="form-group row oxDate [{if !$iBirthdayMonth || !$iBirthdayDay || !$iBirthdayYear}]text-danger[{/if}]">
+            <label class="col-12 col-lg-3 req" for="oxDay">[{oxmultilang ident="BIRTHDATE"}]</label>
+            <div class="col-3 col-lg-3">
+                <input id="birthdate_day" class="oxDay form-control" type="text" maxlength="2" value="[{if $iBirthdayDay > 0}][{$iBirthdayDay}][{/if}]"
+                       placeholder="[{oxmultilang ident="DAY"}]" required>
+            </div>
+            <div class="col-6 col-lg-3">
+                <select id="birthdate_month" class="oxMonth form-control selectpicker" required>
+                    <option value="" label="-">-</option>
+                    [{section name="month" start=1 loop=13}]
+                    <option value="[{$smarty.section.month.index}]" label="[{$smarty.section.month.index}]" [{if $iBirthdayMonth|intval == $smarty.section.month.index}] selected="selected" [{/if}]>
+                        [{oxmultilang ident="MONTH_NAME_"|cat:$smarty.section.month.index}]
+                    </option>
+                    [{/section}]
+                </select>
+            </div>
+            <div class="col-3 col-lg-3">
+                <input id="birthdate_year" class="oxYear form-control" type="text" maxlength="4" value="[{if $iBirthdayYear}][{$iBirthdayYear}][{/if}]"
+                       placeholder="[{oxmultilang ident="YEAR"}]" required>
+            </div>
+            <div class="offset-lg-3 col-lg-9 col-12">
+                <div class="help-block">
+                    <p class="text-danger [{if $iBirthdayMonth && $iBirthdayDay && $iBirthdayYear}]d-none hidden[{/if}]">[{oxmultilang ident="DD_FORM_VALIDATION_REQUIRED"}]</p>
+                </div>
+            </div>
+        </div>
         [{if $isCompany}]
-            <div id="consumer_b2b" [{if $isBoth}]class="collapse"[{/if}]>
-                <div id="consumer_b2b" class="form-group row unzerCommercialSector text-danger">
-                    <label class="col-12 col-lg-3  req" for="unzer_commercial_sector">[{oxmultilang ident="OSCUNZER_COMMERCIAL_SECTOR"}]</label>
-                    <div class="col-12 col-lg-9">
-                        <select id="unzer_commercial_sector" class="form-control selectpicker" required>
-                            <option value="" label="-">-</option>
-                            [{foreach from=$oView->getUnzerCommercialSectors() item=title key=value}]
-                                <option value="[{$value}]" label="[{$title}]">[{$title}]</option>
-                            [{/foreach}]
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row text-danger">
-                    <label class="col-12 col-lg-3 req" for="unzer_commercial_register_number">[{oxmultilang ident="OSCUNZER_COMMERCIAL_REGISTER_NUMBER"}]</label>
-                    <div class="col-12 col-lg-9">
-                        <input id="unzer_commercial_register_number" class="form-control" type="text" maxlength="20" value=""
-                               placeholder="[{oxmultilang ident="OSCUNZER_COMMERCIAL_REGISTER_NUMBER"}]" required>
-                    </div>
-                    <div class="offset-lg-3 col-lg-9 col-12">
-                        <div class="help-block">
-                            <p class="text-danger">[{oxmultilang ident="OSCUNZER_COMMERCIAL_HELP"}]</p>
-                        </div>
-                    </div>
-                </div>
+        <div id="consumer_b2b" class="form-group row unzerCompanyForm text-danger">
+            <label class="col-12 col-lg-3  req" for="unzer_company_form">[{oxmultilang ident="OSCUNZER_COMPANY_FORM"}]</label>
+            <div class="col-12 col-lg-9">
+                <select id="unzer_company_form" class="form-control selectpicker" required>
+                    <option value="" label="-">-</option>
+                    [{foreach from=$oView->getUnzerCompanyTypes() item=title key=value}]
+                    <option value="[{$value}]" label="[{$title}]">[{$title}]</option>
+                    [{/foreach}]
+                </select>
             </div>
-        [{/if}]
-        [{if !$isCompany}]
-            <div id="consumer_b2c" class="form-group row oxDate [{if !$iBirthdayMonth || !$iBirthdayDay || !$iBirthdayYear}]text-danger[{/if}] [{if $isBoth}]collapse[{/if}]">
-                <label class="col-12 col-lg-3 req" for="oxDay">[{oxmultilang ident="BIRTHDATE"}]</label>
-                <div class="col-3 col-lg-3">
-                    <input id="birthdate_day" class="oxDay form-control" type="text" maxlength="2" value="[{if $iBirthdayDay > 0}][{$iBirthdayDay}][{/if}]"
-                           placeholder="[{oxmultilang ident="DAY"}]" required>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <select id="birthdate_month" class="oxMonth form-control selectpicker" required>
-                        <option value="" label="-">-</option>
-                        [{section name="month" start=1 loop=13}]
-                        <option value="[{$smarty.section.month.index}]" label="[{$smarty.section.month.index}]" [{if $iBirthdayMonth|intval == $smarty.section.month.index}] selected="selected" [{/if}]>
-                            [{oxmultilang ident="MONTH_NAME_"|cat:$smarty.section.month.index}]
-                        </option>
-                        [{/section}]
-                    </select>
-                </div>
-                <div class="col-3 col-lg-3">
-                    <input id="birthdate_year" class="oxYear form-control" type="text" maxlength="4" value="[{if $iBirthdayYear}][{$iBirthdayYear}][{/if}]"
-                           placeholder="[{oxmultilang ident="YEAR"}]" required>
-                </div>
-                <div class="offset-lg-3 col-lg-9 col-12">
-                    <div class="help-block">
-                        <p class="text-danger [{if $iBirthdayMonth && $iBirthdayDay && $iBirthdayYear}]d-none hidden[{/if}]">[{oxmultilang ident="DD_FORM_VALIDATION_REQUIRED"}]</p>
-                    </div>
-                </div>
-            </div>
+        </div>
         [{/if}]
     </form>
     [{capture assign="unzerInvoiceJS"}]
@@ -179,22 +163,16 @@
             )
         [{if $isCompany}]
             || (
-            !$( '.unzerCommercialSector' ).hasClass("text-danger") && selectConsumer == 'B2B'
+            !$( '.unzerCompanyForm' ).hasClass("text-danger") && selectConsumer == 'B2B'
             )
         [{/if}]
         ) {
         [{if $isCompany}]
-            let hiddenInputCommercialSector = $(document.createElement('input'))
+            let hiddenInputCompanyForm = $(document.createElement('input'))
                 .attr('type', 'hidden')
-                .attr('name', 'unzer_commercial_sector')
-                .val($('#unzer_commercial_sector').val());
-            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputCommercialSector);
-
-            let hiddenInputRegistrationNumber = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'unzer_commercial_register_number')
-                .val($('#unzer_commercial_register_number').val());
-            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputRegistrationNumber);
+                .attr('name', 'unzer_company_form')
+                .val($('#unzer_company_form').val());
+            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputCompanyForm);
         [{/if}]
             let hiddenInputBirthdate = $(document.createElement('input'))
                 .attr('type', 'hidden')
