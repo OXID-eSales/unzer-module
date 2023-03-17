@@ -19,6 +19,7 @@ use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
+use UnzerSDK\Constants\CompanyRegistrationTypes;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Resources\Customer;
@@ -155,6 +156,11 @@ class Unzer
             $companyInfo = new CompanyInfo();
             $companyInfo->setCompanyType($companyType);
             $customer->setCompanyInfo($companyInfo);
+            $companyInfo->setRegistrationType(CompanyRegistrationTypes::REGISTRATION_TYPE_NOT_REGISTERED);
+            $companyInfo->setFunction('OWNER');
+
+            // https://docs.unzer.com/server-side-integration/php-sdk-integration/manage-php-resources/php-manage-customer/
+            $companyInfo->setCommercialRegisterNumber($oUser->getFieldData('oxlname'));
         }
 
         return $customer;
