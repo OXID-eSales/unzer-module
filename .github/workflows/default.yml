@@ -314,6 +314,7 @@ jobs:
           sed -i 's+/var/www/test-module/++' tests/phpunit.xml
 
       - name: Download styles artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v3
         with:
           name: StylesLog-8.0
