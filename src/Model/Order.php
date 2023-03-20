@@ -23,6 +23,7 @@ class Order extends Order_parent
 {
     use ServiceContainer;
 
+    /** @var bool $isRedirectOrder */
     protected $isRedirectOrder = false;
 
     /**
@@ -30,6 +31,8 @@ class Order extends Order_parent
      * @param User $oUser
      * @return int|bool
      * @throws \Exception
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function finalizeUnzerOrderAfterRedirect(
         Basket $oBasket,
@@ -40,7 +43,7 @@ class Order extends Order_parent
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus != "ERROR") {
-            if (!$this->oxorder__oxordernr->value) {
+            if (!$this->getFieldData('oxordernr')) {
                 $this->_setNumber();
             }
             // else {
@@ -90,11 +93,15 @@ class Order extends Order_parent
         return $iRet;
     }
 
+    /**
+     * @return void
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
     public function markUnzerOrderAsPaid(): void
     {
         $utilsDate = Registry::getUtilsDate();
         $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-        $this->oxorder__oxpaid = new Field($date);
+        $this->_setFieldData('oxpaid', $date);
         $this->save();
     }
 
@@ -111,21 +118,25 @@ class Order extends Order_parent
     }
 
     /**
-     * @param null $unzerPayment
+     * @param \UnzerSDK\Resources\Payment|null $unzerPayment
      * @return bool
      * @throws UnzerApiException
      */
     public function initWriteTransactionToDB($unzerPayment = null): bool
     {
+        /** @var string $oxpaymenttype */
+        $oxpaymenttype = $this->getFieldData('oxpaymenttype');
         if (
-            $this->oxorder__oxtransstatus->value == "OK"
-            && strpos($this->oxorder__oxpaymenttype->value, "oscunzer") !== false
+            $this->getFieldData('oxtransstatus') == "OK"
+            && strpos($oxpaymenttype, "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             return $transactionService->writeTransactionToDB(
                 $this->getId(),
                 $this->getOrderUser()->getId() ?: '',
-                $unzerPayment ?? $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
+                $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
+                    $unzerPayment :
+                    $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
             );
         }
 
@@ -137,9 +148,11 @@ class Order extends Order_parent
      */
     public function getUnzerInvoiceNr()
     {
-        return (int)$this->getFieldData('OXINVOICENR') !== 0 ?
+        /** @var int $number */
+        $number = $this->getFieldData('OXINVOICENR') !== 0 ?
             $this->getFieldData('OXINVOICENR') :
             $this->getFieldData('OXORDERNR');
+        return $number;
     }
 
     /**
@@ -147,19 +160,20 @@ class Order extends Order_parent
      * @throws DatabaseConnectionException
      *
      * @return false|int
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function reinitializeOrder()
     {
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $rs = $oDB->getRow("SELECT OXUSERID, SERIALIZED_BASKET from oscunzertransaction
+        $rowSelect = $oDB->getRow("SELECT OXUSERID, SERIALIZED_BASKET from oscunzertransaction
                             where OXORDERID = :oxorderid AND OXACTION = 'init'", [':oxorderid' => $this->getId()]);
-        if ($rs) {
+        if ($rowSelect) {
             $oUser = oxNew(User::class);
-            $oUser->load($rs['OXUSERID']);
-            if (
-                $oUser->isLoaded() &&
-                $oBasket = unserialize(base64_decode($rs['SERIALIZED_BASKET']))
-            ) {
+            $oUser->load($rowSelect['OXUSERID']);
+            if ($oUser->isLoaded()) {
+                /** @var Basket $oBasket */
+                $oBasket = unserialize(base64_decode($rowSelect['SERIALIZED_BASKET']));
                 return $this->finalizeOrder($oBasket, $oUser, true);
             }
         }
@@ -181,11 +195,23 @@ class Order extends Order_parent
         $transactionList = oxNew(TransactionList::class);
         $transactionList->getTransactionList($sOxId);
         if ($transactionList->count()) {
+            /** @var Transaction $transaction */
             foreach ($transactionList as $transaction) {
                 $transaction->delete();
             }
         }
 
         return parent::delete($sOxId);
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $value
+     * @param int $dataType
+     * @return false|void
+     */
+    public function setFieldData($fieldName, $value, $dataType = \OxidEsales\Eshop\Core\Field::T_TEXT)
+    {
+        return parent::_setFieldData($fieldName, $value, $dataType);
     }
 }

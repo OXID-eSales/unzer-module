@@ -17,6 +17,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
 
+/**
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
+ */
 abstract class UnzerPayment
 {
     /** @var Unzer */
@@ -77,6 +80,8 @@ abstract class UnzerPayment
      * @param User $userModel
      * @param Basket $basketModel
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function execute(
         User $userModel,

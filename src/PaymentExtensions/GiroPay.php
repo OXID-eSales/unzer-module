@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Giropay as UnzerGiropay;
 
 class GiroPay extends UnzerPayment
 {
@@ -23,7 +24,7 @@ class GiroPay extends UnzerPayment
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(
-            new \UnzerSDK\Resources\PaymentTypes\Giropay()
+            new UnzerGiropay()
         );
     }
 }

@@ -100,12 +100,9 @@ class Events
             ->getContainer();
         /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
         $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-        /** @var ContextInterface $context */
-        $context = $container->get(ContextInterface::class);
 
         return new StaticContent(
             $queryBuilderFactory,
-            $context
         );
     }
 }

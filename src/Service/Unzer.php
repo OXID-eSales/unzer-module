@@ -7,6 +7,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Exception;
+use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
@@ -32,6 +34,10 @@ use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Unzer
 {
     /** @var Session */
@@ -75,52 +81,80 @@ class Unzer
      * @param Order|null $oOrder
      * @param string $companyType
      * @return Customer
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getUnzerCustomer(
         User $oUser,
         ?Order $oOrder = null,
         string $companyType = ''
     ): Customer {
+        /** @var string $oxfname */
+        $oxfname = $oUser->getFieldData('oxfname');
+        /** @var string $oxlname */
+        $oxlname = $oUser->getFieldData('oxlname');
         $customer = CustomerFactory::createCustomer(
-            $oUser->getFieldData('oxfname'),
-            $oUser->getFieldData('oxlname')
+            $oxfname,
+            $oxlname
         );
 
-        if ($birthdate = Registry::getRequest()->getRequestParameter('birthdate')) {
-            $oUser->oxuser__oxbirthdate = new Field($birthdate, FieldAlias::T_RAW);
+        $birthdate = Registry::getRequest()->getRequestParameter('birthdate');
+        if (is_string($birthdate)) {
+            $oUser->assign(['oxuser__oxbirthdate' => $birthdate]);
         }
 
-        $customer->setBirthDate(
-            $oUser->getFieldData('oxbirthdate') != "0000-00-00"
-                ? $oUser->getFieldData('oxbirthdate')
-                : ''
-        );
+        /** @var string $birthdate */
+        $birthdate = $oUser->getFieldData('oxbirthdate');
+        $customer->setBirthDate($birthdate != "0000-00-00" ? $birthdate : '');
 
-        $customer->setCompany($oUser->getFieldData('oxcompany'));
-        $customer->setSalutation($oUser->getFieldData('oxsal'));
-        $customer->setEmail($oUser->getFieldData('oxusername'));
-        $customer->setPhone($oUser->getFieldData('oxfon'));
-        $customer->setMobile($oUser->getFieldData('oxmobfon'));
+        /** @var string $oxcompany */
+        $oxcompany = $oUser->getFieldData('oxcompany');
+        $customer->setCompany($oxcompany);
+
+        /** @var string $oxsal */
+        $oxsal = $oUser->getFieldData('oxsal');
+        $customer->setSalutation($oxsal);
+
+        /** @var string $oxusername */
+        $oxusername = $oUser->getFieldData('oxusername');
+        $customer->setEmail($oxusername);
+
+        /** @var string $oxfon */
+        $oxfon = $oUser->getFieldData('oxfon');
+        $customer->setPhone($oxfon);
+
+        /** @var string $oxmobfon */
+        $oxmobfon = $oUser->getFieldData('oxmobfon');
+        $customer->setMobile($oxmobfon);
 
         $billingAddress = $customer->getBillingAddress();
 
         $oCountry = oxNew(Country::class);
-        $billingCountryIso = $oCountry->load($oUser->getFieldData('oxcountryid'))
+        /** @var string $oxcountryid */
+        $oxcountryid = $oUser->getFieldData('oxcountryid');
+        /** @var string $billingCountryIso */
+        $billingCountryIso = $oCountry->load($oxcountryid)
             ? $oCountry->getFieldData('oxisoalpha2')
             : '';
 
-        $billingAddress->setName(
-            $oUser->getFieldData('oxcompany') ??
-            $oUser->getFieldData('oxfname') . ' ' . $oUser->getFieldData('oxlname')
-        );
+        $billingAddress->setName(!empty($oxcompany) ? $oxcompany : $oxfname . ' ' . $oxlname);
         $billingAddress->setStreet(trim(
             $oUser->getFieldData('oxstreet') .
             ' ' .
             $oUser->getFieldData('oxstreetnr')
         ));
 
-        $billingAddress->setZip($oUser->getFieldData('oxzip'));
-        $billingAddress->setCity(trim($oUser->getFieldData('oxcity')));
+        /** @var string $oxzip */
+        $oxzip = $oUser->getFieldData('oxzip');
+        $billingAddress->setZip($oxzip);
+
+        /** @var string $oxcity */
+        $oxcity = $oUser->getFieldData('oxcity');
+        $billingAddress->setCity(trim($oxcity));
         $billingAddress->setCountry($billingCountryIso);
 
         $oDelAddress = null;
@@ -131,30 +165,40 @@ class Unzer
             $oDelAddress = $oUser->getSelectedAddress();
         }
 
-        if ($oDelAddress) {
+        if ($oDelAddress instanceof Address) {
             $shippingAddress = $customer->getShippingAddress();
-            $deliveryCountryIso = $oCountry->load($oDelAddress->getFieldData('oxcountryid'))
+            /** @var string $oxcountryid */
+            $oxcountryid = $oDelAddress->getFieldData('oxcountryid');
+            /** @var string $deliveryCountryIso */
+            $deliveryCountryIso = $oCountry->load($oxcountryid)
                 ? $oDelAddress->getFieldData('oxisoalpha2')
                 : '';
 
-            $shippingAddress->setName(
-                $oDelAddress->getFieldData('oxcompany') ??
-                $oDelAddress->getFieldData('oxfname') . ' ' . $oDelAddress->getFieldData('oxlname')
-            );
+            /** @var string $oxcompany */
+            $oxcompany = $oDelAddress->getFieldData('oxcompany');
+            /** @var string $oxfname */
+            $oxfname = $oDelAddress->getFieldData('oxfname');
+            /** @var string $oxlname */
+            $oxlname = $oDelAddress->getFieldData('oxlname');
+            $shippingAddress->setName(!empty($oxcompany) ? $oxcompany : $oxfname . ' ' . $oxlname);
             $shippingAddress->setStreet(trim(
                 $oDelAddress->getFieldData('oxstreet') .
                 ' ' .
                 $oDelAddress->getFieldData('oxstreetnr')
             ));
 
-            $shippingAddress->setZip($oDelAddress->getFieldData('oxzip'));
-            $shippingAddress->setCity($oDelAddress->getFieldData('oxstreet'));
+            /** @var string $oxzip */
+            $oxzip = $oDelAddress->getFieldData('oxzip');
+            $shippingAddress->setZip($oxzip);
+
+            /** @var string $oxcity */
+            $oxcity = $oDelAddress->getFieldData('oxstreet');
+            $shippingAddress->setCity($oxcity);
             $shippingAddress->setCountry($deliveryCountryIso);
         }
 
         if ($companyType) {
             $companyInfo = new CompanyInfo();
-            $companyInfo->setCompanyType($companyType);
             $customer->setCompanyInfo($companyInfo);
             $companyInfo->setRegistrationType(CompanyRegistrationTypes::REGISTRATION_TYPE_NOT_REGISTERED);
             $companyInfo->setFunction('OWNER');
@@ -299,6 +343,7 @@ class Unzer
     /**
      * @param bool $addPending
      * @return string
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function prepareOrderRedirectUrl(bool $addPending = false): string
     {
@@ -336,14 +381,16 @@ class Unzer
      */
     public function getUnzerPaymentIdFromRequest(): string
     {
+        /** @var string $jsonPaymentData */
         $jsonPaymentData = $this->request->getRequestParameter('paymentData');
+        /** @var array $paymentData */
         $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
 
         if (array_key_exists('id', $paymentData)) {
             return $paymentData['id'];
         }
 
-        throw new \Exception('oscunzer_WRONGPAYMENTID');
+        throw new Exception('oscunzer_WRONGPAYMENTID');
     }
 
     /**
@@ -362,14 +409,16 @@ class Unzer
             $this->session->setVariable('UzrPdfLink', $charge->getPDFLink());
         }
 
-        $paymentType = $charge->getPayment()->getPaymentType();
+        /** @var \UnzerSDK\Resources\Payment $payment */
+        $payment = $charge->getPayment();
+        $paymentType = $payment->getPaymentType();
 
         if (!$paymentType) {
             return;
         }
 
         // TODO: $charge is not only class of Charge possible here. Investigate and fix.
-        if ($paymentType instanceof Prepayment || $paymentType->isInvoiceType()) {
+        if ($charge instanceof Charge && ($paymentType instanceof Prepayment || $paymentType->isInvoiceType())) {
             $this->session->setVariable(
                 'additionalPaymentInformation',
                 $this->getBankDataFromCharge($charge)
@@ -381,6 +430,7 @@ class Unzer
      * @param string $paymentMethod
      * @return Metadata
      * @throws \Exception
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getShopMetadata(string $paymentMethod): Metadata
     {
@@ -405,8 +455,9 @@ class Unzer
 
     /**
      * @return void
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function setIsAjaxPayment($isAjaxPayment = false): void
+    public function setIsAjaxPayment(bool $isAjaxPayment = false): void
     {
         $this->session->setVariable('UzrAjaxRedirect', $isAjaxPayment);
     }
