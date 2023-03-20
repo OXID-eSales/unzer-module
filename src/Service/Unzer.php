@@ -203,7 +203,7 @@ class Unzer
             $companyInfo->setRegistrationType(CompanyRegistrationTypes::REGISTRATION_TYPE_NOT_REGISTERED);
             $companyInfo->setFunction('OWNER');
 
-            $companyInfo->setCommercialRegisterNumber($oUser->getFieldData('oxustid'));
+            $companyInfo->setCommercialRegisterNumber(strval($oUser->getFieldData('oxustid')));
         }
 
         return $customer;

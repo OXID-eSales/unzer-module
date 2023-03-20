@@ -257,9 +257,7 @@ class ViewConfig extends ViewConfig_parent
     {
         $currencyName = '';
         $basket = Registry::getSession()->getBasket();
-        if ($basket) {
-            $currencyName = $basket->getBasketCurrency()->name;
-        }
+        $currencyName = $basket->getBasketCurrency()->name;
         return $currencyName;
     }
 }

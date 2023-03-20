@@ -39,7 +39,7 @@ class OrderController extends OrderController_parent
     /** @var Order $actualOrder */
     protected $actualOrder = null;
 
-    /** @var array $commercialSectors */
+    /** @var array $companyTypes */
     protected $companyTypes = null;
 
     /**
@@ -48,7 +48,7 @@ class OrderController extends OrderController_parent
     public function execute()
     {
         if (!$this->isSepaConfirmed()) {
-            return null;
+            return '';
         }
 
         $ret = parent::execute();
@@ -216,9 +216,7 @@ class OrderController extends OrderController_parent
      */
     public function getUnzerCompanyTypes(): array
     {
-        if (!is_array($this->commercialSectors)) {
-            $this->commercialSectors = [];
-        if (is_null($this->companyTypes) || empty($this->companyTypes)) {
+        if (empty($this->companyTypes)) {
             $this->companyTypes = [];
             $translator = $this->getServiceFromContainer(Translator::class);
             foreach (UnzerDefinitions::getUnzerCompanyTypes() as $value) {

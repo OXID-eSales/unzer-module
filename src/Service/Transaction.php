@@ -7,7 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Driver\Result;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Application\Model\Basket;

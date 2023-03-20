@@ -554,7 +554,7 @@ final class UnzerDefinitions
         ],
     ];
 
-    /** @var array[] */
+    /** @var array */
     private const UNZER_COMPANY_TYPES = [
         CompanyTypes::AUTHORITY,
         CompanyTypes::ASSOCIATION,
@@ -563,22 +563,22 @@ final class UnzerDefinitions
         CompanyTypes::OTHER,
     ];
 
-    public static function getUnzerDefinitions()
+    public static function getUnzerDefinitions(): array
     {
         return self::UNZER_DEFINTIONS;
     }
 
-    public static function getUnzerRdfaDefinitions()
+    public static function getUnzerRdfaDefinitions(): array
     {
         return self::UNZER_RDFA_DEFINITIONS;
     }
 
-    public static function getUnzerStaticContents()
+    public static function getUnzerStaticContents(): array
     {
         return self::PAYPAL_STATIC_CONTENTS;
     }
 
-    public static function getUnzerCompanyTypes()
+    public static function getUnzerCompanyTypes(): array
     {
         return self::UNZER_COMPANY_TYPES;
     }
