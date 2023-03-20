@@ -53,7 +53,8 @@ class UnzerSDKLoader
         $basket = $this->session->getBasket();
         if ($basket instanceof Basket && $basket->getPaymentId() === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
             $request = Registry::getRequest();
-            $customerType = strval($request->getRequestParameter('unzer_customer_type', ''));
+            /** @var string $customerType */
+            $customerType = $request->getRequestParameter('unzer_customer_type', '');
 
             $key = $this->moduleSettings->getShopPrivateKeyInvoice($customerType);
         }

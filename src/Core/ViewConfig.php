@@ -101,57 +101,25 @@ class ViewConfig extends ViewConfig_parent
 
     public function getUnzerB2BPubKey(): string
     {
-        $key = '';
-        $currencyName = $this->getBasketCurrencyName();
-        if ($currencyName === 'CHF') {
-            return $this->moduleSettings->getShopPublicKeyB2BInvoiceCHF();
-        }
-
-        if ($currencyName === 'EUR') {
-            return $this->moduleSettings->getShopPublicKeyB2BInvoiceEUR();
-        }
+        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2B');
         return $key;
     }
 
     public function getUnzerB2BPrivKey(): string
     {
-        $key = '';
-        $currencyName = $this->getBasketCurrencyName();
-        if ($currencyName === 'CHF') {
-            return $this->moduleSettings->getShopPrivateKeyB2BInvoiceCHF();
-        }
-
-        if ($currencyName === 'EUR') {
-            return $this->moduleSettings->getShopPrivateKeyB2BInvoiceEUR();
-        }
+        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2B');
         return $key;
     }
 
     public function getUnzerB2CPubKey(): string
     {
-        $key = '';
-        $currencyName = $this->getBasketCurrencyName();
-        if ($currencyName === 'CHF') {
-            $key = $this->moduleSettings->getShopPublicKeyB2CInvoiceCHF();
-        }
-
-        if ($currencyName === 'EUR') {
-            $key = $this->moduleSettings->getShopPublicKeyB2CInvoiceEUR();
-        }
+        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2C');
         return $key;
     }
 
     public function getUnzerB2CPrivKey(): string
     {
-        $key = '';
-        $currencyName = $this->getBasketCurrencyName();
-        if ($currencyName === 'CHF') {
-            $key = $this->moduleSettings->getShopPrivateKeyB2CInvoiceCHF();
-        }
-
-        if ($currencyName === 'EUR') {
-            $key = $this->moduleSettings->getShopPrivateKeyB2CInvoiceEUR();
-        }
+        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2C');
         return $key;
     }
 

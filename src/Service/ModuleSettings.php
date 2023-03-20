@@ -508,7 +508,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPublicKeyB2CInvoiceEUR(): string
+    private function getShopPublicKeyB2CInvoiceEUR(): string
     {
         /** @var string $unzerPubKeyB2CEUR */
         $unzerPubKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CEUR');
@@ -518,7 +518,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2CInvoiceEUR(): string
+    private function getShopPrivateKeyB2CInvoiceEUR(): string
     {
         /** @var string $unzerPrivKeyB2CEUR */
         $unzerPrivKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CEUR');
@@ -528,7 +528,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPublicKeyB2BInvoiceEUR(): string
+    private function getShopPublicKeyB2BInvoiceEUR(): string
     {
         /** @var string $unzerPubKeyB2BEUR */
         $unzerPubKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BEUR');
@@ -538,7 +538,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2BInvoiceEUR(): string
+    private function getShopPrivateKeyB2BInvoiceEUR(): string
     {
         /** @var string $unzerPrivKeyB2BEUR */
         $unzerPrivKeyB2BEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BEUR');
@@ -548,7 +548,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPublicKeyB2CInvoiceCHF(): string
+    private function getShopPublicKeyB2CInvoiceCHF(): string
     {
         /** @var string $unzerPubKeyB2CCHF */
         $unzerPubKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CCHF');
@@ -558,7 +558,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2CInvoiceCHF(): string
+    private function getShopPrivateKeyB2CInvoiceCHF(): string
     {
         /** @var string $unzerPrivKeyB2CCHF */
         $unzerPrivKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2CCHF');
@@ -568,7 +568,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPublicKeyB2BInvoiceCHF(): string
+    private function getShopPublicKeyB2BInvoiceCHF(): string
     {
         /** @var string $unzerPubKeyB2BCHF */
         $unzerPubKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2BCHF');
@@ -578,7 +578,7 @@ class ModuleSettings
     /**
      * @return string
      */
-    public function getShopPrivateKeyB2BInvoiceCHF(): string
+    private function getShopPrivateKeyB2BInvoiceCHF(): string
     {
         /** @var string $unzerPrivKeyB2BCHF */
         $unzerPrivKeyB2BCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKeyB2BCHF');

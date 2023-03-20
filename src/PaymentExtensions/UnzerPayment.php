@@ -89,7 +89,8 @@ abstract class UnzerPayment
     ): bool {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
-        $companyType = strval($request->getRequestParameter('unzer_company_form', ''));
+        /** @var string $companyType */
+        $companyType = $request->getRequestParameter('unzer_company_form', '');
 
         $customer = $this->unzerService->getUnzerCustomer(
             $userModel,
