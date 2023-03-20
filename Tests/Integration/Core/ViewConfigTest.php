@@ -13,6 +13,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\Mod
 use OxidEsales\TestingLibrary\UnitTestCase;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
 
 class ViewConfigTest extends UnitTestCase
 {
@@ -40,8 +41,8 @@ class ViewConfigTest extends UnitTestCase
         $this->assertSame($testValue, $viewConfig->getSessionPaymentInfo());
     }
 
-    private function getViewConfig(): \OxidSolutionCatalysts\Unzer\Core\ViewConfig
+    private function getViewConfig(): ViewConfig
     {
-        return Registry::get(\OxidEsales\Eshop\Core\ViewConfig::class);
+        return Registry::get(ViewConfig::class);
     }
 }

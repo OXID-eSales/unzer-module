@@ -26,6 +26,7 @@ class Context extends BasicContext
 
     /**
      * @return string
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getUnzerLogFilePath(): string
     {

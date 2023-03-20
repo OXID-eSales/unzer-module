@@ -81,13 +81,16 @@ class Transaction extends BaseModel
     }
 
     /**
-     * @return array|mixed
+     * @return array|null
      */
     public function getUnzerMetaData(): ?array
     {
+        /** @var string $json */
         $json = $this->getRawField('METADATA');
         if ($json) {
-            return json_decode($json, true);
+            /** @var array $jsonDecoded */
+            $jsonDecoded = json_decode($json, true);
+            return $jsonDecoded;
         }
 
         return [];
@@ -104,7 +107,7 @@ class Transaction extends BaseModel
         if (isset($this->{$sLongFieldName})) {
             $fieldData = $this->{$sLongFieldName};
             if ($fieldData instanceof Field) {
-                $val = $fieldData->rawValue;
+                $val = $fieldData->getRawValue();
 
                 // Fix for MariaDB empty default-value issue with some oxid versions:
                 // (causes quotes to be saved instead of empty string)

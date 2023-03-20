@@ -141,23 +141,23 @@ jobs:
           cd source/test-module
           composer install
 
-      - name: Run psalm
-        run: |
-          cd source/test-module
-          php vendor/bin/psalm --show-info=true --no-cache --report=logs/psalm.sonarqube.json
+      - name: Run phpstan
+        id: phpstan
+        if: always()
+        working-directory: source/test-module
+        run: composer phpstan-report || composer phpstan
+
+      - name: Run phpmd
+        id: phpmd
+        if: always()
+        working-directory: source/test-module
+        run: composer phpmd-report || composer phpmd
 
       - name: Run phpcs
         if: always()
         run: |
           cd source/test-module
           composer phpcs
-
-      - name: Save psalm logs
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: TestsLog
-          path: source/test-module/logs/psalm.sonarqube.json
 
       - name: Upload log artifact
         if: always()
@@ -314,6 +314,7 @@ jobs:
           sed -i 's+/var/www/test-module/++' tests/phpunit.xml
 
       - name: Download styles artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v3
         with:
           name: StylesLog-8.0

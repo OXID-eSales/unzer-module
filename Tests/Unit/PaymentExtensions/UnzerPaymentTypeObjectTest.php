@@ -50,11 +50,7 @@ class UnzerPaymentTypeObjectTest extends TestCase
             ],
             [
                 \OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice::class,
-                \UnzerSDK\Resources\PaymentTypes\Invoice::class
-            ],
-            [
-                \OxidSolutionCatalysts\Unzer\PaymentExtensions\InvoiceSecured::class,
-                \UnzerSDK\Resources\PaymentTypes\InvoiceSecured::class
+                \UnzerSDK\Resources\PaymentTypes\PaylaterInvoice::class
             ],
             [
                 \OxidSolutionCatalysts\Unzer\PaymentExtensions\PayPal::class,

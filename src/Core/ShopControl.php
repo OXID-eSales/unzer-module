@@ -29,10 +29,11 @@ class ShopControl extends ShopControl_parent
     {
         if ($exception instanceof UnzerException) {
             $this->handleCustomUnzerException($exception);
-        } else {
-            parent::_handleBaseException($exception);
+            return;
         }
-    } // @codeCoverageIgnore
+
+        parent::_handleBaseException($exception);
+    }
 
     /**
      * @param UnzerException $exception
@@ -41,16 +42,21 @@ class ShopControl extends ShopControl_parent
     {
         if ($exception instanceof RedirectWithMessage) {
             $this->handleRedirectWithMessageException($exception);
-        } elseif ($exception instanceof Redirect) {
-            $this->handleRedirectException($exception, false);
-        } else {
-            parent::_handleBaseException($exception);
+            return;
         }
-    } // @codeCoverageIgnore
+
+        if ($exception instanceof Redirect) {
+            $this->handleRedirectException($exception, false);
+            return;
+        }
+
+        parent::_handleBaseException($exception);
+    }
 
     /**
      * @param Redirect $redirectException
      * @param bool $blAddRedirectParam
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function handleRedirectException(Redirect $redirectException, bool $blAddRedirectParam = true): void
     {

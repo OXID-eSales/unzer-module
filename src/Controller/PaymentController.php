@@ -39,6 +39,8 @@ class PaymentController extends PaymentController_parent
      * Template variable getter. Returns paymentlist
      *
      * @return array<array-key, mixed>|object
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getPaymentList()
     {
@@ -49,6 +51,9 @@ class PaymentController extends PaymentController_parent
             $paymentListRaw = $paymentList;
             $paymentList = [];
 
+            /**
+             * @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment
+             */
             foreach ($paymentListRaw as $key => $payment) {
                 if (is_object($payment) && $payment->isUnzerPayment()) {
                     continue;
@@ -70,16 +75,24 @@ class PaymentController extends PaymentController_parent
         return $paymentList;
     }
 
-    protected function checkForUnzerPaymentErrors()
+    /**
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected function checkForUnzerPaymentErrors(): void
     {
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment */
         $payment = oxNew(Payment::class);
+        $actualPaymentId = $this->getCheckedPaymentId();
         if (
             $this->getPaymentError() &&
-            ($actualPaymentId = $this->getCheckedPaymentId()) &&
+            (is_string($actualPaymentId)) &&
             $payment->load($actualPaymentId) &&
             $payment->isUnzerPayment()
         ) {
             $session = Registry::getSession();
+            /** @var string $orderId */
             $orderId = $session->getVariable('sess_challenge');
             $order = oxNew(Order::class);
             $order->delete($orderId);

@@ -531,7 +531,7 @@ final class UnzerDefinitions
         ],
     ];
 
-    /** @var array[] */
+    /** @var array */
     private const UNZER_COMMERCIAL_SECTORS = [
         'OTHER',
         'WHOLESALE_TRADE_EXCEPT_VEHICLE_TRADE',
@@ -576,22 +576,34 @@ final class UnzerDefinitions
         'ARTS_ENTERTAINMENT_AND_RECREATION'
     ];
 
-    public static function getUnzerDefinitions()
+    /**
+     * @return array[]
+     */
+    public static function getUnzerDefinitions(): array
     {
         return self::UNZER_DEFINTIONS;
     }
 
-    public static function getUnzerRdfaDefinitions()
+    /**
+     * @return array[]|\string[][]
+     */
+    public static function getUnzerRdfaDefinitions(): array
     {
         return self::UNZER_RDFA_DEFINITIONS;
     }
 
-    public static function getUnzerStaticContents()
+    /**
+     * @return array[]
+     */
+    public static function getUnzerStaticContents(): array
     {
         return self::PAYPAL_STATIC_CONTENTS;
     }
 
-    public static function getUnzerCommercialSectors()
+    /**
+     * @return array|string[]
+     */
+    public static function getUnzerCommercialSectors(): array
     {
         return self::UNZER_COMMERCIAL_SECTORS;
     }
