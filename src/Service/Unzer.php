@@ -159,8 +159,7 @@ class Unzer
             $companyInfo->setRegistrationType(CompanyRegistrationTypes::REGISTRATION_TYPE_NOT_REGISTERED);
             $companyInfo->setFunction('OWNER');
 
-            // https://docs.unzer.com/server-side-integration/php-sdk-integration/manage-php-resources/php-manage-customer/
-            $companyInfo->setCommercialRegisterNumber($oUser->getFieldData('oxlname'));
+            $companyInfo->setCommercialRegisterNumber($oUser->getFieldData('oxustid'));
         }
 
         return $customer;
