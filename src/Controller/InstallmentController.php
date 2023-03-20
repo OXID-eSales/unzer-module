@@ -9,13 +9,16 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Application\Model\Basket;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 
 class InstallmentController extends FrontendController
 {
@@ -48,22 +51,26 @@ class InstallmentController extends FrontendController
 
     /**
      * @inheritDoc
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function render()
     {
+        /** @var Basket $oBasket */
         $oBasket = Registry::getSession()->getBasket();
+        /** @var User|null $oUser */
         $oUser = Registry::getSession()->getUser();
 
         $myConfig = Registry::getConfig();
 
-        if (!$oBasket || ($oBasket && !$oBasket->getProductsCount())) {
+        if (!$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
         }
 
         // can we proceed with ordering ?
-        if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
+        if (!$oUser && $oBasket->getProductsCount() > 0) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
-        } elseif (!$oBasket || !$oUser || ($oBasket && !$oBasket->getProductsCount())) {
+        } elseif (!$oUser || !$oBasket->getProductsCount()) {
             Registry::getUtils()->redirect($myConfig->getShopHomeUrl(), false, 302);
         }
 
@@ -73,9 +80,9 @@ class InstallmentController extends FrontendController
             Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', true, 302);
         }
 
+        /** @var string $sPdfLink */
         $sPdfLink = Registry::getSession()->getVariable('UzrPdfLink');
-
-        if (!$sPdfLink || $sPdfLink === '') {
+        if (empty($sPdfLink)) {
             // redirecting to payment step on error ..
             Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', false, 302);
         }
@@ -105,23 +112,23 @@ class InstallmentController extends FrontendController
     public function getPayment()
     {
         if ($this->oxPayment === null) {
-            $this->oxPayment = false;
-
             $oBasket = Registry::getSession()->getBasket();
             $oUser = Registry::getSession()->getUser();
 
             // payment is set ?
             $sPaymentid = $oBasket->getPaymentId();
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+            $oPayment = oxNew(\OxidSolutionCatalysts\Unzer\Model\Payment::class);
 
+            /** @var string $sShipSet */
+            $sShipSet = Registry::getSession()->getVariable('sShipSet');
             if (
                 $sPaymentid && $oPayment->load($sPaymentid) &&
                 $oPayment->isValidPayment(
-                    Registry::getSession()->getVariable('dynvalue'),
-                    (string) $this->getConfig()->getShopId(),
+                    (array)Registry::getSession()->getVariable('dynvalue'),
+                    (string)$this->getConfig()->getShopId(),
                     $oUser,
                     $oBasket->getPriceForPayment(),
-                    Registry::getSession()->getVariable('sShipSet')
+                    $sShipSet
                 )
             ) {
                 $this->oxPayment = $oPayment;
@@ -141,12 +148,19 @@ class InstallmentController extends FrontendController
         return 'confirmInstallment';
     }
 
+    /**
+     * @return Payment|null
+     */
     protected function getUnzerSessionPayment(): ?Payment
     {
         if ($this->uzrPayment === null) {
-            $this->uzrPayment = $this->getServiceFromContainer(
+            /** @var \OxidSolutionCatalysts\Unzer\Service\Payment $payment */
+            $payment = $this->getServiceFromContainer(
                 \OxidSolutionCatalysts\Unzer\Service\Payment::class
-            )->getSessionUnzerPayment();
+            );
+            /** @var Payment $sessionUnzerPayment */
+            $sessionUnzerPayment = $payment->getSessionUnzerPayment();
+            $this->uzrPayment = $sessionUnzerPayment;
         }
         return $this->uzrPayment;
     }
@@ -166,18 +180,28 @@ class InstallmentController extends FrontendController
 
     public function confirmInstallment(): void
     {
+        /** @var Payment $unzerPayment */
         $unzerPayment = $this->getUnzerSessionPayment();
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = oxNew(Order::class);
+        /** @var string $sess_challenge */
+        $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
 
-        if ($oOrder->load(Registry::getSession()->getVariable('sess_challenge'))) {
-            $charge = $unzerPayment->getAuthorization()->charge();
+        if ($oOrder->load($sess_challenge)) {
+            /** @var string $oxuserid */
+            $oxuserid = $oOrder->getFieldData('oxuserid');
+            /** @var Authorization $authorization */
+            $authorization = $unzerPayment->getAuthorization();
+            $charge = $authorization->charge();
             $transactionService = $this->getServiceFromContainer(Transaction::class);
             $transactionService->writeChargeToDB(
                 $oOrder->getId(),
-                $oOrder->oxorder__oxuserid->value,
+                $oxuserid,
                 $charge
             );
-            if ($charge->isSuccess() && $charge->getPayment()->getAmount()->getRemaining() == 0) {
+            /** @var Payment $payment */
+            $payment = $charge->getPayment();
+            if ($charge->isSuccess() && $payment->getAmount()->getRemaining() == 0) {
                 $oOrder->markUnzerOrderAsPaid();
             }
 

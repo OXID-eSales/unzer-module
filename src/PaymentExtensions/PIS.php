@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\PIS as UnzerPIS;
 
 class PIS extends UnzerPayment
 {
@@ -23,7 +24,7 @@ class PIS extends UnzerPayment
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(
-            new \UnzerSDK\Resources\PaymentTypes\PIS()
+            new UnzerPIS()
         );
     }
 }

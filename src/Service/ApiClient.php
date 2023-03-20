@@ -114,6 +114,7 @@ class ApiClient
         array $body = [],
         array $headers = []
     ): ResponseInterface {
+        $options = [];
         $options['headers'] = array_merge($this->headers, $headers);
         if ($body) {
             $options['headers']['Content-Type'] = 'application/json';

@@ -28,13 +28,21 @@ class DispatcherController extends FrontendController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @throws UnzerApiException
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function updatePaymentTransStatus(): void
     {
         $result = '';
 
+        /** @var string $jsonRequest */
         $jsonRequest = file_get_contents('php://input');
+        /** @var array $aJson */
         $aJson = json_decode($jsonRequest, true);
+        /** @var array $url */
         $url = parse_url($aJson['retrieveUrl']);
         /** @var Transaction $transaction */
         $transaction = $this->getServiceFromContainer(Transaction::class);
@@ -51,8 +59,11 @@ class DispatcherController extends FrontendController
         $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
 
-        if ($paymentId = $resource->getId()) {
-            $order = oxNew(Order::class);
+        $paymentId = $resource->getId();
+        if (is_string($paymentId)) {
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+            $order = oxNew(\OxidSolutionCatalysts\Unzer\Model\Order::class);
+            /** @var array $data */
             $data = $transaction->getTransactionDataByPaymentId($paymentId);
 
             $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
@@ -60,10 +71,12 @@ class DispatcherController extends FrontendController
                 ->fetchPayment($paymentId);
 
             if ($order->load($data[0]['OXORDERID'])) {
-                if ($unzerPayment->getState() == 1 && $order->oxorder__oxtransstatus->value == "OK") {
+                /** @var string $oxTransStatus */
+                $oxTransStatus = $order->getFieldData('oxtransstatus');
+                if ($unzerPayment->getState() == 1 && $oxTransStatus == "OK") {
                     $utilsDate = Registry::getUtilsDate();
                     $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-                    $order->oxorder__oxpaid = new Field($date);
+                    $order->setFieldData('oxpaid', $date);
                     $order->save();
                 }
 
@@ -73,7 +86,7 @@ class DispatcherController extends FrontendController
 
                 $translator = $this->getServiceFromContainer(Translator::class);
 
-                if ($unzerPayment->getState() != 2 && $order->oxorder__oxtransstatus->value != "OK") {
+                if ($unzerPayment->getState() != 2 && $oxTransStatus != "OK") {
                     $ret = $order->reinitializeOrder();
                     if ($ret != 1) {
                         $unzer->debugLog("Order-Recalculation failed and returned with code: " . $ret);

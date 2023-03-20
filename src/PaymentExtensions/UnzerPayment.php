@@ -14,6 +14,9 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Unzer;
 
+/**
+ * @SuppressWarnings(PHPMD.NumberOfChildren)
+ */
 abstract class UnzerPayment
 {
     /** @var Unzer */
@@ -74,6 +77,8 @@ abstract class UnzerPayment
      * @param User $userModel
      * @param Basket $basketModel
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function execute(
         User $userModel,
@@ -82,11 +87,15 @@ abstract class UnzerPayment
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
 
+        /** @var string $unzerComSector */
+        $unzerComSector = $request->getRequestParameter('unzer_commercial_sector', '');
+        /** @var string $unzerComRegNumber */
+        $unzerComRegNumber = $request->getRequestParameter('unzer_commercial_register_number', '');
         $customer = $this->unzerService->getUnzerCustomer(
             $userModel,
             null,
-            $request->getRequestParameter('unzer_commercial_sector', ''),
-            $request->getRequestParameter('unzer_commercial_register_number', '')
+            $unzerComSector,
+            $unzerComRegNumber
         );
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);

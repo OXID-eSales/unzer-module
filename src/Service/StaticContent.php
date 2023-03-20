@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
@@ -25,17 +26,16 @@ class StaticContent
     /** @var QueryBuilderFactoryInterface */
     private $queryBuilderFactory;
 
-    /** @var ContextInterface */
-    private $context;
-
     public function __construct(
-        QueryBuilderFactoryInterface $queryBuilderFactory,
-        ContextInterface $context
+        QueryBuilderFactoryInterface $queryBuilderFactory
     ) {
         $this->queryBuilderFactory = $queryBuilderFactory;
-        $this->context = $context;
     }
 
+    /**
+     * @return void
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
     public function ensureUnzerPaymentMethods(): void
     {
         foreach (UnzerDefinitions::getUnzerDefinitions() as $paymentId => $paymentDefinitions) {
@@ -59,20 +59,26 @@ class StaticContent
 
     protected function assignPaymentToCountries(string $paymentId, array $countries): void
     {
-        $activeCountriesIso2Id = array_flip($this->getActiveCountries());
+        $activeCountries = array_flip($this->getActiveCountries());
         $assignToCountries = [];
         foreach ($countries as $countryIsoAlpha2) {
-            if (isset($activeCountriesIso2Id[strtoupper($countryIsoAlpha2)])) {
-                $assignToCountries[] = $activeCountriesIso2Id[strtoupper($countryIsoAlpha2)];
+            if (isset($activeCountries[strtoupper($countryIsoAlpha2)])) {
+                $assignToCountries[] = $activeCountries[strtoupper($countryIsoAlpha2)];
             }
         }
-        $assignToCountries = empty($assignToCountries) ? $activeCountriesIso2Id : $assignToCountries;
+        $assignToCountries = empty($assignToCountries) ? $activeCountries : $assignToCountries;
 
         foreach ($assignToCountries as $countryId) {
             $this->assignPaymentToCountry($paymentId, $countryId);
         }
     }
 
+    /**
+     * @param string $paymentId
+     * @param string $countryId
+     * @return void
+     * @throws \Exception
+     */
     protected function assignPaymentToCountry(string $paymentId, string $countryId): void
     {
         $object2Paymentent = oxNew(EshopBaseModel::class);
@@ -87,6 +93,12 @@ class StaticContent
         $object2Paymentent->save();
     }
 
+    /**
+     * @param string $paymentId
+     * @param string $deliverySetId
+     * @return void
+     * @throws \Exception
+     */
     protected function assignPaymentToDelivery(string $paymentId, string $deliverySetId): void
     {
         $object2Paymentent = oxNew(EshopBaseModel::class);
@@ -101,6 +113,12 @@ class StaticContent
         $object2Paymentent->save();
     }
 
+    /**
+     * @param string $paymentId
+     * @param array $definitions
+     * @return void
+     * @throws \Exception
+     */
     protected function createPaymentMethod(string $paymentId, array $definitions): void
     {
         /** @var EshopModelPayment $paymentModel */
@@ -140,6 +158,10 @@ class StaticContent
         }
     }
 
+    /**
+     * @return void
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
     public function ensureStaticContents(): void
     {
         foreach (UnzerDefinitions::getUnzerStaticContents() as $content) {
@@ -167,6 +189,10 @@ class StaticContent
         }
     }
 
+    /**
+     * @return void
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
     public function createRdfa(): void
     {
         foreach (UnzerDefinitions::getUnzerRdfaDefinitions() as $oxId => $rdfaDefinitions) {
@@ -178,6 +204,13 @@ class StaticContent
         }
     }
 
+    /**
+     * @param string $oxId
+     * @param string $paymentId
+     * @param string $rdfaId
+     * @return void
+     * @throws \Exception
+     */
     protected function assignPaymentToRdfa(string $oxId, string $paymentId, string $rdfaId): void
     {
         $object2Paymentent = oxNew(EshopBaseModel::class);
@@ -193,6 +226,10 @@ class StaticContent
         $object2Paymentent->save();
     }
 
+    /**
+     * @param string $ident
+     * @return bool
+     */
     protected function needToAddContent(string $ident): bool
     {
         $content = oxNew(EshopModelContent::class);
@@ -202,6 +239,11 @@ class StaticContent
         return true;
     }
 
+    /**
+     * @param string $ident
+     * @param int $languageId
+     * @return EshopModelContent
+     */
     protected function getContentModel(string $ident, int $languageId): EshopModelContent
     {
         $content = oxNew(EshopModelContent::class);
@@ -212,19 +254,30 @@ class StaticContent
         return $content;
     }
 
+    /**
+     * @return array
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
     protected function getActiveDeliverySetIds(): array
     {
+        /** @var array $result */
+        $result = null;
+
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->queryBuilderFactory->create();
-        $fromDb = $queryBuilder
+        $resultDb = $queryBuilder
             ->select('oxid')
             ->from('oxdeliveryset')
             ->where('oxactive = 1')
-            ->execute()
-            ->fetchAll(PDO::FETCH_ASSOC);
+            ->execute();
 
-        foreach ($fromDb as $row) {
-            $result[$row['oxid']] = $row['oxid'];
+        if ($resultDb instanceof Result) {
+            $fromDb = $resultDb->fetchAllAssociative();
+            /** @var array $row */
+            foreach ($fromDb as $row) {
+                $result[$row['oxid']] = $row['oxid'];
+            }
         }
 
         return $result;
@@ -238,21 +291,29 @@ class StaticContent
         return EshopRegistry::getLang()->getLanguageIds();
     }
 
+    /**
+     * @return array
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
     protected function getActiveCountries(): array
     {
         $result = [];
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->queryBuilderFactory->create();
-        $fromDb = $queryBuilder
+        $resultDb = $queryBuilder
             ->select('oxid, oxisoalpha2')
             ->from('oxcountry')
             ->where('oxactive = 1')
-            ->execute()
-            ->fetchAll(PDO::FETCH_ASSOC);
+            ->execute();
 
-        foreach ($fromDb as $row) {
-            $result[$row['oxid']] = $row['oxisoalpha2'];
+        if ($resultDb instanceof Result) {
+            $fromDb = $resultDb->fetchAllAssociative();
+            /** @var array $row */
+            foreach ($fromDb as $row) {
+                $result[$row['oxid']] = $row['oxisoalpha2'];
+            }
         }
 
         return $result;

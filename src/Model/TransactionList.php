@@ -31,9 +31,9 @@ class TransactionList extends ListModel
 
         $params = [':shopid' => $shopId, ':orderid' => $orderId];
 
-        $sQ = "select $sFieldList from " . $oListObject->getViewName() . "
+        $query = "select $sFieldList from " . $oListObject->getViewName() . "
             where oxshopid = :shopid and oxorderid = :orderid order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
 
-        $this->selectString($sQ, $params);
+        $this->selectString($query, $params);
     }
 }

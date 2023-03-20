@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Doctrine\DBAL\Result;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Application\Model\Basket;
@@ -21,11 +22,18 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Customer;
+use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Transaction
 {
     /** @var Context */
@@ -68,10 +76,10 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
-        if ($unzerPayment && !$unzerShipment) {
-            $params = array_merge($params, $this->getUnzerPaymentData($unzerPayment));
-        } elseif ($unzerShipment) {
-            $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
+        if ($unzerPayment) {
+            $params = $unzerShipment ?
+                array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment)) :
+                array_merge($params, $this->getUnzerPaymentData($unzerPayment));
         }
 
         if ($unzerPayment && $unzerPayment->getState() == 2) {
@@ -116,7 +124,9 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
-        $params = array_merge($params, $this->getUnzerInitOrderData($unzerPayment, $basketModel));
+        if ($unzerPayment instanceof Payment && $basketModel instanceof Basket) {
+            $params = array_merge($params, $this->getUnzerInitOrderData($unzerPayment, $basketModel));
+        }
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
@@ -135,12 +145,6 @@ class Transaction
     /**
      * @param (int|mixed|string)[] $params
      *
-     * @psalm-param array{
-     *     oxorderid: mixed|string,
-     *     oxshopid: int|mixed,
-     *     oxuserid: mixed|string,
-     *     oxactiondate: mixed|string
-     * } $params
      */
     public function deleteInitOrder(array $params): void
     {
@@ -186,10 +190,11 @@ class Transaction
             ))
             ->andWhere('oxorderdate < now() - interval :sessiontime SECOND');
 
-        $ids = $queryBuilder->setParameters($parameters)
-            ->execute()
-            ->fetchAll(PDO::FETCH_COLUMN);
+        /** @var Result $result */
+        $result = $queryBuilder->setParameters($parameters)->execute();
+        $ids = $result->fetchAllAssociative();
 
+        /** @var string $id */
         foreach ($ids as $id) {
             $order = oxNew(EshopModelOrder::class);
             if ($order->load($id)) {
@@ -204,7 +209,7 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param Cancellation|null $unzerCharge
+     * @param \UnzerSDK\Resources\TransactionTypes\Cancellation|null $unzerCancel
      * @return bool
      * @throws \Exception
      */
@@ -219,8 +224,9 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
-
-        $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
+        if ($unzerCancel instanceof Cancellation) {
+            $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
+        }
 
 
         // building oxid from unique index columns
@@ -240,7 +246,7 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param Charge|null $unzerCharge
+     * @param \UnzerSDK\Resources\TransactionTypes\Charge|null $unzerCharge
      * @throws \Exception
      * @return bool
      */
@@ -255,7 +261,9 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
         ];
 
-        $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
+        if ($unzerCharge instanceof Charge) {
+            $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
+        }
 
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
@@ -279,7 +287,9 @@ class Transaction
     {
         unset($params['oxactiondate']);
         unset($params['serialized_basket']);
-        return md5(json_encode($params));
+        /** @var string $jsonEncode */
+        $jsonEncode = json_encode($params);
+        return md5($jsonEncode);
     }
 
     /**
@@ -312,20 +322,19 @@ class Transaction
             'traceid'  => $unzerPayment->getTraceId()
         ];
 
-        if (
-            ($initialTransaction = $unzerPayment->getInitialTransaction()) &&
-            $initialTransaction->getShortId() !== null
-        ) {
-            $params['shortid'] = $initialTransaction->getShortId();
-        } else {
-            $params['shortid'] = Registry::getSession()->getVariable('ShortId');
-        }
+        /** @var AbstractTransactionType $initialTransaction */
+        $initialTransaction = $unzerPayment->getInitialTransaction();
+        $params['shortid'] = $initialTransaction->getShortId() !== null ?
+            $initialTransaction->getShortId() :
+            Registry::getSession()->getVariable('ShortId');
 
-        if ($metadata = $unzerPayment->getMetadata()) {
+        $metadata = $unzerPayment->getMetadata();
+        if ($metadata instanceof Metadata) {
             $params['metadata'] = $metadata->jsonSerialize();
         }
 
-        if ($unzerCustomer = $unzerPayment->getCustomer()) {
+        $unzerCustomer = $unzerPayment->getCustomer();
+        if ($unzerCustomer instanceof Customer) {
             $params['customerid'] = $unzerCustomer->getId();
         }
 
@@ -369,7 +378,8 @@ class Transaction
             'metadata'  => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
         ];
 
-        if ($unzerCustomer = $unzerPayment->getCustomer()) {
+        $unzerCustomer = $unzerPayment->getCustomer();
+        if ($unzerCustomer instanceof Customer) {
             $params['customerid'] = $unzerCustomer->getId();
         }
 
@@ -419,8 +429,6 @@ class Transaction
      * @param Cancellation|Charge $unzerObject
      *
      * @return null|string
-     *
-     * @psalm-return 'error'|'pending'|'success'|null
      */
     protected static function getUzrStatus($unzerObject)
     {
@@ -433,6 +441,7 @@ class Transaction
         if ($unzerObject->isPending()) {
             return "pending";
         }
+
         return null;
     }
 
@@ -459,6 +468,11 @@ class Transaction
         return $result;
     }
 
+    /**
+     * @param string $typeid
+     * @return bool
+     * @throws DatabaseConnectionException
+     */
     public function isValidTransactionTypeId($typeid): bool
     {
         if (

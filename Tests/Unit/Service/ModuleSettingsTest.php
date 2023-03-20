@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Module;

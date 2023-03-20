@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerPaypal;
 
 class PayPal extends UnzerPayment
 {
@@ -23,7 +24,7 @@ class PayPal extends UnzerPayment
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
         return $this->unzerSDK->createPaymentType(
-            new \UnzerSDK\Resources\PaymentTypes\Paypal()
+            new UnzerPaypal()
         );
     }
 }

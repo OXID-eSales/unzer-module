@@ -7,9 +7,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
-use OxidSolutionCatalysts\Unzer\Exception\Redirect;
-use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
@@ -19,11 +16,15 @@ class PaymentGateway extends PaymentGateway_parent
 
     /**
      * @inerhitDoc
+     *
+     * @param Order $oOrder
      */
     public function executePayment($dAmount, &$oOrder)
     {
-        $oPayment = oxNew(PaymentModel::class);
-        if ($oPayment->load($oOrder->getFieldData('oxpaymenttype'))) {
+        /** @var string $oxpaymenttype */
+        $oxpaymenttype = $oOrder->getFieldData('oxpaymenttype');
+        $oPayment = oxNew(Payment::class);
+        if ($oPayment->load($oxpaymenttype)) {
             if ($oPayment->isUnzerPayment()) {
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
                 $paymentService->executeUnzerPayment($oPayment);

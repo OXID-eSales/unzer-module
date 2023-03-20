@@ -12,20 +12,20 @@ use OxidEsales\Eshop\Application\Model\Payment;
 class PaymentValidator
 {
     /** @var PaymentExtensionLoader */
-    protected $paymentExtensionLoader;
+    protected $paymentExtLoader;
 
     /** @var Context */
     protected $moduleContext;
 
     /**
-     * @param PaymentExtensionLoader $paymentExtensionLoader
+     * @param PaymentExtensionLoader $paymentExtLoader
      * @param Context $moduleContext
      */
     public function __construct(
-        PaymentExtensionLoader $paymentExtensionLoader,
+        PaymentExtensionLoader $paymentExtLoader,
         Context $moduleContext
     ) {
-        $this->paymentExtensionLoader = $paymentExtensionLoader;
+        $this->paymentExtLoader = $paymentExtLoader;
         $this->moduleContext = $moduleContext;
     }
 
@@ -51,7 +51,7 @@ class PaymentValidator
     public function isPaymentCurrencyAllowed(Payment $payment): bool
     {
         return $this->isSelectedCurrencyAllowed(
-            $this->paymentExtensionLoader->getPaymentExtension($payment)->getPaymentCurrencies()
+            $this->paymentExtLoader->getPaymentExtension($payment)->getPaymentCurrencies()
         );
     }
 
