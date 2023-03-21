@@ -101,8 +101,8 @@ abstract class UnzerPayment
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
 
+        // PaylaterInvoice is freaky special...
         if (!method_exists($paymentType, $paymentProcedure)) {
-            // paylater invoice type id - we need it later on I guess
             $typeId = $request->getRequestParameter('unzer_type_id');
             $customerObj = $this->unzerSDK->createCustomer($customer);
             $basketObj = $this->unzerSDK->createBasket($uzrBasket);
@@ -112,28 +112,24 @@ abstract class UnzerPayment
                 $basketModel->getBasketCurrency()->name,
                 $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending())
             );
-            $performAuth = $this->unzerSDK->performAuthorization(
+            $transaction = $this->unzerSDK->performAuthorization(
                 $authObj,
-                $paymentType,
+                $typeId,
                 $customerObj,
                 null,
                 $basketObj
             );
-
-            $message = sprintf('Procedure "%s" not found for "%s"', $paymentProcedure, $this->paymentMethod);
-            Registry::getUtilsView()->addErrorToDisplay(new StandardException($message));
-            throw new UnzerApiException($message);
+        } else {
+            $transaction = $paymentType->{$paymentProcedure}(
+                $basketModel->getPrice()->getPrice(),
+                $basketModel->getBasketCurrency()->name,
+                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+                $customer,
+                $this->unzerOrderId,
+                $this->unzerService->getShopMetadata($this->paymentMethod),
+                $uzrBasket
+            );
         }
-
-        $transaction = $paymentType->{$paymentProcedure}(
-            $basketModel->getPrice()->getPrice(),
-            $basketModel->getBasketCurrency()->name,
-            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
-            $customer,
-            $this->unzerOrderId,
-            $this->unzerService->getShopMetadata($this->paymentMethod),
-            $uzrBasket
-        );
 
         $this->unzerService->setSessionVars($transaction);
 
