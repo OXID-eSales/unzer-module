@@ -13,14 +13,11 @@ use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
-use OxidEsales\EshopCommunity\Core\Field as FieldAlias;
 use OxidEsales\Facts\Facts;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
 use UnzerSDK\Constants\ShippingTypes;
 use UnzerSDK\Resources\Basket;
@@ -29,7 +26,6 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\EmbeddedResources\CompanyInfo;
-use UnzerSDK\Resources\EmbeddedResources\RiskData;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
@@ -223,20 +219,16 @@ class Unzer
      */
     public function getUnzerBasket(string $unzerOrderId, BasketModel $basketModel): Basket
     {
-        // v2
+        // v2 (BUT we need to keep the v1 methods for some reason...)
         $basket = new Basket();
         $basket->setOrderId($unzerOrderId)
+            ->setAmountTotalGross($basketModel->getPrice()->getBruttoPrice())
+            ->setAmountTotalDiscount(0.0)
             ->setCurrencyCode($basketModel->getBasketCurrency()->name);
 
-        // calculate effective discount, to apply it with each basket item (as reduced amount)
-        // basketModel->getBruttoPrice() will already deduct a voucher! To get it straight, we need to consider this.
-        $discount = $basketModel->getTotalDiscount()->getPrice();
-        $realBrutto = (
-            $basketModel->getPrice()->getBruttoPrice() +
-            $basketModel->getVoucherDiscount()->getBruttoPrice() +
-            $discount
-        );
-        $percentDiscount = ($discount / $realBrutto);
+        $priceForPayment = $basketModel->getPriceForPayment();
+        $discountAmount = $basketModel->getTotalDiscount()->getPrice();
+        $voucherAmount = $basketModel->getVoucherDiscount()->getPrice();
 
         $shopBasketContents = $basketModel->getContents();
 
@@ -248,10 +240,14 @@ class Unzer
             $unzerBasketItem = new BasketItem();
             $priceBrutto = $basketItem->getUnitPrice()->getBruttoPrice();
             $unzerBasketItem->setTitle($basketItem->getTitle())
-                ->setAmountDiscountPerUnitGross($priceBrutto * $percentDiscount)
                 ->setQuantity((int)$basketItem->getAmount())
                 ->setType(BasketItemTypes::GOODS)
+                ->setAmountNet($priceBrutto)
+                ->setAmountPerUnit($priceBrutto)
+                ->setAmountVat($basketItem->getPrice()->getVatValue())
+                ->setAmountGross($priceBrutto)
                 ->setVat($basketItem->getPrice()->getVat())
+                ->setAmountDiscountPerUnitGross(0.)
                 ->setAmountPerUnitGross($priceBrutto);
 
             $unzerBasketItems[] = $unzerBasketItem;
@@ -264,6 +260,10 @@ class Unzer
             $unzerBasketItem->setTitle($this->translator->translate('SHIPPING_COST'))
                 ->setQuantity(1)
                 ->setType(BasketItemTypes::SHIPMENT)
+                ->setAmountNet($deliveryCosts->getNettoPrice())
+                ->setAmountPerUnit($deliveryCosts->getNettoPrice())
+                ->setAmountVat($deliveryCosts->getVatValue())
+                ->setAmountGross($deliveryCosts->getBruttoPrice())
                 ->setVat($deliveryCosts->getVat())
                 ->setAmountPerUnitGross($deliveryCosts->getBruttoPrice());
 
@@ -271,21 +271,38 @@ class Unzer
         }
 
         // Add Vouchers
-        $voucherDiscounts = $basketModel->getVoucherDiscount();
-        if ($voucherDiscounts->getBruttoPrice() > 0.) {
+        $totalVoucherAmount = $voucherAmount + $discountAmount;
+        if ($totalVoucherAmount > 0.) {
             $unzerBasketItem = new BasketItem();
             $unzerBasketItem->setTitle($this->translator->translate('DISCOUNT'))
                 ->setQuantity(1)
                 ->setType(BasketItemTypes::VOUCHER)
-                ->setVat($voucherDiscounts->getVat())
+                ->setAmountNet($totalVoucherAmount)
+                ->setAmountPerUnit($totalVoucherAmount)
+                ->setAmountGross($totalVoucherAmount)
+                ->setVat(0)
                 ->setAmountPerUnitGross(0.)
-                ->setAmountDiscountPerUnitGross($voucherDiscounts->getBruttoPrice());
+                ->setAmountDiscountPerUnitGross($totalVoucherAmount);
+
+            $unzerBasketItems[] = $unzerBasketItem;
+        } elseif ($totalVoucherAmount < 0.) {
+            $totalVoucherAmount *= -1.;
+            $unzerBasketItem = new BasketItem();
+            $unzerBasketItem->setTitle('Negativer Rabatt')
+                ->setQuantity(1)
+                ->setType(BasketItemTypes::GOODS)
+                ->setAmountNet($totalVoucherAmount)
+                ->setAmountPerUnit($totalVoucherAmount)
+                ->setAmountGross($totalVoucherAmount)
+                ->setVat(0)
+                ->setAmountPerUnitGross($totalVoucherAmount)
+                ->setAmountDiscountPerUnitGross(0.);
 
             $unzerBasketItems[] = $unzerBasketItem;
         }
 
         $basket->setBasketItems($unzerBasketItems);
-        $basket->setTotalValueGross($basketModel->getPrice()->getBruttoPrice());
+        $basket->setTotalValueGross($priceForPayment);
 
         return $basket;
     }
