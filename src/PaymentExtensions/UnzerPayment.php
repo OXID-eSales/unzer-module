@@ -101,35 +101,15 @@ abstract class UnzerPayment
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
 
-        // PaylaterInvoice is freaky special...
-        if (!method_exists($paymentType, $paymentProcedure)) {
-            $typeId = $request->getRequestParameter('unzer_type_id');
-            $customerObj = $this->unzerSDK->createCustomer($customer);
-            $basketObj = $this->unzerSDK->createBasket($uzrBasket);
-
-            $authObj = new Authorization(
-                $basketModel->getPrice()->getBruttoPrice(),
-                $basketModel->getBasketCurrency()->name,
-                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending())
-            );
-            $transaction = $this->unzerSDK->performAuthorization(
-                $authObj,
-                $typeId,
-                $customerObj,
-                null,
-                $basketObj
-            );
-        } else {
-            $transaction = $paymentType->{$paymentProcedure}(
-                $basketModel->getPrice()->getPrice(),
-                $basketModel->getBasketCurrency()->name,
-                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
-                $customer,
-                $this->unzerOrderId,
-                $this->unzerService->getShopMetadata($this->paymentMethod),
-                $uzrBasket
-            );
-        }
+        $transaction = $paymentType->{$paymentProcedure}(
+            $basketModel->getPrice()->getPrice(),
+            $basketModel->getBasketCurrency()->name,
+            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+            $customer,
+            $this->unzerOrderId,
+            $this->unzerService->getShopMetadata($this->paymentMethod),
+            $uzrBasket
+        );
 
         $this->unzerService->setSessionVars($transaction);
 
