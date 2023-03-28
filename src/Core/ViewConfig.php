@@ -132,7 +132,7 @@ class ViewConfig extends ViewConfig_parent
     {
         /** @var string $addPaymentInfo */
         $addPaymentInfo = Registry::getSession()->getVariable('additionalPaymentInformation');
-        return $addPaymentInfo;
+        return $addPaymentInfo ?? '';
     }
 
     /**
