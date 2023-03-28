@@ -17,7 +17,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 class Invoice extends UnzerPayment
 {
-    protected $paymentMethod = 'invoice';
+    protected $paymentMethod = 'paylater-invoice';
 
     protected $allowedCurrencies = ['EUR', 'CHF'];
 
