@@ -51,6 +51,13 @@ class Transaction extends BaseModel
     /**
      * @return string|null
      */
+    public function getUnzerCustomerType(): ?string
+    {
+        return $this->getRawField('CUSTOMERTYPE');
+    }
+    /**
+     * @return string|null
+     */
     public function getUnzerState(): ?string
     {
         return $this->getRawField('OXACTION');
