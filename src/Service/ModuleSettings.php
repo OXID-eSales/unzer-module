@@ -643,7 +643,12 @@ class ModuleSettings
         return $result;
     }
 
-    public function getShopPublicKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency)
+    /**
+     * @param string $customerType
+     * @param string $currency
+     * @return string
+     */
+    public function getShopPublicKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency): string
     {
         $key = '';
         if ($customerType == 'B2C' && $currency == 'EUR') {
@@ -657,7 +662,13 @@ class ModuleSettings
         }
         return $key;
     }
-    public function getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency)
+
+    /**
+     * @param string $customerType
+     * @param string $currency
+     * @return string
+     */
+    public function getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency): string
     {
         $key = '';
         if ($customerType == 'B2C' && $currency == 'EUR') {
