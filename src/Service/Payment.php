@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
@@ -225,7 +226,25 @@ class Payment
     {
         $paymentId = $this->session->getVariable('PaymentId');
         if (is_string($paymentId)) {
-            return $this->unzerSDKLoader->getUnzerSDKbyPaymentType($paymentId)->fetchPayment($paymentId);
+            $sessionOrderId = $this->session->getVariable('sess_challenge');
+            $order = oxNew(Order::class);
+            $order->load($sessionOrderId);
+
+            $customerType = '';
+            $currency = $order->getRawFieldData('oxcurrency');
+            if ($order->getRawFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+
+                if (empty($order->getRawFieldData('oxbillcompany')) && empty($order->getRawFieldData('oxdelcompany'))) {
+                    $customerType = 'B2C';
+                }
+                else {
+                    $customerType = 'B2B';
+                }
+
+            }
+
+            $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
+            return $sdk->fetchPayment($paymentId);
         }
 
         return null;
