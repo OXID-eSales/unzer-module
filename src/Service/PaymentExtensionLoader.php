@@ -86,4 +86,23 @@ class PaymentExtensionLoader
             $this->unzerService
         );
     }
+
+    /**
+     * @param PaymentModel $payment
+     * @param string $customerType
+     * @param string $currency
+     * @return AbstractUnzerPayment
+     */
+    public function getPaymentExtensionByCustomerTypeAndCurrency(
+        PaymentModel $payment,
+        string $customerType,
+        string $currency): AbstractUnzerPayment
+    {
+        return oxNew(
+            self::UNZERCLASSNAMEMAPPING[$payment->getId()],
+            $this->unzerSdkLoader->getUnzerSDK($customerType, $currency),
+            $this->unzerService
+        );
+
+    }
 }
