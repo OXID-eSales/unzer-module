@@ -147,7 +147,6 @@
                         <td class="listheader">[{oxmultilang ident="OSCUNZER_CHARGE_CANCELAMOUNT"}]</td>
                         <td class="listheader"> </td>
                     </tr>
-
                     [{foreach from=$aCharges item="oUnzerCharge"}]
                     <tr>
                         <form name="uzr" id="uzr_[{$oUnzerCharge.chargeId}]" action="[{$oViewConf->getSelfLink()}]" method="post">
@@ -202,11 +201,30 @@
                                 [{/capture}]
                                 [{oxscript add=$cancelConfirm}]
                             [{else}]
-                                <td colspan="3"></td>
+                                <td>[{$oUnzerCharge.cancelledAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                                <td>[{$oUnzerCharge.chargedAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                                <td></td>
                             [{/if}]
                         </form>
                     </tr>
                     [{/foreach}]
+                    [{if $canCancelAmount > 0}]
+                        <form name="uzr" id="uzr_payout" action="[{$oViewConf->getSelfLink()}]" method="post">
+                        [{$oViewConf->getHiddenSid()}]
+                        <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                        <input type="hidden" name="chargedamount" value="[{$canCancelAmount}]">
+                        <input type="hidden" name="cl" value="unzer_admin_order">
+                        <input type="hidden" name="fnc" value="doUnzerCancel">
+                        <input type="hidden" name="oxid" value="[{$oxid}]">
+                        <tr>
+                            <td colspan="2"></td>
+                            <td>[{$totalAmountCharge|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                            <td>[{$totalAmountCancel|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                            <td><input type="text" name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
+                            <td><button type="submit">[{oxmultilang ident="OSCUNZER_PAYOUT"}]</button></td>
+                        </tr>
+                        </form>
+                    [{/if}]
                     [{if $errCancel}]
                         <tr>
                             <td colspan="[{if $blCancelReasonReq}]7[{else}]6[{/if}]"><div style="color: red">[{$errCancel}]</div></td>
