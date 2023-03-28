@@ -82,6 +82,22 @@ class Transaction extends BaseModel
     /**
      * @return string|null
      */
+    public function getUnzerCurrency(): ?string
+    {
+        return $this->getRawField('CURRENCY');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUnzerAmount(): ?string
+    {
+        return $this->getRawField('AMOUNT');
+    }
+
+    /**
+     * @return string|null
+     */
     public function getUnzerTraceId(): ?string
     {
         return $this->getRawField('TRACEID');
