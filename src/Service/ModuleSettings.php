@@ -643,6 +643,35 @@ class ModuleSettings
         return $result;
     }
 
+    public function getShopPublicKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency)
+    {
+        $key = '';
+        if ($customerType == 'B2C' && $currency == 'EUR') {
+            $key = $this->getShopPublicKeyB2CInvoiceEUR();
+        } elseif ($customerType == 'B2C' && $currency == 'CHF') {
+            $key = $this->getShopPublicKeyB2CInvoiceCHF();
+        } elseif ($customerType == 'B2B' && $currency == 'EUR') {
+            $key = $this->getShopPublicKeyB2BInvoiceEUR();
+        } elseif ($customerType == 'B2B' && $currency == 'CHF') {
+            $key = $this->getShopPublicKeyB2BInvoiceCHF();
+        }
+        return $key;
+    }
+    public function getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency)
+    {
+        $key = '';
+        if ($customerType == 'B2C' && $currency == 'EUR') {
+            $key = $this->getShopPrivateKeyB2CInvoiceEUR();
+        } elseif ($customerType == 'B2C' && $currency == 'CHF') {
+            $key = $this->getShopPrivateKeyB2CInvoiceCHF();
+        } elseif ($customerType == 'B2B' && $currency == 'EUR') {
+            $key = $this->getShopPrivateKeyB2BInvoiceEUR();
+        } elseif ($customerType == 'B2B' && $currency == 'CHF') {
+            $key = $this->getShopPrivateKeyB2BInvoiceCHF();
+        }
+        return $key;
+    }
+
     /**
      * @return bool
      */
