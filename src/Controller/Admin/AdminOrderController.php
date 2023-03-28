@@ -10,7 +10,9 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Model\Transaction;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -18,11 +20,13 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
+use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
+use UnzerSDK\Unzer;
 
 /**
  * Order class wrapper for Unzer module
@@ -73,6 +77,7 @@ class AdminOrderController extends AdminDetailsController
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
 
+            $this->_aViewData['paymentTitle'] = $this->oPaymnet->getFieldData('OXDESC');
             $this->_aViewData['oOrder'] = $oOrder;
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
@@ -89,6 +94,18 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
+    public function getUnzerSDKbyPaymentId(string $sPaymentId): Unzer
+    {
+        return $this->getServiceFromContainer(UnzerSDKLoader::class)
+                    ->getUnzerSDKbyPaymentType($sPaymentId);
+    }
+
+    public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
+    {
+        return $this->getServiceFromContainer(UnzerSDKLoader::class)
+                    ->getUnzerSDK($customerType, $currency);
+    }
+
     /**
      * @param string $sPaymentId
      * @return void
@@ -97,15 +114,21 @@ class AdminOrderController extends AdminDetailsController
     protected function getUnzerViewData(string $sPaymentId): void
     {
         try {
+            $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
+            // initialize proper SDK object
+            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency']);
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
-                ->fetchPayment($sPaymentId);
+            $unzerPayment = $sdk->fetchPayment($sPaymentId);
             $fCancelled = 0.0;
             $fCharged = 0.0;
 
             $paymentType = $unzerPayment->getPaymentType();
 
+            $this->_aViewData['totalBasketPrice'] = sprintf(
+                '%s %s',
+                $this->getEditObject()->getFormattedTotalOrderSum(),
+                $this->getEditObject()->getOrderCurrency()->name
+            );
             $this->_aViewData["blShipment"] = (
                 $paymentType instanceof InstallmentSecured
             );
@@ -134,6 +157,7 @@ class AdminOrderController extends AdminDetailsController
             if ($unzerPayment->getAuthorization()) {
                 /** @var Authorization $unzAuthorization */
                 $unzAuthorization = $unzerPayment->getAuthorization();
+
                 $this->_aViewData["AuthAmountRemaining"] = $unzerPayment->getAmount()->getRemaining();
                 $this->_aViewData["AuthFetchedAt"] = $unzAuthorization->getFetchedAt();
                 $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
@@ -159,6 +183,8 @@ class AdminOrderController extends AdminDetailsController
                     }
                 }
             }
+            $this->_aViewData['totalAmountCharge'] = $fCharged;
+            $this->_aViewData['remainingAmountCharge'] = $unzerPayment->getAmount()->getTotal() - $fCharged;
 
             $cancellations = [];
             /** @var Cancellation $cancellation */
@@ -173,6 +199,9 @@ class AdminOrderController extends AdminDetailsController
                     $cancellations[] = $aRv;
                 }
             }
+            $this->_aViewData['totalAmountCancel'] = $fCancelled;
+            $this->_aViewData['canCancelAmount'] = $fCharged - $fCancelled;
+
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;
             $this->_aViewData['aCancellations'] = $cancellations;
@@ -182,6 +211,12 @@ class AdminOrderController extends AdminDetailsController
                 $e->getMessage()
             );
         }
+    }
+
+    protected function getCustomerTypeAndCurrencyFromTransaction()
+    {
+        $transactionService = $this->getServiceFromContainer(TransactionService::class);
+        return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());
     }
 
     /**
