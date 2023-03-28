@@ -25,6 +25,7 @@
                     <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID"}]</td>
                     <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</td>
                     <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_AMOUNT"}]</td>
                 </tr>
                 [{foreach from=$oUnzerTransactions item="oUnzerTransaction"}]
                     [{assign var="transaction_state" value=$oUnzerTransaction->getUnzerState()|escape}]
@@ -35,6 +36,9 @@
                         <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
                         <td>[{'OSCUNZER_TRANSACTION_STATUS_'|cat:$transaction_state|oxmultilangassign}]</td>
                         <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
+                        <td>[{$oUnzerTransaction->getUnzerAmount()|string_format:"%.2f"}]
+                            [{$oUnzerTransaction->getUnzerCurrency()}]
+                        </td>
                     </tr>
                 [{/foreach}]
             </tbody>
@@ -189,8 +193,8 @@
                                            value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
                                 </td>
                                 [{capture assign="cancelConfirm"}]
-                                    const inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
-                                    const form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');
+                                    inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
+                                    form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');
                                     form.addEventListener('submit', function (e) {
                                     if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
                                     return true;
@@ -220,9 +224,21 @@
                             <td colspan="2"></td>
                             <td>[{$totalAmountCharge|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                             <td>[{$totalAmountCancel|string_format:"%.2f"}] [{$uzrCurrency}]</td>
-                            <td><input type="text" name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
+                            <td><input type="text" id="amount_payout" name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
                             <td><button type="submit">[{oxmultilang ident="OSCUNZER_PAYOUT"}]</button></td>
                         </tr>
+                            [{capture assign="cancelConfirm"}]
+                            inAmount = document.getElementById('amount_payout');
+                            form = document.getElementById('uzr_payout');
+                            form.addEventListener('submit', function (e) {
+                            if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
+                            return true;
+                            } else {
+                            return false;
+                            }
+                            });
+                            [{/capture}]
+                            [{oxscript add=$cancelConfirm}]
                         </form>
                     [{/if}]
                     [{if $errCancel}]
