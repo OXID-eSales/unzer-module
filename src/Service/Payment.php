@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
@@ -18,9 +19,12 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerP
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
+use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
+use UnzerSDK\Resources\TransactionTypes\Cancellation;
+use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 /**
@@ -92,11 +96,21 @@ class Payment
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         try {
+            $request = Registry::getRequest();
+            $customerType = $request->getRequestParameter('unzer_customer_type', '');
+            $user = $this->session->getUser();
+            $basket = $this->session->getBasket();
+            $currency = $basket->getBasketCurrency()->name;
+
             /** @var AbstractUnzerPayment $paymentExtension */
-            $paymentExtension = $this->paymentExtLoader->getPaymentExtension($paymentModel);
+            $paymentExtension = $this->paymentExtLoader->getPaymentExtensionByCustomerTypeAndCurrency(
+                $paymentModel,
+                $customerType,
+                $currency
+            );
             $paymentExtension->execute(
-                $this->session->getUser(),
-                $this->session->getBasket()
+                $user,
+                $basket
             );
 
             /** @var string $sess_challenge */
@@ -194,11 +208,13 @@ class Payment
     }
 
     /**
+     * @param string customerType
+     * @param string $currency
      * @return \UnzerSDK\Unzer
      */
-    protected function getUnzerSDK(): \UnzerSDK\Unzer
+    protected function getUnzerSDK(string $customerType = '', string $currency = ''): \UnzerSDK\Unzer
     {
-        return $this->unzerSDKLoader->getUnzerSDK();
+        return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
     }
 
     /**
@@ -209,7 +225,7 @@ class Payment
     {
         $paymentId = $this->session->getVariable('PaymentId');
         if (is_string($paymentId)) {
-            return $this->getUnzerSDK()->fetchPayment($paymentId);
+            return $this->unzerSDKLoader->getUnzerSDKbyPaymentType($paymentId)->fetchPayment($paymentId);
         }
 
         return null;
@@ -226,9 +242,22 @@ class Payment
     public function doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, $reason)
     {
         try {
-            $unzerPayment = $this->getUnzerSDK()->fetchChargeById($unzerid, $chargeid);
+            $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
 
-            $cancellation = $unzerPayment->cancel($amount, $reason);
+            if ($chargeid) {
+                $unzerCharge = $sdk->fetchChargeById($unzerid, $chargeid);
+                $cancellation = $unzerCharge->cancel($amount, $reason);
+
+                // these do not work...the system has not allowed ypu to call this method
+                //$cancellation = $sdk->cancelCharge($unzerCharge, $amount, $reason);
+                //$cancellation = $sdk->cancelChargeById($unzerid, $chargeid, $amount, $reason);
+            }
+            else {
+                $payment = $sdk->fetchPayment($unzerid);
+                $cancellation = new Cancellation($amount);
+                $cancellation = $sdk->cancelChargedPayment($payment, $cancellation);
+            }
+
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
             $this->transactionService->writeCancellationToDB(
@@ -255,11 +284,13 @@ class Payment
         }
 
         try {
-            $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
+            $unzerPayment = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid)->fetchPayment($unzerid);
 
             /** @var Authorization $authorization */
             $authorization = $unzerPayment->getAuthorization();
-            $charge = $authorization->charge($amount);
+            if (null != $authorization) {
+                $charge = $authorization->charge($amount);
+            }
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
             $this->transactionService->writeChargeToDB(
@@ -294,11 +325,10 @@ class Payment
         }
 
         try {
-            $unzerPayment = $this->getUnzerSDK()->fetchPayment($unzerid);
+            $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
+            $unzerPayment = $sdk->fetchPayment($unzerid);
+            $sdk->cancelAuthorizedPayment($unzerPayment);
 
-            /** @var Authorization $authorization */
-            $authorization = $unzerPayment->getAuthorization();
-            $authorization->cancel();
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
             $this->transactionService->writeTransactionToDB(
@@ -327,20 +357,22 @@ class Payment
         }
 
         $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
+        $transactionDetails = $this->transactionService->getCustomerTypeAndCurrencyByOrderId($oOrder->getId());
 
         $blSuccess = false;
 
         if ($sPaymentId) {
+            $sdk = $this->getUnzerSDK($transactionDetails['customertype'], $transactionDetails['currency']);
             /** @var string $sInvoiceNr */
             $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
 
-            $unzerPayment = $this->getUnzerSDK()->fetchPayment($sPaymentId);
+            $unzerPayment = $sdk->fetchPayment($sPaymentId);
 
             if ($unzerPayment->getPaymentType() instanceof InstallmentSecured) {
                 $this->setInstallmentDueDate($unzerPayment);
             }
             try {
-                $shipment = $this->getUnzerSDK()->ship(
+                $shipment = $sdk->ship(
                     $unzerPayment,
                     $sInvoiceNr,
                     $oOrder->getId()
