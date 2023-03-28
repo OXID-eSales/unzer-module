@@ -45,6 +45,7 @@ $aLang = [
     'OSCUNZER_CANCEL_ERR_AMOUNT' => 'wrong amount',
     'OSCUNZER_CHARGE_CANCELREASON' => 'refund reason',
     'OSCUNZER_CHARGE_CANCELAMOUNT' => 'redemption amount',
+    'OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT' => 'Refund from charged total amount',
     'OSCUNZER_CHARGE_COLLECT' => 'Collect',
     'OSCUNZER_CHARGE_ID' => 'Charge-ID',
     'OSCUNZER_CANCEL_ID' => 'Cancel-ID',

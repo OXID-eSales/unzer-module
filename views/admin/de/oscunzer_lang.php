@@ -45,6 +45,7 @@ $aLang = [
     'OSCUNZER_CANCEL_ERR_AMOUNT' => 'Ungültiger Betrag',
     'OSCUNZER_CHARGE_CANCELREASON' => 'Rückzahlungsgrund',
     'OSCUNZER_CHARGE_CANCELAMOUNT' => 'Rückzahlungsbetrag',
+    'OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT' => 'Rückzahlung von eingezogenem Gesamtbetrag',
     'OSCUNZER_CHARGE_COLLECT' => 'Einziehen',
     'OSCUNZER_CHARGE_ID' => 'Charge-ID',
     'OSCUNZER_CANCEL_ID' => 'Cancel-ID',
