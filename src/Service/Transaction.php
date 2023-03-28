@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
+use OxidSolutionCatalysts\Unzer\Model\Order;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Application\Model\Basket;
@@ -25,6 +26,8 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
+use UnzerSDK\Resources\PaymentTypes\Invoice;
+use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -75,11 +78,26 @@ class Transaction
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+            'customertype' => '',
         ];
         if ($unzerPayment) {
             $params = $unzerShipment ?
                 array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment)) :
                 array_merge($params, $this->getUnzerPaymentData($unzerPayment));
+
+            // for PaylaterInvoice, store the customer type
+            if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice) {
+                $oOrder = oxNew(Order::class);
+                $oOrder->load($orderid);
+                $delCompany = $oOrder->getRawFieldData('oxdelcompany');
+                $billCompany = $oOrder->getRawFieldData('oxbillcompany');
+                if (empty($delCompany) && empty($billCompany)) {
+                    $params['customertype'] = 'B2C';
+                }
+                else {
+                    $params['customertype'] = 'B2C';
+                }
+            }
         }
 
         if ($unzerPayment && $unzerPayment->getState() == 2) {
@@ -446,7 +464,7 @@ class Transaction
     }
 
     /**
-     * @param $paymentid
+     * @param string $orderid
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
@@ -466,6 +484,50 @@ class Transaction
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $orderid
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    public function getTransactionIdByOrderId(string $orderid): string
+    {
+        $result = '';
+
+        if ($orderid) {
+            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
+                "SELECT OXID FROM oscunzertransaction
+                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')
+                ORDER BY OXTIMESTAMP DESC LIMIT 1",
+                [$orderid]
+            );
+
+            $result = $rows[0]['OXID'];
+        }
+
+        return $result;
+
+    }
+
+    /**
+     * @param string $orderid
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    public function getCustomerTypeAndCurrencyByOrderId($orderid): array
+    {
+        $transaction = oxNew(TransactionModel::class);
+        $transactionId = $this->getTransactionIdByOrderId($orderid);
+        $transaction->load($transactionId);
+
+        return [
+            'customertype' => $transaction->getRawFieldData('customertype') ?? '',
+            'currency' => $transaction->getRawFieldData('currency') ?? '',
+        ];
+
     }
 
     /**
