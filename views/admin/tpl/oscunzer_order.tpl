@@ -5,7 +5,7 @@
 [{else}]
     [{assign var="readonly" value=""}]
 [{/if}]
-
+<h3>[{$paymentTitle}] : [{$totalBasketPrice}]</h3>
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="oxid" value="[{$oxid}]">
