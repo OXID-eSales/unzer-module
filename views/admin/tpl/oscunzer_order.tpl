@@ -5,7 +5,9 @@
 [{else}]
     [{assign var="readonly" value=""}]
 [{/if}]
+[{if $paymentTitle && $totalBasketPrice}]
 <h3>[{$paymentTitle}] : [{$totalBasketPrice}]</h3>
+[{/if}]
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="oxid" value="[{$oxid}]">
@@ -221,7 +223,12 @@
                         <input type="hidden" name="fnc" value="doUnzerCancel">
                         <input type="hidden" name="oxid" value="[{$oxid}]">
                         <tr>
-                            <td colspan="2" align="right">[{oxmultilang ident="OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT"}]</td>
+                            [{if $blCancelReasonReq}]
+                            <td colspan="3" align="right">
+                            [{else}]
+                            <td colspan="2" align="right">
+                            [{/if}]
+                            [{oxmultilang ident="OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT"}]</td>
                             <td>[{$totalAmountCharge|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                             <td>[{$totalAmountCancel|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                             <td><input type="text" id="amount_payout" name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
