@@ -240,7 +240,7 @@ class Payment
             $currency = $order->getFieldData('oxcurrency') ?? '';
             if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
                 $customerType = 'B2C';
-                if (!empty($order->getFieldData('oxbillcompany')) || empty($order->getFieldData('oxdelcompany'))) {
+                if (!empty($order->getFieldData('oxbillcompany')) || !empty($order->getFieldData('oxdelcompany'))) {
                     $customerType = 'B2B';
                 }
             }
