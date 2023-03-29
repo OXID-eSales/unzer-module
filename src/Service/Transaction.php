@@ -36,6 +36,9 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 /**
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ *
+ * TODO: Decrease overall complexity below 50
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Transaction
 {
@@ -89,13 +92,11 @@ class Transaction
             if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice) {
                 $oOrder = oxNew(Order::class);
                 $oOrder->load($orderid);
-                $delCompany = $oOrder->getRawFieldData('oxdelcompany');
-                $billCompany = $oOrder->getRawFieldData('oxbillcompany');
-                if (empty($delCompany) && empty($billCompany)) {
-                    $params['customertype'] = 'B2C';
-                }
-                else {
-                    $params['customertype'] = 'B2C';
+                $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
+                $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
+                $params['customertype'] = 'B2C';
+                if (!empty($delCompany) || !empty($billCompany)) {
+                    $params['customertype'] = 'B2B';
                 }
             }
         }
@@ -361,12 +362,20 @@ class Transaction
 
     protected function getUnzerChargeData(Charge $unzerCharge): array
     {
+        $customerId = '';
+        $payment = $unzerCharge->getPayment();
+        if (is_object($payment)) {
+            $customer = $payment->getCustomer();
+            if (is_object($customer)) {
+                $customerId = $customer->getId();
+            }
+        }
         return [
             'amount'     => $unzerCharge->getAmount(),
             'currency'   => $unzerCharge->getCurrency(),
             'typeid'     => $unzerCharge->getId(),
             'oxaction'   => 'charged',
-            'customerid' => $unzerCharge->getPayment()->getCustomer()->getId(),
+            'customerid' => $customerId,
             'traceid'    => $unzerCharge->getTraceId(),
             'shortid'    => $unzerCharge->getShortId(),
             'status'     => $this->getUzrStatus($unzerCharge),
@@ -375,12 +384,22 @@ class Transaction
 
     protected function getUnzerCancelData(Cancellation $unzerCancel): array
     {
+        $currency = '';
+        $customerId = '';
+        $payment = $unzerCancel->getPayment();
+        if (is_object($payment)) {
+            $currency = $payment->getCurrency();
+            $customer = $payment->getCustomer();
+            if (is_object($customer)) {
+                $customerId = $customer->getId();
+            }
+        }
         return [
             'amount'     => $unzerCancel->getAmount(),
-            'currency'   => $unzerCancel->getPayment()->getCurrency(),
+            'currency'   => $currency,
             'typeid'     => $unzerCancel->getId(),
             'oxaction'   => 'canceled',
-            'customerid' => $unzerCancel->getPayment()->getCustomer()->getId(),
+            'customerid' => $customerId,
             'traceid'    => $unzerCancel->getTraceId(),
             'shortid'    => $unzerCancel->getShortId(),
             'status'     => $this->getUzrStatus($unzerCancel),
@@ -389,13 +408,23 @@ class Transaction
 
     protected function getUnzerShipmentData(Shipment $unzerShipment, Payment $unzerPayment): array
     {
+        $currency = '';
+        $customerId = '';
+        $payment = $unzerShipment->getPayment();
+        if (is_object($payment)) {
+            $currency = $payment->getCurrency();
+            $customer = $payment->getCustomer();
+            if (is_object($customer)) {
+                $customerId = $customer->getId();
+            }
+        }
         $params = [
             'amount'     => $unzerShipment->getAmount(),
-            'currency'   => $unzerShipment->getPayment()->getCurrency(),
+            'currency'   => $currency,
             'fetchedAt'  => $unzerShipment->getFetchedAt(),
             'typeid'     => $unzerShipment->getId(),
             'oxaction'   => 'shipped',
-            'customerid' => $unzerShipment->getPayment()->getCustomer()->getId(),
+            'customerid' => $customerId,
             'shortid'    => $unzerShipment->getShortId(),
             'traceid'    => $unzerShipment->getTraceId(),
             'metadata'   => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
@@ -513,7 +542,6 @@ class Transaction
         }
 
         return $result;
-
     }
 
     /**
@@ -529,10 +557,9 @@ class Transaction
         $transaction->load($transactionId);
 
         return [
-            'customertype' => $transaction->getRawFieldData('customertype') ?? '',
-            'currency' => $transaction->getRawFieldData('currency') ?? '',
+            'customertype' => $transaction->getFieldData('customertype') ?? '',
+            'currency' => $transaction->getFieldData('currency') ?? '',
         ];
-
     }
 
     /**

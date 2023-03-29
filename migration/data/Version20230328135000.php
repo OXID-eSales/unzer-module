@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Copyright © OXID eSales AG. All rights reserved.
  * See LICENSE file for license details.
@@ -18,8 +17,8 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230328135000 extends AbstractMigration {
-
+final class Version20230328135000 extends AbstractMigration
+{
     /** @throws Exception */
     public function __construct($version)
     {

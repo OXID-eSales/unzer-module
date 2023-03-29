@@ -35,6 +35,8 @@ class UnzerSDKLoader
     /**
      * @param ModuleSettings $moduleSettings
      * @param DebugHandler $debugHandler
+     *
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     public function __construct(
         ModuleSettings $moduleSettings,
@@ -44,6 +46,7 @@ class UnzerSDKLoader
         $this->moduleSettings = $moduleSettings;
         $this->debugHandler = $debugHandler;
         $this->session = $session;
+        $ignore = $this->session->isAdmin();
     }
 
     /**
@@ -91,6 +94,8 @@ class UnzerSDKLoader
      * Initialize UnzerSDK from a payment id
      * @param string $sPaymentId
      * @return Unzer
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getUnzerSDKbyPaymentType(string $sPaymentId): Unzer
     {
@@ -107,10 +112,8 @@ class UnzerSDKLoader
             $currency = $row['CURRENCY'];
             $paymentType = $row['OXPAYMENTTYPE'];
             if ($paymentType == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-                if (empty($row['OXDELCOMPANY']) && empty($row['OXBILLCOMPANY'])) {
-                    $customerType = 'B2C';
-                }
-                else {
+                $customerType = 'B2C';
+                if (!empty($row['OXDELCOMPANY']) || !empty($row['OXBILLCOMPANY'])) {
                     $customerType = 'B2B';
                 }
             }

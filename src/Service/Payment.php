@@ -31,6 +31,9 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 /**
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ *
+ * TODO: Decrease overall complexity below 50
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Payment
 {
@@ -97,8 +100,8 @@ class Payment
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         try {
-            $request = Registry::getRequest();
-            $customerType = $request->getRequestParameter('unzer_customer_type', '');
+            /** @var string $customerType */
+            $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
             $user = $this->session->getUser();
             $basket = $this->session->getBasket();
             $currency = $basket->getBasketCurrency()->name;
@@ -209,7 +212,7 @@ class Payment
     }
 
     /**
-     * @param string customerType
+     * @param string $customerType
      * @param string $currency
      * @return \UnzerSDK\Unzer
      */
@@ -226,21 +229,20 @@ class Payment
     {
         $paymentId = $this->session->getVariable('PaymentId');
         if (is_string($paymentId)) {
+            /** @var string $sessionOrderId */
             $sessionOrderId = $this->session->getVariable('sess_challenge');
+            /** @var Order $order */
             $order = oxNew(Order::class);
             $order->load($sessionOrderId);
 
             $customerType = '';
-            $currency = $order->getRawFieldData('oxcurrency');
-            if ($order->getRawFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-
-                if (empty($order->getRawFieldData('oxbillcompany')) && empty($order->getRawFieldData('oxdelcompany'))) {
-                    $customerType = 'B2C';
-                }
-                else {
+            /** @var string $currency */
+            $currency = $order->getFieldData('oxcurrency') ?? '';
+            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+                $customerType = 'B2C';
+                if (!empty($order->getFieldData('oxbillcompany')) || empty($order->getFieldData('oxdelcompany'))) {
                     $customerType = 'B2B';
                 }
-
             }
 
             $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
@@ -257,6 +259,8 @@ class Payment
      * @param float $amount
      * @param string $reason
      * @return UnzerApiException|bool
+     *
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, $reason)
     {
@@ -266,12 +270,7 @@ class Payment
             if ($chargeid) {
                 $unzerCharge = $sdk->fetchChargeById($unzerid, $chargeid);
                 $cancellation = $unzerCharge->cancel($amount, $reason);
-
-                // these do not work...the system has not allowed ypu to call this method
-                //$cancellation = $sdk->cancelCharge($unzerCharge, $amount, $reason);
-                //$cancellation = $sdk->cancelChargeById($unzerid, $chargeid, $amount, $reason);
-            }
-            else {
+            } else {
                 $payment = $sdk->fetchPayment($unzerid);
                 $cancellation = new Cancellation($amount);
                 $cancellation = $sdk->cancelChargedPayment($payment, $cancellation);
@@ -307,9 +306,11 @@ class Payment
 
             /** @var Authorization $authorization */
             $authorization = $unzerPayment->getAuthorization();
-            if (null != $authorization) {
-                $charge = $authorization->charge($amount);
+            if (null == $authorization) {
+                return false;
             }
+            $charge = $authorization->charge($amount);
+
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
             $this->transactionService->writeChargeToDB(

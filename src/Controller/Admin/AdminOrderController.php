@@ -123,11 +123,13 @@ class AdminOrderController extends AdminDetailsController
             $fCharged = 0.0;
 
             $paymentType = $unzerPayment->getPaymentType();
+            /** @var Order $editObject */
+            $editObject = $this->getEditObject();
 
             $this->_aViewData['totalBasketPrice'] = sprintf(
                 '%s %s',
-                $this->getEditObject()->getFormattedTotalOrderSum(),
-                $this->getEditObject()->getOrderCurrency()->name
+                $editObject->getFormattedTotalOrderSum(),
+                $unzerPayment->getCurrency()
             );
             $this->_aViewData["blShipment"] = (
                 $paymentType instanceof InstallmentSecured
@@ -157,12 +159,8 @@ class AdminOrderController extends AdminDetailsController
             if ($unzerPayment->getAuthorization()) {
                 /** @var Authorization $unzAuthorization */
                 $unzAuthorization = $unzerPayment->getAuthorization();
-
                 $this->_aViewData["AuthAmountRemaining"] = $unzerPayment->getAmount()->getRemaining();
-                $this->_aViewData["AuthFetchedAt"] = $unzAuthorization->getFetchedAt();
-                $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
-                $this->_aViewData["AuthId"] = $unzAuthorization->getId();
-                $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
+                $this->addAuthorizationViewData($unzAuthorization);
                 $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
             }
 
@@ -213,7 +211,18 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    protected function getCustomerTypeAndCurrencyFromTransaction()
+    protected function addAuthorizationViewData(Authorization $authorization): void
+    {
+        $this->_aViewData["AuthFetchedAt"] = $authorization->getFetchedAt();
+        $this->_aViewData["AuthShortId"] = $authorization->getShortId();
+        $this->_aViewData["AuthId"] = $authorization->getId();
+        $this->_aViewData["AuthAmount"] = $authorization->getAmount();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCustomerTypeAndCurrencyFromTransaction(): array
     {
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
         return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());

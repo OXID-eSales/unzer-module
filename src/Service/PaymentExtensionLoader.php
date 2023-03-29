@@ -96,13 +96,12 @@ class PaymentExtensionLoader
     public function getPaymentExtensionByCustomerTypeAndCurrency(
         PaymentModel $payment,
         string $customerType,
-        string $currency): AbstractUnzerPayment
-    {
+        string $currency
+    ): AbstractUnzerPayment {
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $this->unzerSdkLoader->getUnzerSDK($customerType, $currency),
             $this->unzerService
         );
-
     }
 }
