@@ -51,6 +51,13 @@ class Transaction extends BaseModel
     /**
      * @return string|null
      */
+    public function getUnzerCustomerType(): ?string
+    {
+        return $this->getRawField('CUSTOMERTYPE');
+    }
+    /**
+     * @return string|null
+     */
     public function getUnzerState(): ?string
     {
         return $this->getRawField('OXACTION');
@@ -70,6 +77,22 @@ class Transaction extends BaseModel
     public function getUnzerShortId(): ?string
     {
         return $this->getRawField('SHORTID');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUnzerCurrency(): ?string
+    {
+        return $this->getRawField('CURRENCY');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUnzerAmount(): ?string
+    {
+        return $this->getRawField('AMOUNT');
     }
 
     /**

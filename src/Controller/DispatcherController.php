@@ -67,7 +67,7 @@ class DispatcherController extends FrontendController
             $data = $transaction->getTransactionDataByPaymentId($paymentId);
 
             $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
+                ->getUnzerSDKbyPaymentType($paymentId)
                 ->fetchPayment($paymentId);
 
             if ($order->load($data[0]['OXORDERID'])) {

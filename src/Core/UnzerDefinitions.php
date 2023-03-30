@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Core;
 
+use UnzerSDK\Constants\CompanyTypes;
+
 final class UnzerDefinitions
 {
     public const ALIPAY_UNZER_PAYMENT_ID = 'oscunzer_alipay';
@@ -19,6 +21,7 @@ final class UnzerDefinitions
     public const IDEAL_UNZER_PAYMENT_ID = 'oscunzer_ideal';
     public const INSTALLMENT_UNZER_PAYMENT_ID = 'oscunzer_installment';
     public const INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice';
+    public const OLD_INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice_old';
     public const PAYPAL_UNZER_PAYMENT_ID = 'oscunzer_paypal';
     public const PIS_UNZER_PAYMENT_ID = 'oscunzer_pis';
     public const PREPAYMENT_UNZER_PAYMENT_ID = 'oscunzer_prepayment';
@@ -36,7 +39,27 @@ final class UnzerDefinitions
     ];
 
     private const UNZER_DEFINTIONS = [
-
+        self::OLD_INVOICE_UNZER_PAYMENT_ID => [
+            'descriptions' => [
+                'de' => [
+                    'desc' => 'Kauf auf Rechnung (old)',
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
+                        Bei dieser Methode zahlen Sie per Kauf auf Rechnung'
+                ],
+                'en' => [
+                    'desc' => 'Invoice (old)',
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Invoice" style="float: left;margin-right: 10px;" />'
+                ]
+            ],
+            'active' => true,
+            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
+                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'constraints' => self::PAYMENT_CONSTRAINTS
+        ],
         //Alipay is China’s leading third-party mobile and online payment solution.
         self::ALIPAY_UNZER_PAYMENT_ID => [
             'descriptions' => [
@@ -532,79 +555,31 @@ final class UnzerDefinitions
     ];
 
     /** @var array */
-    private const UNZER_COMMERCIAL_SECTORS = [
-        'OTHER',
-        'WHOLESALE_TRADE_EXCEPT_VEHICLE_TRADE',
-        'RETAIL_TRADE_EXCEPT_VEHICLE_TRADE',
-        'WATER_TRANSPORT',
-        'AIR_TRANSPORT',
-        'WAREHOUSING_AND_SUPPORT_ACTIVITES_FOR_TRANSPORTATION',
-        'POSTAL_AND_COURIER_ACTIVITIES',
-        'ACCOMMODATION',
-        'FOOD_AND_BEVERAGE_SERVICE_ACTIVITIES',
-        'MOTION_PICTURE_PRODUCTION_AND_SIMILAR_ACTIVITIES',
-        'TELECOMMUNICATIONS',
-        'COMPUTER_PROGRAMMING_CONSULTANCY_AND_RELATED_ACTIVITIES',
-        'INFORMATION_SERVICE_ACTIVITIES',
-        'RENTAL_AND_LEASING_ACTIVITIES',
-        'TRAVEL_AGENCY_AND_RELATED_ACTIVITIES',
-        'SERVICES_TO_BUILDINGS_AND_LANDSCAPE_ACTIVITIES',
-        'LIBRARIES_AND_SIMILAR_CULTURAL_ACTIVITIES',
-        'SPORTS_ACTIVITIES_AND_AMUSEMENT_AND_RECREATION_ACTIVITIES',
-        'OTHER_PERSONAL_SERVICE_ACTIVITIES',
-        'NON_RESIDENTIAL_REAL_ESTATE_ACTIVITIES',
-        'MANAGEMENT_CONSULTANCY_ACTIVITIES',
-        'ELECTRICITY_GAS_AND_STEAM_SUPPLY',
-        'WATER_COLLECTION_TREATMENT_AND_SUPPLY',
-        'SEWERAGE',
-        'MANUFACTURE_OF_FOOD_PRODUCTS',
-        'MANUFACTURE_OF_BEVERAGES',
-        'MANUFACTURE_OF_TEXTILES',
-        'OTHERS_COMMERCIAL_SECTORS',
-        'MANUFACTURE_OF_WEARING_APPAREL',
-        'MANUFACTURE_OF_LEATHER_AND_RELATED_PRODUCTS',
-        'MANUFACTURE_OF_PHARMACEUTICAL_PRODUCTS',
-        'REPAIR_AND_INSTALLATION_OF_MACHINERY_AND_EQUIPMENT',
-        'TRADE_AND_REPAIR_OF_MOTOR_VEHICLES',
-        'PUBLISHING_ACTIVITIES',
-        'REPAIR_OF_COMPUTERS_AND_GOODS',
-        'PRINTING_AND_REPRODUCTION_OF_RECORDED_MEDIA',
-        'MANUFACTURE_OF_FURNITURE',
-        'OTHER_MANUFACTURING',
-        'ADVERTISING_AND_MARKET_RESEARCH',
-        'OTHER_PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_ACTIVITIES',
-        'ARTS_ENTERTAINMENT_AND_RECREATION'
+    private const UNZER_COMPANY_TYPES = [
+        CompanyTypes::AUTHORITY,
+        CompanyTypes::ASSOCIATION,
+        CompanyTypes::SOLE,
+        CompanyTypes::COMPANY,
+        CompanyTypes::OTHER,
     ];
 
-    /**
-     * @return array[]
-     */
     public static function getUnzerDefinitions(): array
     {
         return self::UNZER_DEFINTIONS;
     }
 
-    /**
-     * @return array[]|\string[][]
-     */
     public static function getUnzerRdfaDefinitions(): array
     {
         return self::UNZER_RDFA_DEFINITIONS;
     }
 
-    /**
-     * @return array[]
-     */
     public static function getUnzerStaticContents(): array
     {
         return self::PAYPAL_STATIC_CONTENTS;
     }
 
-    /**
-     * @return array|string[]
-     */
-    public static function getUnzerCommercialSectors(): array
+    public static function getUnzerCompanyTypes(): array
     {
-        return self::UNZER_COMMERCIAL_SECTORS;
+        return self::UNZER_COMPANY_TYPES;
     }
 }

@@ -39,8 +39,8 @@ class OrderController extends OrderController_parent
     /** @var Order $actualOrder */
     protected $actualOrder = null;
 
-    /** @var array $commercialSectors */
-    protected $commercialSectors = null;
+    /** @var array $companyTypes */
+    protected $companyTypes = null;
 
     /**
      * @inerhitDoc
@@ -48,7 +48,7 @@ class OrderController extends OrderController_parent
     public function execute()
     {
         if (!$this->isSepaConfirmed()) {
-            return null;
+            return '';
         }
 
         $ret = parent::execute();
@@ -214,15 +214,15 @@ class OrderController extends OrderController_parent
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getUnzerCommercialSectors(): array
+    public function getUnzerCompanyTypes(): array
     {
-        if (!is_array($this->commercialSectors)) {
-            $this->commercialSectors = [];
+        if (empty($this->companyTypes)) {
+            $this->companyTypes = [];
             $translator = $this->getServiceFromContainer(Translator::class);
-            foreach (UnzerDefinitions::getUnzerCommercialSectors() as $value) {
-                $this->commercialSectors[$value] = $translator->translate('OSCUNZER_COMMERCIAL_SECTOR_' . $value);
+            foreach (UnzerDefinitions::getUnzerCompanyTypes() as $value) {
+                $this->companyTypes[$value] = $translator->translate('OSCUNZER_COMPANY_FORM_' . $value);
             }
         }
-        return $this->commercialSectors;
+        return $this->companyTypes;
     }
 }

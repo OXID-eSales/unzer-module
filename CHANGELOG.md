@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - New Payment PayLater
 ### FIXED
 - [0007436](https://bugs.oxid-esales.com/view.php?id=7436) add option to reverese a prepayment-transaction from the backend
-
-### Fixed
-
-* [0007430](https://bugs.oxid-esales.com/view.php?id=7430) Update Basket version to V2
+- [0007430](https://bugs.oxid-esales.com/view.php?id=7430) Update Basket version to V2
+- [0007429](https://bugs.oxid-esales.com/view.php?id=7429) Customer details - adjust addresses
+- [0007432](https://bugs.oxid-esales.com/view.php?id=7432) Basket Details - Discount is missed in the Basket
+- [0007447](https://bugs.oxid-esales.com/view.php?id=7447) Markup due to negative discount per shopping cart leads to maintainance mode
+- [0007439](https://bugs.oxid-esales.com/view.php?id=7439) Chargeback transactions do not appear in the backend
+- [0007442](https://bugs.oxid-esales.com/view.php?id=7442) Reversal after partial reversal
 
 ## [1.0.1] - 2022-12-03
 

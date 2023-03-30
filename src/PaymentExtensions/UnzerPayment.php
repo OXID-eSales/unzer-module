@@ -9,9 +9,12 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
 
 /**
@@ -86,16 +89,13 @@ abstract class UnzerPayment
     ): bool {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
+        /** @var string $companyType */
+        $companyType = $request->getRequestParameter('unzer_company_form', '');
 
-        /** @var string $unzerComSector */
-        $unzerComSector = $request->getRequestParameter('unzer_commercial_sector', '');
-        /** @var string $unzerComRegNumber */
-        $unzerComRegNumber = $request->getRequestParameter('unzer_commercial_register_number', '');
         $customer = $this->unzerService->getUnzerCustomer(
             $userModel,
             null,
-            $unzerComSector,
-            $unzerComRegNumber
+            $companyType
         );
 
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);

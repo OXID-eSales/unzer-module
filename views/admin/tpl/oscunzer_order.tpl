@@ -5,7 +5,9 @@
 [{else}]
     [{assign var="readonly" value=""}]
 [{/if}]
-
+[{if $paymentTitle && $totalBasketPrice}]
+<h3>[{$paymentTitle}] : [{$totalBasketPrice}]</h3>
+[{/if}]
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="oxid" value="[{$oxid}]">
@@ -25,6 +27,7 @@
                     <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_CUSTOMERID"}]</td>
                     <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_STATUS"}]</td>
                     <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_TYPEID"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_TRANSACTION_AMOUNT"}]</td>
                 </tr>
                 [{foreach from=$oUnzerTransactions item="oUnzerTransaction"}]
                     [{assign var="transaction_state" value=$oUnzerTransaction->getUnzerState()|escape}]
@@ -35,6 +38,9 @@
                         <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
                         <td>[{'OSCUNZER_TRANSACTION_STATUS_'|cat:$transaction_state|oxmultilangassign}]</td>
                         <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
+                        <td>[{$oUnzerTransaction->getUnzerAmount()|string_format:"%.2f"}]
+                            [{$oUnzerTransaction->getUnzerCurrency()}]
+                        </td>
                     </tr>
                 [{/foreach}]
             </tbody>
@@ -147,7 +153,6 @@
                         <td class="listheader">[{oxmultilang ident="OSCUNZER_CHARGE_CANCELAMOUNT"}]</td>
                         <td class="listheader"> </td>
                     </tr>
-
                     [{foreach from=$aCharges item="oUnzerCharge"}]
                     <tr>
                         <form name="uzr" id="uzr_[{$oUnzerCharge.chargeId}]" action="[{$oViewConf->getSelfLink()}]" method="post">
@@ -190,8 +195,8 @@
                                            value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
                                 </td>
                                 [{capture assign="cancelConfirm"}]
-                                    const inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
-                                    const form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');
+                                    inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
+                                    form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');
                                     form.addEventListener('submit', function (e) {
                                     if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
                                     return true;
@@ -202,11 +207,47 @@
                                 [{/capture}]
                                 [{oxscript add=$cancelConfirm}]
                             [{else}]
-                                <td colspan="3"></td>
+                                <td>[{$oUnzerCharge.cancelledAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                                <td>[{$oUnzerCharge.chargedAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                                <td></td>
                             [{/if}]
                         </form>
                     </tr>
                     [{/foreach}]
+                    [{if $canCancelAmount > 0}]
+                        <form name="uzr" id="uzr_payout" action="[{$oViewConf->getSelfLink()}]" method="post">
+                        [{$oViewConf->getHiddenSid()}]
+                        <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                        <input type="hidden" name="chargedamount" value="[{$canCancelAmount}]">
+                        <input type="hidden" name="cl" value="unzer_admin_order">
+                        <input type="hidden" name="fnc" value="doUnzerCancel">
+                        <input type="hidden" name="oxid" value="[{$oxid}]">
+                        <tr>
+                            [{if $blCancelReasonReq}]
+                            <td colspan="3" align="right">
+                            [{else}]
+                            <td colspan="2" align="right">
+                            [{/if}]
+                            [{oxmultilang ident="OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT"}]</td>
+                            <td>[{$totalAmountCharge|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                            <td>[{$totalAmountCancel|string_format:"%.2f"}] [{$uzrCurrency}]</td>
+                            <td><input type="text" id="amount_payout" name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
+                            <td><button type="submit">[{oxmultilang ident="OSCUNZER_PAYOUT"}]</button></td>
+                        </tr>
+                            [{capture assign="cancelConfirm"}]
+                            inAmount = document.getElementById('amount_payout');
+                            form = document.getElementById('uzr_payout');
+                            form.addEventListener('submit', function (e) {
+                            if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
+                            return true;
+                            } else {
+                            return false;
+                            }
+                            });
+                            [{/capture}]
+                            [{oxscript add=$cancelConfirm}]
+                        </form>
+                    [{/if}]
                     [{if $errCancel}]
                         <tr>
                             <td colspan="[{if $blCancelReasonReq}]7[{else}]6[{/if}]"><div style="color: red">[{$errCancel}]</div></td>

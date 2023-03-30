@@ -99,6 +99,30 @@ class ViewConfig extends ViewConfig_parent
         return $this->moduleSettings->getShopPrivateKey();
     }
 
+    public function getUnzerB2BPubKey(): string
+    {
+        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2B');
+        return $key;
+    }
+
+    public function getUnzerB2BPrivKey(): string
+    {
+        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2B');
+        return $key;
+    }
+
+    public function getUnzerB2CPubKey(): string
+    {
+        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2C');
+        return $key;
+    }
+
+    public function getUnzerB2CPrivKey(): string
+    {
+        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2C');
+        return $key;
+    }
+
     /**
      * retrieve additional payment information from session
      *
@@ -107,7 +131,7 @@ class ViewConfig extends ViewConfig_parent
     public function getSessionPaymentInfo(): string
     {
         /** @var string $addPaymentInfo */
-        $addPaymentInfo = Registry::getSession()->getVariable('additionalPaymentInformation');
+        $addPaymentInfo = Registry::getSession()->getVariable('additionalPaymentInformation') ?? '';
         return $addPaymentInfo;
     }
 
@@ -195,5 +219,13 @@ class ViewConfig extends ViewConfig_parent
     public function isB2BInvoiceEligibility(): bool
     {
         return $this->moduleSettings->isB2BInvoiceEligibility();
+    }
+
+    public function getBasketCurrencyName(): string
+    {
+        $currencyName = '';
+        $basket = Registry::getSession()->getBasket();
+        $currencyName = $basket->getBasketCurrency()->name;
+        return $currencyName;
     }
 }
