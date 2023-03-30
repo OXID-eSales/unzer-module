@@ -93,16 +93,14 @@ jobs:
           make addbasicservices
           make file=services/selenium-chrome.yml addservice
           perl -pi\
-            -e "s#PHP_VERSION=.*#PHP_VERSION='${{ matrix.php }}'#g;"\
+            -e 's#PHP_VERSION=.*#PHP_VERSION=${{ inputs.php }}#g;'\
+            -e "s#MYSQL_VERSION=.*#MYSQL_VERSION=${{ inputs.mysql }}#g;"\
             .env
           perl -pi\
             -e 's#display_errors =.*#display_errors = false#g;'\
+            -e 's#error_reporting = .*#error_reporting = E_ALL ^ E_WARNING ^ E_DEPRECATED#g;'\
             -e 'print "xdebug.max_nesting_level=1000\nxdebug.mode=coverage\n\n"'\
             containers/php/custom.ini
-
-          perl -pi\
-            -e 's#/var/www/#/var/www/source/#g;'\
-            containers/httpd/project.conf
 
       - name: Prepare shop configuration
         run: |
@@ -158,7 +156,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: Configs-${{ matrix.php }}
+          name: Configs-${{ inputs.php }}-${{ inputs.mysql }}-${{ inputs.template_engine }}
           path: |
             docker-compose.yml
             source/composer.json
