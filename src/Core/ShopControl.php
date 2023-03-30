@@ -41,12 +41,12 @@ class ShopControl extends ShopControl_parent
     public function handleCustomUnzerException(UnzerException $exception): void
     {
         if ($exception instanceof RedirectWithMessage) {
-            $this->handleRedirectWithMessageException($exception);
+            $this->handleUnzerRedirectWithMessageException($exception);
             return;
         }
 
         if ($exception instanceof Redirect) {
-            $this->handleRedirectException($exception, false);
+            $this->handleUnzerRedirectException($exception, false);
             return;
         }
 
@@ -58,7 +58,7 @@ class ShopControl extends ShopControl_parent
      * @param bool $blAddRedirectParam
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function handleRedirectException(Redirect $redirectException, bool $blAddRedirectParam = true): void
+    protected function handleUnzerRedirectException(Redirect $redirectException, bool $blAddRedirectParam = true): void
     {
         Registry::getUtils()->redirect($redirectException->getDestination(), $blAddRedirectParam);
     }
@@ -66,7 +66,7 @@ class ShopControl extends ShopControl_parent
     /**
      * @param RedirectWithMessage $redirectException
      */
-    protected function handleRedirectWithMessageException(RedirectWithMessage $redirectException): void
+    protected function handleUnzerRedirectWithMessageException(RedirectWithMessage $redirectException): void
     {
         $displayError = oxNew(DisplayError::class);
         $displayError->setMessage($redirectException->getMessageKey());
@@ -74,6 +74,6 @@ class ShopControl extends ShopControl_parent
 
         Registry::getUtilsView()->addErrorToDisplay($displayError);
 
-        $this->handleRedirectException($redirectException);
+        $this->handleUnzerRedirectException($redirectException);
     }
 }
