@@ -1,0 +1,6 @@
+{% set payment = oView.getPayment() %}
+{% if oViewConf.checkUnzerHealth() and payment.isUnzerPayment() %}
+    {% include "@unzer/unzer_shippingAndPayment_wave.html.twig" %}
+{% else %}
+    {{ parent() }}
+{% endif %}

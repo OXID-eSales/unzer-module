@@ -125,7 +125,7 @@ class InstallmentController extends FrontendController
                 $sPaymentid && $oPayment->load($sPaymentid) &&
                 $oPayment->isValidPayment(
                     (array)Registry::getSession()->getVariable('dynvalue'),
-                    (string)$this->getConfig()->getShopId(),
+                    (string)Registry::getConfig()->getShopId(),
                     $oUser,
                     $oBasket->getPriceForPayment(),
                     $sShipSet

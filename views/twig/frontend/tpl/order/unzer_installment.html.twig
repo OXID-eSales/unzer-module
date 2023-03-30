@@ -1,0 +1,136 @@
+{% include "@unzer/unzer_assets.html.twig" %}
+{% set invadr = oView.getInvoiceAddress() %}
+{% if isset( invadr.oxuser__oxbirthdate.month ) %}
+    {% set iBirthdayMonth = invadr.oxuser__oxbirthdate.month %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00 - 00" %}
+    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]/":""|regex_replace("/[-]([0-9]{1,) 2})$/":"" %}
+{% else %}
+    {% set iBirthdayMonth = 0 %}
+{% endif %}
+
+{% if isset( invadr.oxuser__oxbirthdate.day ) %}
+    {% set iBirthdayDay = invadr.oxuser__oxbirthdate.day %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00 - 00" %}
+    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]([0-9]{1, 2})[-]/":"" %}
+{% else %}
+    {% set iBirthdayDay = 0 %}
+{% endif %}
+
+{% if isset( invadr.oxuser__oxbirthdate.year ) %}
+    {% set iBirthdayYear = invadr.oxuser__oxbirthdate.year %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00 - 00" %}
+    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/[-]([0-9]{1,) 2})[-]([0-9]{1, 2})$/":"" %}
+{% else %}
+    {% set iBirthdayYear = 0 %}
+{% endif %}
+
+<form id="payment-form-installment" class="unzerUI form unzerUI-installmentsecured__form" novalidate>
+    <br />
+    <div id="unzer-installment">
+        <!-- The Installment Secured field UI Element will be inserted here -->
+    </div>
+    <div id="oxDateForInstallment" class="form-group row oxDate {% if not iBirthdayMonth or not iBirthdayDay or not iBirthdayYear %}text-danger{% endif %}">
+        <div class="col-12 col-lg-12">
+            <label for="oxDay">{{ translate({ ident: "BIRTHDATE" }) }}</label>
+        </div>
+
+        <div class="col-3 col-lg-3 unzerUI input">
+            <input id="birthdate_day" class="oxDay form-control" type="text" maxlength="2" value="{% if iBirthdayDay > 0 %}{{ iBirthdayDay }}{% endif %}"
+                   placeholder="{{ translate({ ident: "DAY" }) }}" required>
+        </div>
+        <div class="col-6 col-lg-3">
+            <select id="birthdate_month" class="oxMonth form-control selectpicker" required>
+                <option value="" label="-">-</option>
+                {% for month in 1..13 %}
+                <option value="[{loop.index0 %} selected="selected" {% endif %}>
+                    {{ translate({ ident: "MONTH_NAME_"|cat(smarty.section.month.index) }) }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-3 col-lg-3 unzerUI input">
+            <input id="birthdate_year" class="oxYear form-control" type="text" maxlength="4" value="{% if iBirthdayYear %}{{ iBirthdayYear }}{% endif %}"
+                   placeholder="{{ translate({ ident: "YEAR" }) }}" required>
+        </div>
+        <div class="offset-lg-3 col-lg-9 col-12">
+            <div class="help-block">
+                <p class="text-danger {% if iBirthdayMonth and iBirthdayDay and iBirthdayYear %}d-none hidden{% endif %}">{{ translate({ ident: "DD_FORM_VALIDATION_REQUIRED" }) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="field" id="error-holder" style="color: #9f3a38"> </div>
+    <button id="continue-button" class="unzerUI primary button fluid" type="submit" style="display: none" disabled>
+        {{ translate({ ident: "OSCUNZER_INSTALLMENT_CONTINUE" }) }}
+    </button>
+</form>
+{% set totalgross = oxcmp_basket.getBruttoSum() %}
+{% set uzrcurrency = 'EUR' %}
+{% set installrate = oViewConf.getUnzerInstallmentRate() %}
+
+{% capture assign = "unzerInstallmentJS" %}
+
+        // Create an Unzer instance with your public key
+        let unzerInstance = new unzer('{{ unzerpub }}');
+
+        let InstallmentSecured = unzerInstance.InstallmentSecured();
+
+        function toggleDateVisbility() {
+            if ($('#installment-secured-account-owner').length < 1) $('#oxDateForInstallment').hide();
+            $('#installment-secured-account-owner').each(function() {
+                if ($(this).is(':visible')){
+                    $('#oxDateForInstallment').show();
+                }
+            });
+        }
+        window.setInterval(toggleDateVisbility, 100);
+
+        InstallmentSecured.create({
+            containerId: 'unzer-installment',
+            amount: {{ totalgross }},
+            currency: '{{ uzrcurrency }}',
+            effectiveInterest: {{ installrate }}
+        });
+
+        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+            if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+                event.preventDefault();
+                $( '#payment-form-installment' ).submit();
+            }
+        });
+
+        // Handling payment form submission
+        $( "#payment-form-installment" ).submit(function( event ) {
+            event.preventDefault();
+            if($('.unzerUI-installment-secured__selected-rate').length){
+                InstallmentSecured.createResource()
+                .then(function(data) {
+                    let hiddenInput = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentData')
+                    .val(JSON.stringify(data));
+
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+
+                    let hiddenInputBirthdate = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'birthdate')
+                        .val($('#birthdate_year').val()+'-'+$('#birthdate_month').val()+'-'+$('#birthdate_day').val());
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputBirthdate);
+
+                    $( '#orderConfirmAgbBottom' ).addClass("submitable");
+                    $( "#orderConfirmAgbBottom" ).submit();
+                })
+                .catch(function(error) {
+                    $('#error-holder').html(error.message);
+                    $('html, body').animate({
+                    scrollTop: $("#orderPayment").offset().top - 150
+                    }, 350);
+                });
+            }else{
+                $('html, body').animate({
+                scrollTop: $("#orderPayment").offset().top - 150
+                }, 350);
+            }
+        });
+{% endcapture %}
+{{ script({ add: unzerInstallmentJS, dynamic: __oxid_include_dynamic }) }}

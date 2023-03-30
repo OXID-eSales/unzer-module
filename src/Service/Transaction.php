@@ -9,6 +9,8 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
 use OxidSolutionCatalysts\Unzer\Model\Order;
+use DateTime;
+use Doctrine\DBAL\Result;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Application\Model\Basket;
@@ -48,6 +50,9 @@ class Transaction
     /** @var UtilsDate */
     protected $utilsDate;
 
+    /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+    protected $queryBuilderFactory;
+
     /**
      * @param Context $context
      * @param UtilsDate $utilsDate
@@ -58,6 +63,10 @@ class Transaction
     ) {
         $this->context = $context;
         $this->utilsDate = $utilsDate;
+
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        $this->queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
     }
 
     /**
@@ -177,20 +186,26 @@ class Transaction
 
     public function deleteOldInitOrders(): void
     {
-        DatabaseProvider::getDb()->Execute(
-            "DELETE from oscunzertransaction where OXACTION = 'init' AND OXACTIONDATE < NOW() - INTERVAL 1 DAY"
-        );
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->queryBuilderFactory->create();
+
+        $queryBuilder->delete()
+            ->from('oscunzertransaction')
+            ->where('oxaction = :oxaction')
+            ->andWhere('oxactiondate < :oxactiondate');
+
+        $parameters = [
+            'oxaction' => 'init',
+            'oxactiondate' => (new DateTime())->modify('-1 day')->format('Y-m-d 00:00:00'),
+        ];
+
+        $queryBuilder->setParameters($parameters)->execute();
     }
 
     public function cleanUpNotFinishedOrders(): void
     {
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()->getContainer();
-        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $queryBuilderFactory->create();
+        $queryBuilder = $this->queryBuilderFactory->create();
 
         $parameters = [
             'oxordernr' => '0',
@@ -468,10 +483,25 @@ class Transaction
     public static function getTransactionDataByPaymentId(string $paymentid)
     {
         if ($paymentid) {
-            return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT DISTINCT OXORDERID, OXUSERID FROM oscunzertransaction WHERE TYPEID=?",
-                [$paymentid]
-            );
+            /** @var ContainerInterface $container */
+            $container = ContainerFactory::getInstance()->getContainer();
+            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $queryBuilderFactory->create();
+
+            $queryBuilder->select('oxorderid', 'oxuserid')
+                ->from('oscunzertransaction')
+                ->where('typeid = :typeid')
+                ->distinct();
+
+            $parameters = [
+                'typeid' => $paymentid
+            ];
+
+            /** @var Result $result */
+            $result = $queryBuilder->setParameters($parameters)->execute();
+            return $result->fetchAllAssociative();
         }
 
         return false;
@@ -505,19 +535,34 @@ class Transaction
      */
     public static function getPaymentIdByOrderId(string $orderid)
     {
-        $result = '';
-
         if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT DISTINCT TYPEID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
-                [$orderid]
-            );
+            /** @var ContainerInterface $container */
+            $container = ContainerFactory::getInstance()->getContainer();
+            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $queryBuilderFactory->create();
 
-            $result = $rows[0]['TYPEID'];
+            $queryBuilder->select('typeid')
+                ->from('oscunzertransaction')
+                ->where('oxorderid = :oxorderid')
+                ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
+                ->distinct();
+
+            $parameters = [
+                'oxorderid' => $orderid
+            ];
+
+            /** @var Result $result */
+            $result = $queryBuilder->setParameters($parameters)->execute();
+            $rows = $result->fetchAllAssociative();
+
+            /** @var string $typeid */
+            $typeid = $rows[0]['typeid'];
+            return $typeid;
         }
 
-        return $result;
+        return '';
     }
 
     /**
@@ -569,14 +614,25 @@ class Transaction
      */
     public function isValidTransactionTypeId($typeid): bool
     {
-        if (
-            DatabaseProvider::getDb()->getOne(
-                "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE TYPEID=? ",
-                [$typeid]
-            )
-        ) {
-            return true;
-        }
-        return false;
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $queryBuilder->select('typeid')
+            ->from('oscunzertransaction')
+            ->where('typeid = :typeid')
+            ->distinct();
+
+        $parameters = [
+            'typeid' => $typeid
+        ];
+
+        /** @var Result $result */
+        $result = $queryBuilder->setParameters($parameters)->execute();
+
+        return $result->rowCount() > 0;
     }
 }

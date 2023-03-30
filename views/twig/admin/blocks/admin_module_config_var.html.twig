@@ -1,0 +1,171 @@
+{% if oModule.getInfo('id') == "osc - unzer" %}
+    {% set systemModeTrans = 'OSCUNZER_'|cat(systemMode)|translate %}
+    {% if var_group == "unzermerchant" and module_var == "registeredWebhook" %}
+        {% if showWebhookButtons %}
+            {% if registeredwebhook %}
+                <dl>
+                    <dt>
+                        <input size="128" type="text" value="{{ registeredwebhook }}" disabled>
+                    </dt>
+                    <dd>
+                        {{ translate({ ident: "SHOP_MODULE_WEBHOOK" }) }}
+                    </dd>
+                    <div class="spacer"></div>
+                </dl>
+                <dl>
+                    <dt>
+                        <input type="submit" class="confinput" name="deletewebhook"
+                               value="{{ translate({ ident: "SHOP_MODULE_DELETE_WEBHOOK" }) }}"
+                               onClick="Javascript:document.module_configuration.fnc.value='deleteWebhook'" {{ readonly }}>
+                    </dt>
+                    <div class="spacer"></div>
+                </dl>
+            {% else %}
+                <dl>
+                    <dt>
+                        <input type="submit" class="confinput" name="registerwebhook"
+                               value="{{ translate({ ident: "SHOP_MODULE_REGISTER_WEBHOOK" }) }}"
+                               onClick="Javascript:document.module_configuration.fnc.value='registerWebhook'" {{ readonly }}>
+                    </dt>
+                    <div class="spacer"></div>
+                </dl>
+            {% endif %}
+        {% else %}
+            <dl>
+                <dt>
+                    <input disabled type="submit"
+                           value="{{ translate({ ident: "SHOP_MODULE_REGISTER_WEBHOOK" }) }}" {{ readonly }}>
+                </dt>
+                <dd>
+                    {{ translate({ ident: "SHOP_MODULE_WEBHOOK_NO_UNZER" }) }}
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+        {% endif %}
+    {% elseif var_group == "unzerapplepay" %}
+        {% if module_var == "applepay_merchant_capabilities" or module_var == "applepay_networks" %}
+            <dl>
+                <dd>
+                    {{ translate({ ident: "SHOP_MODULE_`$module_var`" }) }}
+                    {% include "inputhelp.html.twig" with {'sHelpId': help_id("HELP_SHOP_MODULE_`$module_var`"), 'sHelpText': help_text("HELP_SHOP_MODULE_`$module_var`")} %}
+                </dd>
+                {% if module_var == "applepay_merchant_capabilities" %}
+                    <dd>
+                        {% for settingName, setting in applePayMC %}
+                            <label>
+                                <input type="hidden" name="applePayMC[{{ settingName }}]" value="0">
+                                <input type="checkbox" name="applePayMC[{{ settingName }}]"
+                                       value="1"{% if setting %} checked="checked"{% endif %}>
+                                {{ translate({ ident: "SHOP_MODULE_`$module_var`_`$settingName`" }) }}
+                            </label>
+                            <br>
+                        {% endfor %}
+                    </dd>
+                    <div class="spacer"></div>
+                {% elseif module_var == "applepay_networks" %}
+                    <dd>
+                        {% for settingName, setting in applePayNetworks %}
+                            <label>
+                                <input type="hidden" name="applePayNetworks[{{ settingName }}]" value="0">
+                                <input type="checkbox" name="applePayNetworks[{{ settingName }}]"
+                                       value="1"{% if setting %} checked="checked"{% endif %}>
+                                {{ translate({ ident: "SHOP_MODULE_`$module_var`_`$settingName`" }) }}
+                            </label>
+                            <br>
+                        {% endfor %}
+                    </dd>
+                {% endif %}
+                <div class="spacer"></div>
+            </dl>
+        {% elseif module_var == systemMode|cat(" - applepay_merchant_cert_key") or module_var == systemMode|cat(" - applepay_merchant_cert") %}
+            <dl>
+                <dt>
+                    {% if module_var == systemMode|cat(" - applepay_merchant_cert_key") %}
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;"
+                                  name="{{ systemMode }}-applePayMerchantCertKey" {{ readonly }}>{{ applePayMerchantCertKey }}</textarea>
+                    {% else %}
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;"
+                                  name="{{ systemMode }}-applePayMerchantCert" {{ readonly }}>{{ applePayMerchantCert }}</textarea>
+                    {% endif %}
+                    {% include "inputhelp.html.twig" with {'sHelpId': help_id("HELP_SHOP_MODULE_`$module_var`"), 'sHelpText': help_text("HELP_SHOP_MODULE_`$module_var`")} %}
+                </dt>
+                <dd>
+                    {{ translate({ ident: "SHOP_MODULE_`$module_var`", args: systemModeTrans }) }}
+                </dd>
+            </dl>
+            <div class="spacer"></div>
+        {% elseif module_var == systemMode|cat(" - applepay_merchant_identifier") %}
+            {# before we check the applepay_merchant_identifier, we have a upload-function for payment-key and payment-cert #}
+            {% set hidePaymentProcessingTextareas = false %}
+            {% if oView.getApplePayPaymentProcessingCertExists() and oView.getApplePayPaymentProcessingKeyExists() %}
+                {% set hidePaymentProcessingTextareas = true %}
+            {% endif %}
+            <dl class="js-payment-cert-list" {% if hidePaymentProcessingTextareas %}style="display: none"{% endif %}>
+                <dt>
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;"
+                                  name="applePayPaymentProcessingCert"></textarea>
+                </dt>
+                <dd>
+                    {{ translate({ ident: "SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT", args: systemModeTrans }) }}
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+            <dl class="js-payment-cert-list" {% if hidePaymentProcessingTextareas %}style="display: none"{% endif %}>
+                <dt>
+                        <textarea class="txt"
+                                  style="width: 250px; height: 200px;"
+                                  name="applePayPaymentProcessingCertKey"></textarea>
+                </dt>
+                <dd>
+                    {{ translate({ ident: "SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT_KEY", args: systemModeTrans }) }}
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+            <dl class="js-payment-cert-list" {% if hidePaymentProcessingTextareas %}style="display: none;"{% endif %}>
+                <dt>
+                    <input type="submit" class="confinput" name="transferApplePayPaymentProcessingData"
+                           value="{{ translate({ ident: "SHOP_MODULE_TRANSFER_APPLE_PAY_PAYMENT_DATA", args: systemModeTrans }) }}"
+                           style="margin-bottom: 25px;"
+                           onClick="Javascript:document.module_configuration.fnc.value='transferApplePayPaymentProcessingData'" {{ readonly }}>
+                </dt>
+                <div class="spacer"></div>
+            </dl>
+            <dl class="js-show-payment-cert-list" style="{% if not hidePaymentProcessingTextareas %}display: none;{% else %}margin-bottom: 25px;"{% endif %}>
+                <dd style="color: green; padding-left: 5px;">
+                    {{ translate({ ident: "SHOP_MODULE_APPLE_PAY_PAYMENT_CERTS_PROCESSED", args: systemModeTrans }) }}
+                </dd>
+                <dt>
+                    <input class="js-show-payment-certs confinput" type="submit" value="{{ translate({ ident: "SHOP_MODULE_RETRANSFER_APPLE_PAY_PAYMENT_DATA", args: systemModeTrans }) }}">
+                </dt>
+                <div class="spacer"></div>
+            </dl>
+            <script>
+                document.querySelector('.js-show-payment-certs').addEventListener('click', e => {
+                    e.preventDefault();
+
+                    document.querySelectorAll('.js-payment-cert-list').forEach(el => {
+                        el.style.display = '';
+                    })
+                    document.querySelector('.js-show-payment-cert-list').style.display = 'none';
+                })
+            </script>
+            <dl>
+                <dt>
+                    <input type=text  class="txt" style="width: 250px;" name="confstrs[{{ module_var }}]" value="{{ confstrs.$module_var }}" {{ readonly }}>
+                    {% include "inputhelp.html.twig" with {'sHelpId': help_id("HELP_SHOP_MODULE_`$module_var`"), 'sHelpText': help_text("HELP_SHOP_MODULE_`$module_var`")} %}
+                </dt>
+                <dd>
+                    {{ translate({ ident: "SHOP_MODULE_`$module_var`", args: systemModeTrans }) }}
+                </dd>
+                <div class="spacer"></div>
+            </dl>
+        {% endif %}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% else %}
+    {{ parent() }}
+{% endif %}

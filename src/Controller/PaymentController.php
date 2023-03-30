@@ -12,6 +12,7 @@ use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Controller\PaymentController as PaymentController_parent;
 use OxidEsales\Eshop\Core\Registry;
 
 class PaymentController extends PaymentController_parent

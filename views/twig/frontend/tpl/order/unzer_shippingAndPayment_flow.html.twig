@@ -1,0 +1,71 @@
+{% set sPaymentID = payment.getId() %}
+{% set unzerpub = oViewConf.getUnzerPubKey() %}
+<div class="row">
+    <div class="col-xs-12 col-md-6" id="orderShipping">
+        <form action="{{ oViewConf.getSslSelfLink() }}" method="post">
+            <div class="hidden">
+                {{ oViewConf.getHiddenSid() }}
+                <input type="hidden" name="cl" value="payment">
+                <input type="hidden" name="fnc" value="">
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        {{ translate({ ident: "SHIPPING_CARRIER" }) }}
+                        <button type="submit"
+                                class="btn btn-xs btn-warning pull-right submitButton largeButton"
+                                title="{{ translate({ ident: "EDIT" }) }}">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    {% set oShipSet = oView.getShipSet() %}
+                    {{ oShipSet.oxdeliveryset__oxtitle.value }}
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-xs-12 col-md-6" id="orderPayment">
+        <div>
+            <div class="panel panel-default">
+                <form class="panel-heading" action="{{ oViewConf.getSslSelfLink() }}" method="post">
+                    <h3 class="panel-title">
+                        {{ translate({ ident: "PAYMENT_METHOD" }) }}
+                        {{ oViewConf.getHiddenSid() }}
+                        <input type="hidden" name="cl" value="payment">
+                        <input type="hidden" name="fnc" value="">
+                        <button type="submit"
+                                class="btn btn-xs btn-warning pull-right submitButton largeButton"
+                                title="{{ translate({ ident: "EDIT" }) }}">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                    </h3>
+                </form>
+                <div class="panel-body">
+                    {{ payment.oxpayments__oxdesc.value }}
+                    {% if sPaymentID == "oscunzer_card" %}
+                        {% include "@unzer/unzer_card.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_eps" %}
+                        {% include "@unzer/unzer_eps_charge.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_ideal" %}
+                        {% include "@unzer/unzer_ideal.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_installment" %}
+                        {% include "@unzer/unzer_installment.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_invoice" %}
+                        {% include "@unzer/unzer_invoice.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_paypal" %}
+                        {% include "@unzer/unzer_paypal.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_applepay" %}
+                        {% include "@unzer/unzer_applepay.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_sepa" %}
+                        {% include "@unzer/unzer_sepa.html.twig" %}
+                    {% elseif sPaymentID == "oscunzer_sepa - secured" %}
+                        {% include "@unzer/unzer_sepa_secured.html.twig" %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -56,17 +56,17 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
-        \OxidEsales\Eshop\Core\Config::class => Config::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
-        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
-        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
-        \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
         \OxidEsales\Eshop\Application\Model\Article::class => Article::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
+        \OxidEsales\Eshop\Core\Config::class => Config::class,
+        \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
     ],
     'controllers' => [
         'unzer_admin_order' => AdminOrderController::class,
@@ -76,27 +76,27 @@ $aModule = [
     ],
     'templates' => [
         // admin
-        'oscunzer_order.tpl' => 'osc/unzer/views/admin/tpl/oscunzer_order.tpl',
+        '@unzer/oscunzer_order.tpl' => 'smarty/admin/tpl/oscunzer_order.tpl',
 
         // frontend
-        'modules/osc/unzer/unzer_assets.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_assets.tpl',
-        'modules/osc/unzer/unzer_card.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_card.tpl',
-        'modules/osc/unzer/unzer_eps_charge.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_eps_charge.tpl',
-        'modules/osc/unzer/unzer_installment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment.tpl',
-        'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
-        'modules/osc/unzer/unzer_installment_confirm_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
-        'modules/osc/unzer/unzer_installment_confirm_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
-        'modules/osc/unzer/unzer_invoice.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice.tpl',
-        'modules/osc/unzer/unzer_applepay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl',
-        'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
-        'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
-        'modules/osc/unzer/unzer_ideal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_ideal.tpl',
-        'modules/osc/unzer/unzer_shippingAndPayment_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
-        'modules/osc/unzer/unzer_shippingAndPayment_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
-        'modules/osc/unzer/message/js-errors.tpl' => 'osc/unzer/views/frontend/tpl/message/js-errors.tpl',
-        'modules/osc/unzer/payment/applepay_availibility_check.tpl' => 'osc/unzer/views/frontend/tpl/payment/applepay_availibility_check.tpl',
-        'modules/osc/unzer/payment/payment_unzer.tpl' => 'osc/unzer/views/frontend/tpl/payment/payment_unzer.tpl',
-        'modules/osc/unzer/order/applepay_button.tpl' => 'osc/unzer/views/frontend/tpl/order/applepay_button.tpl',
+        '@unzer/unzer_assets.tpl' =>                        'views/frontend/tpl/order/unzer_assets.tpl',
+        '@unzer/unzer_card.tpl' =>                          'views/frontend/tpl/order/unzer_card.tpl',
+        '@unzer/unzer_eps_charge.tpl' =>                    'views/frontend/tpl/order/unzer_eps_charge.tpl',
+        '@unzer/unzer_installment.tpl' =>                   'views/frontend/tpl/order/unzer_installment.tpl',
+        '@unzer/unzer_installment_confirm.tpl' =>           'views/frontend/tpl/order/unzer_installment_confirm.tpl',
+        '@unzer/unzer_installment_confirm_flow.tpl' =>      'views/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
+        '@unzer/unzer_installment_confirm_wave.tpl' =>      'views/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
+        '@unzer/unzer_invoice.tpl' =>                       'views/frontend/tpl/order/unzer_invoice.tpl',
+        '@unzer/unzer_applepay.tpl' =>                      'views/frontend/tpl/order/unzer_applepay.tpl',
+        '@unzer/unzer_sepa.tpl' =>                          'views/frontend/tpl/order/unzer_sepa.tpl',
+        '@unzer/unzer_sepa_secured.tpl' =>                  'views/frontend/tpl/order/unzer_sepa_secured.tpl',
+        '@unzer/unzer_ideal.tpl' =>                         'views/frontend/tpl/order/unzer_ideal.tpl',
+        '@unzer/unzer_shippingAndPayment_flow.tpl' =>       'views/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
+        '@unzer/unzer_shippingAndPayment_wave.tpl' =>       'views/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
+        '@unzer/message/js-errors.tpl' =>                   'views/frontend/tpl/message/js-errors.tpl',
+        '@unzer/payment/applepay_availibility_check.tpl' => 'views/frontend/tpl/payment/applepay_availibility_check.tpl',
+        '@unzer/payment/payment_unzer.tpl' =>               'views/frontend/tpl/payment/payment_unzer.tpl',
+        '@unzer/order/applepay_button.tpl' =>               'views/frontend/tpl/order/applepay_button.tpl',
     ],
     'blocks' => [
         //frontend
@@ -131,7 +131,7 @@ $aModule = [
         [
             'template' => 'module_config.tpl',
             'block' => 'admin_module_config_var',
-            'file' => 'views/admin/blocks/admin_module_config_var.tpl'
+            'file' => 'views/smarty/admin/blocks/admin_module_config_var.tpl'
         ],
         //email
         [

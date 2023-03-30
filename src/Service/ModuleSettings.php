@@ -68,8 +68,8 @@ class ModuleSettings
     {
         return (
             $this->getShopPublicKey() &&
-            $this->getShopPrivateKey() &&
-            $this->getRegisteredWebhookId()
+            $this->getShopPrivateKey() /*&&
+            $this->getRegisteredWebhookId()*/
         );
     }
 

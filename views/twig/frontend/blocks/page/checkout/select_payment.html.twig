@@ -1,0 +1,11 @@
+{% if oViewConf.checkUnzerHealth() and paymentmethod.isUnzerPayment() and paymentmethod.isUnzerPaymentTypeAllowed() %}
+    {% if sPaymentID == 'oscunzer_applepay' %}
+        {% include "@unzer/payment/applepay_availibility_check.html.twig" %}
+    {% endif %}
+    <div class="well well-sm">
+        {# We include it as template, so that it can be modified in custom themes #}
+        {% include "@unzer/payment/payment_unzer.html.twig" %}
+    </div>
+{% else %}
+    {{ parent() }}
+{% endif %}

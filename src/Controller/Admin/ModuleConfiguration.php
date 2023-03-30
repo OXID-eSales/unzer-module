@@ -3,10 +3,9 @@
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
 use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ApiClient;
@@ -102,6 +101,25 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         return 'module_config.tpl';
     }
 
+    protected function getProposedWebhookForActualShop(): string
+    {
+        $withXDebug = ($this->moduleSettings->isSandboxMode() && $this->moduleSettings->isDebugMode());
+        return Registry::getConfig()->getSslShopUrl()
+            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus'
+            . ($withXDebug ? '&XDEBUG_SESSION_START' : '');
+    }
+
+    /**
+     * @param string $webhookUrl
+     * @param string $webhookId
+     * @return void
+     */
+    protected function saveWebhookOption(string $webhookUrl, string $webhookId): void
+    {
+        $this->moduleSettings->saveWebhook($webhookUrl);
+        $this->moduleSettings->saveWebhookId($webhookId);
+    }
+
     /**
      * @throws UnzerApiException
      */
@@ -129,14 +147,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    protected function getProposedWebhookForActualShop(): string
-    {
-        $withXDebug = ($this->moduleSettings->isSandboxMode() && $this->moduleSettings->isDebugMode());
-        return Registry::getConfig()->getSslShopUrl()
-            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus'
-            . ($withXDebug ? '&XDEBUG_SESSION_START' : '');
-    }
-
     /**
      * @throws UnzerApiException
      */
@@ -162,19 +172,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @param string $webhookUrl
-     * @param string $webhookId
-     * @return void
-     */
-    protected function saveWebhookOption(string $webhookUrl, string $webhookId): void
-    {
-        $this->moduleSettings->saveWebhook($webhookUrl);
-        $this->moduleSettings->saveWebhookId($webhookId);
-    }
-
-    /**
      * @throws GuzzleException
-     * @throws \JsonException
+     * @throws JsonException
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -261,8 +260,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         if ($this->moduleSettings->getApplePayMerchantCertKey() && $keyId) {
             try {
                 $keyExists = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentKey($keyId)
-                    ->getStatusCode()
+                        ->requestApplePayPaymentKey($keyId)
+                        ->getStatusCode()
                     === 200;
             } catch (GuzzleException $guzzleException) {
                 Registry::getUtilsView()->addErrorToDisplay(
@@ -288,8 +287,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         if ($this->moduleSettings->getApplePayMerchantCert() && $certId) {
             try {
                 $certExists = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentCert($certId)
-                    ->getStatusCode()
+                        ->requestApplePayPaymentCert($certId)
+                        ->getStatusCode()
                     === 200;
             } catch (GuzzleException $guzzleException) {
                 Registry::getUtilsView()->addErrorToDisplay(

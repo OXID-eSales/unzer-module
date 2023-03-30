@@ -25,14 +25,14 @@ class ShopControl extends ShopControl_parent
     /**
      * @param StandardException $exception
      */
-    protected function _handleBaseException($exception) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function handleBaseException($exception): void
     {
         if ($exception instanceof UnzerException) {
             $this->handleCustomUnzerException($exception);
             return;
         }
 
-        parent::_handleBaseException($exception);
+        parent::handleBaseException($exception);
     }
 
     /**
@@ -50,7 +50,7 @@ class ShopControl extends ShopControl_parent
             return;
         }
 
-        parent::_handleBaseException($exception);
+        parent::handleBaseException($exception);
     }
 
     /**

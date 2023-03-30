@@ -1,0 +1,16 @@
+{% capture append = "oxidBlock_content" %}
+
+    {# ordering steps #}
+    {% include "page/checkout/inc/steps.html.twig" with {active: 4} %}
+    {% set content = content('oscunzerinstallmentconfirmation') %}
+    {% set title = content('oscunzerinstallmentconfirmation') %}
+
+    {% block checkout_installment_confirm_main %}
+        {% if oViewConf.isFlowCompatibleTheme() %}
+            {% include '@unzer/unzer_installment_confirm_flow.html.twig' %}
+        {% else %}
+            {% include '@unzer/unzer_installment_confirm_wave.html.twig' %}
+        {% endif %}
+    {% endblock %}
+{% endcapture %}
+{% include "layout/page.html.twig" with {title: title, location: title} %}

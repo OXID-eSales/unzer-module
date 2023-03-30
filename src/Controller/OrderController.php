@@ -83,7 +83,7 @@ class OrderController extends OrderController_parent
     {
         // get basket contents
         $oUser = $this->getUser();
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
             try {
                 /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
@@ -95,7 +95,7 @@ class OrderController extends OrderController_parent
                 // performing special actions after user finishes order (assignment to special user groups)
                 $oUser->onOrderExecute($oBasket, $iSuccess);
 
-                $nextStep = $this->_getNextStep($iSuccess);
+                $nextStep = $this->getNextStep($iSuccess);
 
                 // proceeding to next view
                 $unzerService = $this->getServiceFromContainer(Unzer::class);

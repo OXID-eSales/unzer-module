@@ -5,7 +5,7 @@ php-cs-fixer.phar
 /var/
 /vendor/
 /composer.lock
-/Tests/Codeception/_output/
-/Tests/Codeception/_support/
+/tests/Codeception/_output/
+/tests/Codeception/_support/
 /files/*
 !/files/.htaccess

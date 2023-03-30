@@ -125,11 +125,12 @@ class Transaction extends BaseModel
      */
     private function getRawField(string $sFieldName): ?string
     {
-        $sLongFieldName = $this->_getFieldLongName($sFieldName);
+        $sLongFieldName = $this->getFieldLongName($sFieldName);
 
         if (isset($this->{$sLongFieldName})) {
             $fieldData = $this->{$sLongFieldName};
             if ($fieldData instanceof Field) {
+                /** @var string|null $val */
                 $val = $fieldData->getRawValue();
 
                 // Fix for MariaDB empty default-value issue with some oxid versions:

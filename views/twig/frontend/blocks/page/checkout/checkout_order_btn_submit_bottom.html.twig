@@ -1,0 +1,6 @@
+{% set payment = oView.getPayment() %}
+{% if payment.getId() is same as('oscunzer_applepay') %}
+    {% include "@unzer/order/applepay_button.html.twig" %}
+{% else %}
+    {{ parent() }}
+{% endif %}
