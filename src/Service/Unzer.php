@@ -288,7 +288,7 @@ class Unzer
         } elseif ($totalVoucherAmount < 0.) {
             $totalVoucherAmount *= -1.;
             $unzerBasketItem = new BasketItem();
-            $unzerBasketItem->setTitle('Negativer Rabatt')
+            $unzerBasketItem->setTitle($this->translator->translate('SURCHARGE'))
                 ->setQuantity(1)
                 ->setType(BasketItemTypes::GOODS)
                 ->setAmountNet($totalVoucherAmount)

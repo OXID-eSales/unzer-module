@@ -22,6 +22,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
+use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -45,8 +46,8 @@ class AdminOrderController extends AdminDetailsController
      */
     protected $editObject = null;
 
-    /** @var Payment $oPaymnet */
-    protected $oPaymnet = null;
+    /** @var Payment $oPayment */
+    protected $oPayment = null;
 
     /** @var string $sPaymentId */
     protected $sPaymentId;
@@ -77,7 +78,7 @@ class AdminOrderController extends AdminDetailsController
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
 
-            $this->_aViewData['paymentTitle'] = $this->oPaymnet->getFieldData('OXDESC');
+            $this->_aViewData['paymentTitle'] = $this->oPayment->getFieldData('OXDESC');
             $this->_aViewData['oOrder'] = $oOrder;
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
@@ -131,12 +132,9 @@ class AdminOrderController extends AdminDetailsController
                 $editObject->getFormattedTotalOrderSum(),
                 $unzerPayment->getCurrency()
             );
-            $this->_aViewData["blShipment"] = (
-                $paymentType instanceof InstallmentSecured
-            );
-
             $isPrepaymentType = ($paymentType instanceof Prepayment);
-
+            $this->_aViewData["blShipment"] = ($paymentType instanceof InstallmentSecured);
+            $this->_aViewData["isCreditCard"] = ($paymentType instanceof Card);
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
@@ -323,13 +321,14 @@ class AdminOrderController extends AdminDetailsController
     {
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
+        $amount = floatval(Registry::getRequest()->getRequestParameter('amount'));
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
-        $oStatus = $paymentService->doUnzerAuthorizationCancel($oOrder, $unzerid);
+        $oStatus = $paymentService->doUnzerAuthorizationCancel($oOrder, $unzerid, $amount);
 
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
@@ -350,8 +349,8 @@ class AdminOrderController extends AdminDetailsController
         /** @var string $oxPaymentType */
         $oxPaymentType = $order->getFieldData('oxpaymenttype');
         if ($order instanceof Order && strpos($oxPaymentType, "oscunzer") !== false) {
-            $this->oPaymnet = oxNew(Payment::class);
-            if ($this->oPaymnet->load($oxPaymentType)) {
+            $this->oPayment = oxNew(Payment::class);
+            if ($this->oPayment->load($oxPaymentType)) {
                 $isUnzer = true;
             }
         }
@@ -364,11 +363,11 @@ class AdminOrderController extends AdminDetailsController
      */
     public function isCancelReasonRequired(): bool
     {
-        if (!($this->oPaymnet instanceof Payment)) {
+        if (!($this->oPayment instanceof Payment)) {
             return false;
         }
 
-        return $this->oPaymnet->isUnzerSecuredPayment();
+        return $this->oPayment->isUnzerSecuredPayment();
     }
     /**
      * Returns editable order object
