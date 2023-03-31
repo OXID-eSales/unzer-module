@@ -24,12 +24,12 @@ class TransactionTest extends IntegrationTestCase
     {
         $model = $this->createPartialMock(Transaction::class, ['assign']);
         $sut = $this->getTransactionServiceMock($model);
-        $params = array(
+        $params = [
             'oxorderid' => 'orderId',
             'oxuserid' => 'userId',
             'oxshopid' => 5,
             'oxactiondate' => '2021-12-10 16:44:54'
-        );
+        ];
 
         $model->expects($this->once())->method('assign')->with($params);
 

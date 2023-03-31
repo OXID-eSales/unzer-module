@@ -50,9 +50,6 @@ class Transaction
     /** @var UtilsDate */
     protected $utilsDate;
 
-    /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-    protected $queryBuilderFactory;
-
     /**
      * @param Context $context
      * @param UtilsDate $utilsDate
@@ -63,10 +60,6 @@ class Transaction
     ) {
         $this->context = $context;
         $this->utilsDate = $utilsDate;
-
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()->getContainer();
-        $this->queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
     }
 
     /**
@@ -186,8 +179,12 @@ class Transaction
 
     public function deleteOldInitOrders(): void
     {
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->queryBuilderFactory->create();
+        $queryBuilder = $queryBuilderFactory->create();
 
         $queryBuilder->delete()
             ->from('oscunzertransaction')
@@ -204,8 +201,12 @@ class Transaction
 
     public function cleanUpNotFinishedOrders(): void
     {
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->queryBuilderFactory->create();
+        $queryBuilder = $queryBuilderFactory->create();
 
         $parameters = [
             'oxordernr' => '0',

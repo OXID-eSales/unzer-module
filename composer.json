@@ -14,14 +14,6 @@
     "GPL-3.0"
   ],
   "minimum-stability": "dev",
-  "extra": {
-    "oxideshop": {
-      "target-directory": "osc/unzer",
-      "blacklist-filter": [
-        "tests/**/*"
-      ]
-    }
-  },
   "require": {
     "unzerdev/php-sdk": "^v1.2.3.0",
     "webmozart/path-util": "^2.3.0",
