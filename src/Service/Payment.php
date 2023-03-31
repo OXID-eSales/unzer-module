@@ -336,9 +336,10 @@ class Payment
     /**
      * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
      * @param string $unzerid
+     * @param float $amount
      * @return UnzerApiException|bool
      */
-    public function doUnzerAuthorizationCancel($oOrder, $unzerid)
+    public function doUnzerAuthorizationCancel($oOrder, $unzerid, $amount)
     {
         if (!($oOrder instanceof Order)) {
             return false;
@@ -347,7 +348,8 @@ class Payment
         try {
             $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
             $unzerPayment = $sdk->fetchPayment($unzerid);
-            $sdk->cancelAuthorizedPayment($unzerPayment);
+            $cancellation = new Cancellation($amount);
+            $sdk->cancelAuthorizedPayment($unzerPayment, $cancellation);
 
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');

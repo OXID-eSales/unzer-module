@@ -124,6 +124,9 @@
                         <tbody>
                         <tr>
                             <td>[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE"}]</td>
+                            [{if $isCreditCard}]
+                            <td><input type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
+                            [{/if}]
                             <td><button type="submit">[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL"}]</button></td>
                         </tr>
                         </tbody>
