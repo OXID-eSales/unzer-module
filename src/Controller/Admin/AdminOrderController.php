@@ -132,14 +132,9 @@ class AdminOrderController extends AdminDetailsController
                 $editObject->getFormattedTotalOrderSum(),
                 $unzerPayment->getCurrency()
             );
-            $this->_aViewData["blShipment"] = (
-                $paymentType instanceof InstallmentSecured
-            );
-
             $isPrepaymentType = ($paymentType instanceof Prepayment);
-            $isCreditCardType = ($paymentType instanceof Card);
-
-            $this->_aViewData["isCreditCard"] = $isCreditCardType;
+            $this->_aViewData["blShipment"] = ($paymentType instanceof InstallmentSecured);
+            $this->_aViewData["isCreditCard"] = ($paymentType instanceof Card);
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
