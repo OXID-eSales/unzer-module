@@ -4,6 +4,10 @@ on:
   pull_request:
   push:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   p80m57both:
     name: 'Php-8.0-Mysql-5.7'
