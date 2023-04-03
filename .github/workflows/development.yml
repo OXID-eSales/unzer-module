@@ -184,8 +184,9 @@ jobs:
 
       - name: Install module dependencies
         run: |
-          cd source/test-module
-          composer install
+          docker-compose exec -T \
+            --workdir=/var/www/test-module \
+            php composer install
 
       - name: Run phpcs
         if: always()
