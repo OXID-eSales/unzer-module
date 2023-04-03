@@ -190,8 +190,9 @@ jobs:
       - name: Run phpcs
         if: always()
         run: |
-          cd source/test-module
-          composer phpcs
+          docker-compose exec -T \
+            --workdir=/var/www/test-module \
+            php composer phpcs
 
       - name: Run phpstan scan and show results
         id: phpstan
@@ -208,11 +209,21 @@ jobs:
             --workdir=/var/www/test-module \
             php composer phpstan-report
 
-      - name: Run phpmd
+      - name: Run phpmd scan and show results
         id: phpmd
         if: always()
         working-directory: source/test-module
-        run: composer phpmd-report || composer phpmd
+        run: |
+          docker-compose exec -T \
+            --workdir=/var/www/test-module \
+            php composer phpmd
+
+      - name: Run phpstan scan and generate report for further processing
+        if: always()
+        run: |
+          docker-compose exec -T \
+            --workdir=/var/www/test-module \
+            php composer phpmd-report
 
       - name: Stop containers
         if: always()
