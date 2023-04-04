@@ -79,24 +79,24 @@ $aModule = [
         '@unzer/oscunzer_order.tpl' => 'smarty/admin/tpl/oscunzer_order.tpl',
 
         // frontend
-        '@unzer/unzer_assets.tpl' =>                        'views/frontend/tpl/order/unzer_assets.tpl',
-        '@unzer/unzer_card.tpl' =>                          'views/frontend/tpl/order/unzer_card.tpl',
-        '@unzer/unzer_eps_charge.tpl' =>                    'views/frontend/tpl/order/unzer_eps_charge.tpl',
-        '@unzer/unzer_installment.tpl' =>                   'views/frontend/tpl/order/unzer_installment.tpl',
-        '@unzer/unzer_installment_confirm.tpl' =>           'views/frontend/tpl/order/unzer_installment_confirm.tpl',
-        '@unzer/unzer_installment_confirm_flow.tpl' =>      'views/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
-        '@unzer/unzer_installment_confirm_wave.tpl' =>      'views/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
-        '@unzer/unzer_invoice.tpl' =>                       'views/frontend/tpl/order/unzer_invoice.tpl',
-        '@unzer/unzer_applepay.tpl' =>                      'views/frontend/tpl/order/unzer_applepay.tpl',
-        '@unzer/unzer_sepa.tpl' =>                          'views/frontend/tpl/order/unzer_sepa.tpl',
-        '@unzer/unzer_sepa_secured.tpl' =>                  'views/frontend/tpl/order/unzer_sepa_secured.tpl',
-        '@unzer/unzer_ideal.tpl' =>                         'views/frontend/tpl/order/unzer_ideal.tpl',
-        '@unzer/unzer_shippingAndPayment_flow.tpl' =>       'views/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
-        '@unzer/unzer_shippingAndPayment_wave.tpl' =>       'views/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
-        '@unzer/message/js-errors.tpl' =>                   'views/frontend/tpl/message/js-errors.tpl',
-        '@unzer/payment/applepay_availibility_check.tpl' => 'views/frontend/tpl/payment/applepay_availibility_check.tpl',
-        '@unzer/payment/payment_unzer.tpl' =>               'views/frontend/tpl/payment/payment_unzer.tpl',
-        '@unzer/order/applepay_button.tpl' =>               'views/frontend/tpl/order/applepay_button.tpl',
+        '@unzer/unzer_assets.tpl' =>                        'views/smarty/frontend/tpl/order/unzer_assets.tpl',
+        '@unzer/unzer_card.tpl' =>                          'views/smarty/frontend/tpl/order/unzer_card.tpl',
+        '@unzer/unzer_eps_charge.tpl' =>                    'views/smarty/frontend/tpl/order/unzer_eps_charge.tpl',
+        '@unzer/unzer_installment.tpl' =>                   'views/smarty/frontend/tpl/order/unzer_installment.tpl',
+        '@unzer/unzer_installment_confirm.tpl' =>           'views/smarty/frontend/tpl/order/unzer_installment_confirm.tpl',
+        '@unzer/unzer_installment_confirm_flow.tpl' =>      'views/smarty/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
+        '@unzer/unzer_installment_confirm_wave.tpl' =>      'views/smarty/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
+        '@unzer/unzer_invoice.tpl' =>                       'views/smarty/frontend/tpl/order/unzer_invoice.tpl',
+        '@unzer/unzer_applepay.tpl' =>                      'views/smarty/frontend/tpl/order/unzer_applepay.tpl',
+        '@unzer/unzer_sepa.tpl' =>                          'views/smarty/frontend/tpl/order/unzer_sepa.tpl',
+        '@unzer/unzer_sepa_secured.tpl' =>                  'views/smarty/frontend/tpl/order/unzer_sepa_secured.tpl',
+        '@unzer/unzer_ideal.tpl' =>                         'views/smarty/frontend/tpl/order/unzer_ideal.tpl',
+        '@unzer/unzer_shippingAndPayment_flow.tpl' =>       'views/smarty/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
+        '@unzer/unzer_shippingAndPayment_wave.tpl' =>       'views/smarty/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
+        '@unzer/message/js-errors.tpl' =>                   'views/smarty/frontend/tpl/message/js-errors.tpl',
+        '@unzer/payment/applepay_availibility_check.tpl' => 'views/smarty/frontend/tpl/payment/applepay_availibility_check.tpl',
+        '@unzer/payment/payment_unzer.tpl' =>               'views/smarty/frontend/tpl/payment/payment_unzer.tpl',
+        '@unzer/order/applepay_button.tpl' =>               'views/smarty/frontend/tpl/order/applepay_button.tpl',
     ],
     'blocks' => [
         //frontend
@@ -104,28 +104,28 @@ $aModule = [
             'theme' => 'flow',
             'template' => 'page/checkout/order.tpl',
             'block' => 'shippingAndPayment',
-            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment_flow.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/shippingAndPayment_flow.tpl'
         ],
         [
             'theme' => 'wave',
             'template' => 'page/checkout/order.tpl',
             'block' => 'shippingAndPayment',
-            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment_wave.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/shippingAndPayment_wave.tpl'
         ],
         [
             'template' => 'page/checkout/order.tpl',
             'block' => 'checkout_order_errors',
-            'file' => 'views/frontend/blocks/page/checkout/checkout_order_errors.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/checkout_order_errors.tpl'
         ],
         [
             'template' => 'page/checkout/order.tpl',
             'block' => 'checkout_order_btn_submit_bottom',
-            'file' => 'views/frontend/blocks/page/checkout/checkout_order_btn_submit_bottom.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/checkout_order_btn_submit_bottom.tpl'
         ],
         [
             'template' => 'page/checkout/payment.tpl',
             'block' => 'select_payment',
-            'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/select_payment.tpl'
         ],
         //admin
         [
@@ -137,12 +137,12 @@ $aModule = [
         [
             'template' => 'email/plain/order_cust.tpl',
             'block' => 'email_plain_order_cust_paymentinfo',
-            'file' => 'views/frontend/blocks/email/plain/email_plain_order_cust_paymentinfo.tpl'
+            'file' => 'views/smarty/frontend/blocks/email/plain/email_plain_order_cust_paymentinfo.tpl'
         ],
         [
             'template' => 'email/html/order_cust.tpl',
             'block' => 'email_html_order_cust_paymentinfo',
-            'file' => 'views/frontend/blocks/email/html/email_html_order_cust_paymentinfo.tpl'
+            'file' => 'views/smarty/frontend/blocks/email/html/email_html_order_cust_paymentinfo.tpl'
         ],
     ],
     'settings' => [
