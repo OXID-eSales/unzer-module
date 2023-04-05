@@ -138,7 +138,7 @@ jobs:
         run: |
           docker-compose exec -T \
             php composer config repositories.oxid-esales/oxideshop-demodata-ce \
-            --json '{"type":"git", "url":"https://github.com/OXID-eSales/oxideshop_demodata_ee"}'
+            --json '{"type":"git", "url":"https://github.com/OXID-eSales/oxideshop_demodata_ce"}'
           docker-compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-master --no-update
 
       - name: Install dependencies and reset shop
