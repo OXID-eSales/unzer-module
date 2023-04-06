@@ -29,11 +29,13 @@ class ShopControlTest extends IntegrationTestCase
             \OxidEsales\Eshop\Core\ShopControl::class,
             'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
         );
+        $someException = new $expectedException();
+
         $mock = $this->createPartialMock(ShopControl::class, ['isAdmin', 'logException']);
-        $mock->method('isAdmin')->willThrowException(new $expectedException());
+        $mock->method('isAdmin')->willThrowException($someException);
 
         $this->addToAssertionCount(1);
-        $mock->expects($this->once())->method('logException')->with($expectedException);
+        $mock->expects($this->once())->method('logException')->with($someException);
 
         $mock->start();
     }
