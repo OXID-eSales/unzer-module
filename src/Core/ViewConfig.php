@@ -160,7 +160,7 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return boolean
      */
-    public function isFlowCompatibleTheme()
+    public function isFlowCompatibleTheme(): bool
     {
         if ($this->isFlowCompatibleTheme) {
             $this->isFlowCompatibleTheme = $this->isCompatibleTheme('flow');
@@ -173,7 +173,7 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return boolean
      */
-    public function isWaveCompatibleTheme()
+    public function isWaveCompatibleTheme(): bool
     {
         if ($this->isWaveCompatibleTheme) {
             $this->isWaveCompatibleTheme = $this->isCompatibleTheme('wave');
@@ -188,7 +188,7 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return boolean
      */
-    public function isCompatibleTheme($themeId = null)
+    public function isCompatibleTheme($themeId = null): bool
     {
         $result = false;
         if ($themeId) {
