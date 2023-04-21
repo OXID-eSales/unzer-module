@@ -1,7 +1,5 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
-
 [{assign var="invadr" value=$oView->getInvoiceAddress()}]
-[{assign var="deladr" value=$oView->getDelAddress()}]
 [{assign var="iBirthdayMonth" value=0}]
 [{assign var="iBirthdayDay" value=0}]
 [{assign var="iBirthdayYear" value=0}]
@@ -26,7 +24,7 @@
 [{elseif $oxcmp_user->oxuser__oxbirthdate->value && $oxcmp_user->oxuser__oxbirthdate->value != "0000-00-00"}]
     [{assign var="iBirthdayYear" value=$oxcmp_user->oxuser__oxbirthdate->value|regex_replace:"/[-]([0-9]{1,2})[-]([0-9]{1,2})$/":""}]
 [{/if}]
-[{if ($oxcmp_user->oxuser__oxcompany->value || ($deladr && $deladr->oxaddress__oxcompany->value))}]
+[{if ($oxcmp_user->oxuser__oxcompany->value || ($invadr && $invadr->oxaddress__oxcompany->value))}]
     [{assign var="isCompany" value=true}]
 [{/if}]
 
