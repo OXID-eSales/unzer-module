@@ -18,7 +18,10 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
+use UnzerSDK\Constants\CompanyTypes;
+use UnzerSDK\Constants\Salutations;
 use UnzerSDK\Constants\ShippingTypes;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Constants\BasketItemTypes;
@@ -79,6 +82,7 @@ class Unzer
      * @param Order|null $oOrder
      * @param string $companyType
      * @return Customer
+     * @throws UnzerException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -114,7 +118,12 @@ class Unzer
         $customer->setCompany($oxcompany);
 
         /** @var string $oxsal */
+        $salutation = Salutations::UNKNOWN;
         $oxsal = $oUser->getFieldData('oxsal');
+        if (strcasecmp($oxsal, Salutations::MR) ||
+            strcasecmp($oxsal, Salutations::MRS)) {
+            $oxsal = strtolower($oxsal);
+        }
         $customer->setSalutation($oxsal);
 
         /** @var string $oxusername */
@@ -129,6 +138,10 @@ class Unzer
         $oxmobfon = $oUser->getFieldData('oxmobfon');
         $customer->setMobile($oxmobfon);
 
+        /** @var string $oxcustnr */
+        $oxcustnr = $oUser->getFieldData('oxcustnr');
+        $customer->setCustomerId($oxcustnr);
+
         $billingAddress = $customer->getBillingAddress();
 
         $oCountry = oxNew(Country::class);
@@ -139,7 +152,8 @@ class Unzer
             ? $oCountry->getFieldData('oxisoalpha2')
             : '';
 
-        $billingAddress->setName(!empty($oxcompany) ? $oxcompany : $oxfname . ' ' . $oxlname);
+        $billingAddress->setName($oxfname . ' ' . $oxlname);
+
         $billingAddress->setStreet(trim(
             $oUser->getFieldData('oxstreet') .
             ' ' .
@@ -169,8 +183,9 @@ class Unzer
             $oxcountryid = $oDelAddress->getFieldData('oxcountryid');
             /** @var string $deliveryCountryIso */
             $deliveryCountryIso = $oCountry->load($oxcountryid)
-                ? $oDelAddress->getFieldData('oxisoalpha2')
+                ? $oCountry->getFieldData('oxisoalpha2')
                 : '';
+            $shippingAddress->setCountry($deliveryCountryIso);
 
             /** @var string $oxcompany */
             $oxcompany = $oDelAddress->getFieldData('oxcompany');
@@ -178,7 +193,7 @@ class Unzer
             $oxfname = $oDelAddress->getFieldData('oxfname');
             /** @var string $oxlname */
             $oxlname = $oDelAddress->getFieldData('oxlname');
-            $shippingAddress->setName(!empty($oxcompany) ? $oxcompany : $oxfname . ' ' . $oxlname);
+            $shippingAddress->setName($oxfname . ' ' . $oxlname);
             $shippingAddress->setStreet(trim(
                 $oDelAddress->getFieldData('oxstreet') .
                 ' ' .
@@ -190,9 +205,11 @@ class Unzer
             $shippingAddress->setZip($oxzip);
 
             /** @var string $oxcity */
-            $oxcity = $oDelAddress->getFieldData('oxstreet');
+            $oxcity = $oDelAddress->getFieldData('oxcity');
             $shippingAddress->setCity($oxcity);
-            $shippingAddress->setCountry($deliveryCountryIso);
+
+            $billingAddress->setShippingType(ShippingTypes::DIFFERENT_ADDRESS);
+            $shippingAddress->setShippingType(ShippingTypes::DIFFERENT_ADDRESS);
         } else {
             $billingAddress->setShippingType(ShippingTypes::EQUALS_BILLING);
             $customer->setShippingAddress($billingAddress);
@@ -201,6 +218,18 @@ class Unzer
         if ($companyType) {
             $companyInfo = new CompanyInfo();
             $customer->setCompanyInfo($companyInfo);
+            $companyTypes = [
+                CompanyTypes::COMPANY,
+                CompanyTypes::ASSOCIATION,
+                CompanyTypes::AUTHORITY,
+                CompanyTypes::SOLE,
+                CompanyTypes::OTHER
+            ];
+            if (!in_array(strtolower($companyType), $companyTypes)) {
+                throw new UnzerException('company type unknown');
+            }
+            $companyInfo->setCompanyType(strtolower($companyType));
+
             $companyInfo->setRegistrationType(CompanyRegistrationTypes::REGISTRATION_TYPE_NOT_REGISTERED);
             $companyInfo->setFunction('OWNER');
 
