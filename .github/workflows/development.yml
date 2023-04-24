@@ -379,6 +379,10 @@ jobs:
           docker-compose exec -T php composer require oxid-esales/twig-theme:dev-b-7.0.x --no-update
           docker-compose exec -T php composer update --no-interaction
 
+      - name: Install demodata
+        run: |
+          docker-compose exec -T php bin/oe-console oe:setup:demodata
+
       - name: Configure codeception runner for twig case
         run: |
           perl -pi\
@@ -457,6 +461,10 @@ jobs:
         run: |
           make up
           sleep 2
+      - name: Install demodata
+        run: |
+          docker-compose exec -T php bin/oe-console oe:setup:demodata
+
       - name: Install smarty template engine and flow theme
         run: |
           docker-compose exec -T php composer require oxid-esales/smarty-component:dev-b-7.0.x --no-update
