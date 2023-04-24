@@ -199,18 +199,6 @@
                                            [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
                                            value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
                                 </td>
-                                [{capture assign="cancelConfirm"}]
-                                    inAmount = document.getElementById('amount_[{$oUnzerCharge.chargeId}]');
-                                    form = document.getElementById('uzr_[{$oUnzerCharge.chargeId}]');
-                                    form.addEventListener('submit', function (e) {
-                                    if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
-                                    return true;
-                                    } else {
-                                    return false;
-                                    }
-                                    });
-                                [{/capture}]
-                                [{oxscript add=$cancelConfirm}]
                             [{else}]
                                 <td>[{$oUnzerCharge.cancelledAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                                 <td>[{$oUnzerCharge.chargedAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
@@ -239,18 +227,6 @@
                             <td><input type="text" id="amount_payout" name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
                             <td><button type="submit">[{oxmultilang ident="OSCUNZER_PAYOUT"}]</button></td>
                         </tr>
-                            [{capture assign="cancelConfirm"}]
-                            inAmount = document.getElementById('amount_payout');
-                            form = document.getElementById('uzr_payout');
-                            form.addEventListener('submit', function (e) {
-                            if (window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
-                            return true;
-                            } else {
-                            return false;
-                            }
-                            });
-                            [{/capture}]
-                            [{oxscript add=$cancelConfirm}]
                         </form>
                     [{/if}]
                     [{if $errCancel}]
@@ -294,3 +270,31 @@
 [{include file="bottomnaviitem.tpl"}]
 
 [{include file="bottomitem.tpl"}]
+<script>
+/* handle Unzer forms for refund */
+let handleUnzerForm = function(formElement) {
+    if(formElement.id.indexOf('uzr_') === 0) { // make absolutely sure to start with "uzr_"
+        let paymentId = formElement.id.slice(4);
+        let amountId = 'amount_' + paymentId; // f.e. "uzr_s-chg-1"
+        let inAmount = document.getElementById(amountId);
+
+        if (null !== inAmount &&
+            window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
+            return true;
+        }
+        return false;
+    }
+    // if it is not a form we want to process, let it proceed
+    return true;
+};
+
+/* apply submit listener */
+document.addEventListener('DOMContentLoaded', function () {
+    let forms = document.querySelectorAll('form[id^="uzr_"]');
+    for(var i = 0; i < forms.length; i++) {
+        forms[i].addEventListener('submit', function() {
+            return handleUnzerForm(this);
+        });
+    }
+}, false);
+</script>
