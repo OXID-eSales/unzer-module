@@ -52,4 +52,6 @@ modules:
           - Db
     - \OxidEsales\Codeception\Module\Translation\TranslationsModule:
         shop_path: '%SHOP_SOURCE_PATH%'
-        paths: 'Application/views/flow/translations,modules/osc/unzer/translations'
+        paths:
+          - Application/views/admin_smarty
+          - ../vendor/oxid-esales/unzer/views/admin_smarty

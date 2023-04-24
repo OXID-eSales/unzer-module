@@ -31,14 +31,15 @@ abstract class BaseCest
                 ['OXID' => $payment]
             );
 
-            $I->haveInDatabase(
+            /*$I->haveInDatabase(
                 'oxobject2payment',
-                ['OXID' => 'test' . $payment,
+                [
+                    'OXID' => 'test' . $payment,
                     'OXOBJECTID' => 'a7c40f631fc920687.20179984',
                     'OXPAYMENTID' => $payment,
                     'OXTYPE' => 'oxcountry'
                 ]
-            );
+            );*/
         }
 
         $this->I = $I;
@@ -64,7 +65,19 @@ abstract class BaseCest
         $clientData = Fixtures::get('client');
         $homePage->loginUser($clientData['username'], $clientData['password']);
 
-        $this->paymentSelection = $homePage->openMiniBasket()->openCheckout();
+        $this->paymentSelection = $homePage->openMiniBasket();
+
+        $this->I->waitForText(Translator::translate('DISPLAY_BASKET'));
+        $this->I->click(Translator::translate('DISPLAY_BASKET'));
+        $this->I->waitForPageLoad();
+
+        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForPageLoad();
+
+        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForPageLoad();
     }
 
     /**
@@ -80,9 +93,33 @@ abstract class BaseCest
 
         $homePage = $this->I->openShop();
         $clientData = Fixtures::get('secured_client');
+        //$this->_loginUser();
         $homePage->loginUser($clientData['username'], $clientData['password']);
 
         $this->paymentSelection = $homePage->openMiniBasket()->openCheckout();
+    }
+
+    protected function _loginUser()
+    {
+        $accountMenuButton = "//div[contains(@class,'service-menu')]/button";
+        $openAccountMenuButton = "//div[contains(@class,'service-menu')]/ul";
+        $userLoginName = '#loginEmail';
+        $userLoginPassword = '#loginPasword';
+        $userLoginButton = '//div[@id="loginBox"]/button';
+
+        $clientData = Fixtures::get('secured_client');
+
+        $this->I->waitForPageLoad();
+        $this->I->waitForElementVisible($accountMenuButton);
+        $this->I->click($accountMenuButton);
+        $this->I->waitForElementClickable($openAccountMenuButton);
+
+        $this->I->waitForText(Translator::translate('MY_ACCOUNT'));
+        $this->I->waitForElementVisible($userLoginName);
+        $this->I->fillField($userLoginName, $clientData['username']);
+        $this->I->fillField($userLoginPassword, $clientData['password']);
+        $this->I->click($userLoginButton);
+        $this->I->waitForPageLoad();
     }
 
     /**
