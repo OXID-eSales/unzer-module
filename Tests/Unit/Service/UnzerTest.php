@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\Eshop\Core\Price;
 use OxidSolutionCatalysts\Unzer\Service\Context;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -118,17 +119,25 @@ class UnzerTest extends TestCase
         $currency = new \stdClass();
         $currency->name = 'EUR';
 
-        $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
-        $price1 = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price = oxNew(Price::class);
+        $price1 = oxNew(Price::class);
         $price1->setPrice(234.56);
-        $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
-            'getNettoSum' => 123.45,
-            'getBruttoSum' => 234.56,
-            'getPrice' => $price1,
-            'getBasketCurrency' => $currency,
-            'getTotalDiscount' => $price,
-            'getDeliveryCost' => $price
+        $shopBasketModel = $this->createPartialMock(ShopBasketModel::class, [
+            'getNettoSum',
+            'getBruttoSum',
+            'getPrice',
+            'getBasketCurrency',
+            'getTotalDiscount',
+            'getDeliveryCost',
+            'getVoucherDiscount'
         ]);
+        $shopBasketModel->method('getNettoSum')->willReturn(123.45);
+        $shopBasketModel->method('getBruttoSum')->willReturn(234.56);
+        $shopBasketModel->method('getPrice')->willReturn($price1);
+        $shopBasketModel->method('getBasketCurrency')->willReturn($currency);
+        $shopBasketModel->method('getTotalDiscount')->willReturn($price);
+        $shopBasketModel->method('getDeliveryCost')->willReturn($price);
+        $shopBasketModel->method('getVoucherDiscount')->willReturn($price);
 
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket('someOrderId', $shopBasketModel);
@@ -144,32 +153,41 @@ class UnzerTest extends TestCase
         $currency = new \stdClass();
         $currency->name = 'EUR';
 
-        $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price = oxNew(Price::class);
 
         $basketItem1 = $this->createConfiguredMock(BasketItem::class, [
             'getTitle' => 'basket item title 1',
-            'getPrice' => new \OxidEsales\Eshop\Core\Price(100),
-            'getUnitPrice' => new \OxidEsales\Eshop\Core\Price(20),
+            'getPrice' => new Price(100),
+            'getUnitPrice' => new Price(20),
             'getAmount' => 5
         ]);
 
         $basketItem2 = $this->createConfiguredMock(BasketItem::class, [
             'getTitle' => 'basket item title 2',
-            'getPrice' => new \OxidEsales\Eshop\Core\Price(40),
-            'getUnitPrice' => new \OxidEsales\Eshop\Core\Price(10),
+            'getPrice' => new Price(40),
+            'getUnitPrice' => new Price(10),
             'getAmount' => 4
         ]);
-        $price1 = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price1 = oxNew(Price::class);
         $price1->setPrice(234.56);
-        $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
-            'getNettoSum' => 123.45,
-            'getBruttoSum' => 234.56,
-            'getPrice' => $price1,
-            'getBasketCurrency' => $currency,
-            'getContents' => [$basketItem1, $basketItem2],
-            'getTotalDiscount' => $price,
-            'getDeliveryCost' => $price
+        $shopBasketModel = $this->createPartialMock(ShopBasketModel::class, [
+            'getNettoSum',
+            'getBruttoSum',
+            'getPrice',
+            'getBasketCurrency',
+            'getContents',
+            'getTotalDiscount',
+            'getDeliveryCost',
+            'getVoucherDiscount'
         ]);
+        $shopBasketModel->method('getNettoSum')->willReturn(123.45);
+        $shopBasketModel->method('getBruttoSum')->willReturn(234.56);
+        $shopBasketModel->method('getPrice')->willReturn($price1);
+        $shopBasketModel->method('getContents')->willReturn([$basketItem1, $basketItem2]);
+        $shopBasketModel->method('getBasketCurrency')->willReturn($currency);
+        $shopBasketModel->method('getTotalDiscount')->willReturn($price);
+        $shopBasketModel->method('getDeliveryCost')->willReturn($price);
+        $shopBasketModel->method('getVoucherDiscount')->willReturn($price);
 
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);

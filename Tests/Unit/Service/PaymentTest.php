@@ -15,12 +15,13 @@ use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
+use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
-use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use PHPUnit\Framework\TestCase;
+use UnzerSDK\Unzer;
 
 class PaymentTest extends TestCase
 {
@@ -34,9 +35,27 @@ class PaymentTest extends TestCase
             'execute' => true
         ]);
 
-        $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
-            'getPaymentExtension'
+        $UnzerSDKMock = $this->createConfiguredMock(Unzer::class, []);
+        $UnzerServiceMock = $this->createConfiguredMock(UnzerService::class, []);
+        $unzerSDKLoaderMock = $this->createPartialMock(UnzerSDKLoader::class, [
+            'getUnzerSDK'
         ]);
+
+        $basketCurrency = new \stdClass();
+        $basketCurrency->name = 'EUR';
+        $currencyName = $basketCurrency->name;
+
+        $unzerSDKLoaderMock->method('getUnzerSDK')
+            ->with('', $currencyName)
+            ->willReturn($UnzerSDKMock);
+
+        $extensionLoader = $this->getMockBuilder(PaymentExtensionLoader::class)
+            ->setConstructorArgs([
+                $unzerSDKLoaderMock,
+                $UnzerServiceMock
+            ])->onlyMethods(['getPaymentExtension'])
+            ->getMock();
+
         $extensionLoader->expects($this->once())
             ->method('getPaymentExtension')
             ->with($paymentModel)
@@ -47,7 +66,12 @@ class PaymentTest extends TestCase
             ->willReturnCallback(function ($param) {
                 return $param === 'PaymentId' ? 'examplePaymentId' : 'someValue';
             });
-        $sessionStub->method('getBasket')->willReturn($this->createConfiguredMock(BasketModel::class, []));
+
+        $sessionStub->method('getBasket')->willReturn(
+            $this->createConfiguredMock(BasketModel::class, [
+                'getBasketCurrency' => $basketCurrency
+            ])
+        );
         $sessionStub->method('getUser')->willReturn(
             $this->createConfiguredMock(UserModel::class, [
                 'getId' => 'someId'
@@ -61,8 +85,8 @@ class PaymentTest extends TestCase
                 $sessionStub,
                 $extensionLoader,
                 $this->createPartialMock(Translator::class, []),
-                $this->createConfiguredMock(UnzerService::class, []),
-                $this->createPartialMock(UnzerSDKLoader::class, []),
+                $UnzerServiceMock,
+                $unzerSDKLoaderMock,
                 $transactionMock
             ])
             ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment'])
