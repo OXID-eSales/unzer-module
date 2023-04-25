@@ -89,11 +89,11 @@ class PaymentTest extends TestCase
                 $unzerSDKLoaderMock,
                 $transactionMock
             ])
-            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment'])
+            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment', 'executeUnzerPayment'])
             ->getMock();
+
         $sut->expects($this->never())->method('removeTemporaryOrder');
         $sut->method('getUnzerPaymentStatus')->willReturn($expectedValue);
-
         $this->assertSame($expectedValue != 'ERROR', $sut->executeUnzerPayment($paymentModel));
     }
 
