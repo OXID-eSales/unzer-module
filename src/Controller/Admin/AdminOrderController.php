@@ -34,6 +34,8 @@ use UnzerSDK\Unzer;
  *
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * TODO: Decrease complexity to 50 or under
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AdminOrderController extends AdminDetailsController_parent
 {
