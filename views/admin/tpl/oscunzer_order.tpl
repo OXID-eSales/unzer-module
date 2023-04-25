@@ -285,11 +285,7 @@
     [{/if}]
     [{/block}]
 </div>
-
-[{include file="bottomnaviitem.tpl"}]
-
-[{include file="bottomitem.tpl"}]
-<script>
+[{capture assign="cancelConfirm"}]
 /* handle Unzer forms for refund */
 let handleUnzerForm = function(formElement) {
     if(formElement.id.indexOf('uzr_') === 0) { // make absolutely sure to start with "uzr_"
@@ -316,4 +312,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 }, false);
-</script>
+[{/capture}]
+
+[{oxscript add=$cancelConfirm}]
+
+[{include file="bottomnaviitem.tpl"}]
+
+[{include file="bottomitem.tpl"}]
