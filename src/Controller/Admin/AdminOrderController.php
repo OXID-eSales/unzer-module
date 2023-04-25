@@ -180,7 +180,7 @@ class AdminOrderController extends AdminDetailsController
                 }
             }
             $this->_aViewData['totalAmountCharge'] = $fCharged;
-            $this->_aViewData['remainingAmountCharge'] = $editObject->getTotalOrderSum() - $fCharged;
+            $this->_aViewData['remainingAmountCharge'] = floatval($editObject->getTotalOrderSum()) - $fCharged;
 
             $cancellations = [];
             /** @var Cancellation $cancellation */
@@ -196,7 +196,7 @@ class AdminOrderController extends AdminDetailsController
                 }
             }
             $this->_aViewData['totalAmountCancel'] = $fCancelled;
-            $this->_aViewData['canCancelAmount'] = $editObject->getTotalOrderSum() - $fCancelled;
+            $this->_aViewData['canCancelAmount'] = floatval($editObject->getTotalOrderSum()) - $fCancelled;
 
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;

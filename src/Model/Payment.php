@@ -50,16 +50,17 @@ class Payment extends Payment_parent
         return $this->getServiceFromContainer(PaymentValidator::class)->isSecuredPayment($this);
     }
 
-    private function canDoUnzerAbility($sAbility): bool
+    private function canDoUnzerAbility(string $sAbility): bool
     {
         $moduleId = $this->getFieldData('oxid');
         $unzerDefinitions = UnzerDefinitions::getUnzerDefinitions();
         $unzerAbilities = UnzerDefinitions::PAYMENT_ABILITIES;
 
-        if (in_array($sAbility, $unzerAbilities) &&
+        if (
+            in_array($sAbility, $unzerAbilities) &&
             isset($unzerDefinitions[ $moduleId ]) &&
-            $unzerDefinitions[ $moduleId ]['abilities']) {
-
+            $unzerDefinitions[ $moduleId ]['abilities']
+        ) {
             return in_array($sAbility, $unzerDefinitions[ $moduleId ]['abilities']);
         }
         return false;
