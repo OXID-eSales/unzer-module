@@ -54,6 +54,7 @@ class Payment extends Payment_parent
     private function canDoUnzerAbility(string $sAbility): bool
     {
         $definitionService = $this->getServiceFromContainer(UnzerDefinitions::class);
+        /** @var string $moduleId */
         $moduleId = $this->getFieldData('oxid');
 
         return $definitionService->unzerTypeHasAbility($moduleId, $sAbility);
