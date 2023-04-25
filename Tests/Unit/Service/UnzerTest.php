@@ -154,19 +154,23 @@ class UnzerTest extends TestCase
         $currency->name = 'EUR';
 
         $price = oxNew(Price::class);
+        $priceMock = $this->createPartialMock(Price::class, [
+            'getVatValue'
+        ]);
+        $priceMock->method('getVatValue')->willReturn(19.0);
 
         $basketItem1 = $this->createConfiguredMock(BasketItem::class, [
             'getTitle' => 'basket item title 1',
-            'getPrice' => new Price(100),
             'getUnitPrice' => new Price(20),
-            'getAmount' => 5
+            'getAmount' => 5,
+            'getPrice' => $priceMock
         ]);
 
         $basketItem2 = $this->createConfiguredMock(BasketItem::class, [
             'getTitle' => 'basket item title 2',
-            'getPrice' => new Price(40),
             'getUnitPrice' => new Price(10),
-            'getAmount' => 4
+            'getAmount' => 4,
+            'getPrice' => $priceMock
         ]);
         $price1 = oxNew(Price::class);
         $price1->setPrice(234.56);
@@ -198,8 +202,7 @@ class UnzerTest extends TestCase
         $items = $result->getBasketItems();
 
         $this->assertSame('basket item title 1', $items[0]->getTitle());
-        $this->assertSame(20.0, $items[0]->getAmountPerUnit());
-        $this->assertSame(100.0, $items[0]->getAmountNet());
+        $this->assertSame(20.0, $items[0]->getAmountPerUnitGross());
         $this->assertSame(5, $items[0]->getQuantity());
     }
 
