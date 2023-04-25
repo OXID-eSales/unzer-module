@@ -7,7 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController as AdminDetailsController_parent;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
@@ -35,7 +35,7 @@ use UnzerSDK\Unzer;
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class AdminOrderController extends AdminDetailsController
+class AdminOrderController extends AdminDetailsController_parent
 {
     use ServiceContainer;
 
@@ -93,12 +93,6 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return "oscunzer_order.tpl";
-    }
-
-    public function getUnzerSDKbyPaymentId(string $sPaymentId): Unzer
-    {
-        return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDKbyPaymentType($sPaymentId);
     }
 
     public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
