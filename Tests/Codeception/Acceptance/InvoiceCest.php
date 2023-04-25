@@ -18,11 +18,11 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class InvoiceCest extends BaseCest
 {
-    private $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice']";
+    private $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice_old']";
 
     protected function _getOXID(): array
     {
-        return ['oscunzer_invoice'];
+        return ['oscunzer_invoice_old'];
     }
 
     /**
@@ -31,7 +31,7 @@ final class InvoiceCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
-        $I->wantToTest('Test Invoice payment works');
+        $I->wantToTest('Test Invoice (old) payment works');
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
         $orderPage->submitOrder();
