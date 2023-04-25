@@ -372,6 +372,14 @@ jobs:
           make up
           sleep 2
 
+      - name: Configure codeception runner for twig case
+        run: |
+          perl -pi\
+            -e 's#theme_id: .*#theme_id: twig#g;'\
+            -e 's#admin_smarty#admin_twig#g;'\
+            -e 's#\/flow\/translations#\/twig#g;'\
+            source/vendor/${{ env.PACKAGE_NAME }}/tests/Codeception/acceptance.suite.yml
+
       - name: Install twig template engine and twig theme
         run: |
           docker-compose exec -T php composer require oxid-esales/twig-component:dev-b-7.0.x --no-update
@@ -382,14 +390,6 @@ jobs:
       - name: Install demodata
         run: |
           docker-compose exec -T php bin/oe-console oe:setup:demodata
-
-      - name: Configure codeception runner for twig case
-        run: |
-          perl -pi\
-            -e 's#theme_id: .*#theme_id: twig#g;'\
-            -e 's#admin_smarty#admin_twig#g;'\
-            -e 's#\/flow\/translations#\/twig#g;'\
-            source/vendor/${{ env.PACKAGE_NAME }}/tests/Codeception/acceptance.suite.yml
 
       - name: Run tests
         run: |
@@ -402,12 +402,6 @@ jobs:
                 -c /var/www/vendor/${{ env.PACKAGE_NAME }}/tests/codeception.yml \
                 --bootstrap tests/bootstrap.php \
                 -g ${{ matrix.group }}
-
-      - name: Stop containers
-        if: always()
-        run: |
-          docker-compose down
-          sleep 2
 
       - name: Upload log artifact
         if: always()
@@ -422,6 +416,13 @@ jobs:
             source/source/log/oxideshop.log
             data/php/logs/error_log.txt
             source/tests/Codeception/_output
+            source/vendor/${{ env.PACKAGE_NAME }}/Tests/Codeception/_output/
+
+      - name: Stop containers
+        if: always()
+        run: |
+          docker-compose down
+          sleep 2
 
   codeception_smarty:
     strategy:
@@ -496,6 +497,7 @@ jobs:
             source/source/log/oxideshop.log
             data/php/logs/error_log.txt
             source/tests/Codeception/_output
+            source/vendor/${{ env.PACKAGE_NAME }}/Tests/Codeception/_output/
       - name: Stop containers
         if: always()
         run: |

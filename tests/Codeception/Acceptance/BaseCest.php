@@ -31,7 +31,7 @@ abstract class BaseCest
                 ['OXID' => $payment]
             );
 
-            /*$I->haveInDatabase(
+            $I->haveInDatabase(
                 'oxobject2payment',
                 [
                     'OXID' => 'test' . $payment,
@@ -39,7 +39,7 @@ abstract class BaseCest
                     'OXPAYMENTID' => $payment,
                     'OXTYPE' => 'oxcountry'
                 ]
-            );*/
+            );
         }
 
         $this->I = $I;
