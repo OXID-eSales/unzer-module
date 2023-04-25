@@ -49,7 +49,7 @@ class UnzerDefinitions
         return $this->checkAbility($sTypeId, $sAbility);
     }
 
-    private function checkAbility(string $sTypeId, string$sAbility): bool
+    private function checkAbility(string $sTypeId, string $sAbility): bool
     {
         if ($this->isUnzerType($sTypeId)) {
             $unzerDefinitions = $this->getDefinitionsArray();
