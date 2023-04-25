@@ -101,6 +101,9 @@ jobs:
             -e 's#error_reporting = .*#error_reporting = E_ALL ^ E_WARNING ^ E_DEPRECATED#g;'\
             -e 'print "xdebug.max_nesting_level=1000\nxdebug.mode=coverage\n\n"'\
             containers/php/custom.ini
+          perl -pi\
+            -e 's#/var/www/#/var/www/source/#g;'\
+            containers/httpd/project.conf
 
       - name: Prepare shop configuration
         run: |
@@ -416,7 +419,7 @@ jobs:
             source/source/log/oxideshop.log
             data/php/logs/error_log.txt
             source/tests/Codeception/_output
-            source/vendor/${{ env.PACKAGE_NAME }}/Tests/Codeception/_output/
+            source/vendor/${{ env.PACKAGE_NAME }}/tests/Codeception/_output/
 
       - name: Stop containers
         if: always()
@@ -497,7 +500,7 @@ jobs:
             source/source/log/oxideshop.log
             data/php/logs/error_log.txt
             source/tests/Codeception/_output
-            source/vendor/${{ env.PACKAGE_NAME }}/Tests/Codeception/_output/
+            source/vendor/${{ env.PACKAGE_NAME }}/tests/Codeception/_output/
       - name: Stop containers
         if: always()
         run: |
