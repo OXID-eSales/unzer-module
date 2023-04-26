@@ -156,7 +156,7 @@ jobs:
         run: |
           mkdir -p source/var/configuration/shops/1/modules
           echo "${{ secrets.MODULE_SETTINGS }}" > source/var/configuration/shops/1/modules/osc-unzer.yaml
-          docker-compose exec -T php php bin/oe-console oe:module:apply-configuration
+          docker-compose exec -T php php bin/oe-console oe:module:activate osc-unzer
 
       - name: Show docker log
         if: always()
