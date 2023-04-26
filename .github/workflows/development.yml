@@ -151,6 +151,13 @@ jobs:
             --db-host=mysql --db-port=3306 --db-name=example --db-user=root --db-password=root --force
           docker-compose exec -T php bin/oe-console oe:module:activate osc-unzer
 
+      - name: Put module settings
+        continue-on-error: true
+        run: |
+          mkdir -p source/var/configuration/shops/1/modules
+          echo "${{ secrets.MODULE_SETTINGS }}" > source/var/configuration/shops/1/modules/osc-unzer.yaml
+          docker-compose exec -T php php bin/oe-console oe:module:apply-configuration
+
       - name: Show docker log
         if: always()
         run: |
