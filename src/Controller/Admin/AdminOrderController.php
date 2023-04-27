@@ -7,7 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController as AdminDetailsController_parent;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
@@ -34,8 +34,10 @@ use UnzerSDK\Unzer;
  *
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * TODO: Decrease complexity to 50 or under
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AdminOrderController extends AdminDetailsController
+class AdminOrderController extends AdminDetailsController_parent
 {
     use ServiceContainer;
 
@@ -95,16 +97,10 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    public function getUnzerSDKbyPaymentId(string $sPaymentId): Unzer
-    {
-        return $this->getServiceFromContainer(UnzerSDKLoader::class)
-                    ->getUnzerSDKbyPaymentType($sPaymentId);
-    }
-
     public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
     {
         return $this->getServiceFromContainer(UnzerSDKLoader::class)
-                    ->getUnzerSDK($customerType, $currency);
+            ->getUnzerSDK($customerType, $currency);
     }
 
     /**
@@ -126,7 +122,7 @@ class AdminOrderController extends AdminDetailsController
             $paymentType = $unzerPayment->getPaymentType();
             /** @var Order $editObject */
             $editObject = $this->getEditObject();
-
+            $this->_aViewData['totalBasketAmount'] = $editObject->getTotalOrderSum();
             $this->_aViewData['totalBasketPrice'] = sprintf(
                 '%s %s',
                 $editObject->getFormattedTotalOrderSum(),
@@ -180,7 +176,7 @@ class AdminOrderController extends AdminDetailsController
                 }
             }
             $this->_aViewData['totalAmountCharge'] = $fCharged;
-            $this->_aViewData['remainingAmountCharge'] = $unzerPayment->getAmount()->getTotal() - $fCharged;
+            $this->_aViewData['remainingAmountCharge'] = floatval($editObject->getTotalOrderSum()) - $fCharged;
 
             $cancellations = [];
             /** @var Cancellation $cancellation */
@@ -196,7 +192,7 @@ class AdminOrderController extends AdminDetailsController
                 }
             }
             $this->_aViewData['totalAmountCancel'] = $fCancelled;
-            $this->_aViewData['canCancelAmount'] = $fCharged - $fCancelled;
+            $this->_aViewData['canCancelAmount'] = floatval($editObject->getTotalOrderSum()) - $fCancelled;
 
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;
@@ -356,6 +352,39 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $isUnzer;
+    }
+
+    public function canCollectFully(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canCollectFully();
+    }
+    public function canCollectPartially(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canCollectPartially();
+    }
+    public function canRefundFully(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canRefundFully();
+    }
+    public function canRefundPartially(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canRefundPartially();
     }
 
     /**

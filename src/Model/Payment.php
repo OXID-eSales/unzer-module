@@ -7,6 +7,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\PaymentValidator;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment as Payment_parent;
@@ -47,5 +49,31 @@ class Payment extends Payment_parent
     public function isUnzerSecuredPayment(): bool
     {
         return $this->getServiceFromContainer(PaymentValidator::class)->isSecuredPayment($this);
+    }
+
+    private function canDoUnzerAbility(string $sAbility): bool
+    {
+        $definitionService = $this->getServiceFromContainer(UnzerDefinitions::class);
+        /** @var string $moduleId */
+        $moduleId = $this->getFieldData('oxid');
+
+        return $definitionService->unzerTypeHasAbility($moduleId, $sAbility);
+    }
+
+    public function canCollectFully(): bool
+    {
+        return $this->canDoUnzerAbility(CoreUnzerDefinitions::CAN_COLLECT_FULLY);
+    }
+    public function canCollectPartially(): bool
+    {
+        return $this->canDoUnzerAbility(CoreUnzerDefinitions::CAN_COLLECT_PARTIALLY);
+    }
+    public function canRefundFully(): bool
+    {
+        return $this->canDoUnzerAbility(CoreUnzerDefinitions::CAN_REFUND_FULLY);
+    }
+    public function canRefundPartially(): bool
+    {
+        return $this->canDoUnzerAbility(CoreUnzerDefinitions::CAN_REFUND_PARTIALLY);
     }
 }
