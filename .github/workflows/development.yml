@@ -179,6 +179,7 @@ jobs:
             source/composer.json
             source/composer.lock
             source/config.inc.php
+            source/var/configuration/shops/1/modules/osc-unzer.yaml
             data/php/logs/error_log.txt
 
   styles:
