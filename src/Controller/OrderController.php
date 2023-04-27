@@ -20,7 +20,8 @@ use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 
 /**
  * TODO: Decrease count of dependencies to 13
@@ -126,8 +127,8 @@ class OrderController extends OrderController_parent
 
         return (
         ($payment instanceof Payment) ?
-            ( $payment->getId() === UnzerDefinitions::SEPA_UNZER_PAYMENT_ID
-            || $payment->getId() === UnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
+            ( $payment->getId() === CoreUnzerDefinitions::SEPA_UNZER_PAYMENT_ID
+            || $payment->getId() === CoreUnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
         );
     }
 
@@ -219,7 +220,9 @@ class OrderController extends OrderController_parent
         if (empty($this->companyTypes)) {
             $this->companyTypes = [];
             $translator = $this->getServiceFromContainer(Translator::class);
-            foreach (UnzerDefinitions::getUnzerCompanyTypes() as $value) {
+            $unzerDefinitions = $this->getServiceFromContainer(UnzerDefinitions::class);
+
+            foreach ($unzerDefinitions->getCompanyTypes() as $value) {
                 $this->companyTypes[$value] = $translator->translate('OSCUNZER_COMPANY_FORM_' . $value);
             }
         }

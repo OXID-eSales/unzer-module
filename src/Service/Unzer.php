@@ -117,13 +117,9 @@ class Unzer
         $oxcompany = $oUser->getFieldData('oxcompany');
         $customer->setCompany($oxcompany);
 
-        /** @var string $oxsal */
-        $salutation = Salutations::UNKNOWN;
+        /** @var null|string $oxsal */
         $oxsal = $oUser->getFieldData('oxsal');
-        if (strcasecmp($oxsal, Salutations::MR) ||
-            strcasecmp($oxsal, Salutations::MRS)) {
-            $oxsal = strtolower($oxsal);
-        }
+        $oxsal = strtolower($oxsal ?? Salutations::UNKNOWN);
         $customer->setSalutation($oxsal);
 
         /** @var string $oxusername */
