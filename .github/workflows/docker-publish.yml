@@ -9,7 +9,8 @@ on:
   schedule:
     - cron: '16 6 * * *'
   push:
-    branches: [ b-6.3.x ]
+    tags:
+      - '**'
   repository_dispatch:
     types: [docker-build]
 
@@ -28,8 +29,14 @@ jobs:
       packages: write
 
     steps:
+      - name: 'Get latest tag'
+        id: latest_tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.latest_tag.outputs.tag }}
 
       - name: Checkout dockerfiles
         uses: actions/checkout@v3
