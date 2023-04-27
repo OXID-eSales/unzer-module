@@ -211,11 +211,6 @@
                            [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
                            value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
                         [{/if}]
-                    </td>
-                    [{else}]
-                    <td>[{$oUnzerCharge.cancelledAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
-                    <td>[{$oUnzerCharge.chargedAmount|string_format:"%.2f"}] [{$uzrCurrency}]</td>
-                    <td></td>
                     [{/if}]
                 </form>
             </tr>
