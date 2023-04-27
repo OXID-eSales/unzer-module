@@ -15,12 +15,13 @@ use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
+use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
-use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use PHPUnit\Framework\TestCase;
+use UnzerSDK\Unzer;
 
 class PaymentTest extends TestCase
 {
@@ -29,48 +30,21 @@ class PaymentTest extends TestCase
      */
     public function testRegularExecuteUnzerPaymentFlow(string $expectedValue): void
     {
-        $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createConfiguredMock(UnzerPayment::class, [
-            'execute' => true
-        ]);
-
-        $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
-            'getPaymentExtension'
-        ]);
-        $extensionLoader->expects($this->once())
-            ->method('getPaymentExtension')
-            ->with($paymentModel)
-            ->willReturn($paymentExtension);
-
-        $sessionStub = $this->createPartialMock(Session::class, ['getVariable', 'getBasket', 'getUser']);
-        $sessionStub->method('getVariable')
-            ->willReturnCallback(function ($param) {
-                return $param === 'PaymentId' ? 'examplePaymentId' : 'someValue';
-            });
-        $sessionStub->method('getBasket')->willReturn($this->createConfiguredMock(BasketModel::class, []));
-        $sessionStub->method('getUser')->willReturn(
-            $this->createConfiguredMock(UserModel::class, [
-                'getId' => 'someId'
-            ])
-        );
-
-        $transactionMock = $this->createPartialMock(TransactionService::class, ['writeTransactionToDB']);
-
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
-                $sessionStub,
-                $extensionLoader,
-                $this->createPartialMock(Translator::class, []),
-                $this->createConfiguredMock(UnzerService::class, []),
-                $this->createPartialMock(UnzerSDKLoader::class, []),
-                $transactionMock
+                $this->getSessionMock(),
+                $this->getExtensionLoaderMock(),
+                $this->getTranslatorMock(),
+                $this->getUnzerServiceMock(),
+                $this->getUnzerSDKLoaderMock(),
+                $this->getTransactionServiceMock()
             ])
-            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment'])
+            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment', 'executeUnzerPayment'])
             ->getMock();
+
         $sut->expects($this->never())->method('removeTemporaryOrder');
         $sut->method('getUnzerPaymentStatus')->willReturn($expectedValue);
-
-        $this->assertSame($expectedValue != 'ERROR', $sut->executeUnzerPayment($paymentModel));
+        $this->assertSame($expectedValue != 'ERROR', $sut->executeUnzerPayment($this->getPaymentModelMock()));
     }
 
     public function executePaymentStatusDataProvider(): array
@@ -84,36 +58,21 @@ class PaymentTest extends TestCase
 
     public function testUnzerRedirectReThrownFlow(): void
     {
-        $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
-        $paymentExtension->method('execute')->willThrowException(new Redirect("someDestination"));
-
-        $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
-            'getPaymentExtension'
-        ]);
-        $extensionLoader->expects($this->once())
-            ->method('getPaymentExtension')
-            ->with($paymentModel)
-            ->willReturn($paymentExtension);
-
         $sut = new PaymentService(
-            $this->createConfiguredMock(Session::class, [
-                'getUser' => $this->createConfiguredMock(UserModel::class, []),
-                'getBasket' => $this->createConfiguredMock(BasketModel::class, [])
-            ]),
-            $extensionLoader,
-            $this->createPartialMock(Translator::class, []),
-            $this->createPartialMock(UnzerService::class, []),
-            $this->createPartialMock(UnzerSDKLoader::class, []),
-            $this->createPartialMock(TransactionService::class, [])
+            $this->getSessionMock(),
+            $this->getExtensionLoaderMock(),
+            $this->getTranslatorMock(),
+            $this->getUnzerServiceMock(),
+            $this->getUnzerSDKLoaderMock(),
+            $this->getTransactionServiceMock()
         );
 
         $this->expectException(Redirect::class);
 
         try {
-            $sut->executeUnzerPayment($paymentModel);
+            $sut->executeUnzerPayment($this->getPaymentModelMock());
         } catch (Redirect $exception) {
-            $this->assertSame("someDestination", $exception->getDestination());
+            $this->assertSame("someUrl", $exception->getDestination());
 
             throw $exception;
         }
@@ -127,47 +86,15 @@ class PaymentTest extends TestCase
             "specialCode"
         );
 
-        $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
+        $paymentExtension = $this->getPaymentExtensionMock();
         $paymentExtension->method('execute')->willThrowException($unzerException);
 
-        $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
-            'getPaymentExtension'
-        ]);
-        $extensionLoader->expects($this->once())
-            ->method('getPaymentExtension')
-            ->with($paymentModel)
-            ->willReturn($paymentExtension);
-
-        $translatorMock = $this->createPartialMock(Translator::class, ['translateCode']);
-        $translatorMock->method('translateCode')
-            ->with("No error id provided", "clientMessage")
-            ->willReturn("specialTranslation");
-
-        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareOrderRedirectUrl']);
-        $unzerServiceMock->method('prepareOrderRedirectUrl')
-            ->willReturn('someUrl');
-
-        $sut = $this->getMockBuilder(PaymentService::class)
-            ->setConstructorArgs([
-                $this->createConfiguredMock(Session::class, [
-                    'getUser' => $this->createConfiguredMock(UserModel::class, []),
-                    'getBasket' => $this->createConfiguredMock(BasketModel::class, [])
-                ]),
-                $extensionLoader,
-                $translatorMock,
-                $unzerServiceMock,
-                $this->createPartialMock(UnzerSDKLoader::class, []),
-                $this->createPartialMock(TransactionService::class, [])
-            ])
-            ->onlyMethods(['removeTemporaryOrder'])
-            ->getMock();
-        $sut->expects($this->once())->method('removeTemporaryOrder');
+        $sut = $this->getPaymentServiceMock($this->getTranslatorMock());
 
         $this->expectException(RedirectWithMessage::class);
 
         try {
-            $sut->executeUnzerPayment($paymentModel);
+            $sut->executeUnzerPayment($this->getPaymentModelMock());
         } catch (RedirectWithMessage $exception) {
             $this->assertSame("someUrl", $exception->getDestination());
             $this->assertSame("specialTranslation", $exception->getMessageKey());
@@ -178,47 +105,145 @@ class PaymentTest extends TestCase
 
     public function testRegularExceptionCaseConvertedToRedirectWithMessage(): void
     {
-        $paymentModel = $this->createConfiguredMock(PaymentModel::class, []);
-        $paymentExtension = $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
+        $paymentExtension = $this->getPaymentExtensionMock();
         $paymentExtension->method('execute')->willThrowException(new \Exception("clientMessage"));
 
-        $extensionLoader = $this->createPartialMock(PaymentExtensionLoader::class, [
-            'getPaymentExtension'
-        ]);
-        $extensionLoader->expects($this->once())
-            ->method('getPaymentExtension')
-            ->with($paymentModel)
-            ->willReturn($paymentExtension);
-
-        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareOrderRedirectUrl']);
-        $unzerServiceMock->method('prepareOrderRedirectUrl')
-            ->willReturn('someUrl');
-
-        $sut = $this->getMockBuilder(PaymentService::class)
-            ->setConstructorArgs([
-                $this->createConfiguredMock(Session::class, [
-                    'getUser' => $this->createConfiguredMock(UserModel::class, []),
-                    'getBasket' => $this->createConfiguredMock(BasketModel::class, [])
-                ]),
-                $extensionLoader,
-                $this->createPartialMock(Translator::class, []),
-                $unzerServiceMock,
-                $this->createPartialMock(UnzerSDKLoader::class, []),
-                $this->createPartialMock(TransactionService::class, [])
-            ])
-            ->onlyMethods(['removeTemporaryOrder'])
-            ->getMock();
-        $sut->expects($this->once())->method('removeTemporaryOrder');
+        $sut = $this->getPaymentServiceMock($this->getTranslatorMock());
 
         $this->expectException(RedirectWithMessage::class);
 
         try {
-            $sut->executeUnzerPayment($paymentModel);
+            $sut->executeUnzerPayment($this->getPaymentModelMock());
         } catch (RedirectWithMessage $exception) {
             $this->assertSame("someUrl", $exception->getDestination());
             $this->assertSame("clientMessage", $exception->getMessageKey());
 
             throw $exception;
         }
+    }
+
+    protected function getSessionMock()
+    {
+        $sessionStub = $this->createPartialMock(Session::class, ['getVariable', 'getBasket', 'getUser']);
+        $sessionStub->method('getVariable')
+            ->willReturnCallback(function ($param) {
+                return $param === 'PaymentId' ? 'examplePaymentId' : 'someValue';
+            });
+
+        $sessionStub->method('getBasket')->willReturn(
+            $this->createConfiguredMock(BasketModel::class, [
+                'getBasketCurrency' => $this->getBasketCurrency()
+            ])
+        );
+        $sessionStub->method('getUser')->willReturn(
+            $this->createConfiguredMock(UserModel::class, [
+                'getId' => 'someId'
+            ])
+        );
+        return $sessionStub;
+    }
+
+    protected function getTransactionServiceMock()
+    {
+        return $this->createPartialMock(TransactionService::class, ['writeTransactionToDB']);
+    }
+
+    protected function getPaymentServiceMock($translatorMock)
+    {
+        $basketModel = $this->createConfiguredMock(BasketModel::class, [
+            'getBasketCurrency' => $this->getBasketCurrency()
+        ]);
+
+        $sut = $this->getMockBuilder(PaymentService::class)
+            ->setConstructorArgs([
+                $this->createConfiguredMock(Session::class, [
+                    'getUser' => $this->createConfiguredMock(UserModel::class, []),
+                    'getBasket' => $basketModel
+                ]),
+                $this->getExtensionLoaderMock(),
+                $translatorMock,
+                $this->getUnzerServiceMock(),
+                $this->getUnzerSDKLoaderMock(),
+                $this->createPartialMock(TransactionService::class, [])
+            ])
+            ->onlyMethods(['removeTemporaryOrder'])
+            ->getMock();
+        $sut->expects($this->once())->method('removeTemporaryOrder');
+        return $sut;
+    }
+
+    protected function getExtensionLoaderMock()
+    {
+        $paymentModel = $this->getPaymentModelMock();
+        $paymentExtension = $this->getPaymentExtensionMock();
+        $paymentExtension->method('execute')->willThrowException(new Redirect("someDestination"));
+
+        $extensionLoader = $this->getMockBuilder(PaymentExtensionLoader::class)
+            ->setConstructorArgs([
+                $this->getUnzerSDKLoaderMock(),
+                $this->getUnzerServiceMock()
+            ])->onlyMethods(['getPaymentExtension'])
+            ->getMock();
+
+        $extensionLoader->expects($this->once())
+            ->method('getPaymentExtension')
+            ->with($paymentModel)
+            ->willReturn($paymentExtension);
+
+        return $extensionLoader;
+    }
+
+    protected function getTranslatorMock()
+    {
+        $translatorMock = $this->createPartialMock(Translator::class, ['translateCode']);
+        $translatorMock->method('translateCode')
+            ->with("No error id provided", "clientMessage")
+            ->willReturn("specialTranslation");
+        return $translatorMock;
+    }
+
+    protected function getPaymentExtensionMock()
+    {
+        return $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
+    }
+
+    protected function getPaymentModelMock()
+    {
+        return $this->createConfiguredMock(PaymentModel::class, []);
+    }
+
+    protected function getUnzerServiceMock()
+    {
+        $unzerServiceMock = $this->createPartialMock(UnzerService::class, ['prepareOrderRedirectUrl']);
+        $unzerServiceMock->method('prepareOrderRedirectUrl')
+            ->willReturn('someUrl');
+        return $unzerServiceMock;
+    }
+
+    protected function getUnzerSDKMock()
+    {
+        return $this->createConfiguredMock(Unzer::class, []);
+    }
+
+    protected function getUnzerSDKLoaderMock()
+    {
+        $UnzerSDKMock = $this->getUnzerSDKMock();
+        $unzerSDKLoaderMock = $this->createPartialMock(UnzerSDKLoader::class, [
+            'getUnzerSDK'
+        ]);
+
+        $basketCurrency = $this->getBasketCurrency();
+        $currencyName = $basketCurrency->name;
+
+        $unzerSDKLoaderMock->method('getUnzerSDK')
+            ->with('', $currencyName)
+            ->willReturn($UnzerSDKMock);
+        return $unzerSDKLoaderMock;
+    }
+    protected function getBasketCurrency()
+    {
+        $basketCurrency = new \stdClass();
+        $basketCurrency->name = 'EUR';
+        return $basketCurrency;
     }
 }

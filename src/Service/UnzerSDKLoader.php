@@ -7,9 +7,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Doctrine\DBAL\Exception;
-use OxidEsales\Eshop\Application\Model\Basket;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
