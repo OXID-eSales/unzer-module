@@ -4,11 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.0] - 2023-02-XX
+## [1.1.0] - 2023-05-XX
 
 ### NEW
 - New Payment PayLater
 ### FIXED
+- Correct Customer-Details for Unzer (e.g. OXID-customerId)
+- [0007453](https://bugs.oxid-esales.com/view.php?id=7453) Unzer prohibits changes in settings of other modules
+- [0007454](https://bugs.oxid-esales.com/view.php?id=7454) Unzer and Paypal cannot be activated at the same time
 - [0007436](https://bugs.oxid-esales.com/view.php?id=7436) add option to reverese a prepayment-transaction from the backend
 - [0007430](https://bugs.oxid-esales.com/view.php?id=7430) Update Basket version to V2
 - [0007429](https://bugs.oxid-esales.com/view.php?id=7429) Customer details - adjust addresses
