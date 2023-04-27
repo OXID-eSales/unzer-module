@@ -154,9 +154,9 @@ jobs:
       - name: Put module settings
         continue-on-error: true
         run: |
-          mkdir -p source/var/configuration/shops/1/modules
+          mkdir -p source/var/configuration/environment/shops/1/modules
           echo "${{ secrets.MODULE_SETTINGS_OXID7 }}" > source/var/configuration/environment/shops/1/modules/osc-unzer.yaml
-          docker-compose exec -T php php bin/oe-console oe:module:deploy-configurations
+          docker-compose exec -T php php bin/oe-console oe:module:activate osc-unzer
 
       - name: Show docker log
         if: always()
