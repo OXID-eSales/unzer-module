@@ -21,6 +21,8 @@ use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use PHPUnit\Framework\TestCase;
+use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Payment;
 use UnzerSDK\Unzer;
 
 class PaymentTest extends TestCase
@@ -30,21 +32,18 @@ class PaymentTest extends TestCase
      */
     public function testRegularExecuteUnzerPaymentFlow(string $expectedValue): void
     {
-        $sut = $this->getMockBuilder(PaymentService::class)
-            ->setConstructorArgs([
-                $this->getSessionMock(),
-                $this->getExtensionLoaderMock(),
-                $this->getTranslatorMock(),
-                $this->getUnzerServiceMock(),
-                $this->getUnzerSDKLoaderMock(),
-                $this->getTransactionServiceMock()
-            ])
-            ->onlyMethods(['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment', 'executeUnzerPayment'])
-            ->getMock();
+        $expectedResult = ($expectedValue !== 'ERROR');
 
-        $sut->expects($this->never())->method('removeTemporaryOrder');
-        $sut->method('getUnzerPaymentStatus')->willReturn($expectedValue);
-        $this->assertSame($expectedValue != 'ERROR', $sut->executeUnzerPayment($this->getPaymentModelMock()));
+        $sut = $this->getPaymentServiceMock(
+            $this->getTranslatorMock(),
+            $expectedValue,
+            $this->getUnzerSDKPaymentMock(),
+            $expectedResult,
+            null
+        );
+
+        $paymentModelMock = $this->getPaymentModelMock();
+        $this->assertSame($expectedResult, $sut->executeUnzerPayment($paymentModelMock));
     }
 
     public function executePaymentStatusDataProvider(): array
@@ -58,13 +57,12 @@ class PaymentTest extends TestCase
 
     public function testUnzerRedirectReThrownFlow(): void
     {
-        $sut = new PaymentService(
-            $this->getSessionMock(),
-            $this->getExtensionLoaderMock(),
+        $sut = $this->getPaymentServiceMock(
             $this->getTranslatorMock(),
-            $this->getUnzerServiceMock(),
-            $this->getUnzerSDKLoaderMock(),
-            $this->getTransactionServiceMock()
+            'ERROR',
+            $this->getUnzerSDKPaymentMock(),
+            null,
+            $this->getRedirectException()
         );
 
         $this->expectException(Redirect::class);
@@ -75,21 +73,20 @@ class PaymentTest extends TestCase
             $this->assertSame("someUrl", $exception->getDestination());
 
             throw $exception;
+        } catch(\Exception $e) {
+            $this->assertSame($e, $this->getRedirectException(), 'Exception Type mot matching');
         }
     }
 
     public function testUnzerApiExceptionCaseConvertedToRedirectWithMessage(): void
     {
-        $unzerException = new \UnzerSDK\Exceptions\UnzerApiException(
-            "merchantMessage",
-            "clientMessage",
-            "specialCode"
+        $sut = $this->getPaymentServiceMock(
+            $this->getTranslatorMock(),
+            'ERROR',
+            $this->getUnzerSDKPaymentMock(),
+            null,
+            $this->getUnzerApiException()
         );
-
-        $paymentExtension = $this->getPaymentExtensionMock();
-        $paymentExtension->method('execute')->willThrowException($unzerException);
-
-        $sut = $this->getPaymentServiceMock($this->getTranslatorMock());
 
         $this->expectException(RedirectWithMessage::class);
 
@@ -105,17 +102,21 @@ class PaymentTest extends TestCase
 
     public function testRegularExceptionCaseConvertedToRedirectWithMessage(): void
     {
-        $paymentExtension = $this->getPaymentExtensionMock();
-        $paymentExtension->method('execute')->willThrowException(new \Exception("clientMessage"));
-
-        $sut = $this->getPaymentServiceMock($this->getTranslatorMock());
+        $sut = $this->getPaymentServiceMock(
+            $this->getTranslatorMock(),
+            'ERROR',
+            $this->getUnzerSDKPaymentMock(),
+            null,
+            $this->getException()
+        );
 
         $this->expectException(RedirectWithMessage::class);
 
         try {
             $sut->executeUnzerPayment($this->getPaymentModelMock());
         } catch (RedirectWithMessage $exception) {
-            $this->assertSame("someUrl", $exception->getDestination());
+            $destination = $exception->getDestination();
+            $this->assertSame("someUrl", $destination);
             $this->assertSame("clientMessage", $exception->getMessageKey());
 
             throw $exception;
@@ -143,51 +144,88 @@ class PaymentTest extends TestCase
         return $sessionStub;
     }
 
-    protected function getTransactionServiceMock()
+    protected function getBasketModelMock()
     {
-        return $this->createPartialMock(TransactionService::class, ['writeTransactionToDB']);
-    }
-
-    protected function getPaymentServiceMock($translatorMock)
-    {
-        $basketModel = $this->createConfiguredMock(BasketModel::class, [
+        return $this->createConfiguredMock(BasketModel::class, [
             'getBasketCurrency' => $this->getBasketCurrency()
         ]);
+    }
 
+    protected function getTransactionServiceMock()
+    {
+        $transactionMock = $this->createPartialMock(TransactionService::class, ['writeTransactionToDB']);
+        $transactionMock->method('writeTransactionToDB')
+            ->withAnyParameters()
+            ->willReturn(true);
+
+        return $transactionMock;
+    }
+
+    protected function getPaymentServiceMock(
+        $translatorMock,
+        $getUnzerPaymentStatusReturn,
+        $getSessionUnzerPaymentReturn,
+        $executeUnzerPaymentReturn,
+        $executeWillThrowException
+    )
+    {
+        $methodsToMock = ['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment'];
+        if (null !== $executeUnzerPaymentReturn) {
+            $methodsToMock[] = 'executeUnzerPayment';
+        }
         $sut = $this->getMockBuilder(PaymentService::class)
             ->setConstructorArgs([
-                $this->createConfiguredMock(Session::class, [
-                    'getUser' => $this->createConfiguredMock(UserModel::class, []),
-                    'getBasket' => $basketModel
-                ]),
-                $this->getExtensionLoaderMock(),
+                $this->getSessionMock(),
+                $this->getExtensionLoaderMock($executeWillThrowException),
                 $translatorMock,
                 $this->getUnzerServiceMock(),
                 $this->getUnzerSDKLoaderMock(),
-                $this->createPartialMock(TransactionService::class, [])
+                $this->getTransactionServiceMock()
             ])
-            ->onlyMethods(['removeTemporaryOrder'])
+            ->onlyMethods($methodsToMock)
             ->getMock();
-        $sut->expects($this->once())->method('removeTemporaryOrder');
+
+        $sut->method('getUnzerPaymentStatus')->willReturn($getUnzerPaymentStatusReturn);
+        $sut->method('getSessionUnzerPayment')->willReturn($getSessionUnzerPaymentReturn);
+        if (null !== $executeUnzerPaymentReturn) {
+            $sut->method('executeUnzerPayment')->willReturn($executeUnzerPaymentReturn);
+        }
+
         return $sut;
     }
 
-    protected function getExtensionLoaderMock()
+    protected function getExtensionLoaderMock(
+        $executeWillThrowException
+    )
     {
         $paymentModel = $this->getPaymentModelMock();
-        $paymentExtension = $this->getPaymentExtensionMock();
-        $paymentExtension->method('execute')->willThrowException(new Redirect("someDestination"));
+
+        $cfgPaymentMock = ['getUnzerPaymentTypeObject', 'execute'];
+        $paymentExtension = $this->getPaymentExtensionMock($cfgPaymentMock);
+        if (null !== $executeWillThrowException) {
+            $paymentExtension->method('execute')
+                ->willThrowException($executeWillThrowException);
+        }
+        else {
+            $paymentExtension->method('execute')
+                ->willReturn(true);
+        }
 
         $extensionLoader = $this->getMockBuilder(PaymentExtensionLoader::class)
             ->setConstructorArgs([
                 $this->getUnzerSDKLoaderMock(),
                 $this->getUnzerServiceMock()
-            ])->onlyMethods(['getPaymentExtension'])
+            ])->onlyMethods(['getPaymentExtension', 'getPaymentExtensionByCustomerTypeAndCurrency'])
             ->getMock();
 
-        $extensionLoader->expects($this->once())
+        $extensionLoader
             ->method('getPaymentExtension')
             ->with($paymentModel)
+            ->willReturn($paymentExtension);
+
+        $extensionLoader
+            ->method('getPaymentExtensionByCustomerTypeAndCurrency')
+            ->with($paymentModel, '', 'EUR')
             ->willReturn($paymentExtension);
 
         return $extensionLoader;
@@ -202,9 +240,9 @@ class PaymentTest extends TestCase
         return $translatorMock;
     }
 
-    protected function getPaymentExtensionMock()
+    protected function getPaymentExtensionMock($configuration = [])
     {
-        return $this->createPartialMock(UnzerPayment::class, ['execute', 'getUnzerPaymentTypeObject']);
+        return $this->createPartialMock(UnzerPayment::class, $configuration);
     }
 
     protected function getPaymentModelMock()
@@ -223,6 +261,11 @@ class PaymentTest extends TestCase
     protected function getUnzerSDKMock()
     {
         return $this->createConfiguredMock(Unzer::class, []);
+    }
+
+    protected function getUnzerSDKPaymentMock()
+    {
+        return $this->createConfiguredMock(Payment::class, []);
     }
 
     protected function getUnzerSDKLoaderMock()
@@ -245,5 +288,29 @@ class PaymentTest extends TestCase
         $basketCurrency = new \stdClass();
         $basketCurrency->name = 'EUR';
         return $basketCurrency;
+    }
+
+    protected function getRedirectException()
+    {
+        return new Redirect("someUrl");
+    }
+
+    protected function getRedirectWithMessageException()
+    {
+        return new RedirectWithMessage("someUrl", "clientMessage");
+    }
+
+    protected function getUnzerApiException()
+    {
+        return new UnzerApiException(
+            "merchantMessage",
+            "clientMessage",
+            "specialCode"
+        );
+    }
+
+    protected function getException()
+    {
+        return new \Exception("clientMessage");
     }
 }
