@@ -73,7 +73,7 @@ class PaymentTest extends TestCase
             $this->assertSame("someUrl", $exception->getDestination());
 
             throw $exception;
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->assertSame($e, $this->getRedirectException(), 'Exception Type mot matching');
         }
     }
@@ -167,8 +167,7 @@ class PaymentTest extends TestCase
         $getSessionUnzerPaymentReturn,
         $executeUnzerPaymentReturn,
         $executeWillThrowException
-    )
-    {
+    ) {
         $methodsToMock = ['removeTemporaryOrder', 'getUnzerPaymentStatus', 'getSessionUnzerPayment'];
         if (null !== $executeUnzerPaymentReturn) {
             $methodsToMock[] = 'executeUnzerPayment';
@@ -196,8 +195,7 @@ class PaymentTest extends TestCase
 
     protected function getExtensionLoaderMock(
         $executeWillThrowException
-    )
-    {
+    ) {
         $paymentModel = $this->getPaymentModelMock();
 
         $cfgPaymentMock = ['getUnzerPaymentTypeObject', 'execute'];
@@ -205,8 +203,7 @@ class PaymentTest extends TestCase
         if (null !== $executeWillThrowException) {
             $paymentExtension->method('execute')
                 ->willThrowException($executeWillThrowException);
-        }
-        else {
+        } else {
             $paymentExtension->method('execute')
                 ->willReturn(true);
         }
