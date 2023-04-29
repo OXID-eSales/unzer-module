@@ -14,7 +14,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @group EasyOutShopPaymentsTest
+ * @group ThirdGroup
  */
 final class SofortCest extends BaseCest
 {
