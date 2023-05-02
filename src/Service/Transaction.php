@@ -7,6 +7,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use DateTime;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Driver\Result;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use DateTime;
@@ -28,7 +30,6 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
-use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -577,12 +578,27 @@ class Transaction
         $result = '';
 
         if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT OXID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')
-                ORDER BY OXTIMESTAMP DESC LIMIT 1",
-                [$orderid]
-            );
+            /** @var ContainerInterface $container */
+            $container = ContainerFactory::getInstance()->getContainer();
+            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $queryBuilderFactory->create();
+
+            $queryBuilder->select('oxid')
+                ->from('oscunzertransaction')
+                ->where('oxorderid = :oxorderid')
+                ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
+                ->orderBy('oxtimestamp')
+                ->distinct();
+
+            $parameters = [
+                'oxorderid' => $orderid
+            ];
+
+            /** @var Result $result */
+            $result = $queryBuilder->setParameters($parameters)->execute();
+            $rows = $result->fetchAllAssociative();
 
             $result = $rows[0]['OXID'];
         }
