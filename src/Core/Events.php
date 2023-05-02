@@ -128,10 +128,10 @@ class Events
 
         $queryBuilder = $queryBuilderFactory->create();
 
-        $queryBuilder
-            ->delete()
-            ->from('oxpayments')
+        $statement = $queryBuilder
+            ->delete('oxpayments')
             ->where("oxid like 'oscunzer\_%' ")
             ->andWhere(sprintf("oxid not in (%s)", implode(',', $unzerPaymentMethods)));
+        $statement->execute();
     }
 }
