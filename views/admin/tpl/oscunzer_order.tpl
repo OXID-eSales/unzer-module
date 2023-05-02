@@ -121,7 +121,7 @@
                     </table>
                 </form>
             [{/if}]
-            [{if $AuthAmountRemaining == $AuthAmount}]
+            [{if $AuthAmountRemaining > 0}]
                 <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerAuthorizationCancel">
