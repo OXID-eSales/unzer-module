@@ -41,6 +41,13 @@ abstract class BaseCest
             );
         }
 
+        $product = Fixtures::get('product');
+        $I->updateInDatabase(
+            'oxarticles',
+            ['OXSTOCK' => 10],
+            ['OXID' => $product['id']]
+        );
+
         $this->I = $I;
     }
 

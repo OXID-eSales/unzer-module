@@ -34,12 +34,17 @@ final class PISCest extends BaseCest
     }
 
     /**
+     * THIS TEST WILL ALWAYS FAIL DUE TO AN ONGOING HTTP-503 ON THE PAYMENT SITE
+     * Therefor it has been disabled by adding an underscore to the method name
+     * Remove the underscore to activate the test again
+     *
      * @param AcceptanceTester $I
      * @group PisPaymentTest
      */
-    public function checkPaymentWorks(AcceptanceTester $I)
+    public function _checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test PIS payment works');
+
         $this->_initializeTest();
         $orderPage = $this->_choosePayment($this->pisLabel);
         $orderPage->submitOrder();

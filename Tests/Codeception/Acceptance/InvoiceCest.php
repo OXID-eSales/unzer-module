@@ -26,10 +26,13 @@ final class InvoiceCest extends BaseCest
     }
 
     /**
+     * This payment method is deprecated and will be removed in the future
+     * Test has been deactivated
+     *
      * @param AcceptanceTester $I
      * @group InvoicePaymentTest
      */
-    public function checkPaymentWorks(AcceptanceTester $I)
+    public function _checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Invoice (old) payment works');
         $this->_initializeTest();

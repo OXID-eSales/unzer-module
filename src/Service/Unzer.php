@@ -136,6 +136,7 @@ class Unzer
 
         /** @var string $customerId */
         $customerId = $oUser->getFieldData('oxid');
+        $customerId = '';
         $customer->setCustomerId($customerId);
 
         $billingAddress = $customer->getBillingAddress();
