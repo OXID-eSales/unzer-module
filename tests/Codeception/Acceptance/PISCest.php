@@ -14,7 +14,6 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
  * @group unzer_module
- * @group FirstGroup
  */
 final class PISCest extends BaseCest
 {
