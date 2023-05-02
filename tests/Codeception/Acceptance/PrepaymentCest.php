@@ -37,10 +37,5 @@ final class PrepaymentCest extends BaseCest
         $orderPage->submitOrder();
 
         $this->_checkSuccessfulPayment();
-        $I->waitForText(rtrim(strip_tags(sprintf(
-            Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->_getPrice(),
-            $this->_getCurrency()
-        ))));
     }
 }

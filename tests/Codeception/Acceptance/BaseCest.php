@@ -97,7 +97,19 @@ abstract class BaseCest
         //$this->_loginUser();
         $homePage->loginUser($clientData['username'], $clientData['password']);
 
-        $this->paymentSelection = $homePage->openMiniBasket()->openCheckout();
+        $this->paymentSelection = $homePage->openMiniBasket();
+
+        $this->I->waitForText(Translator::translate('DISPLAY_BASKET'));
+        $this->I->click(Translator::translate('DISPLAY_BASKET'));
+        $this->I->waitForPageLoad();
+
+        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForPageLoad();
+
+        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForPageLoad();
     }
 
     protected function _loginUser()
