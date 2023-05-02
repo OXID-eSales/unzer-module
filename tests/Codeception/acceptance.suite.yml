@@ -55,3 +55,4 @@ modules:
         paths:
           - Application/views/admin_smarty
           - ../vendor/oxid-esales/unzer/views/admin_smarty
+          - ../vendor/oxid-esales/unzer/translations
