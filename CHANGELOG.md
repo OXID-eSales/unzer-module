@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - New Payment PayLater
 ### FIXED
+- Cleanup payment methods in database configuration
 - Correct Customer-Details for Unzer (e.g. OXID-customerId)
 - [0007453](https://bugs.oxid-esales.com/view.php?id=7453) Unzer prohibits changes in settings of other modules
 - [0007454](https://bugs.oxid-esales.com/view.php?id=7454) Unzer and Paypal cannot be activated at the same time
