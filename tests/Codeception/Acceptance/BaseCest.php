@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
+use OxidEsales\Codeception\Page\Checkout\OrderCheckout;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Codeception\Page\Page;
 use OxidEsales\Codeception\Step\Basket as BasketSteps;
@@ -128,10 +129,16 @@ abstract class BaseCest
      */
     protected function _choosePayment(string $label): Page
     {
+        $nextStepButton = '#paymentNextStepBottom';
+        $breadCrumb = '#breadcrumb';
+
         $this->I->waitForElement($label);
         $this->I->click($label);
 
-        return $this->paymentSelection->goToNextStep();
+        $this->I->click($nextStepButton);
+        $this->I->waitForElement($breadCrumb);
+
+        return new OrderCheckout($this->I);
     }
 
     /**
