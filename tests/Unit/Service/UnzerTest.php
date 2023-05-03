@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\EshopCommunity\Core\Price;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidSolutionCatalysts\Unzer\Service\Context;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
@@ -118,23 +119,31 @@ class UnzerTest extends IntegrationTestCase
         $currency = new \stdClass();
         $currency->name = 'EUR';
 
-        $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
-        $price1 = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price = oxNew(Price::class);
+        $price1 = oxNew(Price::class);
         $price1->setPrice(234.56);
-        $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
-            'getNettoSum' => 123.45,
-            'getBruttoSum' => 234.56,
-            'getPrice' => $price1,
-            'getBasketCurrency' => $currency,
-            'getTotalDiscount' => $price,
-            'getDeliveryCost' => $price
+        $shopBasketModel = $this->createPartialMock(ShopBasketModel::class, [
+            'getNettoSum',
+            'getBruttoSum',
+            'getPrice',
+            'getBasketCurrency',
+            'getTotalDiscount',
+            'getDeliveryCost',
+            'getVoucherDiscount'
         ]);
+        $shopBasketModel->method('getNettoSum')->willReturn(123.45);
+        $shopBasketModel->method('getBruttoSum')->willReturn(234.56);
+        $shopBasketModel->method('getPrice')->willReturn($price1);
+        $shopBasketModel->method('getBasketCurrency')->willReturn($currency);
+        $shopBasketModel->method('getTotalDiscount')->willReturn($price);
+        $shopBasketModel->method('getDeliveryCost')->willReturn($price);
+        $shopBasketModel->method('getVoucherDiscount')->willReturn($price);
 
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket('someOrderId', $shopBasketModel);
 
         $this->assertInstanceOf(\UnzerSDK\Resources\Basket::class, $result);
-        $this->assertSame(234.56, $result->getTotalValueGross());
+        $this->assertSame(234.56, $result->getAmountTotalGross());
         $this->assertSame('EUR', $result->getCurrencyCode());
         $this->assertSame('someOrderId', $result->getOrderId());
     }
@@ -144,32 +153,45 @@ class UnzerTest extends IntegrationTestCase
         $currency = new \stdClass();
         $currency->name = 'EUR';
 
-        $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price = oxNew(Price::class);
+        $priceMock = $this->createPartialMock(Price::class, [
+            'getVatValue'
+        ]);
+        $priceMock->method('getVatValue')->willReturn(19.0);
 
         $basketItem1 = $this->createConfiguredMock(BasketItem::class, [
             'getTitle' => 'basket item title 1',
-            'getPrice' => new \OxidEsales\Eshop\Core\Price(100),
-            'getUnitPrice' => new \OxidEsales\Eshop\Core\Price(20),
-            'getAmount' => 5
+            'getUnitPrice' => new Price(20),
+            'getAmount' => 5,
+            'getPrice' => $priceMock
         ]);
 
         $basketItem2 = $this->createConfiguredMock(BasketItem::class, [
             'getTitle' => 'basket item title 2',
-            'getPrice' => new \OxidEsales\Eshop\Core\Price(40),
-            'getUnitPrice' => new \OxidEsales\Eshop\Core\Price(10),
-            'getAmount' => 4
+            'getUnitPrice' => new Price(10),
+            'getAmount' => 4,
+            'getPrice' => $priceMock
         ]);
-        $price1 = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $price1 = oxNew(Price::class);
         $price1->setPrice(234.56);
-        $shopBasketModel = $this->createConfiguredMock(ShopBasketModel::class, [
-            'getNettoSum' => 123.45,
-            'getBruttoSum' => 234.56,
-            'getPrice' => $price1,
-            'getBasketCurrency' => $currency,
-            'getContents' => [$basketItem1, $basketItem2],
-            'getTotalDiscount' => $price,
-            'getDeliveryCost' => $price
+        $shopBasketModel = $this->createPartialMock(ShopBasketModel::class, [
+            'getNettoSum',
+            'getBruttoSum',
+            'getPrice',
+            'getBasketCurrency',
+            'getContents',
+            'getTotalDiscount',
+            'getDeliveryCost',
+            'getVoucherDiscount'
         ]);
+        $shopBasketModel->method('getNettoSum')->willReturn(123.45);
+        $shopBasketModel->method('getBruttoSum')->willReturn(234.56);
+        $shopBasketModel->method('getPrice')->willReturn($price1);
+        $shopBasketModel->method('getContents')->willReturn([$basketItem1, $basketItem2]);
+        $shopBasketModel->method('getBasketCurrency')->willReturn($currency);
+        $shopBasketModel->method('getTotalDiscount')->willReturn($price);
+        $shopBasketModel->method('getDeliveryCost')->willReturn($price);
+        $shopBasketModel->method('getVoucherDiscount')->willReturn($price);
 
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);
@@ -180,8 +202,7 @@ class UnzerTest extends IntegrationTestCase
         $items = $result->getBasketItems();
 
         $this->assertSame('basket item title 1', $items[0]->getTitle());
-        $this->assertSame(20.0, $items[0]->getAmountPerUnit());
-        $this->assertSame(100.0, $items[0]->getAmountNet());
+        $this->assertSame(20.0, $items[0]->getAmountPerUnitGross());
         $this->assertSame(5, $items[0]->getQuantity());
     }
 

@@ -28,7 +28,8 @@ class TransactionTest extends IntegrationTestCase
             'oxorderid' => 'orderId',
             'oxuserid' => 'userId',
             'oxshopid' => 5,
-            'oxactiondate' => '2021-12-10 16:44:54'
+            'oxactiondate' => '2021-12-10 16:44:54',
+            'customertype' => ''
         ];
 
         $model->expects($this->once())->method('assign')->with($params);
@@ -71,6 +72,7 @@ class TransactionTest extends IntegrationTestCase
             'oxaction' => 'statename',
             'metadata' => 'metadataJson',
             'customerid' => 'unzerCustomerId',
+            'customertype' => ''
         ]);
 
         $this->assertTrue($sut->writeTransactionToDB("orderId", "userId", $payment));
