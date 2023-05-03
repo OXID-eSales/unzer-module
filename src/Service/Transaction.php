@@ -591,33 +591,34 @@ class Transaction
      */
     public function getTransactionIdByOrderId(string $orderid): string
     {
-        $result = '';
-
         if ($orderid) {
-            /** @var ContainerInterface $container */
-            $container = ContainerFactory::getInstance()->getContainer();
-            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = $queryBuilderFactory->create();
-
-            $queryBuilder->select('oxid')
-                ->from('oscunzertransaction')
-                ->where('oxorderid = :oxorderid')
-                ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
-                ->orderBy('oxtimestamp')
-                ->distinct();
-
-            $parameters = [
-                'oxorderid' => $orderid
-            ];
-
-            /** @var Result $result */
-            $result = $queryBuilder->setParameters($parameters)->execute();
-            $rows = $result->fetchAllAssociative();
-
-            $result = $rows[0]['OXID'];
+            return '';
         }
+
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $queryBuilder->select('oxid')
+            ->from('oscunzertransaction')
+            ->where('oxorderid = :oxorderid')
+            ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
+            ->orderBy('oxtimestamp')
+            ->distinct();
+
+        $parameters = [
+            'oxorderid' => $orderid
+        ];
+
+        /** @var Result $result */
+        $result = $queryBuilder->setParameters($parameters)->execute();
+        $rows = $result->fetchAllAssociative();
+
+        /** @var string $result */
+        $result = $rows[0]['OXID'];
 
         return $result;
     }
