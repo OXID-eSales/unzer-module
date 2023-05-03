@@ -9,7 +9,6 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
@@ -20,12 +19,10 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerP
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
-use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
-use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 /**
@@ -78,13 +75,14 @@ class Payment
      * @param TransactionService $transactionService
      */
     public function __construct(
-        Session $session,
+        Session                $session,
         PaymentExtensionLoader $paymentExtLoader,
-        Translator $translator,
-        Unzer $unzerService,
-        UnzerSDKLoader $unzerSDKLoader,
-        TransactionService $transactionService
-    ) {
+        Translator             $translator,
+        Unzer                  $unzerService,
+        UnzerSDKLoader         $unzerSDKLoader,
+        TransactionService     $transactionService
+    )
+    {
         $this->session = $session;
         $this->paymentExtLoader = $paymentExtLoader;
         $this->translator = $translator;
@@ -160,14 +158,44 @@ class Payment
     }
 
     /**
-     * @return bool
+     * @return \UnzerSDK\Resources\Payment|null
+     * @throws UnzerApiException
      */
-    public function removeTemporaryOrder(): bool
+    public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
     {
-        $orderModel = oxNew(Order::class);
-        /** @var string $sessionOrderId */
-        $sessionOrderId = $this->session->getVariable('sess_challenge');
-        return $orderModel->delete($sessionOrderId);
+        $paymentId = $this->session->getVariable('PaymentId');
+        if (is_string($paymentId)) {
+            /** @var string $sessionOrderId */
+            $sessionOrderId = $this->session->getVariable('sess_challenge');
+            /** @var Order $order */
+            $order = oxNew(Order::class);
+            $order->load($sessionOrderId);
+
+            $customerType = '';
+            /** @var string $currency */
+            $currency = $order->getFieldData('oxcurrency') ?? '';
+            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+                $customerType = 'B2C';
+                if (!empty($order->getFieldData('oxbillcompany')) || !empty($order->getFieldData('oxdelcompany'))) {
+                    $customerType = 'B2B';
+                }
+            }
+
+            $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
+            return $sdk->fetchPayment($paymentId);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $customerType
+     * @param string $currency
+     * @return \UnzerSDK\Unzer
+     */
+    protected function getUnzerSDK(string $customerType = '', string $currency = ''): \UnzerSDK\Unzer
+    {
+        return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
     }
 
     /**
@@ -212,44 +240,22 @@ class Payment
     }
 
     /**
-     * @param string $customerType
-     * @param string $currency
-     * @return \UnzerSDK\Unzer
+     * @return bool
      */
-    protected function getUnzerSDK(string $customerType = '', string $currency = ''): \UnzerSDK\Unzer
+    public function isPdfSession(): bool
     {
-        return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
+        return (bool)Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
     }
 
     /**
-     * @return \UnzerSDK\Resources\Payment|null
-     * @throws UnzerApiException
+     * @return bool
      */
-    public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
+    public function removeTemporaryOrder(): bool
     {
-        $paymentId = $this->session->getVariable('PaymentId');
-        if (is_string($paymentId)) {
-            /** @var string $sessionOrderId */
-            $sessionOrderId = $this->session->getVariable('sess_challenge');
-            /** @var Order $order */
-            $order = oxNew(Order::class);
-            $order->load($sessionOrderId);
-
-            $customerType = '';
-            /** @var string $currency */
-            $currency = $order->getFieldData('oxcurrency') ?? '';
-            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-                $customerType = 'B2C';
-                if (!empty($order->getFieldData('oxbillcompany')) || !empty($order->getFieldData('oxdelcompany'))) {
-                    $customerType = 'B2B';
-                }
-            }
-
-            $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
-            return $sdk->fetchPayment($paymentId);
-        }
-
-        return null;
+        $orderModel = oxNew(Order::class);
+        /** @var string $sessionOrderId */
+        $sessionOrderId = $this->session->getVariable('sess_challenge');
+        return $orderModel->delete($sessionOrderId);
     }
 
     /**
@@ -457,13 +463,5 @@ class Payment
     public function getTomorrowsTimestamp(): string
     {
         return date('Y-m-d', strtotime("+1 days"));
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPdfSession(): bool
-    {
-        return (bool) Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
     }
 }

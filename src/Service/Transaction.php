@@ -8,22 +8,17 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use DateTime;
-use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Driver\Result;
-use OxidSolutionCatalysts\Unzer\Model\Order;
-use DateTime;
-use Doctrine\DBAL\Result;
-use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order as EshopModelOrder;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -56,11 +51,83 @@ class Transaction
      * @param UtilsDate $utilsDate
      */
     public function __construct(
-        Context $context,
+        Context   $context,
         UtilsDate $utilsDate
-    ) {
+    )
+    {
         $this->context = $context;
         $this->utilsDate = $utilsDate;
+    }
+
+    /**
+     * @param $paymentid
+     * @return array|false
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    public static function getTransactionDataByPaymentId(string $paymentid)
+    {
+        if ($paymentid) {
+            /** @var ContainerInterface $container */
+            $container = ContainerFactory::getInstance()->getContainer();
+            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $queryBuilderFactory->create();
+
+            $queryBuilder->select('oxorderid', 'oxuserid')
+                ->from('oscunzertransaction')
+                ->where('typeid = :typeid')
+                ->distinct();
+
+            $parameters = [
+                'typeid' => $paymentid
+            ];
+
+            /** @var Result $result */
+            $result = $queryBuilder->setParameters($parameters)->execute();
+            return $result->fetchAllAssociative();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $orderid
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    public static function getPaymentIdByOrderId(string $orderid)
+    {
+        if ($orderid) {
+            /** @var ContainerInterface $container */
+            $container = ContainerFactory::getInstance()->getContainer();
+            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $queryBuilderFactory->create();
+
+            $queryBuilder->select('typeid')
+                ->from('oscunzertransaction')
+                ->where('oxorderid = :oxorderid')
+                ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
+                ->distinct();
+
+            $parameters = [
+                'oxorderid' => $orderid
+            ];
+
+            /** @var Result $result */
+            $result = $queryBuilder->setParameters($parameters)->execute();
+            $rows = $result->fetchAllAssociative();
+
+            /** @var string $typeid */
+            $typeid = $rows[0]['typeid'];
+            return $typeid;
+        }
+
+        return '';
     }
 
     /**
@@ -70,13 +137,14 @@ class Transaction
      * @param Shipment|null $unzerShipment
      * @return bool
      * @throws \Exception
-    */
+     */
     public function writeTransactionToDB(
-        string $orderid,
-        string $userId,
-        ?Payment $unzerPayment,
+        string    $orderid,
+        string    $userId,
+        ?Payment  $unzerPayment,
         ?Shipment $unzerShipment = null
-    ): bool {
+    ): bool
+    {
         $transaction = $this->getNewTransactionObject();
 
         $params = [
@@ -124,6 +192,145 @@ class Transaction
     }
 
     /**
+     * @return TransactionModel
+     */
+
+    protected function getNewTransactionObject(): TransactionModel
+    {
+        return oxNew(TransactionModel::class);
+    }
+
+    protected function getUnzerShipmentData(Shipment $unzerShipment, Payment $unzerPayment): array
+    {
+        $currency = '';
+        $customerId = '';
+        $payment = $unzerShipment->getPayment();
+        if (is_object($payment)) {
+            $currency = $payment->getCurrency();
+            $customer = $payment->getCustomer();
+            if (is_object($customer)) {
+                $customerId = $customer->getId();
+            }
+        }
+        $params = [
+            'amount' => $unzerShipment->getAmount(),
+            'currency' => $currency,
+            'fetchedAt' => $unzerShipment->getFetchedAt(),
+            'typeid' => $unzerShipment->getId(),
+            'oxaction' => 'shipped',
+            'customerid' => $customerId,
+            'shortid' => $unzerShipment->getShortId(),
+            'traceid' => $unzerShipment->getTraceId(),
+            'metadata' => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
+        ];
+
+        $unzerCustomer = $unzerPayment->getCustomer();
+        if ($unzerCustomer instanceof Customer) {
+            $params['customerid'] = $unzerCustomer->getId();
+        }
+
+        return $params;
+    }
+
+    /**
+     * @param Payment $unzerPayment
+     * @return array
+     * @throws UnzerApiException
+     */
+    protected function getUnzerPaymentData(Payment $unzerPayment): array
+    {
+        $oxaction = preg_replace(
+            '/[^a-z]/',
+            '',
+            strtolower($unzerPayment->getStateName())
+        );
+        $params = [
+            'amount' => $unzerPayment->getAmount()->getTotal(),
+            'currency' => $unzerPayment->getCurrency(),
+            'typeid' => $unzerPayment->getId(),
+            'oxaction' => $oxaction,
+            'traceid' => $unzerPayment->getTraceId()
+        ];
+
+        /** @var AbstractTransactionType $initialTransaction */
+        $initialTransaction = $unzerPayment->getInitialTransaction();
+        $params['shortid'] = $initialTransaction->getShortId() !== null ?
+            $initialTransaction->getShortId() :
+            Registry::getSession()->getVariable('ShortId');
+
+        $metadata = $unzerPayment->getMetadata();
+        if ($metadata instanceof Metadata) {
+            $params['metadata'] = $metadata->jsonSerialize();
+        }
+
+        $unzerCustomer = $unzerPayment->getCustomer();
+        if ($unzerCustomer instanceof Customer) {
+            $params['customerid'] = $unzerCustomer->getId();
+        }
+
+        return $params;
+    }
+
+    public function deleteOldInitOrders(): void
+    {
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $queryBuilder->delete()
+            ->from('oscunzertransaction')
+            ->where('oxaction = :oxaction')
+            ->andWhere('oxactiondate < :oxactiondate');
+
+        $parameters = [
+            'oxaction' => 'init',
+            'oxactiondate' => (new DateTime())->modify('-1 day')->format('Y-m-d 00:00:00'),
+        ];
+
+        $queryBuilder->setParameters($parameters)->execute();
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    protected function prepareTransactionOxid(array $params): string
+    {
+        unset($params['oxactiondate']);
+        unset($params['serialized_basket']);
+        /** @var string $jsonEncode */
+        $jsonEncode = json_encode($params);
+        return md5($jsonEncode);
+    }
+
+    /**
+     * @param (int|mixed|string)[] $params
+     *
+     */
+    public function deleteInitOrder(array $params): void
+    {
+        $transaction = $this->getNewTransactionObject();
+
+        $oxid = $this->getInitOrderOxid($params);
+        if ($transaction->load($oxid)) {
+            $transaction->delete();
+        }
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    protected function getInitOrderOxid(array $params): string
+    {
+        $params['oxaction'] = "init";
+        return $this->prepareTransactionOxid($params);
+    }
+
+    /**
      * @param string $orderid
      * @param string $userId
      * @param Payment|null $unzerPayment
@@ -132,11 +339,12 @@ class Transaction
      * @throws \Exception
      */
     public function writeInitOrderToDB(
-        string $orderid,
-        string $userId,
+        string   $orderid,
+        string   $userId,
         ?Payment $unzerPayment,
-        ?Basket $basketModel
-    ): bool {
+        ?Basket  $basketModel
+    ): bool
+    {
         $transaction = $this->getNewTransactionObject();
 
         $params = [
@@ -165,39 +373,15 @@ class Transaction
     }
 
     /**
-     * @param (int|mixed|string)[] $params
-     *
+     * @throws UnzerApiException
      */
-    public function deleteInitOrder(array $params): void
+    protected function getUnzerInitOrderData(Payment $unzerPayment, Basket $basketModel): array
     {
-        $transaction = $this->getNewTransactionObject();
+        $params = $this->getUnzerPaymentData($unzerPayment);
+        $params["oxaction"] = 'init';
+        $params["serialized_basket"] = base64_encode(serialize($basketModel));
 
-        $oxid = $this->getInitOrderOxid($params);
-        if ($transaction->load($oxid)) {
-            $transaction->delete();
-        }
-    }
-
-    public function deleteOldInitOrders(): void
-    {
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()->getContainer();
-        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $queryBuilderFactory->create();
-
-        $queryBuilder->delete()
-            ->from('oscunzertransaction')
-            ->where('oxaction = :oxaction')
-            ->andWhere('oxactiondate < :oxactiondate');
-
-        $parameters = [
-            'oxaction' => 'init',
-            'oxactiondate' => (new DateTime())->modify('-1 day')->format('Y-m-d 00:00:00'),
-        ];
-
-        $queryBuilder->setParameters($parameters)->execute();
+        return $params;
     }
 
     public function cleanUpNotFinishedOrders(): void
@@ -279,12 +463,56 @@ class Transaction
         return false;
     }
 
+    protected function getUnzerCancelData(Cancellation $unzerCancel): array
+    {
+        $currency = '';
+        $customerId = '';
+        $payment = $unzerCancel->getPayment();
+        if (is_object($payment)) {
+            $currency = $payment->getCurrency();
+            $customer = $payment->getCustomer();
+            if (is_object($customer)) {
+                $customerId = $customer->getId();
+            }
+        }
+        return [
+            'amount' => $unzerCancel->getAmount(),
+            'currency' => $currency,
+            'typeid' => $unzerCancel->getId(),
+            'oxaction' => 'canceled',
+            'customerid' => $customerId,
+            'traceid' => $unzerCancel->getTraceId(),
+            'shortid' => $unzerCancel->getShortId(),
+            'status' => $this->getUzrStatus($unzerCancel),
+        ];
+    }
+
+    /**
+     * @param Cancellation|Charge $unzerObject
+     *
+     * @return null|string
+     */
+    protected static function getUzrStatus($unzerObject)
+    {
+        if ($unzerObject->isSuccess()) {
+            return "success";
+        }
+        if ($unzerObject->isError()) {
+            return "error";
+        }
+        if ($unzerObject->isPending()) {
+            return "pending";
+        }
+
+        return null;
+    }
+
     /**
      * @param string $orderid
      * @param string $userId
      * @param \UnzerSDK\Resources\TransactionTypes\Charge|null $unzerCharge
-     * @throws \Exception
      * @return bool
+     * @throws \Exception
      */
     public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
     {
@@ -315,68 +543,6 @@ class Transaction
         return false;
     }
 
-    /**
-     * @param array $params
-     * @return string
-     */
-    protected function prepareTransactionOxid(array $params): string
-    {
-        unset($params['oxactiondate']);
-        unset($params['serialized_basket']);
-        /** @var string $jsonEncode */
-        $jsonEncode = json_encode($params);
-        return md5($jsonEncode);
-    }
-
-    /**
-     * @param array $params
-     * @return string
-     */
-    protected function getInitOrderOxid(array $params): string
-    {
-        $params['oxaction'] = "init";
-        return $this->prepareTransactionOxid($params);
-    }
-
-    /**
-     * @param Payment $unzerPayment
-     * @return array
-     * @throws UnzerApiException
-     */
-    protected function getUnzerPaymentData(Payment $unzerPayment): array
-    {
-        $oxaction = preg_replace(
-            '/[^a-z]/',
-            '',
-            strtolower($unzerPayment->getStateName())
-        );
-        $params = [
-            'amount'   => $unzerPayment->getAmount()->getTotal(),
-            'currency' => $unzerPayment->getCurrency(),
-            'typeid'   => $unzerPayment->getId(),
-            'oxaction' => $oxaction,
-            'traceid'  => $unzerPayment->getTraceId()
-        ];
-
-        /** @var AbstractTransactionType $initialTransaction */
-        $initialTransaction = $unzerPayment->getInitialTransaction();
-        $params['shortid'] = $initialTransaction->getShortId() !== null ?
-            $initialTransaction->getShortId() :
-            Registry::getSession()->getVariable('ShortId');
-
-        $metadata = $unzerPayment->getMetadata();
-        if ($metadata instanceof Metadata) {
-            $params['metadata'] = $metadata->jsonSerialize();
-        }
-
-        $unzerCustomer = $unzerPayment->getCustomer();
-        if ($unzerCustomer instanceof Customer) {
-            $params['customerid'] = $unzerCustomer->getId();
-        }
-
-        return $params;
-    }
-
     protected function getUnzerChargeData(Charge $unzerCharge): array
     {
         $customerId = '';
@@ -388,183 +554,33 @@ class Transaction
             }
         }
         return [
-            'amount'     => $unzerCharge->getAmount(),
-            'currency'   => $unzerCharge->getCurrency(),
-            'typeid'     => $unzerCharge->getId(),
-            'oxaction'   => 'charged',
+            'amount' => $unzerCharge->getAmount(),
+            'currency' => $unzerCharge->getCurrency(),
+            'typeid' => $unzerCharge->getId(),
+            'oxaction' => 'charged',
             'customerid' => $customerId,
-            'traceid'    => $unzerCharge->getTraceId(),
-            'shortid'    => $unzerCharge->getShortId(),
-            'status'     => $this->getUzrStatus($unzerCharge),
+            'traceid' => $unzerCharge->getTraceId(),
+            'shortid' => $unzerCharge->getShortId(),
+            'status' => $this->getUzrStatus($unzerCharge),
         ];
-    }
-
-    protected function getUnzerCancelData(Cancellation $unzerCancel): array
-    {
-        $currency = '';
-        $customerId = '';
-        $payment = $unzerCancel->getPayment();
-        if (is_object($payment)) {
-            $currency = $payment->getCurrency();
-            $customer = $payment->getCustomer();
-            if (is_object($customer)) {
-                $customerId = $customer->getId();
-            }
-        }
-        return [
-            'amount'     => $unzerCancel->getAmount(),
-            'currency'   => $currency,
-            'typeid'     => $unzerCancel->getId(),
-            'oxaction'   => 'canceled',
-            'customerid' => $customerId,
-            'traceid'    => $unzerCancel->getTraceId(),
-            'shortid'    => $unzerCancel->getShortId(),
-            'status'     => $this->getUzrStatus($unzerCancel),
-        ];
-    }
-
-    protected function getUnzerShipmentData(Shipment $unzerShipment, Payment $unzerPayment): array
-    {
-        $currency = '';
-        $customerId = '';
-        $payment = $unzerShipment->getPayment();
-        if (is_object($payment)) {
-            $currency = $payment->getCurrency();
-            $customer = $payment->getCustomer();
-            if (is_object($customer)) {
-                $customerId = $customer->getId();
-            }
-        }
-        $params = [
-            'amount'     => $unzerShipment->getAmount(),
-            'currency'   => $currency,
-            'fetchedAt'  => $unzerShipment->getFetchedAt(),
-            'typeid'     => $unzerShipment->getId(),
-            'oxaction'   => 'shipped',
-            'customerid' => $customerId,
-            'shortid'    => $unzerShipment->getShortId(),
-            'traceid'    => $unzerShipment->getTraceId(),
-            'metadata'   => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
-        ];
-
-        $unzerCustomer = $unzerPayment->getCustomer();
-        if ($unzerCustomer instanceof Customer) {
-            $params['customerid'] = $unzerCustomer->getId();
-        }
-
-        return $params;
-    }
-
-    /**
-     * @throws UnzerApiException
-     */
-    protected function getUnzerInitOrderData(Payment $unzerPayment, Basket $basketModel): array
-    {
-        $params = $this->getUnzerPaymentData($unzerPayment);
-        $params["oxaction"] = 'init';
-        $params["serialized_basket"] = base64_encode(serialize($basketModel));
-
-        return $params;
-    }
-
-    /**
-     * @return TransactionModel
-     */
-
-    protected function getNewTransactionObject(): TransactionModel
-    {
-        return oxNew(TransactionModel::class);
-    }
-
-    /**
-     * @param $paymentid
-     * @return array|false
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    public static function getTransactionDataByPaymentId(string $paymentid)
-    {
-        if ($paymentid) {
-            /** @var ContainerInterface $container */
-            $container = ContainerFactory::getInstance()->getContainer();
-            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = $queryBuilderFactory->create();
-
-            $queryBuilder->select('oxorderid', 'oxuserid')
-                ->from('oscunzertransaction')
-                ->where('typeid = :typeid')
-                ->distinct();
-
-            $parameters = [
-                'typeid' => $paymentid
-            ];
-
-            /** @var Result $result */
-            $result = $queryBuilder->setParameters($parameters)->execute();
-            return $result->fetchAllAssociative();
-        }
-
-        return false;
-    }
-
-    /**
-     * @param Cancellation|Charge $unzerObject
-     *
-     * @return null|string
-     */
-    protected static function getUzrStatus($unzerObject)
-    {
-        if ($unzerObject->isSuccess()) {
-            return "success";
-        }
-        if ($unzerObject->isError()) {
-            return "error";
-        }
-        if ($unzerObject->isPending()) {
-            return "pending";
-        }
-
-        return null;
     }
 
     /**
      * @param string $orderid
-     * @return string
+     * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public static function getPaymentIdByOrderId(string $orderid)
+    public function getCustomerTypeAndCurrencyByOrderId($orderid): array
     {
-        if ($orderid) {
-            /** @var ContainerInterface $container */
-            $container = ContainerFactory::getInstance()->getContainer();
-            /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-            $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = $queryBuilderFactory->create();
+        $transaction = oxNew(TransactionModel::class);
+        $transactionId = $this->getTransactionIdByOrderId($orderid);
+        $transaction->load($transactionId);
 
-            $queryBuilder->select('typeid')
-                ->from('oscunzertransaction')
-                ->where('oxorderid = :oxorderid')
-                ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
-                ->distinct();
-
-            $parameters = [
-                'oxorderid' => $orderid
-            ];
-
-            /** @var Result $result */
-            $result = $queryBuilder->setParameters($parameters)->execute();
-            $rows = $result->fetchAllAssociative();
-
-            /** @var string $typeid */
-            $typeid = $rows[0]['typeid'];
-            return $typeid;
-        }
-
-        return '';
+        return [
+            'customertype' => $transaction->getFieldData('customertype') ?? '',
+            'currency' => $transaction->getFieldData('currency') ?? '',
+        ];
     }
 
     /**
@@ -604,24 +620,6 @@ class Transaction
         }
 
         return $result;
-    }
-
-    /**
-     * @param string $orderid
-     * @return array
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    public function getCustomerTypeAndCurrencyByOrderId($orderid): array
-    {
-        $transaction = oxNew(TransactionModel::class);
-        $transactionId = $this->getTransactionIdByOrderId($orderid);
-        $transaction->load($transactionId);
-
-        return [
-            'customertype' => $transaction->getFieldData('customertype') ?? '',
-            'currency' => $transaction->getFieldData('currency') ?? '',
-        ];
     }
 
     /**
