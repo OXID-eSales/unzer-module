@@ -1,10 +1,5 @@
 [{include file="headitem.tpl" title="GENERAL_ADMIN_TITLE"|oxmultilangassign}]
 
-[{if $readonly}]
-    [{assign var="readonly" value="readonly disabled"}]
-[{else}]
-    [{assign var="readonly" value=""}]
-[{/if}]
 [{if $paymentTitle && $totalBasketPrice}]
     <h3>[{$paymentTitle}] : [{$totalBasketPrice}]</h3>
 [{/if}]
@@ -230,7 +225,7 @@
                                 <td>[{$totalAmountCharge|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                                 <td>[{$totalAmountCancel|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                                 [{if $canRefundFully}]
-                                    <td><input type="text" id="amount_payout" [{if !$canRefundPartially}]readonly[{/if}]
+                                    <td><input type="text" id="amount_payout"
                                                name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
                                     <td><button type="submit">[{oxmultilang ident="OSCUNZER_PAYOUT"}]</button></td>
                                 [{else}]
@@ -285,9 +280,8 @@ let handleUnzerForm = function(formElement) {
         let amountId = 'amount_' + paymentId; // f.e. "uzr_s-chg-1"
         let inAmount = document.getElementById(amountId);
 
-        if (null !== inAmount &&
-            window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
-            return true;
+        if (null !== inAmount) {
+            return window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value);
         }
         return false;
     }
@@ -297,13 +291,12 @@ let handleUnzerForm = function(formElement) {
 
 /* apply submit listener */
 document.addEventListener('DOMContentLoaded', function () {
-    let forms = document.querySelectorAll('form[id^="uzr_"]');
+    let forms = document.querySelectorAll('form[id^="uzr_s-chg"]');
     for(var i = 0; i < forms.length; i++) {
         forms[i].addEventListener('submit', function(event) {
             let returnValue = handleUnzerForm(this);
             if (!returnValue) {
                 event.preventDefault();
-                window.location.reload();
             }
             return returnValue;
         });
