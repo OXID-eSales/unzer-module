@@ -1,4 +1,7 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
+<script type="text/javascript" async
+        src="https://h.online-metrix.net/fp/tags.js?org_id=363t8kgq&session_id=[{$unzerThreatMetrixSessionID}]">
+</script>
 [{assign var="invadr" value=$oView->getInvoiceAddress()}]
 [{assign var="iBirthdayMonth" value=0}]
 [{assign var="iBirthdayDay" value=0}]
