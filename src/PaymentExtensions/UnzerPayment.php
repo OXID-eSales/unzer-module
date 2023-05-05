@@ -98,6 +98,13 @@ abstract class UnzerPayment
             $companyType
         );
 
+        // first try to fetch customer, secondly create anew if not found in unzer
+        try {
+            $customer = $this->unzerSDK->fetchCustomer($customer);
+        } catch (UnzerApiException $apiException) {
+            $customer = $this->unzerSDK->createCustomer($customer);
+        }
+
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
 

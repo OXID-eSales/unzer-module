@@ -60,7 +60,13 @@ class Invoice extends UnzerPayment
         // resource from frontend
         /** @var string $typeId */
         $typeId = $request->getRequestParameter('unzer_type_id');
-        $customerObj = $this->unzerSDK->createCustomer($customer);
+        // first try to fetch customer, secondly create anew if not found in unzer
+        try {
+            $customerObj = $this->unzerSDK->fetchCustomer($customer);
+        } catch (UnzerApiException $apiException) {
+            $customerObj = $this->unzerSDK->createCustomer($customer);
+        }
+
         $basketObj = $this->unzerSDK->createBasket($uzrBasket);
         $authObj = new Authorization(
             $basketModel->getPrice()->getBruttoPrice(),
