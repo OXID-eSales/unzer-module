@@ -285,9 +285,8 @@ let handleUnzerForm = function(formElement) {
         let amountId = 'amount_' + paymentId; // f.e. "uzr_s-chg-1"
         let inAmount = document.getElementById(amountId);
 
-        if (null !== inAmount &&
-            window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value)) {
-            return true;
+        if (null !== inAmount) {
+            return window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value);
         }
         return false;
     }
@@ -297,13 +296,12 @@ let handleUnzerForm = function(formElement) {
 
 /* apply submit listener */
 document.addEventListener('DOMContentLoaded', function () {
-    let forms = document.querySelectorAll('form[id^="uzr_"]');
+    let forms = document.querySelectorAll('form[id^="uzr_s-chg"]');
     for(var i = 0; i < forms.length; i++) {
         forms[i].addEventListener('submit', function(event) {
             let returnValue = handleUnzerForm(this);
             if (!returnValue) {
                 event.preventDefault();
-                window.location.reload();
             }
             return returnValue;
         });
