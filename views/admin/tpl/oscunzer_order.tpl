@@ -299,8 +299,13 @@ let handleUnzerForm = function(formElement) {
 document.addEventListener('DOMContentLoaded', function () {
     let forms = document.querySelectorAll('form[id^="uzr_"]');
     for(var i = 0; i < forms.length; i++) {
-        forms[i].addEventListener('submit', function() {
-            return handleUnzerForm(this);
+        forms[i].addEventListener('submit', function(event) {
+            let returnValue = handleUnzerForm(this);
+            if (!returnValue) {
+                event.preventDefault();
+                window.location.reload();
+            }
+            return returnValue;
         });
     }
 }, false);
