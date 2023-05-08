@@ -153,6 +153,8 @@ class AdminOrderController extends AdminDetailsController_parent
             if ($unzerPayment->getAuthorization()) {
                 /** @var Authorization $unzAuthorization */
                 $unzAuthorization = $unzerPayment->getAuthorization();
+                // an "auth-cancel" must be considered as "charged", to make the calculation work correctly
+                $fCharged = $unzAuthorization->getCancelledAmount();
                 $this->_aViewData["AuthAmountRemaining"] = $unzerPayment->getAmount()->getRemaining();
                 $this->addAuthorizationViewData($unzAuthorization);
                 $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
@@ -192,7 +194,7 @@ class AdminOrderController extends AdminDetailsController_parent
                 }
             }
             $this->_aViewData['totalAmountCancel'] = $fCancelled;
-            $this->_aViewData['canCancelAmount'] = floatval($editObject->getTotalOrderSum()) - $fCancelled;
+            $this->_aViewData['canCancelAmount'] = $fCharged - $fCancelled;
 
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;
