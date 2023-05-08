@@ -76,4 +76,8 @@ class Payment extends Payment_parent
     {
         return $this->canDoUnzerAbility(CoreUnzerDefinitions::CAN_REFUND_PARTIALLY);
     }
+    public function canRevertPartially(): bool
+    {
+        return $this->canDoUnzerAbility(CoreUnzerDefinitions::CAN_REVERT_PARTIALLY);
+    }
 }

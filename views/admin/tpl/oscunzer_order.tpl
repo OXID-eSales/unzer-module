@@ -9,6 +9,7 @@
 [{assign var="canCollectPartially" value=$oView->canCollectPartially()}]
 [{assign var="canRefundFully" value=$oView->canRefundFully()}]
 [{assign var="canRefundPartially" value=$oView->canRefundPartially()}]
+[{assign var="canRevertPartially" value=$oView->canRevertPartially()}]
 
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
@@ -126,7 +127,7 @@
                         <tbody>
                         <tr>
                             <td>[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE"}]</td>
-                            [{if $isCreditCard}]
+                            [{if $canRevertPartially}]
                             <td><input type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
                             [{else}]
                             <td><input type="hidden" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"></td>
