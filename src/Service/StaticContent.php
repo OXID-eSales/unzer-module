@@ -58,7 +58,7 @@ class StaticContent
         $assignToCountries = [];
         foreach ($paymentCountries as $countryIsoAlpha2) {
             if (isset($activeCountries[strtoupper($countryIsoAlpha2)])) {
-                $assignToCountries[] = $activeCountries[strtoupper($countryIsoAlpha2)];
+                $assignToCountries[strtoupper($countryIsoAlpha2)] = $activeCountries[strtoupper($countryIsoAlpha2)];
             }
         }
         $assignToCountries = empty($assignToCountries) ? $activeCountries : $assignToCountries;
@@ -67,19 +67,14 @@ class StaticContent
 
     protected function getAssignedCountriesFromPayment(string $paymentId, array $assignToCountries): array
     {
-        $andWhere = sprintf("oxobjectid IN('%s')", implode("','", $assignToCountries));
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()->getContainer();
-        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-        $queryBuilder = $queryBuilderFactory->create();
+        $queryBuilder = $this->queryBuilderFactory->create();
         $statement = $queryBuilder
             ->select('*')
             ->from('oxobject2payment')
             ->where('oxpaymentid = :oxpaymentid')
             ->andWhere('oxtype = "oxcountry"')
-            ->andWhere($andWhere)
             ->setParameters([':oxpaymentid' => $paymentId]);
+
         $result = $statement->execute();
         $assignedCountries = [];
         if ($result instanceof Result) {
@@ -110,6 +105,13 @@ class StaticContent
         if (!empty($diffCountries)) {
             foreach ($diffCountries as $countryId) {
                 $this->assignPaymentToCountry($paymentId, $countryId);
+            }
+        }
+
+        $toRemove = array_diff($assignedCountries, $assignToCountries);
+        if (!empty($toRemove)) {
+            foreach ($toRemove as $countryId) {
+                $this->removePaymentFromCountry($paymentId, $countryId);
             }
         }
     }
@@ -149,6 +151,22 @@ class StaticContent
             ]
         );
         $object2Paymentent->save();
+    }
+
+    protected function removePaymentFromCountry(string $paymentId, string $countryId): void
+    {
+        $queryBuilder = $this->queryBuilderFactory->create();
+
+        $statement = $queryBuilder
+            ->delete('oxobject2payment')
+            ->where('oxpaymentid = :oxpaymentid')
+            ->andWhere('oxobjectid = :oxobjectid')
+            ->andWhere('oxtype = "oxcountry"')
+            ->setParameters([
+                ':oxpaymentid' => $paymentId,
+                ':oxobjectid' => $countryId
+            ]);
+        $statement->execute();
     }
 
     /**
