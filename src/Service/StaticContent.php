@@ -101,13 +101,6 @@ class StaticContent
         $assignToCountries = $this->getAssignToCountries($countries);
         $assignedCountries = $this->getAssignedCountriesFromPayment($paymentId, $assignToCountries);
 
-        $diffCountries = array_diff($assignToCountries, $assignedCountries);
-        if (!empty($diffCountries)) {
-            foreach ($diffCountries as $countryId) {
-                $this->assignPaymentToCountry($paymentId, $countryId);
-            }
-        }
-
         $toRemove = array_diff($assignedCountries, $assignToCountries);
         if (!empty($toRemove)) {
             foreach ($toRemove as $countryId) {
