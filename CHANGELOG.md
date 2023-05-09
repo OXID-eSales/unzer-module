@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - New Payment PayLater
 ### FIXED
+- New country restrictions based on the Unzer documentation
+  - ALIPAY: DE, AT, BE, IT, ES, NL
+  - Installment: DE, AT, CH
+  - Unzer Invoice (Paylater): DE, AT, CH, NL
+  - Prepayment: all Countries
+  - SEPA Direct Debit: DE, AT
+  - Sofort: DE, AT, BE, IT, ES, NL
+  - WeChat: AT, BE, DK, FI, FR, DE, ES, GB, GR, HU, IE, IS, IT, LI, LU, MT, NL, NO, PT, SE
 - Cleanup payment methods in database configuration
 - Correct Customer-Details for Unzer (e.g. OXID-customerId)
 - [0007453](https://bugs.oxid-esales.com/view.php?id=7453) Unzer prohibits changes in settings of other modules
