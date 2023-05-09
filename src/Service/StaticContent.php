@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use Psr\Container\ContainerInterface;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
@@ -41,11 +43,74 @@ class StaticContent
         foreach (UnzerDefinitions::getUnzerDefinitions() as $paymentId => $paymentDefinitions) {
             $paymentMethod = oxNew(EshopModelPayment::class);
             if ($paymentMethod->load($paymentId)) {
+                $this->updatePaymentToCountries($paymentId, $paymentDefinitions['countries']);
                 continue;
             }
             $this->createPaymentMethod($paymentId, $paymentDefinitions);
             $this->assignPaymentToCountries($paymentId, $paymentDefinitions['countries']);
             $this->assignPaymentToActiveDeliverySets($paymentId);
+        }
+    }
+
+    protected function getAssignToCountries(array $paymentCountries): array
+    {
+        $activeCountries = array_flip($this->getActiveCountries());
+        $assignToCountries = [];
+        foreach ($paymentCountries as $countryIsoAlpha2) {
+            if (isset($activeCountries[strtoupper($countryIsoAlpha2)])) {
+                $assignToCountries[] = $activeCountries[strtoupper($countryIsoAlpha2)];
+            }
+        }
+        $assignToCountries = empty($assignToCountries) ? $activeCountries : $assignToCountries;
+        return $assignToCountries;
+    }
+
+    protected function getAssignedCountriesFromPayment(string $paymentId, array $assignToCountries): array
+    {
+        $andWhere = sprintf("oxobjectid IN('%s')", implode("','", $assignToCountries));
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()->getContainer();
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
+        $statement = $queryBuilder
+            ->select('*')
+            ->from('oxobject2payment')
+            ->where('oxpaymentid = :oxpaymentid')
+            ->andWhere('oxtype = "oxcountry"')
+            ->andWhere($andWhere)
+            ->setParameters([':oxpaymentid' => $paymentId]);
+        $result = $statement->execute();
+        $assignedCountries = [];
+        if ($result instanceof Result) {
+            $array = $result->fetchAllAssociative();
+            foreach ($array as $obj2payment) {
+                $assignedCountries[] = $obj2payment['OXOBJECTID'];
+            }
+        }
+        return $assignedCountries;
+    }
+
+    /**
+     * Update the list of countries for which a payment should be available. Might become neccessary, if countries
+     * become active/inactive (otherwise, it would happen only when the payment method is created, which happes
+     * only once at all)
+     *
+     * @param string $paymentId
+     * @param array $countries
+     * @return void
+     * @throws \Exception
+     */
+    protected function updatePaymentToCountries(string $paymentId, array $countries): void
+    {
+        $assignToCountries = $this->getAssignToCountries($countries);
+        $assignedCountries = $this->getAssignedCountriesFromPayment($paymentId, $assignToCountries);
+
+        $diffCountries = array_diff($assignToCountries, $assignedCountries);
+        if (!empty($diffCountries)) {
+            foreach ($diffCountries as $countryId) {
+                $this->assignPaymentToCountry($paymentId, $countryId);
+            }
         }
     }
 
@@ -59,14 +124,7 @@ class StaticContent
 
     protected function assignPaymentToCountries(string $paymentId, array $countries): void
     {
-        $activeCountries = array_flip($this->getActiveCountries());
-        $assignToCountries = [];
-        foreach ($countries as $countryIsoAlpha2) {
-            if (isset($activeCountries[strtoupper($countryIsoAlpha2)])) {
-                $assignToCountries[] = $activeCountries[strtoupper($countryIsoAlpha2)];
-            }
-        }
-        $assignToCountries = empty($assignToCountries) ? $activeCountries : $assignToCountries;
+        $assignToCountries = $this->getAssignToCountries($countries);
 
         foreach ($assignToCountries as $countryId) {
             $this->assignPaymentToCountry($paymentId, $countryId);
