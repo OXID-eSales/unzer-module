@@ -97,7 +97,7 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => [],
+            'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -302,7 +302,7 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['DE', 'AT'],
+            'countries' => ['DE', 'AT', 'CH'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -330,8 +330,7 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
-                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'countries' => ['DE', 'AT', 'CH', 'NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -394,8 +393,7 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
-                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -477,7 +475,7 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['DE'],
+            'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -500,8 +498,7 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['SE', 'NO', 'FI', 'DK', 'DE', 'NL', 'BE', 'CH', 'FR', 'IT',
-                'PL', 'ES', 'PT', 'GB', 'HU', 'CZ', 'AU', 'SK', 'US'],
+            'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -551,7 +548,8 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => [],
+            'countries' => ['AT', 'BE', 'DK', 'FI', 'FR', 'DE', 'ES', 'GB', 'GR', 'HU',
+                'IE', 'IS', 'IT', 'LI', 'LU', 'MT', 'NL', 'NO', 'PT', 'SE'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
