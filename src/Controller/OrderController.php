@@ -46,6 +46,17 @@ class OrderController extends OrderController_parent
     /**
      * @inerhitDoc
      */
+    public function render()
+    {
+        // generate always a new threat metrix session id
+        $unzer = $this->getServiceFromContainer(Unzer::class);
+        $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();
+        return parent::render();
+    }
+
+    /**
+     * @inerhitDoc
+     */
     public function execute()
     {
         if (!$this->isSepaConfirmed()) {

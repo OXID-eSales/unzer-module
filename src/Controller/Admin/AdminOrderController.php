@@ -317,7 +317,9 @@ class AdminOrderController extends AdminDetailsController_parent
     {
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        $amount = floatval(Registry::getRequest()->getRequestParameter('amount'));
+        /** @var string $sAmount */
+        $sAmount = Registry::getRequest()->getRequestParameter('amount');
+        $amount = floatval($sAmount);
 
         $translator = $this->getServiceFromContainer(Translator::class);
 

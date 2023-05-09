@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -19,8 +20,10 @@ use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
 use UnzerSDK\Constants\CompanyTypes;
+use UnzerSDK\Constants\CustomerGroups;
 use UnzerSDK\Constants\Salutations;
 use UnzerSDK\Constants\ShippingTypes;
 use UnzerSDK\Resources\Basket;
@@ -29,11 +32,13 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\EmbeddedResources\CompanyInfo;
+use UnzerSDK\Resources\EmbeddedResources\RiskData;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
+use DateTime;
 
 /**
  * TODO: Decrease count of dependencies to 13
@@ -333,6 +338,35 @@ class Unzer
     }
 
     /**
+     * @throws Exception
+     */
+    public function getUnzerRiskData(Customer $unzerCustomer, User $oUser): RiskData
+    {
+        /** @var string $oxregister */
+        $oxregister = $oUser->getFieldData('oxregister');
+        $dtRegister = new DateTime($oxregister);
+
+        $orderedAmount = 0.;
+        /** @var ListModel $orderList */
+        $orderList = $oUser->getOrders();
+        /** @var UnzerModelOrder $order */
+        foreach ($orderList as $order) {
+            $orderedAmount += $order->getTotalOrderSum();
+        }
+
+        $riskData = (new RiskData())
+            ->setThreatMetrixId($this->getUnzerThreatMetrixIdFromSession())
+            ->setConfirmedAmount($orderedAmount)
+            ->setCustomerGroup(CustomerGroups::NEUTRAL) // todo: decide customer group (see doku)
+            ->setConfirmedOrders($oUser->getOrderCount())
+            ->setCustomerId($unzerCustomer->getCustomerId())
+            ->setRegistrationLevel('1') // registered user
+            ->setRegistrationDate($dtRegister->format('Ymd'));
+
+        return $riskData;
+    }
+
+    /**
      * @param Charge $charge
      * @return string
      */
@@ -491,6 +525,26 @@ class Unzer
     public function generateUnzerOrderId(): string
     {
         return 'o' . str_replace(['0.', ' '], '', microtime(false));
+    }
+
+    /**
+     * @return string
+     */
+    public function generateUnzerThreatMetrixIdInSession(): string
+    {
+        $tmSessionID = Registry::getUtilsObject()->generateUID();
+        Registry::getSession()->setVariable('unzerThreatMetrixSessionID', $tmSessionID);
+        return $tmSessionID;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUnzerThreatMetrixIdFromSession(): string
+    {
+        /** @var string $tmSessionID */
+        $tmSessionID = Registry::getSession()->getVariable('unzerThreatMetrixSessionID');
+        return $tmSessionID;
     }
 
     /**

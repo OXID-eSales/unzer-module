@@ -66,6 +66,11 @@ class Invoice extends UnzerPayment
         } catch (UnzerApiException $apiException) {
             $customerObj = $this->unzerSDK->createCustomer($customer);
         }
+        // get risk data for customer
+        $uzrRiskData = $this->unzerService->getUnzerRiskData(
+            $customerObj,
+            $userModel
+        );
 
         $basketObj = $this->unzerSDK->createBasket($uzrBasket);
         $authObj = new Authorization(
@@ -73,6 +78,7 @@ class Invoice extends UnzerPayment
             $basketModel->getBasketCurrency()->name,
             $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending())
         );
+        $authObj->setRiskData($uzrRiskData);
 
         $transaction = $this->unzerSDK->performAuthorization(
             $authObj,
