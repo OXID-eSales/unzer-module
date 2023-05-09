@@ -65,7 +65,7 @@ class StaticContent
         return $assignToCountries;
     }
 
-    protected function getAssignedCountriesFromPayment(string $paymentId, array $assignToCountries): array
+    protected function getAssignedCountriesFromPayment(string $paymentId): array
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $statement = $queryBuilder
@@ -99,7 +99,7 @@ class StaticContent
     protected function updatePaymentToCountries(string $paymentId, array $countries): void
     {
         $assignToCountries = $this->getAssignToCountries($countries);
-        $assignedCountries = $this->getAssignedCountriesFromPayment($paymentId, $assignToCountries);
+        $assignedCountries = $this->getAssignedCountriesFromPayment($paymentId);
 
         $toRemove = array_diff($assignedCountries, $assignToCountries);
         if (!empty($toRemove)) {
