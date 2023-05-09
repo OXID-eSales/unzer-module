@@ -9,6 +9,7 @@
 [{assign var="canCollectPartially" value=$oView->canCollectPartially()}]
 [{assign var="canRefundFully" value=$oView->canRefundFully()}]
 [{assign var="canRefundPartially" value=$oView->canRefundPartially()}]
+[{assign var="canRevertPartially" value=$oView->canRevertPartially()}]
 
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
@@ -126,7 +127,7 @@
                         <tbody>
                         <tr>
                             <td>[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE"}]</td>
-                            [{if $isCreditCard}]
+                            [{if $canRevertPartially}]
                             <td><input type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
                             [{else}]
                             <td><input type="hidden" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"></td>
@@ -174,10 +175,7 @@
                                 <td>[{$oUnzerCharge.chargeDate|escape}]</td>
                                 <td>[{$oUnzerCharge.chargeId|escape}]</td>
                                 <td>[{$oUnzerCharge.chargedAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]</td>
-                                [{if $oUnzerCharge.cancellationPossible}]
-                                <td>
-                                    [{$oUnzerCharge.cancelledAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]
-                                </td>
+                                <td>[{$oUnzerCharge.cancelledAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                                 [{if $blCancelReasonReq}]
                                 <td>
                                     <select name="reason" id="reason_[{$oUnzerCharge.chargeId}]">
@@ -188,24 +186,23 @@
                                 </td>
                                 [{/if}]
                                 <td>
-                                    [{if $canRefundPartially}]
-                                <input type="text"
+                                [{if $canRefundPartially}]
+                                    <input type="text"
                                        name="amount"
                                        id="amount_[{$oUnzerCharge.chargeId}]"
                                        value="[{math equation="x - y" x=$oUnzerCharge.chargedAmount y=$oUnzerCharge.cancelledAmount format="%.2f"}]"
                                        [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]>
-                                    [{else}]
+                                [{else}]
                                     [{math equation="x - y" x=$oUnzerCharge.chargedAmount y=$oUnzerCharge.cancelledAmount format="%.2f"}]
-                                    [{/if}]
+                                [{/if}]
                                     [{$uzrCurrency}]
                                 </td>
                                 <td>
-                                    [{if $canRefundPartially}]
-                                <input type="submit"
+                                [{if $canRefundPartially}]
+                                    <input type="submit"
                                        id="submit_[{$oUnzerCharge.chargeId}]"
                                        [{if !$oUnzerCharge.cancellationPossible}]disabled[{/if}]
                                        value="[{oxmultilang ident="OSCUNZER_PAYOUT"}]">
-                                    [{/if}]
                                 [{/if}]
                             </form>
                         </tr>

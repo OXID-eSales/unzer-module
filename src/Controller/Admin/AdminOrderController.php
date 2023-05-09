@@ -21,6 +21,7 @@ use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
+use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -130,7 +131,6 @@ class AdminOrderController extends AdminDetailsController_parent
             );
             $isPrepaymentType = ($paymentType instanceof Prepayment);
             $this->_aViewData["blShipment"] = ($paymentType instanceof InstallmentSecured);
-            $this->_aViewData["isCreditCard"] = ($paymentType instanceof Card);
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
@@ -153,6 +153,8 @@ class AdminOrderController extends AdminDetailsController_parent
             if ($unzerPayment->getAuthorization()) {
                 /** @var Authorization $unzAuthorization */
                 $unzAuthorization = $unzerPayment->getAuthorization();
+                // an "auth-cancel" must be considered as "charged", to make the calculation work correctly
+                $fCharged = $unzAuthorization->getCancelledAmount();
                 $this->_aViewData["AuthAmountRemaining"] = $unzerPayment->getAmount()->getRemaining();
                 $this->addAuthorizationViewData($unzAuthorization);
                 $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
@@ -192,7 +194,7 @@ class AdminOrderController extends AdminDetailsController_parent
                 }
             }
             $this->_aViewData['totalAmountCancel'] = $fCancelled;
-            $this->_aViewData['canCancelAmount'] = floatval($editObject->getTotalOrderSum()) - $fCancelled;
+            $this->_aViewData['canCancelAmount'] = $fCharged - $fCancelled;
 
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;
@@ -387,6 +389,14 @@ class AdminOrderController extends AdminDetailsController_parent
         }
 
         return $this->oPayment->canRefundPartially();
+    }
+    public function canRevertPartially(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canRevertPartially();
     }
 
     /**

@@ -43,25 +43,27 @@ final class UnzerDefinitions
     public const CAN_COLLECT_PARTIALLY = 'collect_partially';
     public const CAN_REFUND_FULLY = 'refund_fully';
     public const CAN_REFUND_PARTIALLY = 'refund_partially';
+    public const CAN_REVERT_PARTIALLY = 'revert_partially';
     public const PAYMENT_ABILITIES = [
         self::CAN_COLLECT_FULLY,
         self::CAN_COLLECT_PARTIALLY,
         self::CAN_REFUND_FULLY,
         self::CAN_REFUND_PARTIALLY,
+        self::CAN_REVERT_PARTIALLY,
     ];
 
     private const UNZER_DEFINTIONS = [
         self::OLD_INVOICE_UNZER_PAYMENT_ID => [
             'descriptions' => [
                 'de' => [
-                    'desc' => 'Kauf auf Rechnung (old)',
+                    'desc' => 'Kauf auf Rechnung',
                     'longdesc' => '',
                     'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
                         Bei dieser Methode zahlen Sie per Kauf auf Rechnung'
                 ],
                 'en' => [
-                    'desc' => 'Invoice (old)',
+                    'desc' => 'Invoice',
                     'longdesc' => '',
                     'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Invoice" style="float: left;margin-right: 10px;" />'
@@ -71,7 +73,12 @@ final class UnzerDefinitions
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
         //Alipay is China’s leading third-party mobile and online payment solution.
         self::ALIPAY_UNZER_PAYMENT_ID => [
@@ -90,9 +97,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => [],
+            'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //ApplePay
@@ -110,7 +122,12 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
@@ -132,7 +149,12 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['BE'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Credit cards and debit cards are the most common payment method in e-commerce.
@@ -154,7 +176,13 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+                self::CAN_REVERT_PARTIALLY,
+            ],
         ],
 
         //Electronic Payment Standard (EPS) is an online payment system used in Austria.
@@ -184,7 +212,12 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Giropay is an online payment method used in Germany.
@@ -212,7 +245,12 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['DE'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //iDEAL is the most popular method for online payments in the Netherlands.
@@ -234,7 +272,12 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Installment lets your customers pay in monthly payments.
@@ -259,9 +302,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['DE', 'AT'],
+            'countries' => ['DE', 'AT', 'CH'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Invoice lets you issue an invoice and then collect the payment.
@@ -282,14 +330,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
-                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'countries' => ['DE', 'AT', 'CH', 'NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
                 self::CAN_REFUND_FULLY,
                 //self::CAN_REFUND_PARTIALLY,
+                //self::CAN_REVERT_PARTIALLY,
             ],
         ],
 
@@ -316,7 +364,12 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
@@ -340,10 +393,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
-                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'countries' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Przelewy24 is an online payment method used in Poland.
@@ -365,7 +422,12 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['PL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Direct Debit lets you accept payments in euro.
@@ -388,7 +450,12 @@ final class UnzerDefinitions
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
@@ -408,9 +475,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['DE'],
+            'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Sofort is an online payment method used in select European countries.
@@ -426,10 +498,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['SE', 'NO', 'FI', 'DK', 'DE', 'NL', 'BE', 'CH', 'FR', 'IT',
-                'PL', 'ES', 'PT', 'GB', 'HU', 'CZ', 'AU', 'SK', 'US'],
+            'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Bank Transfer lets your customers pay directly from their bank account.
@@ -447,7 +523,12 @@ final class UnzerDefinitions
             'active' => false,
             'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
@@ -467,9 +548,15 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => [],
+            'countries' => ['AT', 'BE', 'DK', 'FI', 'FR', 'DE', 'ES', 'GB', 'GR', 'HU',
+                'IE', 'IS', 'IT', 'LI', 'LU', 'MT', 'NL', 'NO', 'PT', 'SE'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => self::PAYMENT_ABILITIES,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ]
     ];
 
