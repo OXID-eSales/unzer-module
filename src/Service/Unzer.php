@@ -532,8 +532,7 @@ class Unzer
      */
     public function generateUnzerThreatMetrixIdInSession(): string
     {
-        $random = uniqid('unzer', true) . microtime(true);
-        $tmSessionID = \sha1($random);
+        $tmSessionID = Registry::getUtilsObject()->generateUID();
         Registry::getSession()->setVariable('unzerThreatMetrixSessionID', $tmSessionID);
         return $tmSessionID;
     }
