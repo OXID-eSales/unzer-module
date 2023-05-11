@@ -204,12 +204,6 @@ $aModule = [
             'constraints' => '0|1'
         ],
         [
-            'group' => 'unzerinstallment',
-            'name' => 'UnzerOption_oscunzer_installment_rate',
-            'type' => 'str',
-            'value' => '4.5'
-        ],
-        [
             'group' => 'unzerapplepay',
             'name' => 'UnzerOption_oscunzer_applepay',
             'type' => 'select',
