@@ -334,14 +334,14 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             if (is_array($applePayNetworks)) {
                 $this->moduleSettings->saveApplePayNetworks($applePayNetworks);
             }
-            $merchantCertConfigKey = $systemMode . '-' . 'applePayMerchantCert';
-            $applePayMerchantCert = $request->getRequestEscapedParameter($merchantCertConfigKey);
+            $certConfigKey = $systemMode . '-' . 'applePayMerchantCert';
+            $applePayMerchantCert = $request->getRequestEscapedParameter($certConfigKey);
             file_put_contents(
                 $this->moduleSettings->getApplePayMerchantCertFilePath(),
                 $applePayMerchantCert
             );
-            $merchantKeyConfigKey = $systemMode . '-' . 'applePayMerchantCertKey';
-            $applePayMerchCertKey = $request->getRequestEscapedParameter($merchantKeyConfigKey);
+            $keyConfigKey = $systemMode . '-' . 'applePayMerchantCertKey';
+            $applePayMerchCertKey = $request->getRequestEscapedParameter($keyConfigKey);
             file_put_contents(
                 $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
                 $applePayMerchCertKey
