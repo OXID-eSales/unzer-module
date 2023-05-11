@@ -118,7 +118,7 @@
                 </form>
             [{/if}]
             [{if $AuthAmountRemaining > 0}]
-                <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
+                <form name="uzr" id="uzr_authorize" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerAuthorizationCancel">
                     <input type="hidden" name="oxid" value="[{$oxid}]">
@@ -128,9 +128,11 @@
                         <tr>
                             <td>[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE"}]</td>
                             [{if $canRevertPartially}]
-                            <td><input type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
+                            <td><input type="text" id ="amount_authorize" name="amount"
+                                       value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
                             [{else}]
-                            <td><input type="hidden" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"></td>
+                            <td><input type="hidden" id ="amount_authorize" name="amount"
+                                       value="[{$AuthAmountRemaining|string_format:"%.2f"}]"></td>
                             [{/if}]
                             <td><button type="submit">[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL"}]</button></td>
                         </tr>
@@ -270,7 +272,6 @@
     [{/block}]
 </div>
 [{capture assign="cancelConfirm"}]
-/* handle Unzer forms for refund */
 let handleUnzerForm = function(formElement) {
     if(formElement.id.indexOf('uzr_') === 0) { // make absolutely sure to start with "uzr_"
         let paymentId = formElement.id.slice(4);
@@ -286,7 +287,6 @@ let handleUnzerForm = function(formElement) {
     return true;
 };
 
-/* apply submit listener */
 document.addEventListener('DOMContentLoaded', function () {
     let forms = document.querySelectorAll('form[id^="uzr_s-chg"]');
     for(var i = 0; i < forms.length; i++) {
@@ -300,8 +300,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 }, false);
 [{/capture}]
-
 [{oxscript add=$cancelConfirm}]
+
+[{capture assign="cancelAuthConfirm"}]
+let handleUnzerAuthForm = function(formElement) {
+    if(formElement.id.indexOf('uzr_authorize') === 0) {
+        let paymentId = formElement.id.slice(4);
+        let amountId = 'amount_' + paymentId;
+        let inAmount = document.getElementById(amountId);
+
+        if (null !== inAmount) {
+            return window.confirm('[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_ALERT"}]' + ' ' + inAmount.value + ' [{$uzrCurrency}]');
+        }
+        return false;
+    }
+    return true;
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    let forms = document.querySelectorAll('form[id^="uzr_authorize"]');
+    for(var i = 0; i < forms.length; i++) {
+        forms[i].addEventListener('submit', function(event) {
+            let returnValue = handleUnzerAuthForm(this);
+            if (!returnValue) {
+                event.preventDefault();
+            }
+            return returnValue;
+        });
+    }
+}, false);
+[{/capture}]
+[{oxscript add=$cancelAuthConfirm}]
 
 [{include file="bottomnaviitem.tpl"}]
 
