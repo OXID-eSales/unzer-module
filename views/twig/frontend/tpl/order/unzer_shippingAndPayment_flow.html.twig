@@ -46,23 +46,21 @@
                 <div class="panel-body">
                     {{ payment.oxpayments__oxdesc.value }}
                     {% if sPaymentID == "oscunzer_card" %}
-                        {% include "@unzer/unzer_card.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_card.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_eps" %}
-                        {% include "@unzer/unzer_eps_charge.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_eps_charge.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_ideal" %}
-                        {% include "@unzer/unzer_ideal.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_ideal.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_installment" %}
-                        {% include "@unzer/unzer_installment.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_installment.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_invoice" %}
-                        {% include "@unzer/unzer_invoice.html.twig" %}
-                    {% elseif sPaymentID == "oscunzer_paypal" %}
-                        {% include "@unzer/unzer_paypal.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_invoice.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_applepay" %}
-                        {% include "@unzer/unzer_applepay.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_applepay.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_sepa" %}
-                        {% include "@unzer/unzer_sepa.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_sepa.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_sepa - secured" %}
-                        {% include "@unzer/unzer_sepa_secured.html.twig" %}
+                        {% include "@osc-unzer/frontend/tpl/order/unzer_sepa_secured.html.twig" %}
                     {% endif %}
                 </div>
             </div>

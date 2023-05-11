@@ -50,7 +50,7 @@
                     {% if sPaymentID == "oscunzer_card" %}
                         {% include "@unzer/unzer_card.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_eps" %}
-                        {% include "@unzer/unzer_eps_charge.html.twig" %}
+                        {% include "@unzer/frontend/tpl/order/unzer_eps_charge.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_ideal" %}
                         {% include "@unzer/unzer_ideal.html.twig" %}
                     {% elseif sPaymentID == "oscunzer_installment" %}

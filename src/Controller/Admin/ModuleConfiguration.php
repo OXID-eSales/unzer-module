@@ -49,7 +49,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function render(): string
     {
-        parent::render();
+        $template = parent::render();
 
         if ($this->_sModuleId == Module::MODULE_ID) {
             try {
@@ -98,7 +98,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 );
             }
         }
-        return 'module_config.tpl';
+        return $template;
     }
 
     protected function getProposedWebhookForActualShop(): string

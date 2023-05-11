@@ -1,4 +1,0 @@
-{% if payment.oxuserpayments__oxpaymentsid.value == "oscunzer_invoice - secured" or payment.oxuserpayments__oxpaymentsid.value == "oscunzer_invoice" or payment.oxuserpayments__oxpaymentsid.value == "oscunzer_prepayment" %}
-    {{ oViewConf.getSessionPaymentInfo() }}
-{% endif %}
-{{ parent() }}

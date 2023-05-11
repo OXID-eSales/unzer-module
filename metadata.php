@@ -76,13 +76,13 @@ $aModule = [
     ],
     'templates' => [
         // admin
-        '@unzer/oscunzer_order.tpl' => 'smarty/admin/tpl/oscunzer_order.tpl',
+        '@unzer/admin/tpl/oscunzer_order' => 'smarty/admin/tpl/oscunzer_order.tpl',
 
         // frontend
-        '@unzer/unzer_assets.tpl' =>                        'views/smarty/frontend/tpl/order/unzer_assets.tpl',
-        '@unzer/unzer_card.tpl' =>                          'views/smarty/frontend/tpl/order/unzer_card.tpl',
-        '@unzer/unzer_eps_charge.tpl' =>                    'views/smarty/frontend/tpl/order/unzer_eps_charge.tpl',
-        '@unzer/unzer_installment.tpl' =>                   'views/smarty/frontend/tpl/order/unzer_installment.tpl',
+        '@unzer/unzer_assets' =>                        'views/smarty/frontend/tpl/order/unzer_assets.tpl',
+        '@unzer/unzer_card' =>                          'views/smarty/frontend/tpl/order/unzer_card.tpl',
+        '@unzer/unzer_eps_charge' =>                    'views/smarty/frontend/tpl/order/unzer_eps_charge.tpl',
+        '@unzer/unzer_installment' =>                   'views/smarty/frontend/tpl/order/unzer_installment.tpl',
         '@unzer/unzer_installment_confirm.tpl' =>           'views/smarty/frontend/tpl/order/unzer_installment_confirm.tpl',
         '@unzer/unzer_installment_confirm_flow.tpl' =>      'views/smarty/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
         '@unzer/unzer_installment_confirm_wave.tpl' =>      'views/smarty/frontend/tpl/order/unzer_installment_confirm_wave.tpl',

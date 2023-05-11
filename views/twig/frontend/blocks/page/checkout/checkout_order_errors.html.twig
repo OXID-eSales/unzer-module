@@ -1,6 +1,0 @@
-{{ parent() }}
-{% set sepaError = oView.isSepaMandateConfirmationError() %}
-{% if sepaError == 1 %}
-    {% include "message/error.html.twig" with {statusMessage: "ERROR_UNZER_SEPA_CONFIRMATION_MISSING"|translate} %}
-{% endif %}
-{% include "@unzer/message/js-errors.html.twig" %}
