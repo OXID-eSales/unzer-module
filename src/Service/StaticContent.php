@@ -55,8 +55,10 @@ class StaticContent
 
     protected function checkAndDeactivatePaymentMethod(array $paymentDefinition, EshopModelPayment $paymentMethod): void
     {
-        // deactivate inactive payment methods
+        // TODO fixme Access to an undefined property OxidEsales\Eshop\Application\Model\Payment::$oxpayments__oxactive.
+        /** @phpstan-ignore-next-line */
         if (!$paymentDefinition['active'] && $paymentMethod->oxpayments__oxactive->value == 1) {
+            /** @phpstan-ignore-next-line */
             $paymentMethod->oxpayments__oxactive->value = 0;
             $paymentMethod->save();
         }
