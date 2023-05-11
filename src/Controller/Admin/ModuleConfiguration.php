@@ -200,7 +200,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
                 } else {
                     /** @var array{'id': string} $responseBody */
-                    $responseBody = json_decode($response->getBody()->__toString());
+                    $responseBody = json_decode($response->getBody()->__toString(), true);
                     $applePayKeyId = $responseBody['id'];
                 }
             } catch (Throwable $loggerException) {
@@ -216,7 +216,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
                 } else {
                     /** @var array{'id': string} $responseBody */
-                    $responseBody = json_decode($response->getBody()->__toString());
+                    $responseBody = json_decode($response->getBody()->__toString(), true);
                     $applePayCertId = $responseBody['id'];
                 }
             } catch (Throwable $loggerException) {
@@ -334,12 +334,14 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             if (is_array($applePayNetworks)) {
                 $this->moduleSettings->saveApplePayNetworks($applePayNetworks);
             }
-            $applePayMerchantCert = $request->getRequestEscapedParameter('applePayMerchantCert');
+            $merchantCertConfigKey = $systemMode . '-' . 'applePayMerchantCert';
+            $applePayMerchantCert = $request->getRequestEscapedParameter($merchantCertConfigKey);
             file_put_contents(
                 $this->moduleSettings->getApplePayMerchantCertFilePath(),
                 $applePayMerchantCert
             );
-            $applePayMerchCertKey = $request->getRequestEscapedParameter('applePayMerchantCertKey');
+            $merchantKeyConfigKey = $systemMode . '-' . 'applePayMerchantCertKey';
+            $applePayMerchCertKey = $request->getRequestEscapedParameter($merchantKeyConfigKey);
             file_put_contents(
                 $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
                 $applePayMerchCertKey
