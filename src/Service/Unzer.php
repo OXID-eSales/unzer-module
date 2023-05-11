@@ -342,8 +342,14 @@ class Unzer
      */
     public function getUnzerRiskData(Customer $unzerCustomer, User $oUser): RiskData
     {
+        $registrationLevel = '1'; // registered user
         /** @var string $oxregister */
         $oxregister = $oUser->getFieldData('oxregister');
+        if ($oxregister == '0000-00-00 00:00:00') {
+            // unregistered user aka "guest"
+            $oxregister = gmdate('Y-m-d H:i:s');
+            $registrationLevel = '0';
+        }
         $dtRegister = new DateTime($oxregister);
 
         $orderedAmount = 0.;
@@ -360,7 +366,7 @@ class Unzer
             ->setCustomerGroup(CustomerGroups::NEUTRAL) // todo: decide customer group (see doku)
             ->setConfirmedOrders($oUser->getOrderCount())
             ->setCustomerId($unzerCustomer->getCustomerId())
-            ->setRegistrationLevel('1') // registered user
+            ->setRegistrationLevel($registrationLevel)
             ->setRegistrationDate($dtRegister->format('Ymd'));
 
         return $riskData;
