@@ -208,7 +208,7 @@
                         </tr>
                     [{/foreach}]
                     [{if $canCancelAmount > 0}]
-                        <form name="uzr" id="uzr_payout" action="[{$oViewConf->getSelfLink()}]" method="post">
+                        <form name="uzr" id="uzr_s-chg_payout" action="[{$oViewConf->getSelfLink()}]" method="post">
                             [{$oViewConf->getHiddenSid()}]
                             <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
                             <input type="hidden" name="chargedamount" value="[{$canCancelAmount}]">
@@ -222,7 +222,7 @@
                                 <td>[{$totalAmountCharge|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                                 <td>[{$totalAmountCancel|string_format:"%.2f"}] [{$uzrCurrency}]</td>
                                 [{if $canRefundFully}]
-                                    <td><input type="text" id="amount_payout"
+                                    <td><input type="text" id="amount_s-chg_payout"
                                                name="amount" value="[{$canCancelAmount|string_format:"%.2f"}]"> [{$uzrCurrency}]</td>
                                     <td><button type="submit">[{oxmultilang ident="OSCUNZER_PAYOUT"}]</button></td>
                                 [{else}]
@@ -278,7 +278,7 @@ let handleUnzerForm = function(formElement) {
         let inAmount = document.getElementById(amountId);
 
         if (null !== inAmount) {
-            return window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value);
+            return window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value + ' [{$uzrCurrency}]');
         }
         return false;
     }
