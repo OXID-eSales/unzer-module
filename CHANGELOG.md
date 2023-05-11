@@ -9,9 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - New Payment PayLater
 ### FIXED
+- Fixed ApplePay admin settings not saving the merchant certificate properly.
 - New country restrictions based on the Unzer documentation
   - ALIPAY: DE, AT, BE, IT, ES, NL
-  - Installment: DE, AT, CH
+  - ~~Installment: DE, AT, CH~~ (payment method deprecated)
   - Unzer Invoice (Paylater): DE, AT, CH, NL
   - Prepayment: all Countries
   - SEPA Direct Debit: DE, AT
@@ -28,6 +29,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [0007447](https://bugs.oxid-esales.com/view.php?id=7447) Markup due to negative discount per shopping cart leads to maintainance mode
 - [0007439](https://bugs.oxid-esales.com/view.php?id=7439) Chargeback transactions do not appear in the backend
 - [0007442](https://bugs.oxid-esales.com/view.php?id=7442) Reversal after partial reversal
+
+### CHANGES
+Unzer has **deprecated** following payment methods, which will be set to inactive:
+- Installment / Ratenzahlung
+- Unzer Direct Debit Secured/ SEPA Lastschrift (abgesichert durch Unzer)
+- Bank transfer
+
+> Inactive Payment methods are not removed to avoid inaccessible payments of these types in the backend.\
+>  Merchants **should not use deprecated payment methods** in the frontend anymore.
+
 
 ## [1.0.1] - 2022-12-03
 
