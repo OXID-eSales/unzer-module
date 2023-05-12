@@ -344,11 +344,9 @@ class Unzer
     {
         $bPasswordIsEmpty = ($oUser->getFieldData('oxpassword') === '');
 
-        if ($bPasswordIsEmpty) { // guest user
-            $registrationLevel = '0';
-            $registrationDate = gmdate('Ymd');
-        }
-        else { // registered user
+        $registrationLevel = '0';
+        $registrationDate = gmdate('Ymd');
+        if (!$bPasswordIsEmpty) { // registered user
             $registrationLevel = '1'; // 1 = registered user
             $oxregister = $oUser->getFieldData('oxregister');
             // shouldn't happen, but if it did, it would cause an error on unzer
