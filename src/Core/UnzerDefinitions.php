@@ -301,7 +301,7 @@ final class UnzerDefinitions
                         smaller installments. Choose this method for comfortable payment in installments.'
                 ]
             ],
-            'active' => true,
+            'active' => false, // UNZER-199
             'countries' => ['DE', 'AT', 'CH'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
@@ -474,7 +474,7 @@ final class UnzerDefinitions
                         title="Przelewy24" style="float: left;margin-right: 10px;" />'
                 ]
             ],
-            'active' => true,
+            'active' => false, // UNZER-199
             'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
@@ -520,7 +520,7 @@ final class UnzerDefinitions
                     'longdesc' => ''
                 ]
             ],
-            'active' => false,
+            'active' => false, // UNZER-199
             'countries' => ['DE', 'AT'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [

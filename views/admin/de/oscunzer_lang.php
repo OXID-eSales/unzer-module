@@ -39,6 +39,7 @@ $aLang = [
     'OSCUNZER_ORDER_AMOUNT' => 'Gesamtbetrag',
     'OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE' => 'Solange kein Betrag eingezogen wurde, kann die Autorisierung storniert werden.',
     'OSCUNZER_AUTHORIZE_CANCEL' => 'Autorisierung stornieren',
+    'OSCUNZER_AUTHORIZE_CANCEL_ALERT' => 'Wollen Sie wirklich für den gewählten Betrag die Authorisierung stornieren? Gewählter Betrag: ',
     'OSCUNZER_CHARGES' => 'Eingezogene Beträge',
     'OSCUNZER_CHARGED_AMOUNT' => 'Eingezogener Betrag',
     'OSCUNZER_CHARGED_CANCELLED' => 'Erstatteter Betrag',

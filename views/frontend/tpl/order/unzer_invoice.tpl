@@ -138,10 +138,10 @@
 
 [{if $isCompany}]
     showB2B();
-    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2BPubKey()}]');
+    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2BPubKey()}]', {locale: "[{$unzerLocale}]"});
 [{else}]
     showB2C();
-    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2CPubKey()}]');
+    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2CPubKey()}]', {locale: "[{$unzerLocale}]"});
 [{/if}]
     let paylaterInvoice = unzerInstance.PaylaterInvoice();
     paylaterInvoice.create({

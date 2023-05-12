@@ -31,7 +31,7 @@
     });
 
     // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('[{$unzerpub}]');
+    let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
 
     // Create a SEPA Direct Debit instance and render the form
     let SepaDirectDebit = unzerInstance.SepaDirectDebit();

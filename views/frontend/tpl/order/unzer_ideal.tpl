@@ -15,7 +15,7 @@
         });
 
         // Create an Unzer instance with your public key
-        let unzerInstance = new unzer('[{$unzerpub}]');
+        let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
 
         // Create an iDeal instance and render the iDeal form
         let IDeal = unzerInstance.Ideal();
