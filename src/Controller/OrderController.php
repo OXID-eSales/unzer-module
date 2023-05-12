@@ -54,8 +54,7 @@ class OrderController extends OrderController_parent
         /** @var int $iLang */
         $iLang = $lang->getBaseLanguage();
         $sLang = $lang->getLanguageAbbr($iLang);
-        $sLocale = sprintf('%s_%s', $sLang, strtoupper($sLang));
-        $this->_aViewData['unzerLocale'] = $sLocale;
+        $this->_aViewData['unzerLocale'] = $sLang;
 
         // generate always a new threat metrix session id
         $unzer = $this->getServiceFromContainer(Unzer::class);
