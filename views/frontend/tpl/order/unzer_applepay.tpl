@@ -3,7 +3,7 @@
     [{capture assign="unzerApplePayJS"}]
         const $errorHolder = $('#error-holder');
 
-        const unzerInstance = new unzer('[{$unzerpub}]');
+        const unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
         const unzerApplePayInstance = unzerInstance.ApplePay();
         const $form = $('#orderConfirmAgbBottom');
 

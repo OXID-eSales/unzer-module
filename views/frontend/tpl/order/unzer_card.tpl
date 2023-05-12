@@ -32,7 +32,7 @@
     });
 
     // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('[{$unzerpub}]');
+    let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
 
     // Create a Card instance and render the input fields
     let Card = unzerInstance.Card();

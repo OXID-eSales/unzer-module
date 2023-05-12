@@ -45,9 +45,18 @@ class OrderController extends OrderController_parent
 
     /**
      * @inerhitDoc
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function render()
     {
+        $lang = Registry::getLang();
+
+        /** @var int $iLang */
+        $iLang = $lang->getBaseLanguage();
+        $sLang = $lang->getLanguageAbbr($iLang);
+        $sLocale = sprintf('%s_%s', $sLang, strtoupper($sLang));
+        $this->_aViewData['unzerLocale'] = $sLocale;
+
         // generate always a new threat metrix session id
         $unzer = $this->getServiceFromContainer(Unzer::class);
         $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();

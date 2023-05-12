@@ -15,7 +15,7 @@
     });
 
     // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('[{$unzerpub}]');
+    let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
 
     // Create an EPS instance and render the EPS form
     let EPS = unzerInstance.EPS();
