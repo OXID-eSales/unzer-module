@@ -342,15 +342,23 @@ class Unzer
      */
     public function getUnzerRiskData(Customer $unzerCustomer, User $oUser): RiskData
     {
-        $registrationLevel = '1'; // registered user
-        /** @var string $oxregister */
-        $oxregister = $oUser->getFieldData('oxregister');
-        if ($oxregister == '0000-00-00 00:00:00') {
-            // unregistered user aka "guest"
-            $oxregister = gmdate('Y-m-d H:i:s');
+        $bPasswordIsEmpty = ($oUser->getFieldData('oxpassword') === '');
+
+        if ($bPasswordIsEmpty) { // guest user
             $registrationLevel = '0';
+            $registrationDate = gmdate('Ymd');
         }
-        $dtRegister = new DateTime($oxregister);
+        else { // registered user
+            $registrationLevel = '1'; // 1 = registered user
+            $oxregister = $oUser->getFieldData('oxregister');
+            // shouldn't happen, but if it did, it would cause an error on unzer
+            if ($oxregister == '0000-00-00 00:00:00') {
+                $oxregister = gmdate('Y-m-d H:i:s');
+            }
+            /** @var string $oxregister */
+            $dtRegister = new DateTime($oxregister);
+            $registrationDate = $dtRegister->format('Ymd');
+        }
 
         $orderedAmount = 0.;
         /** @var ListModel $orderList */
@@ -367,7 +375,7 @@ class Unzer
             ->setConfirmedOrders($oUser->getOrderCount())
             ->setCustomerId($unzerCustomer->getCustomerId())
             ->setRegistrationLevel($registrationLevel)
-            ->setRegistrationDate($dtRegister->format('Ymd'));
+            ->setRegistrationDate($registrationDate);
 
         return $riskData;
     }
