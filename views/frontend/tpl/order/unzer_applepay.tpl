@@ -10,8 +10,8 @@
         $form.submit(function (e) {
             e.preventDefault();
 
-            const agbCheck = $('[name=ord_agb]');
-            if (agbCheck && !agbCheck.is(':checked')) {
+            const agbCheck = $('[name=ord_agb]:checkbox');
+            if (agbCheck.length > 0 && !agbCheck.is(':checked')) {
                 handleError({html: '[{oxmultilang ident= 'READ_AND_CONFIRM_TERMS'}]'})
                 return;
             }
