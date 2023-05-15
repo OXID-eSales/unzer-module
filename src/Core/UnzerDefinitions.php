@@ -280,40 +280,6 @@ final class UnzerDefinitions
             ],
         ],
 
-        /*
-        //Unzer Installment lets your customers pay in monthly payments.
-        self::INSTALLMENT_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'Ratenzahlung',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg"
-                        title="Ratenzahlung" style="float: left;margin-right: 10px;" />
-                        Viele Kunden ziehen es vor, größere Anschaffungen von mehreren hundert Euro
-                        in kleineren Raten zu bezahlen. Wählen Sie diese Methode für eine einfache
-                        und bequeme Ratenzahlung.'
-                ],
-                'en' => [
-                    'desc' => 'Installment',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg "
-                        title="Installment" style="float: left;margin-right: 10px;" />
-                        Many customers prefer to pay for larger purchases of several hundred euros in
-                        smaller installments. Choose this method for comfortable payment in installments.'
-                ]
-            ],
-            'active' => false, // UNZER-199
-            'countries' => ['DE', 'AT', 'CH'],
-            'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => [
-                self::CAN_COLLECT_FULLY,
-                self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
-                self::CAN_REFUND_PARTIALLY,
-            ],
-        ],
-        */
-
         //Unzer Invoice lets you issue an invoice and then collect the payment.
         self::INVOICE_UNZER_PAYMENT_ID => [
             'descriptions' => [
@@ -460,35 +426,6 @@ final class UnzerDefinitions
             ],
         ],
 
-        /*
-        //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
-        self::SEPA_SECURED_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'SEPA Lastschrift (abgesichert durch Unzer)',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
-                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
-                ],
-                'en' => [
-                    'desc' => 'SEPA Direct Debit with Unzer',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
-                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
-                ]
-            ],
-            'active' => false, // UNZER-199
-            'countries' => ['DE', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => [
-                self::CAN_COLLECT_FULLY,
-                self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
-                self::CAN_REFUND_PARTIALLY,
-            ],
-        ],
-        */
-
         //Sofort is an online payment method used in select European countries.
         self::SOFORT_UNZER_PAYMENT_ID => [
             'descriptions' => [
@@ -511,31 +448,6 @@ final class UnzerDefinitions
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
-
-        /*
-        //Unzer Bank Transfer lets your customers pay directly from their bank account.
-        self::PIS_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'Bank transfer',
-                    'longdesc' => ''
-                ],
-                'en' => [
-                    'desc' => 'Bank Transfer',
-                    'longdesc' => ''
-                ]
-            ],
-            'active' => false, // UNZER-199
-            'countries' => ['DE', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => [
-                self::CAN_COLLECT_FULLY,
-                self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
-                self::CAN_REFUND_PARTIALLY,
-            ],
-        ],
-        */
 
         //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
         self::WECHATPAY_UNZER_PAYMENT_ID => [
