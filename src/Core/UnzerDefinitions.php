@@ -280,6 +280,7 @@ final class UnzerDefinitions
             ],
         ],
 
+        /*
         //Unzer Installment lets your customers pay in monthly payments.
         self::INSTALLMENT_UNZER_PAYMENT_ID => [
             'descriptions' => [
@@ -311,6 +312,7 @@ final class UnzerDefinitions
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
+        */
 
         //Unzer Invoice lets you issue an invoice and then collect the payment.
         self::INVOICE_UNZER_PAYMENT_ID => [
@@ -458,6 +460,7 @@ final class UnzerDefinitions
             ],
         ],
 
+        /*
         //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
         self::SEPA_SECURED_UNZER_PAYMENT_ID => [
             'descriptions' => [
@@ -484,6 +487,7 @@ final class UnzerDefinitions
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
+        */
 
         //Sofort is an online payment method used in select European countries.
         self::SOFORT_UNZER_PAYMENT_ID => [
@@ -508,6 +512,7 @@ final class UnzerDefinitions
             ],
         ],
 
+        /*
         //Unzer Bank Transfer lets your customers pay directly from their bank account.
         self::PIS_UNZER_PAYMENT_ID => [
             'descriptions' => [
@@ -530,6 +535,7 @@ final class UnzerDefinitions
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
+        */
 
         //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
         self::WECHATPAY_UNZER_PAYMENT_ID => [
