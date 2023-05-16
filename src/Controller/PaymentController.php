@@ -43,6 +43,7 @@ class PaymentController extends PaymentController_parent
      * @return array<array-key, mixed>|object
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getPaymentList()
     {
