@@ -33,6 +33,7 @@ use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\EmbeddedResources\CompanyInfo;
 use UnzerSDK\Resources\EmbeddedResources\RiskData;
+use UnzerSDK\Resources\EmbeddedResources\Address as UnzerSDKAddress;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
@@ -41,8 +42,11 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 use DateTime;
 
 /**
- * TODO: Decrease count of dependencies to 13
+ * TODO: Fix all the suppressed warnings
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class Unzer
 {
@@ -240,6 +244,97 @@ class Unzer
         }
 
         return $customer;
+    }
+
+    /**
+     * @param Customer $unzerCustomer
+     * @param Customer $oxidCustomer
+     * @return bool
+     */
+    public function updateUnzerCustomer(Customer $unzerCustomer, Customer $oxidCustomer): bool
+    {
+        $hasChanged = false;
+        // first, it must be the same customer...
+        if ($unzerCustomer->getCustomerId() == $oxidCustomer->getCustomerId()) {
+            if ($unzerCustomer->getFirstname() != $oxidCustomer->getFirstname()) {
+                $hasChanged = true;
+                $unzerCustomer->setFirstname($oxidCustomer->getFirstname() ?? '');
+            }
+            if ($unzerCustomer->getLastname() != $oxidCustomer->getLastname()) {
+                $hasChanged = true;
+                $unzerCustomer->setLastname($oxidCustomer->getLastname() ?? '');
+            }
+            if ($unzerCustomer->getSalutation() != $oxidCustomer->getSalutation()) {
+                $hasChanged = true;
+                $unzerCustomer->setSalutation($oxidCustomer->getSalutation());
+            }
+            if ($unzerCustomer->getBirthDate() != $oxidCustomer->getBirthDate()) {
+                $hasChanged = true;
+                $unzerCustomer->setBirthDate($oxidCustomer->getBirthDate() ?? '');
+            }
+            if ($unzerCustomer->getCompany() != $oxidCustomer->getCompany()) {
+                $hasChanged = true;
+                $unzerCustomer->setCompany($oxidCustomer->getCompany() ?? '');
+            }
+            if ($unzerCustomer->getEmail() != $oxidCustomer->getEmail()) {
+                $hasChanged = true;
+                $unzerCustomer->setEmail($oxidCustomer->getEmail() ?? '');
+            }
+            if ($unzerCustomer->getPhone() != $oxidCustomer->getPhone()) {
+                $hasChanged = true;
+                $unzerCustomer->setPhone($oxidCustomer->getPhone() ?? '');
+            }
+            if ($unzerCustomer->getMobile() != $oxidCustomer->getMobile()) {
+                $hasChanged = true;
+                $unzerCustomer->setMobile($oxidCustomer->getMobile() ?? '');
+            }
+            $hasChanged = $hasChanged || $this->updateUnzerAddress(
+                $unzerCustomer->getBillingAddress(),
+                $oxidCustomer->getBillingAddress()
+            );
+            $hasChanged = $hasChanged || $this->updateUnzerAddress(
+                $unzerCustomer->getShippingAddress(),
+                $oxidCustomer->getShippingAddress()
+            );
+        }
+
+        return $hasChanged;
+    }
+
+    protected function updateUnzerAddress(UnzerSDKAddress $unzerAddress, UnzerSDKAddress $oxidAddress): bool
+    {
+        $hasChanged = false;
+
+        if ($unzerAddress->getName() != $oxidAddress->getName()) {
+            $hasChanged = true;
+            $unzerAddress->setName($oxidAddress->getName() ?? '');
+        }
+        if ($unzerAddress->getStreet() != $oxidAddress->getStreet()) {
+            $hasChanged = true;
+            $unzerAddress->setStreet($oxidAddress->getStreet() ?? '');
+        }
+        if ($unzerAddress->getZip() != $oxidAddress->getZip()) {
+            $hasChanged = true;
+            $unzerAddress->setZip($oxidAddress->getZip() ?? '');
+        }
+        if ($unzerAddress->getCity() != $oxidAddress->getCity()) {
+            $hasChanged = true;
+            $unzerAddress->setCity($oxidAddress->getCity() ?? '');
+        }
+        if ($unzerAddress->getState() != $oxidAddress->getState()) {
+            $hasChanged = true;
+            $unzerAddress->setState($oxidAddress->getState() ?? '');
+        }
+        if ($unzerAddress->getCountry() != $oxidAddress->getCountry()) {
+            $hasChanged = true;
+            $unzerAddress->setCountry($oxidAddress->getCountry() ?? '');
+        }
+        if ($unzerAddress->getShippingType() != $oxidAddress->getShippingType()) {
+            $hasChanged = true;
+            $unzerAddress->setShippingType($oxidAddress->getShippingType());
+        }
+
+        return $hasChanged;
     }
 
     /**
