@@ -72,6 +72,7 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'currencies' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -97,6 +98,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
+            'currencies' => ['AUD', 'CAD', 'CHF', 'CNY', 'EUR', 'GBP', 'HKD', 'NZD', 'SGD', 'USD'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -119,6 +121,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => ['AUD', 'CHF', 'CZK', 'DKK', 'EUR', 'GBP', 'NOK', 'PLN', 'SEK', 'USD', 'HUF', 'RON', 'BGN', 'HRK', 'ISK'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -145,6 +148,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['BE'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -171,6 +175,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -206,6 +211,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['AT'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -238,6 +244,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -264,6 +271,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['NL'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -291,6 +299,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE', 'AT', 'CH', 'NL'],
+            'currencies' => ['EUR', 'CHF'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -323,6 +332,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -353,6 +363,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -379,6 +390,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['PL'],
+            'currencies' => ['PLZ'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -406,6 +418,7 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -428,6 +441,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -455,6 +469,7 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['AT', 'BE', 'DK', 'FI', 'FR', 'DE', 'ES', 'GB', 'GR', 'HU',
                 'IE', 'IS', 'IT', 'LI', 'LU', 'MT', 'NL', 'NO', 'PT', 'SE'],
+            'currencies' => ['CHF', 'CNY', 'EUR', 'GBP', 'USD'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
