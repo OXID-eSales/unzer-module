@@ -12,12 +12,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed ApplePay admin settings not saving the merchant certificate properly.
 - New country restrictions based on the Unzer documentation
   - ALIPAY: DE, AT, BE, IT, ES, NL
-  - ~~Installment: DE, AT, CH~~ (payment method deprecated)
   - Unzer Invoice (Paylater): DE, AT, CH, NL
   - Prepayment: all Countries
   - SEPA Direct Debit: DE, AT
   - Sofort: DE, AT, BE, IT, ES, NL
   - WeChat: AT, BE, DK, FI, FR, DE, ES, GB, GR, HU, IE, IS, IT, LI, LU, MT, NL, NO, PT, SE
+- New currency restrictions based on the Unzer documentation
+  - ALIPAY: AUD, CAD, CHF, CNY, EUR, GBP, HKD, NZD, SGD, USD
+  - ApplePay: AUD, CHF, CZK, DKK, EUR, GBP, NOK, PLN, SEK, USD, HUF, RON, BGN, HRK, ISK
+  - Bancontact: EUR
+  - EPS: EUR
+  - Giropay: EUR
+  - IDEAL: EUR
+  - Przelewy24: PLZ
+  - Sofort: EUR
+  - SEPA Direct Debit: EUR
+  - Unzer Invoice (Paylater): EUR, CHF
+  - Prepayment: EUR
+  - WeChat Pay: CHF, CNY, EUR, GBP, USD
 - Cleanup payment methods in database configuration
 - Correct Customer-Details for Unzer (e.g. OXID-customerId)
 - [0007453](https://bugs.oxid-esales.com/view.php?id=7453) Unzer prohibits changes in settings of other modules
