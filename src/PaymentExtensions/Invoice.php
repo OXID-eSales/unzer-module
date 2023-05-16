@@ -47,7 +47,7 @@ class Invoice extends UnzerPayment
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
 
-        $customer = $this->unzerService->getUnzerCustomer(
+        $customerObj = $this->unzerService->getUnzerCustomer(
             $userModel,
             null,
             $companyType
@@ -62,9 +62,18 @@ class Invoice extends UnzerPayment
         $typeId = $request->getRequestParameter('unzer_type_id');
         // first try to fetch customer, secondly create anew if not found in unzer
         try {
-            $customerObj = $this->unzerSDK->fetchCustomer($customer);
+            $customerObj = $this->unzerSDK->fetchCustomer($customerObj);
+            // for comparison and update, the original object must be recreated
+            $originalCustomer = $this->unzerService->getUnzerCustomer(
+                $userModel,
+                null,
+                $companyType
+            );
+            if ($this->unzerService->updateUnzerCustomer($customerObj, $originalCustomer)) {
+                $customerObj = $this->unzerSDK->updateCustomer($customerObj);
+            }
         } catch (UnzerApiException $apiException) {
-            $customerObj = $this->unzerSDK->createCustomer($customer);
+            $customerObj = $this->unzerSDK->createCustomer($customerObj);
         }
         // get risk data for customer
         $uzrRiskData = $this->unzerService->getUnzerRiskData(
