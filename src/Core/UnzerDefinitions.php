@@ -76,7 +76,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -102,7 +101,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -125,7 +123,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -152,7 +149,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -179,7 +175,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
                 self::CAN_REVERT_PARTIALLY,
             ],
@@ -215,7 +210,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -248,7 +242,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -275,7 +268,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -335,7 +327,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -366,7 +357,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -393,7 +383,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -421,7 +410,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -444,7 +432,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -472,7 +459,6 @@ final class UnzerDefinitions
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ]
