@@ -79,8 +79,7 @@ abstract class BaseCest
         $this->I->waitForPageLoad();
 
         $homePage = $this->I->openShop();
-        $clientData = Fixtures::get('client');
-        $homePage->loginUser($clientData['username'], $clientData['password']);
+        $this->_loginUser();
 
         $this->paymentSelection = $homePage->openMiniBasket();
 
@@ -125,9 +124,7 @@ abstract class BaseCest
         $this->I->waitForPageLoad();
 
         $homePage = $this->I->openShop();
-        $clientData = Fixtures::get('secured_client');
-        //$this->_loginUser();
-        $homePage->loginUser($clientData['username'], $clientData['password']);
+        $this->_loginUser();
 
         $this->paymentSelection = $homePage->openMiniBasket();
 
