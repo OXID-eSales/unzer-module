@@ -56,11 +56,27 @@ abstract class BaseCest
      */
     protected function _initializeTest()
     {
+        $miniBasketMenuElement = '//div[@class="btn-group minibasket-menu"]/button';
         $this->I->openShop();
 
         $basketItem = Fixtures::get('product');
-        $basketSteps = new BasketSteps($this->I);
-        $basketSteps->addProductToBasket($basketItem['id'], $this->amount);
+
+        $params['fnc'] = 'tobasket';
+        $params['aid'] = $basketItem['id'];
+        $params['am'] = $this->amount;
+        $params['anid'] = $basketItem['id'];
+
+        if ($this->I->seePageHasElement('input[name=stoken]')) {
+            $params['stoken'] = $this->I->grabValueFrom('input[name=stoken]');
+        }
+
+        if ($this->I->seePageHasElement('input[name=force_sid]')) {
+            $params['force_sid'] = $this->I->grabValueFrom('input[name=force_sid]');
+        }
+
+        $this->I->amOnPage('/index.php?' . http_build_query($params));
+        $this->I->waitForElement($miniBasketMenuElement);
+        $this->I->waitForPageLoad();
 
         $homePage = $this->I->openShop();
         $clientData = Fixtures::get('client');
@@ -86,11 +102,27 @@ abstract class BaseCest
      */
     protected function _initializeSecuredTest()
     {
+        $miniBasketMenuElement = '//div[@class="btn-group minibasket-menu"]/button';
         $this->I->openShop();
 
         $basketItem = Fixtures::get('product');
-        $basketSteps = new BasketSteps($this->I);
-        $basketSteps->addProductToBasket($basketItem['id'], $this->amount);
+
+        $params['fnc'] = 'tobasket';
+        $params['aid'] = $basketItem['id'];
+        $params['am'] = $this->amount;
+        $params['anid'] = $basketItem['id'];
+
+        if ($this->I->seePageHasElement('input[name=stoken]')) {
+            $params['stoken'] = $this->I->grabValueFrom('input[name=stoken]');
+        }
+
+        if ($this->I->seePageHasElement('input[name=force_sid]')) {
+            $params['force_sid'] = $this->I->grabValueFrom('input[name=force_sid]');
+        }
+
+        $this->I->amOnPage('/index.php?' . http_build_query($params));
+        $this->I->waitForElement($miniBasketMenuElement);
+        $this->I->waitForPageLoad();
 
         $homePage = $this->I->openShop();
         $clientData = Fixtures::get('secured_client');
