@@ -78,10 +78,10 @@ abstract class BaseCest
         $this->I->waitForElement($miniBasketMenuElement);
         $this->I->waitForPageLoad();
 
-        $homePage = $this->I->openShop();
         $this->_loginUser();
 
-        $this->paymentSelection = $homePage->openMiniBasket();
+        $this->I->waitForElementClickable($miniBasketMenuElement);
+        $this->I->click($miniBasketMenuElement);
 
         $this->I->waitForText(Translator::translate('DISPLAY_BASKET'));
         $this->I->click(Translator::translate('DISPLAY_BASKET'));
@@ -123,10 +123,10 @@ abstract class BaseCest
         $this->I->waitForElement($miniBasketMenuElement);
         $this->I->waitForPageLoad();
 
-        $homePage = $this->I->openShop();
         $this->_loginUser();
 
-        $this->paymentSelection = $homePage->openMiniBasket();
+        $this->I->waitForElementClickable($miniBasketMenuElement);
+        $this->I->click($miniBasketMenuElement);
 
         $this->I->waitForText(Translator::translate('DISPLAY_BASKET'));
         $this->I->click(Translator::translate('DISPLAY_BASKET'));
