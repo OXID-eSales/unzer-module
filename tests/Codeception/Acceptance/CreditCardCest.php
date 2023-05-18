@@ -47,7 +47,7 @@ final class CreditCardCest extends BaseCest
      */
     private function _submitCreditCardPayment(string $name)
     {
-        $orderPage = $this->_choosePayment($this->cardPaymentLabel);
+        $this->_choosePayment($this->cardPaymentLabel);
 
         $fixtures = Fixtures::get($name);
         $this->_getAcceptance()->waitForPageLoad();
@@ -62,7 +62,7 @@ final class CreditCardCest extends BaseCest
         $this->_getAcceptance()->fillField($this->CVCInput, $fixtures['CVC']);
         $this->_getAcceptance()->switchToFrame(null);
 
-        $orderPage->submitOrder();
+        $this->_submitOrder();
     }
 
     /**

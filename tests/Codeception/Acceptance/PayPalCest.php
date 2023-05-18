@@ -39,8 +39,8 @@ final class PayPalCest extends BaseCest
     {
         $I->wantToTest('Test PayPal payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->paypalPaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->paypalPaymentLabel);
+        $this->_submitOrder();
 
         $paypalPaymentData = Fixtures::get('paypal_payment');
 

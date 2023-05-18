@@ -33,8 +33,8 @@ final class InvoiceSecuredCest extends BaseCest
     {
         $I->wantToTest('Test Invoice payment works');
         $this->_initializeSecuredTest();
-        $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->invoicePaymentLabel);
+        $this->_submitOrder();
 
         $this->_checkSuccessfulPayment();
         $I->waitForText(rtrim(strip_tags(sprintf(

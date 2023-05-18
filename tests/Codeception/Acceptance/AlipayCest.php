@@ -37,8 +37,8 @@ final class AlipayCest extends BaseCest
     private function _prepareAlipayTest(AcceptanceTester $I)
     {
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->alipayPaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->alipayPaymentLabel);
+        $this->_submitOrder();
     }
 
     /**

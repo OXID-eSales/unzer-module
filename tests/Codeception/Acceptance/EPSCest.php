@@ -52,7 +52,7 @@ final class EPSCest extends BaseCest
     {
         $I->wantToTest('Test EPS payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->epsLabel);
+        $this->_choosePayment($this->epsLabel);
 
         $epsPaymentData = Fixtures::get('eps_payment');
 
@@ -62,7 +62,7 @@ final class EPSCest extends BaseCest
         $I->waitForDocumentReadyState();
         $I->waitForElement("//div[@data-value='" . $epsPaymentData["option"] . "']");
         $I->click("//div[@data-value='" . $epsPaymentData["option"] . "']");
-        $orderPage->submitOrder();
+        $this->_submitOrder();
 
         // first page : login
         $I->waitForPageLoad();

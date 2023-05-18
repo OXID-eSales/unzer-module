@@ -34,14 +34,14 @@ final class SEPADirectDebitSecuredCest extends BaseCest
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
         $this->_initializeSecuredTest();
-        $orderPage = $this->_choosePayment($this->sepaPaymentLabel);
+        $this->_choosePayment($this->sepaPaymentLabel);
 
         $payment = Fixtures::get('sepa_payment');
         $I->fillField($this->IBANInput, $payment['IBAN']);
         $I->click("#oscunzersepaagreement");
         $I->wait(1);
 
-        $orderPage->submitOrder();
+        $this->_submitOrder();
 
         $this->_checkSuccessfulPayment();
     }

@@ -33,8 +33,8 @@ final class WeChatPayCest extends BaseCest
     private function _prepareWechatpayTest(AcceptanceTester $I)
     {
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->wechatpayPaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->wechatpayPaymentLabel);
+        $this->_submitOrder();
     }
 
     /**

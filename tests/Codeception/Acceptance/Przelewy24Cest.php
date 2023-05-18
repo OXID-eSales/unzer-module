@@ -66,8 +66,8 @@ final class Przelewy24Cest extends BaseCest
 
         $this->_initializeTest();
 
-        $orderPage = $this->_choosePayment($this->przelewy24PaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->przelewy24PaymentLabel);
+        $this->_submitOrder();
 
         // first page : choose bank
         $I->waitForDocumentReadyState();

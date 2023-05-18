@@ -166,9 +166,9 @@ abstract class BaseCest
 
     /**
      * @param string $label
-     * @return Page
+     * @return void
      */
-    protected function _choosePayment(string $label): Page
+    protected function _choosePayment(string $label)
     {
         $nextStepButton = '#paymentNextStepBottom';
         $breadCrumb = '#breadcrumb';
@@ -178,8 +178,6 @@ abstract class BaseCest
 
         $this->I->click($nextStepButton);
         $this->I->waitForElement($breadCrumb);
-
-        return new OrderCheckout($this->I);
     }
 
     /**
@@ -190,6 +188,16 @@ abstract class BaseCest
         $this->I->waitForDocumentReadyState();
         $this->I->waitForPageLoad();
         $this->I->waitForText(Translator::translate('THANK_YOU'));
+    }
+
+    /**
+     * @return void
+     */
+    protected function _submitOrder()
+    {
+        $this->I->waitForText(Translator::translate('SUBMIT_ORDER'));
+        $this->I->click(Translator::translate('SUBMIT_ORDER'));
+        $this->I->waitForPageLoad();
     }
 
     /**

@@ -36,8 +36,8 @@ final class InvoiceCest extends BaseCest
     {
         $I->wantToTest('Test Invoice (old) payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->invoicePaymentLabel);
+        $this->_submitOrder();
 
         $this->_checkSuccessfulPayment();
         $I->waitForText(rtrim(strip_tags(sprintf(

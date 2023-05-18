@@ -43,8 +43,8 @@ final class SofortCest extends BaseCest
     {
         $I->wantToTest('Test Sofort payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->sofortPaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->sofortPaymentLabel);
+        $this->_submitOrder();
 
         $sofortPaymentData = Fixtures::get('sofort_payment');
 

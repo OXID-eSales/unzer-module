@@ -39,7 +39,7 @@ final class IDEALCest extends BaseCest
     {
         $I->wantToTest('Test iDEAL payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->idealPaymentLabel);
+        $this->_choosePayment($this->idealPaymentLabel);
 
         $idealPaymentData = Fixtures::get('ideal_payment');
         $price = str_replace(',', '.', $this->_getPrice());
@@ -47,7 +47,7 @@ final class IDEALCest extends BaseCest
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
         $I->click("//div[@data-value='" . $idealPaymentData["option"] . "']");
-        $orderPage->submitOrder();
+        $this->_submitOrder();
 
         // first page : put in bank name
         $I->waitForText($price);

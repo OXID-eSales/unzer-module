@@ -40,8 +40,8 @@ final class PISCest extends BaseCest
     {
         $I->wantToTest('Test PIS payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->pisLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->pisLabel);
+        $this->_submitOrder();
 
         $pisPaymentData = Fixtures::get('pis_payment');
 

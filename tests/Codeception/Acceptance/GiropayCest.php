@@ -43,8 +43,8 @@ final class GiropayCest extends BaseCest
     {
         $I->wantToTest('Test Giropay payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->giropayPaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->giropayPaymentLabel);
+        $this->_submitOrder();
 
         $giropayPaymentData = Fixtures::get('giropay_payment');
 

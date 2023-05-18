@@ -33,8 +33,8 @@ final class PrepaymentCest extends BaseCest
     {
         $I->wantToTest('Test Prepayment payment works');
         $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->prePaymentLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->prePaymentLabel);
+        $this->_submitOrder();
 
         $this->_checkSuccessfulPayment();
     }

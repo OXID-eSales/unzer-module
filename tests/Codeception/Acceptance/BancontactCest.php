@@ -38,8 +38,8 @@ final class BancontactCest extends BaseCest
     {
         $this->_initializeTest();
 
-        $orderPage = $this->_choosePayment($this->bancontactLabel);
-        $orderPage->submitOrder();
+        $this->_choosePayment($this->bancontactLabel);
+        $this->_submitOrder();
     }
 
     /**
