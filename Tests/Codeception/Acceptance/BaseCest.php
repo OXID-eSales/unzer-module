@@ -91,7 +91,7 @@ abstract class BaseCest
                 $I->haveInDatabase(
                     'oxobject2delivery',
                     [
-                        'OXID' => $tmpOxid.'.c',
+                        'OXID' => $tmpOxid . '.c',
                         'OXDELIVERYID' => $delId,
                         'OXOBJECTID' => $countryId,
                         'OXTYPE' => 'oxcountry'
@@ -100,7 +100,7 @@ abstract class BaseCest
                 $I->haveInDatabase(
                     'oxobject2delivery',
                     [
-                        'OXID' => $tmpOxid.'.d',
+                        'OXID' => $tmpOxid . '.d',
                         'OXDELIVERYID' => $delId,
                         'OXOBJECTID' => $countryId,
                         'OXTYPE' => 'oxdelset'

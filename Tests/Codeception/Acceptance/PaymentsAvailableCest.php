@@ -90,7 +90,8 @@ final class PaymentsAvailableCest extends BaseCest
         return  $return;
     }
 
-    private function switchCurrency($currency) {
+    private function switchCurrency($currency)
+    {
         $curr = '';
 
         switch ($currency) {
