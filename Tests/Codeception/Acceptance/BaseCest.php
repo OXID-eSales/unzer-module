@@ -48,6 +48,67 @@ abstract class BaseCest
             ['OXID' => $product['id']]
         );
 
+        // activate some countries and assign country to the payment.
+        // Also make sure, that delivery set and delivery costs are properly assigned
+        $aCountryId2paymentId = [
+            'a7c40f6320aeb2ec2.72885259' => 'oscunzer_eps', // AT -> EPS
+            'a7c40f632e04633c9.47194042' => 'oscunzer_bancontact', // BE -> Bancontact
+            'a7c40f632cdd63c52.64272623' => 'oscunzer_ideal', // NL -> IDEAL
+            '8f241f1109624d3f8.50953605' => 'oscunzer_przelewy24', // PL -> Przelewy24
+        ];
+        $country = [
+            'a7c40f6320aeb2ec2.72885259' => 'AT', // AT -> EPS
+            'a7c40f632e04633c9.47194042' => 'BE', // BE -> Bancontact
+            'a7c40f632cdd63c52.64272623' => 'NL', // NL -> IDEAL
+            '8f241f1109624d3f8.50953605' => 'PL', // PL -> Przelewy24
+        ];
+        // must use "Standard (3.90)", other options could change the price and fail the test
+        $delSet = [
+            '1b842e73470578914.54719298' => 'DEU', // Versandkostenregel
+            'oxidstandard' => 'STD', // Versandart
+        ];
+        foreach ($aCountryId2paymentId as $countryId => $paymentId) {
+            $tmpId = $paymentId . '.' . $country[$countryId];
+            $I->updateInDatabase(
+                'oxcountry',
+                ['OXACTIVE' => '1'],
+                ['OXID' => $countryId]
+            );
+
+            $I->haveInDatabase(
+                'oxobject2payment',
+                [
+                    'OXID' => $tmpId,
+                    'OXOBJECTID' => $countryId,
+                    'OXPAYMENTID' => $paymentId,
+                    'OXTYPE' => 'oxcountry'
+                ]
+            );
+
+            foreach ($delSet as $delId => $delShort) {
+                $tmpOxid = $tmpId . '.' . $delShort;
+
+                $I->haveInDatabase(
+                    'oxobject2delivery',
+                    [
+                        'OXID' => $tmpOxid.'.c',
+                        'OXDELIVERYID' => $delId,
+                        'OXOBJECTID' => $countryId,
+                        'OXTYPE' => 'oxcountry'
+                    ]
+                );
+                $I->haveInDatabase(
+                    'oxobject2delivery',
+                    [
+                        'OXID' => $tmpOxid.'.d',
+                        'OXDELIVERYID' => $delId,
+                        'OXOBJECTID' => $countryId,
+                        'OXTYPE' => 'oxdelset'
+                    ]
+                );
+            }
+        }
+
         $this->I = $I;
     }
 
