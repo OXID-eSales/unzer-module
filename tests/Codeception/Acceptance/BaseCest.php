@@ -153,6 +153,7 @@ abstract class BaseCest
 
         $this->I->waitForPageLoad();
         $this->I->waitForElementVisible($accountMenuButton);
+        $this->I->waitForElementClickable($accountMenuButton);
         $this->I->click($accountMenuButton);
         $this->I->waitForElementClickable($openAccountMenuButton);
 
