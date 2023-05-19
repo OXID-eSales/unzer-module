@@ -101,6 +101,15 @@ abstract class UnzerPayment
         // first try to fetch customer, secondly create anew if not found in unzer
         try {
             $customer = $this->unzerSDK->fetchCustomer($customer);
+            // for comparison and update, the original object must be recreated
+            $originalCustomer = $this->unzerService->getUnzerCustomer(
+                $userModel,
+                null,
+                $companyType
+            );
+            if ($this->unzerService->updateUnzerCustomer($customer, $originalCustomer)) {
+                $customer = $this->unzerSDK->updateCustomer($customer);
+            }
         } catch (UnzerApiException $apiException) {
             $customer = $this->unzerSDK->createCustomer($customer);
         }

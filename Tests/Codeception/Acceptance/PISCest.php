@@ -38,6 +38,8 @@ final class PISCest extends BaseCest
      * Therefor it has been disabled by adding an underscore to the method name
      * Remove the underscore to activate the test again
      *
+     * PAYMENT HAS BEEN REMOVED
+     *
      * @param AcceptanceTester $I
      * @group PisPaymentTest
      */

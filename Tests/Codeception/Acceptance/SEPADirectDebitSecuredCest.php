@@ -27,10 +27,11 @@ final class SEPADirectDebitSecuredCest extends BaseCest
     }
 
     /**
+     * DEPRECATED / PAYMENT HAS BEEN REMOVED
      * @param AcceptanceTester $I
      * @group SEPADirectSecuredPaymentTest
      */
-    public function checkPaymentWorks(AcceptanceTester $I)
+    public function _checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
         $this->_initializeSecuredTest();

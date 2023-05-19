@@ -72,11 +72,11 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'currencies' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -98,11 +98,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
+            'currencies' => ['AUD', 'CAD', 'CHF', 'CNY', 'EUR', 'GBP', 'HKD', 'NZD', 'SGD', 'USD'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -121,11 +121,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => ['AUD', 'CHF', 'CZK', 'DKK', 'EUR', 'GBP', 'NOK', 'PLN', 'SEK', 'USD', 'HUF', 'RON', 'BGN', 'HRK', 'ISK'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -148,11 +148,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['BE'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -175,11 +175,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
                 self::CAN_REVERT_PARTIALLY,
             ],
@@ -211,11 +211,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['AT'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -244,11 +244,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -271,43 +271,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['NL'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
-                self::CAN_REFUND_PARTIALLY,
-            ],
-        ],
-
-        //Unzer Installment lets your customers pay in monthly payments.
-        self::INSTALLMENT_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'Ratenzahlung',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg"
-                        title="Ratenzahlung" style="float: left;margin-right: 10px;" />
-                        Viele Kunden ziehen es vor, größere Anschaffungen von mehreren hundert Euro
-                        in kleineren Raten zu bezahlen. Wählen Sie diese Methode für eine einfache
-                        und bequeme Ratenzahlung.'
-                ],
-                'en' => [
-                    'desc' => 'Installment',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg "
-                        title="Installment" style="float: left;margin-right: 10px;" />
-                        Many customers prefer to pay for larger purchases of several hundred euros in
-                        smaller installments. Choose this method for comfortable payment in installments.'
-                ]
-            ],
-            'active' => false, // UNZER-199
-            'countries' => ['DE', 'AT', 'CH'],
-            'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => [
-                self::CAN_COLLECT_FULLY,
-                self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -331,6 +299,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE', 'AT', 'CH', 'NL'],
+            'currencies' => ['EUR', 'CHF'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
@@ -363,11 +332,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => [],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -394,11 +363,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -421,11 +390,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['PL'],
+            'currencies' => ['PLZ'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -449,38 +418,11 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
-                self::CAN_REFUND_PARTIALLY,
-            ],
-        ],
-
-        //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
-        self::SEPA_SECURED_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'SEPA Lastschrift (abgesichert durch Unzer)',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
-                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
-                ],
-                'en' => [
-                    'desc' => 'SEPA Direct Debit with Unzer',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
-                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
-                ]
-            ],
-            'active' => false, // UNZER-199
-            'countries' => ['DE', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => [
-                self::CAN_COLLECT_FULLY,
-                self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -499,34 +441,11 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
+            'currencies' => ['EUR'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
-                self::CAN_REFUND_PARTIALLY,
-            ],
-        ],
-
-        //Unzer Bank Transfer lets your customers pay directly from their bank account.
-        self::PIS_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'Bank transfer',
-                    'longdesc' => ''
-                ],
-                'en' => [
-                    'desc' => 'Bank Transfer',
-                    'longdesc' => ''
-                ]
-            ],
-            'active' => false, // UNZER-199
-            'countries' => ['DE', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS,
-            'abilities' => [
-                self::CAN_COLLECT_FULLY,
-                self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ],
@@ -550,11 +469,11 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['AT', 'BE', 'DK', 'FI', 'FR', 'DE', 'ES', 'GB', 'GR', 'HU',
                 'IE', 'IS', 'IT', 'LI', 'LU', 'MT', 'NL', 'NO', 'PT', 'SE'],
+            'currencies' => ['CHF', 'CNY', 'EUR', 'GBP', 'USD'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
                 self::CAN_COLLECT_PARTIALLY,
-                self::CAN_REFUND_FULLY,
                 self::CAN_REFUND_PARTIALLY,
             ],
         ]
