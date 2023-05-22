@@ -5,7 +5,7 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Controller;
+namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Model;
 
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
