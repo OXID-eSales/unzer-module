@@ -25,6 +25,30 @@ final class BancontactCest extends BaseCest
     private $cvvCodeInput = "//input[@name='cvvCode']";
     private $continueButton = "//button[@class='btn btn-primary']";
 
+    public function _before(AcceptanceTester $I): void
+    {
+        parent::_before($I);
+
+        // Bancontact is now only available in BE, BaseCest should make all the necessary setup
+        // User is assigned to BE
+        $user = Fixtures::get('client');
+        $I->updateInDatabase(
+            'oxuser',
+            ['oxcountryid' => 'a7c40f632e04633c9.47194042'], // BE
+            ['oxusername' => $user['username']]
+        );
+    }
+
+    public function _after(AcceptanceTester $I): void
+    {
+        $user = Fixtures::get('client');
+        $I->updateInDatabase(
+            'oxuser',
+            ['oxcountryid' => 'a7c40f631fc920687.20179984'], // DE
+            ['oxusername' => $user['username']]
+        );
+    }
+
     protected function _getOXID(): array
     {
         return ['oscunzer_bancontact'];

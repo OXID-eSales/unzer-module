@@ -99,10 +99,14 @@ class Order extends Order_parent
      */
     public function markUnzerOrderAsPaid(): void
     {
-        $utilsDate = Registry::getUtilsDate();
-        $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-        $this->_setFieldData('oxpaid', $date);
-        $this->save();
+        /** @var string $oxpaid */
+        $oxpaid = $this->getFieldData('oxpaid');
+        if ($oxpaid == '0000-00-00 00:00:00') {
+            $utilsDate = Registry::getUtilsDate();
+            $date = date('Y-m-d H:i:s', $utilsDate->getTime());
+            $this->_setFieldData('oxpaid', $date);
+            $this->save();
+        }
     }
 
     /**

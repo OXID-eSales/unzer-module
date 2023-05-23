@@ -37,10 +37,24 @@ final class EPSCest extends BaseCest
     public function _before(AcceptanceTester $I): void
     {
         parent::_before($I);
+
+        // EPS is now only available in AT, BaseCest should make all the necessary setup
+        // User is assigned to AT
+        $user = Fixtures::get('client');
         $I->updateInDatabase(
-            'oxobject2payment',
-            ['OXOBJECTID' => '	a7c40f631fc920687.20179984'],
-            ['OXPAYMENTID' => 'oscunzer_eps', 'OXTYPE' => 'oxcountry']
+            'oxuser',
+            ['oxcountryid' => 'a7c40f6320aeb2ec2.72885259'], // AT
+            ['oxusername' => $user['username']]
+        );
+    }
+
+    public function _after(AcceptanceTester $I): void
+    {
+        $user = Fixtures::get('client');
+        $I->updateInDatabase(
+            'oxuser',
+            ['oxcountryid' => 'a7c40f631fc920687.20179984'], // DE
+            ['oxusername' => $user['username']]
         );
     }
 

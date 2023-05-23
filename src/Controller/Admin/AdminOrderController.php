@@ -12,7 +12,7 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
-use OxidSolutionCatalysts\Unzer\Model\Transaction;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -108,6 +108,8 @@ class AdminOrderController extends AdminDetailsController_parent
      * @param string $sPaymentId
      * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function getUnzerViewData(string $sPaymentId): void
     {
@@ -200,6 +202,15 @@ class AdminOrderController extends AdminDetailsController_parent
             $this->_aViewData['aCharges'] = $charges;
             $this->_aViewData['aCancellations'] = $cancellations;
             $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
+
+            if (
+                $editObject->getFieldData('oxpaid') == '0000-00-00 00:00:00' &&
+                $fCharged == $unzerPayment->getAmount()->getTotal()
+            ) {
+                /** @var UnzerOrder $editObject */
+                $editObject->markUnzerOrderAsPaid();
+                $this->forceReloadListFrame();
+            }
         } catch (\Exception $e) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $e->getMessage()
@@ -222,6 +233,16 @@ class AdminOrderController extends AdminDetailsController_parent
     {
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
         return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());
+    }
+
+    /**
+     */
+    protected function forceReloadListFrame(): void
+    {
+        // we need to set the "edit object id", which will automatically be recognized to reload the list (admin area)
+        /** @var Order $oOrder */
+        $oOrder = $this->getEditObject();
+        $this->setEditObjectId($oOrder->getId());
     }
 
     /**
@@ -253,6 +274,7 @@ class AdminOrderController extends AdminDetailsController_parent
      */
     public function doUnzerCollect(): void
     {
+        $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         /** @var float $amount */
@@ -275,6 +297,7 @@ class AdminOrderController extends AdminDetailsController_parent
      */
     public function doUnzerCancel()
     {
+        $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         /** @var string $chargeid */
@@ -306,7 +329,6 @@ class AdminOrderController extends AdminDetailsController_parent
         /** @var Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, (string)$reason);
-
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errCancel'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
         }
@@ -317,6 +339,7 @@ class AdminOrderController extends AdminDetailsController_parent
      */
     public function doUnzerAuthorizationCancel()
     {
+        $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         /** @var string $sAmount */

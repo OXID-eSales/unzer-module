@@ -26,6 +26,29 @@ final class IDEALCest extends BaseCest
     private $usePINInput = "//input[@name='userPIN']";
     private $tanInput = "//input[@name='tan']";
 
+    public function _before(AcceptanceTester $I): void
+    {
+        parent::_before($I);
+        // IDEAL is now only available in NL, BaseCest should make all the necessary setup
+        // User is assigned to NL
+        $user = Fixtures::get('client');
+        $I->updateInDatabase(
+            'oxuser',
+            ['oxcountryid' => 'a7c40f632cdd63c52.64272623'], // NL
+            ['oxusername' => $user['username']]
+        );
+    }
+
+    public function _after(AcceptanceTester $I): void
+    {
+        $user = Fixtures::get('client');
+        $I->updateInDatabase(
+            'oxuser',
+            ['oxcountryid' => 'a7c40f631fc920687.20179984'], // DE
+            ['oxusername' => $user['username']]
+        );
+    }
+
     protected function _getOXID(): array
     {
         return ['oscunzer_ideal'];

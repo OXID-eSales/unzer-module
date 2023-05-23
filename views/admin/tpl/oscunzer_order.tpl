@@ -14,7 +14,7 @@
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="oxid" value="[{$oxid}]">
-    <input type="hidden" name="cl" value="order_main">
+    <input type="hidden" name="cl" value="unzer_admin_order">
 </form>
 
 <div id="liste" style="margin:0;">

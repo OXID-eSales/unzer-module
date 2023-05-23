@@ -390,7 +390,7 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['PL'],
-            'currencies' => ['PLZ'],
+            'currencies' => ['PLN'],
             'constraints' => self::PAYMENT_CONSTRAINTS,
             'abilities' => [
                 self::CAN_COLLECT_FULLY,
