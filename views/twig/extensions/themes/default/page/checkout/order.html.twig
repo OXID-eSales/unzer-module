@@ -3,7 +3,7 @@
 {% block shippingAndPayment %}
     {% set payment = oView.getPayment() %}
     {% if oViewConf.checkUnzerHealth() and payment.isUnzerPayment() %}
-        {% include "@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment_flow.html.twig" %}
+        {% include "@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment.html.twig" %}
     {% else %}
         {{ parent() }}
     {% endif %}

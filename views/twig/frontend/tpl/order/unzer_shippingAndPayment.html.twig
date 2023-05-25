@@ -33,7 +33,7 @@
                 <form class="panel-heading" action="{{ oViewConf.getSslSelfLink() }}" method="post">
                     <h3 class="panel-title">
                         {{ translate({ ident: "PAYMENT_METHOD" }) }}
-                        {{ oViewConf.getHiddenSid() }}
+                        {{ oViewConf.getHiddenSid()|raw }}
                         <input type="hidden" name="cl" value="payment">
                         <input type="hidden" name="fnc" value="">
                         <button type="submit"
