@@ -396,13 +396,23 @@ class ModuleSettings
      */
     public function getPrivateKeysWithContext(): array
     {
-        return [
-            'shop' => $this->getShopPrivateKey(),
-            'b2ceur' => $this->getShopPrivateKeyB2CInvoiceEUR(),
-            'b2cchf' => $this->getShopPrivateKeyB2CInvoiceCHF(),
-            'b2beur' => $this->getShopPrivateKeyB2BInvoiceEUR(),
-            'b2bchf' => $this->getShopPrivateKeyB2BInvoiceCHF(),
-        ];
+        $privateKeys = [];
+        if ('' !== $this->getShopPrivateKey()) {
+            $privateKeys['shop'] = $this->getShopPrivateKey();
+        }
+        if ('' !== $this->getShopPrivateKeyB2CInvoiceEUR()) {
+            $privateKeys['b2ceur'] = $this->getShopPrivateKeyB2CInvoiceEUR();
+        }
+        if ('' !== $this->getShopPrivateKeyB2CInvoiceCHF()) {
+            $privateKeys['b2cchf'] = $this->getShopPrivateKeyB2CInvoiceCHF();
+        }
+        if ('' !== $this->getShopPrivateKeyB2BInvoiceEUR()) {
+            $privateKeys['b2beur'] = $this->getShopPrivateKeyB2BInvoiceEUR();
+        }
+        if ('' !== $this->getShopPrivateKeyB2BInvoiceCHF()) {
+            $privateKeys['b2bchf'] = $this->getShopPrivateKeyB2BInvoiceCHF();
+        }
+        return $privateKeys;
     }
 
     /**
