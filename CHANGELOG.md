@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - New Payment PayLater
 ### FIXED
+- Webhooks cleanup, registration is now based on key (context)
 - Fixed ApplePay admin settings not saving the merchant certificate properly.
 - New country restrictions based on the Unzer documentation
   - ALIPAY: DE, AT, BE, IT, ES, NL

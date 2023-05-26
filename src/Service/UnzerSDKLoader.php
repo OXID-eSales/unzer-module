@@ -58,11 +58,9 @@ class UnzerSDKLoader
         }
         $key = $this->moduleSettings->getShopPrivateKey();
         $sdk = oxNew(Unzer::class, $key);
-
         if ($this->moduleSettings->isDebugMode()) {
             $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
         }
-
         return $sdk;
     }
 
@@ -80,6 +78,20 @@ class UnzerSDKLoader
         }
 
         $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency($customerType, $currency);
+        $sdk = oxNew(Unzer::class, $key);
+        if ($this->moduleSettings->isDebugMode()) {
+            $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
+        }
+        return $sdk;
+    }
+
+    /**
+     * Creates an UnzerSDK object based upon a specific private key.
+     * @param string $key
+     * @return Unzer
+     */
+    public function getUnzerSDKbyKey(string $key): Unzer
+    {
         $sdk = oxNew(Unzer::class, $key);
         if ($this->moduleSettings->isDebugMode()) {
             $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);

@@ -5,18 +5,14 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use GuzzleHttp\Exception\GuzzleException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ApiClient;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
-use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use Throwable;
-use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Unzer;
 
 /**
  * Order class wrapper for Unzer module
@@ -31,6 +27,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     protected $translator = null;
     /** @var ModuleSettings $moduleSettings */
     protected $moduleSettings = null;
+    /** @var UnzerWebhooks $unzerWebhooks */
+    protected $unzerWebhooks = null;
     protected string $_sModuleId; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
     /**
@@ -41,6 +39,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         parent::__construct();
         $this->translator = $this->getServiceFromContainer(Translator::class);
         $this->moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+        $this->unzerWebhooks = $this->getServiceFromContainer(UnzerWebhooks::class);
     }
 
     /**
@@ -54,37 +53,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         if ($this->_sModuleId == Module::MODULE_ID) {
             try {
-                $pubKey = $this->moduleSettings->getShopPublicKey();
-                $privKey = $this->moduleSettings->getShopPrivateKey();
-                $registeredWebhookUrl = $this->moduleSettings->getRegisteredWebhook();
-                $registeredWebhookId = $this->moduleSettings->getRegisteredWebhookId();
-                $proposedWebhookUrl = $this->getProposedWebhookForActualShop();
-
-                if ($pubKey && $privKey) {
-                    /** @var Unzer $unzer */
-                    $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-                    $webhooks = $unzer->fetchAllWebhooks();
-                    $webhookUrl = '';
-                    $webhookId = '';
-                    foreach ($webhooks as $webhook) {
-                        if (
-                            $webhook->getId() == $registeredWebhookId ||
-                            $webhook->getUrl() == $proposedWebhookUrl
-                        ) {
-                            $webhookUrl = $webhook->getUrl();
-                            $webhookId = $webhook->getId();
-                            break;
-                        }
-                    }
-                    if ($webhookUrl && $webhookId && (!$registeredWebhookUrl || !$registeredWebhookId)) {
-                        $this->saveWebhookOption($webhookUrl, $webhookId);
-                    }
-                    $registeredWebhookUrl = $webhookUrl;
-
-                    $this->_aViewData["registeredwebhook"] = $registeredWebhookUrl;
-                    $this->_aViewData["showWebhookButtons"] = true;
-                }
-
+                $this->_aViewData["webhookConfiguration"] = $this->moduleSettings->getWebhookConfiguration();
                 $this->_aViewData['applePayMC'] = $this->moduleSettings->getApplePayMerchantCapabilities();
                 $this->_aViewData['applePayNetworks'] = $this->moduleSettings->getApplePayNetworks();
                 $this->_aViewData['applePayMerchantCert'] = $this->moduleSettings->getApplePayMerchantCert();
@@ -102,74 +71,20 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         return 'module_config.tpl';
     }
 
-    /**
-     * @throws UnzerApiException
-     */
-    public function deleteWebhook(): void
+    public function registerWebhooks(): void
     {
-        try {
-            /** @var Unzer $unzer */
-            $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $registeredWebhookId = $this->moduleSettings->getRegisteredWebhookId();
-
-            $webhooks = $unzer->fetchAllWebhooks();
-            foreach ($webhooks as $webhook) {
-                if ($webhook->getId() == $registeredWebhookId) {
-                    $unzer->deleteWebhook($webhook);
-                    $this->saveWebhookOption('', '');
-                }
-            }
-        } catch (Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay(
-                $this->translator->translateCode(
-                    (string)$loggerException->getCode(),
-                    $loggerException->getMessage()
-                )
-            );
-        }
+        $this->unzerWebhooks->setPrivateKeys(
+            $this->moduleSettings->getPrivateKeysWithContext()
+        );
+        $this->unzerWebhooks->registerWebhookConfiguration();
     }
 
-    protected function getProposedWebhookForActualShop(): string
+    public function unregisterWebhooks(): void
     {
-        $withXDebug = ($this->moduleSettings->isSandboxMode() && $this->moduleSettings->isDebugMode());
-        return Registry::getConfig()->getSslShopUrl()
-            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus'
-            . ($withXDebug ? '&XDEBUG_SESSION_START' : '');
-    }
-
-    /**
-     * @throws UnzerApiException
-     */
-    public function registerWebhook(): void
-    {
-        try {
-            /** @var Unzer $unzer */
-            $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $url = $this->getProposedWebhookForActualShop();
-
-            $result = $unzer->createWebhook($url, "payment");
-            /** @var string $resultId */
-            $resultId = $result->getId();
-            $this->saveWebhookOption($url, $resultId);
-        } catch (Throwable $loggerException) {
-            Registry::getUtilsView()->addErrorToDisplay(
-                $this->translator->translateCode(
-                    (string)$loggerException->getCode(),
-                    $loggerException->getMessage()
-                )
-            );
-        }
-    }
-
-    /**
-     * @param string $webhookUrl
-     * @param string $webhookId
-     * @return void
-     */
-    protected function saveWebhookOption(string $webhookUrl, string $webhookId): void
-    {
-        $this->moduleSettings->saveWebhook($webhookUrl);
-        $this->moduleSettings->saveWebhookId($webhookId);
+        $this->unzerWebhooks->setPrivateKeys(
+            $this->moduleSettings->getPrivateKeysWithContext()
+        );
+        $this->unzerWebhooks->unregisterWebhookConfiguration();
     }
 
     /**

@@ -51,7 +51,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.1.0-rc.7',
+    'version' => '1.1.0-rc.8',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -184,10 +184,10 @@ $aModule = [
             'value' => ''
         ],
         [
-            'group' => 'unzermerchant',
-            'name' => 'registeredWebhook',
-            'type' => 'str',
-            'value' => ''
+            'group' => 'unzerwebhooks',
+            'name' => 'webhookConfiguration',
+            'type' => 'arr',
+            'value' => []
         ],
         [
             'group' => 'unzercard',
@@ -369,12 +369,6 @@ $aModule = [
             'value' => '0',
         ],
         // this options are invisible because of missing group
-        [
-            'group' => '',
-            'name' => 'registeredWebhookId',
-            'type' => 'str',
-            'value' => ''
-        ],
         [
             'group' => '',
             'name' => 'sandboxApplePayPaymentKeyId',

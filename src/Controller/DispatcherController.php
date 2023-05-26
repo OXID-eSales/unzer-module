@@ -8,14 +8,14 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 
@@ -40,6 +40,7 @@ class DispatcherController extends FrontendController
 
         /** @var string $jsonRequest */
         $jsonRequest = file_get_contents('php://input');
+
         /** @var array $aJson */
         $aJson = json_decode($jsonRequest, true);
         /** @var array $url */
@@ -49,6 +50,16 @@ class DispatcherController extends FrontendController
         $aPath = explode("/", $url['path']);
         $typeid = end($aPath);
 
+        /** @var Request $request */
+        $request = Registry::getRequest();
+        /** @var string $context */
+        $context = $request->getRequestParameter('context', 'shop');
+        $unzerWebhooks = $this->getServiceFromContainer(UnzerWebhooks::class);
+        $unzerKey = $unzerWebhooks->getUnzerKeyFromWebhookContext($context);
+        if (empty($unzerKey)) {
+            Registry::getUtils()->showMessageAndExit("Invalid Webhook call");
+        }
+
         if (
             ($url['scheme'] != "https" || $url['host'] != "api.unzer.com")
             || !$transaction->isValidTransactionTypeId($typeid)
@@ -56,7 +67,7 @@ class DispatcherController extends FrontendController
             Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
         }
 
-        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
+        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDKbyKey($unzerKey);
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
 
         $paymentId = $resource->getId();
@@ -66,9 +77,7 @@ class DispatcherController extends FrontendController
             /** @var array $data */
             $data = $transaction->getTransactionDataByPaymentId($paymentId);
 
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDKbyPaymentType($paymentId)
-                ->fetchPayment($paymentId);
+            $unzerPayment = $unzer->fetchPayment($paymentId);
 
             if ($order->load($data[0]['OXORDERID'])) {
                 /** @var string $oxTransStatus */

@@ -1,47 +1,40 @@
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+    }
+</style>
 [{if $oModule->getInfo('id') eq "osc-unzer"}]
     [{assign var="systemModeTrans" value='OSCUNZER_'|cat:$systemMode|oxmultilangassign}]
-    [{if $var_group eq "unzermerchant" and $module_var eq "registeredWebhook"}]
-        [{if $showWebhookButtons}]
-            [{if $registeredwebhook}]
-                <dl>
-                    <dt>
-                        <input size="128" type="text" value="[{$registeredwebhook}]" disabled>
-                    </dt>
-                    <dd>
-                        [{oxmultilang ident="SHOP_MODULE_WEBHOOK"}]
-                    </dd>
-                    <div class="spacer"></div>
-                </dl>
-                <dl>
-                    <dt>
-                        <input type="submit" class="confinput" name="deletewebhook"
-                               value="[{oxmultilang ident="SHOP_MODULE_DELETE_WEBHOOK"}]"
-                               onClick="Javascript:document.module_configuration.fnc.value='deleteWebhook'" [{$readonly}]>
-                    </dt>
-                    <div class="spacer"></div>
-                </dl>
-            [{else}]
-                <dl>
-                    <dt>
-                        <input type="submit" class="confinput" name="registerwebhook"
-                               value="[{oxmultilang ident="SHOP_MODULE_REGISTER_WEBHOOK"}]"
-                               onClick="Javascript:document.module_configuration.fnc.value='registerWebhook'" [{$readonly}]>
-                    </dt>
-                    <div class="spacer"></div>
-                </dl>
-            [{/if}]
-        [{else}]
-            <dl>
-                <dt>
-                    <input disabled type="submit"
-                           value="[{oxmultilang ident="SHOP_MODULE_REGISTER_WEBHOOK"}]" [{$readonly}]>
-                </dt>
-                <dd>
-                    [{oxmultilang ident="SHOP_MODULE_WEBHOOK_NO_UNZER"}]
-                </dd>
-                <div class="spacer"></div>
-            </dl>
+    [{if $var_group eq "unzerwebhooks" and $module_var eq "webhookConfiguration"}]
+        <dl>
+            <dt>
+                <input type="submit" class="confinput" name="validatewebhooks"
+                       value="[{oxmultilang ident="SHOP_MODULE_webhook_register"}]"
+                       onClick="Javascript:document.module_configuration.fnc.value='registerWebhooks'" [{$readonly}]>
+                <input type="submit" class="confinput" name="deletewebhooks"
+                       value="[{oxmultilang ident="SHOP_MODULE_webhook_unregister"}]"
+                       onClick="Javascript:document.module_configuration.fnc.value='unregisterWebhooks'" [{$readonly}]>
+            </dt>
+            <div class="spacer"></div>
+        </dl>
+    <dl>
+        [{if $webhookConfiguration}]
+        <table>
+            <tr>
+                <th>[{oxmultilang ident="SHOP_MODULE_webhook_id"}]</th>
+                <th>[{oxmultilang ident="SHOP_MODULE_webhook_context"}]</th>
+            </tr>
+        [{foreach from=$webhookConfiguration item="webhookConfig"}]
+            <tr>
+                <td>[{$webhookConfig.id}]</td>
+                <td>[{$webhookConfig.context}]</td>
+            </tr>
+        [{/foreach}]
+        </table>
         [{/if}]
+    </dl>
     [{elseif $var_group eq "unzerapplepay"}]
         [{if $module_var eq "UnzerOption_oscunzer_applepay"}]
             [{$smarty.block.parent}]

@@ -1,4 +1,4 @@
-[{if $oViewConf->checkUnzerHealth() && $paymentmethod->isUnzerPayment() && $paymentmethod->isUnzerPaymentTypeAllowed()}]
+[{if $paymentmethod->isUnzerPayment() && $paymentmethod->isUnzerPaymentTypeAllowed()}]
     [{if $sPaymentID == 'oscunzer_applepay'}]
         [{include file="modules/osc/unzer/payment/applepay_availibility_check.tpl"}]
     [{/if}]

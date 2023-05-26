@@ -8,14 +8,15 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 
 class PaymentValidator
 {
-    /** @var PaymentExtensionLoader */
-    protected $paymentExtLoader;
+    protected PaymentExtensionLoader $paymentExtLoader;
 
-    /** @var Context */
-    protected $moduleContext;
+    protected Context $moduleContext;
+
+    protected ModuleSettings $moduleSettings;
 
     /**
      * @param PaymentExtensionLoader $paymentExtLoader
@@ -23,10 +24,12 @@ class PaymentValidator
      */
     public function __construct(
         PaymentExtensionLoader $paymentExtLoader,
-        Context $moduleContext
+        Context $moduleContext,
+        ModuleSettings $moduleSettings
     ) {
         $this->paymentExtLoader = $paymentExtLoader;
         $this->moduleContext = $moduleContext;
+        $this->moduleSettings = $moduleSettings;
     }
 
     /**
@@ -37,7 +40,7 @@ class PaymentValidator
     {
         $isUnzer = false;
 
-        if (strpos(strtolower($payment->getId()), "oscunzer") !== false) {
+        if (stripos($payment->getId(), "oscunzer") !== false) {
             $isUnzer = true;
         }
 
@@ -62,7 +65,7 @@ class PaymentValidator
     public function isSelectedCurrencyAllowed(array $allowedCurrencies): bool
     {
         return !count($allowedCurrencies)
-            || in_array($this->moduleContext->getActiveCurrencyName(), $allowedCurrencies);
+            || in_array($this->moduleContext->getActiveCurrencyName(), $allowedCurrencies, true);
     }
 
     public function isSecuredPayment(Payment $payment): bool
@@ -70,15 +73,28 @@ class PaymentValidator
         $isSecured = false;
 
         if ($this->isUnzerPayment($payment)) {
-            if (strpos(strtolower($payment->getId()), "installment") !== false) {
+            if (stripos($payment->getId(), "installment") !== false) {
                 $isSecured = true;
             }
 
-            if (strpos(strtolower($payment->getId()), "secured") !== false) {
+            if (stripos($payment->getId(), "secured") !== false) {
                 $isSecured = true;
             }
         }
 
         return $isSecured;
+    }
+
+    public function isConfigurationHealthy(Payment $payment): bool
+    {
+        $paymentId = $payment->getId();
+        $isHealthy = $this->moduleSettings->isStandardEligibility();
+        if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+            $isHealthy = ($isHealthy && $this->moduleSettings->isInvoiceEligibility());
+        } elseif ($paymentId === UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
+            $isHealthy = ($isHealthy && $this->moduleSettings->isApplePayEligibility());
+        }
+
+        return $isHealthy;
     }
 }
