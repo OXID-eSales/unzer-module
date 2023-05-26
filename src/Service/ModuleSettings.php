@@ -66,10 +66,11 @@ class ModuleSettings
      */
     public function checkHealth(): bool
     {
+
         return (
             $this->getShopPublicKey() &&
-            $this->getShopPrivateKey() &&
-            $this->getRegisteredWebhookId()
+            $this->getShopPrivateKey()/* &&
+            $this->getRegisteredWebhookId() */
         );
     }
 
@@ -137,26 +138,6 @@ class ModuleSettings
         /** @var string $unzerPrivateKey */
         $unzerPrivateKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPrivateKey');
         return $unzerPrivateKey;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegisteredWebhook(): string
-    {
-        /** @var string $registeredWebhook */
-        $registeredWebhook = $this->getSettingValue('registeredWebhook');
-        return $registeredWebhook;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegisteredWebhookId(): string
-    {
-        /** @var string $registeredWebhookId */
-        $registeredWebhookId = $this->getSettingValue('registeredWebhookId');
-        return $registeredWebhookId;
     }
 
     /**
@@ -421,6 +402,37 @@ class ModuleSettings
     public function saveApplePayNetworks(array $networks): void
     {
         $this->saveSetting('applepay_networks', $networks);
+    }
+
+    /**
+     * @param array $webhookConfig
+     * @return void
+     */
+    public function saveWebhookConfiguration(array $webhookConfig): void
+    {
+        $this->moduleSettingBridge->save('webhookConfiguration', $webhookConfig, Module::MODULE_ID);
+    }
+
+    /**
+     * @return array
+     */
+    public function getWebhookConfiguration(): array
+    {
+        return $this->moduleSettingBridge->get('webhookConfiguration', Module::MODULE_ID);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrivateKeysWithContext(): array
+    {
+        return [
+            'shop' => $this->getShopPrivateKey(),
+            'b2ceur' => $this->getShopPrivateKeyB2CInvoiceEUR(),
+            'b2cchf' => $this->getShopPrivateKeyB2CInvoiceCHF(),
+            'b2beur' => $this->getShopPrivateKeyB2BInvoiceEUR(),
+            'b2bchf' => $this->getShopPrivateKeyB2BInvoiceCHF(),
+        ];
     }
 
     /**
