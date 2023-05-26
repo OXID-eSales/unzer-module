@@ -397,7 +397,7 @@ class ModuleSettings
     public function getPrivateKeysWithContext(): array
     {
         $privateKeys = [];
-        if ('' !==  $this->getShopPrivateKey()) {
+        if ('' !== $this->getShopPrivateKey()) {
             $privateKeys['shop'] = $this->getShopPrivateKey();
         }
         if ('' !== $this->getShopPrivateKeyB2CInvoiceEUR()) {
