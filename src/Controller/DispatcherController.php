@@ -40,13 +40,7 @@ class DispatcherController extends FrontendController
 
         /** @var string $jsonRequest */
         $jsonRequest = file_get_contents('php://input');
-/*
-file_put_contents(
-    '/var/www/source/log/unzer/webhook.log',
-    date('Y-m-d H:i:s') . ' : ' . $jsonRequest . PHP_EOL,
-    FILE_APPEND
-);
-*/
+
         /** @var array $aJson */
         $aJson = json_decode($jsonRequest, true);
         /** @var array $url */
