@@ -40,7 +40,7 @@ class PaymentValidator
     {
         $isUnzer = false;
 
-        if (strpos(strtolower($payment->getId()), "oscunzer") !== false) {
+        if (stripos($payment->getId(), "oscunzer") !== false) {
             $isUnzer = true;
         }
 
@@ -65,7 +65,7 @@ class PaymentValidator
     public function isSelectedCurrencyAllowed(array $allowedCurrencies): bool
     {
         return !count($allowedCurrencies)
-            || in_array($this->moduleContext->getActiveCurrencyName(), $allowedCurrencies);
+            || in_array($this->moduleContext->getActiveCurrencyName(), $allowedCurrencies, true);
     }
 
     public function isSecuredPayment(Payment $payment): bool
@@ -73,11 +73,11 @@ class PaymentValidator
         $isSecured = false;
 
         if ($this->isUnzerPayment($payment)) {
-            if (strpos(strtolower($payment->getId()), "installment") !== false) {
+            if (stripos($payment->getId(), "installment") !== false) {
                 $isSecured = true;
             }
 
-            if (strpos(strtolower($payment->getId()), "secured") !== false) {
+            if (stripos($payment->getId(), "secured") !== false) {
                 $isSecured = true;
             }
         }
@@ -90,14 +90,14 @@ class PaymentValidator
         $paymentId = $payment->getId();
         $privateKeys = $this->moduleSettings->getPrivateKeysWithContext();
         $isHealthy = (!empty($privateKeys['shop'])); // default
-        if ($paymentId == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+        if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
             $isHealthy = (
                 !empty($privateKeys['b2ceur']) &&
                 !empty($privateKeys['b2cchf']) &&
                 !empty($privateKeys['b2beur']) &&
                 !empty($privateKeys['b2bchf'])
             );
-        } elseif ($paymentId == UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
+        } elseif ($paymentId === UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
             $isHealthy = (
                 !empty($this->moduleSettings->getApplePayMerchantCert()) &&
                 !empty($this->moduleSettings->getApplePayMerchantCertKey()) &&
