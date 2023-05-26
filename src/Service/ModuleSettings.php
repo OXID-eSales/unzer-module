@@ -167,7 +167,8 @@ class ModuleSettings
     {
         return (
             $this->getApplePayMerchantCert() &&
-            $this->getApplePayMerchantCertKey()
+            $this->getApplePayMerchantCertKey() &&
+            $this->hasWebhookConfiguration('shop')
         );
     }
 
@@ -444,11 +445,28 @@ class ModuleSettings
     /**
      * @return bool
      */
+    public function isStandardEligibility(): bool
+    {
+        return (
+            $this->getShopPrivateKey() &&
+            $this->getShopPublicKey() &&
+            $this->hasWebhookConfiguration('shop')
+        );
+    }
+
+    /**
+     * @return bool
+     */
     public function isInvoiceEligibility(): bool
     {
         return (
-            $this->isB2CInvoiceEligibility() ||
-            $this->isB2BInvoiceEligibility()
+                $this->isB2CInvoiceEligibility() &&
+                $this->hasWebhookConfiguration('b2ceur') &&
+                $this->hasWebhookConfiguration('b2cchf')
+            ||
+                $this->isB2BInvoiceEligibility() &&
+                $this->hasWebhookConfiguration('b2beur') &&
+                $this->hasWebhookConfiguration('b2bchf')
         );
     }
 
@@ -686,5 +704,15 @@ class ModuleSettings
     private function getBasketCurrency(): string
     {
         return $this->session->getBasket()->getBasketCurrency()->name;
+    }
+
+    /**
+     * @param $context shop, b2ceur, bc2chf, b2beur, b2bchf
+     * @return bool
+     */
+    private function hasWebhookConfiguration(string $context): bool
+    {
+        $privateKeysContext = $this->getPrivateKeysWithContext();
+        return (!empty($privateKeysContext[$context]));
     }
 }

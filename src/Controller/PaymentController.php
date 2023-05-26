@@ -48,7 +48,6 @@ class PaymentController extends PaymentController_parent
     public function getPaymentList()
     {
         $paymentList = (array)parent::getPaymentList();
-        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
         $unzerDefinitions = $this->getServiceFromContainer(UnzerDefinitionsService::class)
             ->getDefinitionsArray();
         $actShopCurrency = Registry::getConfig()->getActShopCurrencyObject();
@@ -86,15 +85,6 @@ class PaymentController extends PaymentController_parent
             ) {
                 $paymentList[$key] = $payment;
             }
-        }
-        // check ApplePay Eligibility
-        if (!$moduleSettings->isApplePayEligibility()) {
-            unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
-        }
-
-        //check Invoice Eligibility
-        if (!$moduleSettings->isInvoiceEligibility()) {
-            unset($paymentList[UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID]);
         }
 
         return $paymentList;
