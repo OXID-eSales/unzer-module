@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Core\Price;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidEsales\Eshop\Core\Price;
 use OxidSolutionCatalysts\Unzer\Service\Context;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Translator;

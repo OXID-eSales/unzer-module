@@ -12,13 +12,19 @@ use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\Facts\Facts;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
+use UnzerSDK\Constants\CompanyTypes;
+use UnzerSDK\Constants\CustomerGroups;
+use UnzerSDK\Constants\Salutations;
 use UnzerSDK\Constants\ShippingTypes;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Constants\BasketItemTypes;
@@ -26,15 +32,21 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\EmbeddedResources\CompanyInfo;
+use UnzerSDK\Resources\EmbeddedResources\RiskData;
+use UnzerSDK\Resources\EmbeddedResources\Address as UnzerSDKAddress;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
+use DateTime;
 
 /**
- * TODO: Decrease count of dependencies to 13
+ * TODO: Fix all the suppressed warnings
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class Unzer
 {
@@ -79,6 +91,7 @@ class Unzer
      * @param Order|null $oOrder
      * @param string $companyType
      * @return Customer
+     * @throws UnzerException
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -113,8 +126,9 @@ class Unzer
         $oxcompany = $oUser->getFieldData('oxcompany');
         $customer->setCompany($oxcompany);
 
-        /** @var string $oxsal */
+        /** @var null|string $oxsal */
         $oxsal = $oUser->getFieldData('oxsal');
+        $oxsal = strtolower($oxsal ?? Salutations::UNKNOWN);
         $customer->setSalutation($oxsal);
 
         /** @var string $oxusername */
@@ -129,6 +143,10 @@ class Unzer
         $oxmobfon = $oUser->getFieldData('oxmobfon');
         $customer->setMobile($oxmobfon);
 
+        /** @var string $customerId */
+        $customerId = $oUser->getFieldData('oxcustnr');
+        $customer->setCustomerId($customerId);
+
         $billingAddress = $customer->getBillingAddress();
 
         $oCountry = oxNew(Country::class);
@@ -139,7 +157,8 @@ class Unzer
             ? $oCountry->getFieldData('oxisoalpha2')
             : '';
 
-        $billingAddress->setName(!empty($oxcompany) ? $oxcompany : $oxfname . ' ' . $oxlname);
+        $billingAddress->setName($oxfname . ' ' . $oxlname);
+
         $billingAddress->setStreet(trim(
             $oUser->getFieldData('oxstreet') .
             ' ' .
@@ -169,8 +188,9 @@ class Unzer
             $oxcountryid = $oDelAddress->getFieldData('oxcountryid');
             /** @var string $deliveryCountryIso */
             $deliveryCountryIso = $oCountry->load($oxcountryid)
-                ? $oDelAddress->getFieldData('oxisoalpha2')
+                ? $oCountry->getFieldData('oxisoalpha2')
                 : '';
+            $shippingAddress->setCountry($deliveryCountryIso);
 
             /** @var string $oxcompany */
             $oxcompany = $oDelAddress->getFieldData('oxcompany');
@@ -178,7 +198,7 @@ class Unzer
             $oxfname = $oDelAddress->getFieldData('oxfname');
             /** @var string $oxlname */
             $oxlname = $oDelAddress->getFieldData('oxlname');
-            $shippingAddress->setName(!empty($oxcompany) ? $oxcompany : $oxfname . ' ' . $oxlname);
+            $shippingAddress->setName($oxfname . ' ' . $oxlname);
             $shippingAddress->setStreet(trim(
                 $oDelAddress->getFieldData('oxstreet') .
                 ' ' .
@@ -190,9 +210,11 @@ class Unzer
             $shippingAddress->setZip($oxzip);
 
             /** @var string $oxcity */
-            $oxcity = $oDelAddress->getFieldData('oxstreet');
+            $oxcity = $oDelAddress->getFieldData('oxcity');
             $shippingAddress->setCity($oxcity);
-            $shippingAddress->setCountry($deliveryCountryIso);
+
+            $billingAddress->setShippingType(ShippingTypes::DIFFERENT_ADDRESS);
+            $shippingAddress->setShippingType(ShippingTypes::DIFFERENT_ADDRESS);
         } else {
             $billingAddress->setShippingType(ShippingTypes::EQUALS_BILLING);
             $customer->setShippingAddress($billingAddress);
@@ -201,6 +223,18 @@ class Unzer
         if ($companyType) {
             $companyInfo = new CompanyInfo();
             $customer->setCompanyInfo($companyInfo);
+            $companyTypes = [
+                CompanyTypes::COMPANY,
+                CompanyTypes::ASSOCIATION,
+                CompanyTypes::AUTHORITY,
+                CompanyTypes::SOLE,
+                CompanyTypes::OTHER
+            ];
+            if (!in_array(strtolower($companyType), $companyTypes)) {
+                throw new UnzerException('company type unknown');
+            }
+            $companyInfo->setCompanyType(strtolower($companyType));
+
             $companyInfo->setRegistrationType(CompanyRegistrationTypes::REGISTRATION_TYPE_NOT_REGISTERED);
             $companyInfo->setFunction('OWNER');
 
@@ -210,6 +244,97 @@ class Unzer
         }
 
         return $customer;
+    }
+
+    /**
+     * @param Customer $unzerCustomer
+     * @param Customer $oxidCustomer
+     * @return bool
+     */
+    public function updateUnzerCustomer(Customer $unzerCustomer, Customer $oxidCustomer): bool
+    {
+        $hasChanged = false;
+        // first, it must be the same customer...
+        if ($unzerCustomer->getCustomerId() == $oxidCustomer->getCustomerId()) {
+            if ($unzerCustomer->getFirstname() != $oxidCustomer->getFirstname()) {
+                $hasChanged = true;
+                $unzerCustomer->setFirstname($oxidCustomer->getFirstname() ?? '');
+            }
+            if ($unzerCustomer->getLastname() != $oxidCustomer->getLastname()) {
+                $hasChanged = true;
+                $unzerCustomer->setLastname($oxidCustomer->getLastname() ?? '');
+            }
+            if ($unzerCustomer->getSalutation() != $oxidCustomer->getSalutation()) {
+                $hasChanged = true;
+                $unzerCustomer->setSalutation($oxidCustomer->getSalutation());
+            }
+            if ($unzerCustomer->getBirthDate() != $oxidCustomer->getBirthDate()) {
+                $hasChanged = true;
+                $unzerCustomer->setBirthDate($oxidCustomer->getBirthDate() ?? '');
+            }
+            if ($unzerCustomer->getCompany() != $oxidCustomer->getCompany()) {
+                $hasChanged = true;
+                $unzerCustomer->setCompany($oxidCustomer->getCompany() ?? '');
+            }
+            if ($unzerCustomer->getEmail() != $oxidCustomer->getEmail()) {
+                $hasChanged = true;
+                $unzerCustomer->setEmail($oxidCustomer->getEmail() ?? '');
+            }
+            if ($unzerCustomer->getPhone() != $oxidCustomer->getPhone()) {
+                $hasChanged = true;
+                $unzerCustomer->setPhone($oxidCustomer->getPhone() ?? '');
+            }
+            if ($unzerCustomer->getMobile() != $oxidCustomer->getMobile()) {
+                $hasChanged = true;
+                $unzerCustomer->setMobile($oxidCustomer->getMobile() ?? '');
+            }
+            $hasChanged = $hasChanged || $this->updateUnzerAddress(
+                $unzerCustomer->getBillingAddress(),
+                $oxidCustomer->getBillingAddress()
+            );
+            $hasChanged = $hasChanged || $this->updateUnzerAddress(
+                $unzerCustomer->getShippingAddress(),
+                $oxidCustomer->getShippingAddress()
+            );
+        }
+
+        return $hasChanged;
+    }
+
+    protected function updateUnzerAddress(UnzerSDKAddress $unzerAddress, UnzerSDKAddress $oxidAddress): bool
+    {
+        $hasChanged = false;
+
+        if ($unzerAddress->getName() != $oxidAddress->getName()) {
+            $hasChanged = true;
+            $unzerAddress->setName($oxidAddress->getName() ?? '');
+        }
+        if ($unzerAddress->getStreet() != $oxidAddress->getStreet()) {
+            $hasChanged = true;
+            $unzerAddress->setStreet($oxidAddress->getStreet() ?? '');
+        }
+        if ($unzerAddress->getZip() != $oxidAddress->getZip()) {
+            $hasChanged = true;
+            $unzerAddress->setZip($oxidAddress->getZip() ?? '');
+        }
+        if ($unzerAddress->getCity() != $oxidAddress->getCity()) {
+            $hasChanged = true;
+            $unzerAddress->setCity($oxidAddress->getCity() ?? '');
+        }
+        if ($unzerAddress->getState() != $oxidAddress->getState()) {
+            $hasChanged = true;
+            $unzerAddress->setState($oxidAddress->getState() ?? '');
+        }
+        if ($unzerAddress->getCountry() != $oxidAddress->getCountry()) {
+            $hasChanged = true;
+            $unzerAddress->setCountry($oxidAddress->getCountry() ?? '');
+        }
+        if ($unzerAddress->getShippingType() != $oxidAddress->getShippingType()) {
+            $hasChanged = true;
+            $unzerAddress->setShippingType($oxidAddress->getShippingType());
+        }
+
+        return $hasChanged;
     }
 
     /**
@@ -305,6 +430,47 @@ class Unzer
         $basket->setTotalValueGross($priceForPayment);
 
         return $basket;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getUnzerRiskData(Customer $unzerCustomer, User $oUser): RiskData
+    {
+        $bPasswordIsEmpty = ($oUser->getFieldData('oxpassword') === '');
+
+        $registrationLevel = '0';
+        $registrationDate = gmdate('Ymd');
+        if (!$bPasswordIsEmpty) { // registered user
+            $registrationLevel = '1'; // 1 = registered user
+            $oxregister = $oUser->getFieldData('oxregister');
+            // shouldn't happen, but if it did, it would cause an error on unzer
+            if ($oxregister == '0000-00-00 00:00:00') {
+                $oxregister = gmdate('Y-m-d H:i:s');
+            }
+            /** @var string $oxregister */
+            $dtRegister = new DateTime($oxregister);
+            $registrationDate = $dtRegister->format('Ymd');
+        }
+
+        $orderedAmount = 0.;
+        /** @var ListModel $orderList */
+        $orderList = $oUser->getOrders();
+        /** @var UnzerModelOrder $order */
+        foreach ($orderList as $order) {
+            $orderedAmount += $order->getTotalOrderSum();
+        }
+
+        $riskData = (new RiskData())
+            ->setThreatMetrixId($this->getUnzerThreatMetrixIdFromSession())
+            ->setConfirmedAmount($orderedAmount)
+            ->setCustomerGroup(CustomerGroups::NEUTRAL) // todo: decide customer group (see doku)
+            ->setConfirmedOrders($oUser->getOrderCount())
+            ->setCustomerId($unzerCustomer->getCustomerId())
+            ->setRegistrationLevel($registrationLevel)
+            ->setRegistrationDate($registrationDate);
+
+        return $riskData;
     }
 
     /**
@@ -466,6 +632,26 @@ class Unzer
     public function generateUnzerOrderId(): string
     {
         return 'o' . str_replace(['0.', ' '], '', microtime(false));
+    }
+
+    /**
+     * @return string
+     */
+    public function generateUnzerThreatMetrixIdInSession(): string
+    {
+        $tmSessionID = Registry::getUtilsObject()->generateUID();
+        Registry::getSession()->setVariable('unzerThreatMetrixSessionID', $tmSessionID);
+        return $tmSessionID;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUnzerThreatMetrixIdFromSession(): string
+    {
+        /** @var string $tmSessionID */
+        $tmSessionID = Registry::getSession()->getVariable('unzerThreatMetrixSessionID');
+        return $tmSessionID;
     }
 
     /**

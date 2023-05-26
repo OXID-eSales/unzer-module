@@ -24,6 +24,7 @@ class ShopControl extends ShopControl_parent
 
     /**
      * @param StandardException $exception
+     * @phpstan-return void
      */
     protected function handleBaseException($exception): void
     {

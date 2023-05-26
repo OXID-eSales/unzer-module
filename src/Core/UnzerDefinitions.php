@@ -38,18 +38,32 @@ final class UnzerDefinitions
         'oxaddsumtype' => 'abs'
     ];
 
+    /* payment abilities */
+    public const CAN_COLLECT_FULLY = 'collect_fully';
+    public const CAN_COLLECT_PARTIALLY = 'collect_partially';
+    public const CAN_REFUND_FULLY = 'refund_fully';
+    public const CAN_REFUND_PARTIALLY = 'refund_partially';
+    public const CAN_REVERT_PARTIALLY = 'revert_partially';
+    public const PAYMENT_ABILITIES = [
+        self::CAN_COLLECT_FULLY,
+        self::CAN_COLLECT_PARTIALLY,
+        self::CAN_REFUND_FULLY,
+        self::CAN_REFUND_PARTIALLY,
+        self::CAN_REVERT_PARTIALLY,
+    ];
+
     private const UNZER_DEFINTIONS = [
         self::OLD_INVOICE_UNZER_PAYMENT_ID => [
             'descriptions' => [
                 'de' => [
-                    'desc' => 'Kauf auf Rechnung (old)',
+                    'desc' => 'Kauf auf Rechnung',
                     'longdesc' => '',
                     'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
                         Bei dieser Methode zahlen Sie per Kauf auf Rechnung'
                 ],
                 'en' => [
-                    'desc' => 'Invoice (old)',
+                    'desc' => 'Invoice',
                     'longdesc' => '',
                     'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
                         title="Invoice" style="float: left;margin-right: 10px;" />'
@@ -58,7 +72,13 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => [],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
         //Alipay is China’s leading third-party mobile and online payment solution.
         self::ALIPAY_UNZER_PAYMENT_ID => [
@@ -77,8 +97,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => [],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
+            'currencies' => ['AUD', 'CAD', 'CHF', 'CNY', 'EUR', 'GBP', 'HKD', 'NZD', 'SGD', 'USD'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //ApplePay
@@ -95,7 +121,13 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => ['AUD', 'CHF', 'CZK', 'DKK', 'EUR', 'GBP', 'NOK', 'PLN', 'SEK', 'USD', 'HUF', 'RON', 'BGN', 'HRK', 'ISK'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Bancontact is a Belgian company that offers user-friendly solutions for easy everyday shopping experience.
@@ -116,7 +148,13 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['BE'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => ['EUR'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Credit cards and debit cards are the most common payment method in e-commerce.
@@ -137,7 +175,14 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => [],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+                self::CAN_REVERT_PARTIALLY,
+            ],
         ],
 
         //Electronic Payment Standard (EPS) is an online payment system used in Austria.
@@ -166,7 +211,13 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => ['EUR'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Giropay is an online payment method used in Germany.
@@ -193,7 +244,13 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['DE'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => ['EUR'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //iDEAL is the most popular method for online payments in the Netherlands.
@@ -214,33 +271,13 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['NL'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
-        ],
-
-        //Unzer Installment lets your customers pay in monthly payments.
-        self::INSTALLMENT_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'Ratenzahlung',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg"
-                        title="Ratenzahlung" style="float: left;margin-right: 10px;" />
-                        Viele Kunden ziehen es vor, größere Anschaffungen von mehreren hundert Euro
-                        in kleineren Raten zu bezahlen. Wählen Sie diese Methode für eine einfache
-                        und bequeme Ratenzahlung.'
-                ],
-                'en' => [
-                    'desc' => 'Installment',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/59fb020f95/unzer_instalment.svg "
-                        title="Installment" style="float: left;margin-right: 10px;" />
-                        Many customers prefer to pay for larger purchases of several hundred euros in
-                        smaller installments. Choose this method for comfortable payment in installments.'
-                ]
+            'currencies' => ['EUR'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
             ],
-            'active' => true,
-            'countries' => ['DE', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
         ],
 
         //Unzer Invoice lets you issue an invoice and then collect the payment.
@@ -261,9 +298,16 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
-                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'countries' => ['DE', 'AT', 'CH', 'NL'],
+            'currencies' => ['EUR', 'CHF'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                //self::CAN_REFUND_PARTIALLY,
+                //self::CAN_REVERT_PARTIALLY,
+            ],
         ],
 
         //PayPal is one of the world’s most popular online payment systems.
@@ -288,7 +332,13 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => [],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => [],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Prepayment lets you collect the payment before sending the goods to your customer.
@@ -312,9 +362,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
-                'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'countries' => [],
+            'currencies' => ['EUR'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Przelewy24 is an online payment method used in Poland.
@@ -335,7 +390,13 @@ final class UnzerDefinitions
             ],
             'active' => true,
             'countries' => ['PL'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'currencies' => ['PLN'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ],
 
         //Unzer Direct Debit lets you accept payments in euro.
@@ -357,28 +418,13 @@ final class UnzerDefinitions
             'active' => true,
             'countries' => ['BE', 'DE', 'EE', 'FI', 'FR', 'GR', 'IE', 'IT', 'LV',
                 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'CY', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
-        ],
-
-        //Unzer Direct Debit Secured lets you accept payments in euro and secures your money.
-        self::SEPA_SECURED_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'SEPA Lastschrift (abgesichert durch Unzer)',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
-                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
-                ],
-                'en' => [
-                    'desc' => 'SEPA Direct Debit with Unzer',
-                    'longdesc' => '',
-                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/a76f7ea77f/unzer_directdebit.svg"
-                        title="Przelewy24" style="float: left;margin-right: 10px;" />'
-                ]
+            'currencies' => ['EUR'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
             ],
-            'active' => true,
-            'countries' => ['DE'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
         ],
 
         //Sofort is an online payment method used in select European countries.
@@ -394,26 +440,14 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => ['SE', 'NO', 'FI', 'DK', 'DE', 'NL', 'BE', 'CH', 'FR', 'IT',
-                'PL', 'ES', 'PT', 'GB', 'HU', 'CZ', 'AU', 'SK', 'US'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
-        ],
-
-        //Unzer Bank Transfer lets your customers pay directly from their bank account.
-        self::PIS_UNZER_PAYMENT_ID => [
-            'descriptions' => [
-                'de' => [
-                    'desc' => 'Bank transfer',
-                    'longdesc' => ''
-                ],
-                'en' => [
-                    'desc' => 'Bank Transfer',
-                    'longdesc' => ''
-                ]
+            'countries' => ['DE', 'AT', 'BE', 'IT', 'ES', 'NL'],
+            'currencies' => ['EUR'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
             ],
-            'active' => false,
-            'countries' => ['DE', 'AT'],
-            'constraints' => self::PAYMENT_CONSTRAINTS
         ],
 
         //WeChat Pay is one of the biggest and fastest-growing mobile payment solutions in China.
@@ -433,19 +467,26 @@ final class UnzerDefinitions
                 ]
             ],
             'active' => true,
-            'countries' => [],
-            'constraints' => self::PAYMENT_CONSTRAINTS
+            'countries' => ['AT', 'BE', 'DK', 'FI', 'FR', 'DE', 'ES', 'GB', 'GR', 'HU',
+                'IE', 'IS', 'IT', 'LI', 'LU', 'MT', 'NL', 'NO', 'PT', 'SE'],
+            'currencies' => ['CHF', 'CNY', 'EUR', 'GBP', 'USD'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_PARTIALLY,
+            ],
         ]
     ];
 
     private const PAYPAL_STATIC_CONTENTS = [
         'oscunzersepamandatetext' =>
-        [
-            'oxloadid' => 'oscunzersepamandatetext',
-            'oxactive' => 1,
-            'oxtitle_de' => 'SEPA Lastschrift-Mandat (Bankeinzug)',
-            'oxtitle_en' => 'SEPA direct debit mandate (direct debit)',
-            'oxcontent_de' => '<p>Ich ermächtige [{$oxcmp_shop->oxshops__oxname->value}], Zahlungen von
+            [
+                'oxloadid' => 'oscunzersepamandatetext',
+                'oxactive' => 1,
+                'oxtitle_de' => 'SEPA Lastschrift-Mandat (Bankeinzug)',
+                'oxtitle_en' => 'SEPA direct debit mandate (direct debit)',
+                'oxcontent_de' => '<p>Ich ermächtige [{$oxcmp_shop->oxshops__oxname->value}], Zahlungen von
                 meinem Konto mittels SEPA Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an,
                 die von [{$oxcmp_shop->oxshops__oxname->value}] auf mein Konto gezogenen SEPA Lastschriften
                 einzulösen.</p>
@@ -455,7 +496,7 @@ final class UnzerDefinitions
                 <p>Für den Fall der Nichteinlösung der Lastschriften oder des Widerspruchs gegen die Lastschriften
                 weise ich meine Bank unwiderruflich an, [{$oxcmp_shop->oxshops__oxname->value}]oder Dritten auf
                 Anforderung meinen Namen, Adresse und Geburtsdatum vollständig mitzuteilen.</p>',
-            'oxcontent_en' => '<p>By signing this mandate form, you authorise [{$oxcmp_shop->oxshops__oxname->value}]
+                'oxcontent_en' => '<p>By signing this mandate form, you authorise [{$oxcmp_shop->oxshops__oxname->value}]
                 to send instructions to your bank to debit your account and your bank to debit your account in
                 accordance with the instructions from [{$oxcmp_shop->oxshops__oxname->value}].</p>
                 <p>Note: As part of your rights, you are entitled to a refund from your bank under the terms and
@@ -465,37 +506,37 @@ final class UnzerDefinitions
                 bank.<br><br>In case of refusal or rejection of direct debit payment I instruct my bank irrevocably
                 to inform [{$oxcmp_shop->oxshops__oxname->value}] or any third party upon request about my name,
                 address and date of birth.</p>'
-        ],
+            ],
         'oscunzersepamandateconfirmation' =>
-        [
-            'oxloadid' => 'oscunzersepamandateconfirmation',
-            'oxactive' => 1,
-            'oxtitle_de' => 'Unzer Sepa',
-            'oxtitle_en' => 'Unzer Sepa Text',
-            'oxcontent_de' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+            [
+                'oxloadid' => 'oscunzersepamandateconfirmation',
+                'oxactive' => 1,
+                'oxtitle_de' => 'Unzer Sepa',
+                'oxtitle_en' => 'Unzer Sepa Text',
+                'oxcontent_de' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
                 <a rel="nofollow" href="[{ $oCont->getLink() }]"
                 onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:\'plain=1\'}]\', \'agb_popup\',
                 \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;"
                 class="fontunderline">Sepa-Mandat</a> bestätigen.
                 [{/oxifcontent}]',
-            'oxcontent_en' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
+                'oxcontent_en' => '[{oxifcontent ident="oscunzersepamandatetext" object="oCont"}]
                 Confirm <a rel="nofollow" href="[{ $oCont->getLink() }]"
                 onclick="window.open(\'[{ $oCont->getLink()|oxaddparams:"plain=1"}]\', \'sepa_popup\',
                 \'resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400\');return false;"
                 class="fontunderline">Sepa-Mandate</a>.
                 [{/oxifcontent}]'
-        ],
+            ],
         'oscunzerinstallmentconfirmation' =>
-        [
-            'oxloadid' => 'oscunzerinstallmentconfirmation',
-            'oxactive' => 1,
-            'oxtitle_de' => 'Unzer Ratenkauf-Bestätigung',
-            'oxtitle_en' => 'TR: Unzer Installment Text',
-            'oxcontent_de' => '<p>Bitte lesen Sie den Inhalt des Vertrags (siehe PDF) und bestätigen
+            [
+                'oxloadid' => 'oscunzerinstallmentconfirmation',
+                'oxactive' => 1,
+                'oxtitle_de' => 'Unzer Ratenkauf-Bestätigung',
+                'oxtitle_en' => 'TR: Unzer Installment Text',
+                'oxcontent_de' => '<p>Bitte lesen Sie den Inhalt des Vertrags (siehe PDF) und bestätigen
                 Sie die Konditionen.</p><p></p>',
-            'oxcontent_en' => 'TR: <p>Bitte lesen Sie den Inhalt des Vertrags (siehe PDF) und bestätigen
+                'oxcontent_en' => 'TR: <p>Bitte lesen Sie den Inhalt des Vertrags (siehe PDF) und bestätigen
                 Sie die Konditionen.</p><p></p>'
-        ]
+            ]
     ];
 
     /** @var array[] */

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
+use Codeception\Util\Fixtures;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
@@ -37,6 +38,14 @@ final class Przelewy24Cest extends BaseCest
             [0 => 'PLN@ 4.66@ ,@ @ zł@ 2']
         );
         $oConfig->setActShopCurrency(0);
+        // Przelewy24 is now only available in PL, BaseCest should make all the necessary setup
+        // User is assigned to PL
+        $user = Fixtures::get('client');
+        $I->updateInDatabase(
+            'oxuser',
+            ['oxcountryid' => '8f241f1109624d3f8.50953605'], // PL
+            ['oxusername' => $user['username']]
+        );
     }
 
     public function _after(AcceptanceTester $I): void
@@ -53,6 +62,13 @@ final class Przelewy24Cest extends BaseCest
             ]
         );
         $oConfig->setActShopCurrency(0);
+
+        $user = Fixtures::get('client');
+        $I->updateInDatabase(
+            'oxuser',
+            ['oxcountryid' => 'a7c40f631fc920687.20179984'], // DE
+            ['oxusername' => $user['username']]
+        );
         parent::_after($I);
     }
 

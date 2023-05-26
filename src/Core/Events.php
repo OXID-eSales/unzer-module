@@ -8,15 +8,13 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\StaticContent;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions as UnzerDefinitionsService;
 
 /**
  * Class defines what module does on Shop events.
@@ -38,6 +36,8 @@ class Events
 
         //add static contents and payment methods
         self::addStaticContents();
+
+        self::removeNonExistingUnzerPaymentMethodsFromDatabase();
     }
 
     /**
@@ -104,5 +104,34 @@ class Events
         return new StaticContent(
             $queryBuilderFactory,
         );
+    }
+
+    private static function removeNonExistingUnzerPaymentMethodsFromDatabase(): void
+    {
+        /* This method makes sure, that non-existing payment methods are removed from the database,
+         * to avoid them from being offered in the frontend (which will then crash the shop).
+         * */
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()
+            ->getContainer();
+
+        /** @var UnzerDefinitionsService $unzerDefService */
+        $unzerDefService = $container->get(UnzerDefinitionsService::class);
+        $unzerDefinitions = $unzerDefService->getDefinitionsArray();
+        $unzerPaymentMethods = [];
+        foreach (array_keys($unzerDefinitions) as $identifier) {
+            $unzerPaymentMethods[] = sprintf("'%s'", $identifier);
+        }
+
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $statement = $queryBuilder
+            ->delete('oxpayments')
+            ->where("oxid like 'oscunzer\_%' ")
+            ->andWhere(sprintf("oxid not in (%s)", implode(',', $unzerPaymentMethods)));
+        $statement->execute();
     }
 }

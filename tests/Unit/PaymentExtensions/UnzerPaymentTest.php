@@ -48,8 +48,12 @@ class UnzerPaymentTest extends IntegrationTestCase
         $chargeResult = $this->createPartialMock(Charge::class, []);
         $unzerServiceMock->expects($this->once())->method('setSessionVars')->with($chargeResult);
 
+        $sdkMock = $this->createPartialMock(UnzerSDK::class, ['createCustomer', 'fetchCustomer']);
+        $sdkMock->method('createCustomer')->willReturn($customer = new Customer());
+        $sdkMock->method('fetchCustomer')->willReturn($customer = new Customer());
+
         $sut = $this->getMockForAbstractClass(UnzerPayment::class, [
-            $this->createPartialMock(UnzerSDK::class, []),
+            $sdkMock,
             $unzerServiceMock
         ], '', true, true, true, ['getUnzerPaymentTypeObject']);
         $sut->method('getUnzerPaymentTypeObject')->willReturn(

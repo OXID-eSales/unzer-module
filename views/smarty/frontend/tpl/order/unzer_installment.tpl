@@ -70,7 +70,7 @@
 [{capture assign="unzerInstallmentJS"}]
 
         // Create an Unzer instance with your public key
-        let unzerInstance = new unzer('[{$unzerpub}]');
+        let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
 
         let InstallmentSecured = unzerInstance.InstallmentSecured();
 

@@ -3,16 +3,34 @@
     [{capture assign="unzerApplePayJS"}]
         const $errorHolder = $('#error-holder');
 
-        const unzerInstance = new unzer('[{$unzerpub}]');
+        const unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
         const unzerApplePayInstance = unzerInstance.ApplePay();
         const $form = $('#orderConfirmAgbBottom');
 
         $form.submit(function (e) {
             e.preventDefault();
 
-            const agbCheck = $('[name=ord_agb]');
-            if (agbCheck && !agbCheck.is(':checked')) {
-                handleError({html: '[{oxmultilang ident= 'READ_AND_CONFIRM_TERMS'}]'})
+            let needToConfirm = false;
+            let confirmMessage = '';
+
+            const agbCheck = $('[name=ord_agb]:checkbox');
+            const intabgileCheck = $('[name=oxdownloadableproductsagreement]:checkbox');
+            const serviceCheck = $('[name=oxserviceproductsagreement]:checkbox');
+            if (agbCheck.length > 0 && !agbCheck.is(':checked')) {
+                needToConfirm = true;
+                confirmMessage = {html: '[{oxmultilang ident= 'READ_AND_CONFIRM_TERMS'}]'};
+            }
+            else if (intabgileCheck.length > 0 && !intabgileCheck.is(':checked')) {
+                needToConfirm = true;
+                confirmMessage = {html: '[{oxmultilang ident= 'OSCUNZER_MISSING_INTAGIBLE_CONFIRMATION_MESSAGE'}]'};
+            }
+            else if (serviceCheck.length > 0 && !serviceCheck.is(':checked')) {
+                needToConfirm = true;
+                confirmMessage = {html: '[{oxmultilang ident= 'OSCUNZER_MISSING_SERVICEAGREEMENT_CONFIRMATION_MESSAGE'}]'};
+            }
+
+            if (needToConfirm) {
+                handleError(confirmMessage);
                 return;
             }
             setupApplePaySession();

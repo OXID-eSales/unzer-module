@@ -1,7 +1,8 @@
 [{include file="@unzer/unzer_assets.tpl"}]
-
+<script type="text/javascript" async
+        src="https://h.online-metrix.net/fp/tags.js?org_id=363t8kgq&session_id=[{$unzerThreatMetrixSessionID}]">
+</script>
 [{assign var="invadr" value=$oView->getInvoiceAddress()}]
-[{assign var="deladr" value=$oView->getDelAddress()}]
 [{assign var="iBirthdayMonth" value=0}]
 [{assign var="iBirthdayDay" value=0}]
 [{assign var="iBirthdayYear" value=0}]
@@ -26,7 +27,7 @@
 [{elseif $oxcmp_user->oxuser__oxbirthdate->value && $oxcmp_user->oxuser__oxbirthdate->value != "0000-00-00"}]
     [{assign var="iBirthdayYear" value=$oxcmp_user->oxuser__oxbirthdate->value|regex_replace:"/[-]([0-9]{1,2})[-]([0-9]{1,2})$/":""}]
 [{/if}]
-[{if ($oxcmp_user->oxuser__oxcompany->value || ($deladr && $deladr->oxaddress__oxcompany->value))}]
+[{if ($oxcmp_user->oxuser__oxcompany->value || ($invadr && $invadr->oxaddress__oxcompany->value))}]
     [{assign var="isCompany" value=true}]
 [{/if}]
 
@@ -137,10 +138,10 @@
 
 [{if $isCompany}]
     showB2B();
-    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2BPubKey()}]');
+    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2BPubKey()}]', {locale: "[{$unzerLocale}]"});
 [{else}]
     showB2C();
-    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2CPubKey()}]');
+    let unzerInstance = new unzer('[{$oViewConf->getUnzerB2CPubKey()}]', {locale: "[{$unzerLocale}]"});
 [{/if}]
     let paylaterInvoice = unzerInstance.PaylaterInvoice();
     paylaterInvoice.create({
