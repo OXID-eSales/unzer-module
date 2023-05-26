@@ -88,17 +88,12 @@ class PaymentValidator
     public function isConfigurationHealthy(Payment $payment): bool
     {
         $paymentId = $payment->getId();
-        $privateKeys = $this->moduleSettings->getPrivateKeysWithContext();
-        $isHealthy = (!empty($privateKeys['shop'])); // default
+        $isHealthy = ($this->moduleSettings->getShopPrivateKey() && $this->moduleSettings->getShopPublicKey()); // default
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-            $isHealthy = (
-                !empty($privateKeys['b2ceur']) &&
-                !empty($privateKeys['b2cchf']) &&
-                !empty($privateKeys['b2beur']) &&
-                !empty($privateKeys['b2bchf'])
-            );
+            $isHealthy = $this->moduleSettings->isInvoiceEligibility();
         } elseif ($paymentId === UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
             $isHealthy = (
+                $isHealthy &&
                 !empty($this->moduleSettings->getApplePayMerchantCert()) &&
                 !empty($this->moduleSettings->getApplePayMerchantCertKey()) &&
                 !empty($this->moduleSettings->getApplePayMerchantIdentifier())
