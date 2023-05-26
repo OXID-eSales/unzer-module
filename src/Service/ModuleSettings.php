@@ -707,7 +707,7 @@ class ModuleSettings
     }
 
     /**
-     * @param $context shop, b2ceur, bc2chf, b2beur, b2bchf
+     * @param $context
      * @return bool
      */
     private function hasWebhookConfiguration(string $context): bool
