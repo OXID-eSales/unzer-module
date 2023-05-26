@@ -179,6 +179,7 @@ abstract class BaseCest
         $this->I->click($label);
 
         $this->I->click($nextStepButton);
+        $this->I->waitForPageLoad();
         $this->I->waitForElement($breadCrumb);
     }
 
