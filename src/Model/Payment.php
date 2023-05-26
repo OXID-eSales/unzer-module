@@ -51,6 +51,11 @@ class Payment extends Payment_parent
         return $this->getServiceFromContainer(PaymentValidator::class)->isSecuredPayment($this);
     }
 
+    public function isUnzerPaymentHealthy(): bool
+    {
+        return $this->getServiceFromContainer(PaymentValidator::class)->isConfigurationHealthy($this);
+    }
+
     private function canDoUnzerAbility(string $sAbility): bool
     {
         $definitionService = $this->getServiceFromContainer(UnzerDefinitions::class);

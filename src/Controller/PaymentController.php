@@ -57,44 +57,44 @@ class PaymentController extends PaymentController_parent
 
         $paymentListRaw = $paymentList;
         $paymentList = [];
-        if (!$moduleSettings->checkHealth()) {
-            /**
-             * @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment
-             */
-            foreach ($paymentListRaw as $key => $payment) {
-                if (is_object($payment) && $payment->isUnzerPayment()) {
-                    continue;
-                }
 
+        /**
+         * @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment
+         */
+        foreach ($paymentListRaw as $key => $payment) {
+            if (!is_object($payment)) {
+                continue;
+            }
+            // any non-unzer payment ...
+            if (!$payment->isUnzerPayment()) {
+                $paymentList[$key] = $payment;
+                continue;
+            }
+
+            if (
+                (
+                    $payment->isUnzerPaymentHealthy()
+                ) &&
+                (
+                    empty($unzerDefinitions[$key]['currencies']) ||
+                    in_array($actShopCurrency->name, $unzerDefinitions[$key]['currencies'], true)
+                ) &&
+                (
+                    empty($unzerDefinitions[$key]['countries']) ||
+                    in_array($userCountryIso, $unzerDefinitions[$key]['countries'], true)
+                )
+            ) {
                 $paymentList[$key] = $payment;
             }
-        } else {
-            /**
-             * @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment
-             */
-            foreach ($paymentListRaw as $key => $payment) {
-                if (
-                    (
-                        empty($unzerDefinitions[$key]['currencies']) ||
-                        in_array($actShopCurrency->name, $unzerDefinitions[$key]['currencies'], true)
-                    ) &&
-                    (
-                        empty($unzerDefinitions[$key]['countries']) ||
-                        in_array($userCountryIso, $unzerDefinitions[$key]['countries'], true)
-                    )
-                ) {
-                    $paymentList[$key] = $payment;
-                }
-            }
-            // check ApplePay Eligibility
-            if (!$moduleSettings->isApplePayEligibility()) {
-                unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
-            }
+        }
+        // check ApplePay Eligibility
+        if (!$moduleSettings->isApplePayEligibility()) {
+            unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
+        }
 
-            //check Invoice Eligibility
-            if (!$moduleSettings->isInvoiceEligibility()) {
-                unset($paymentList[UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID]);
-            }
+        //check Invoice Eligibility
+        if (!$moduleSettings->isInvoiceEligibility()) {
+            unset($paymentList[UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID]);
         }
 
         return $paymentList;

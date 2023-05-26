@@ -8,14 +8,15 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 
 class PaymentValidator
 {
-    /** @var PaymentExtensionLoader */
-    protected $paymentExtLoader;
+    protected PaymentExtensionLoader $paymentExtLoader;
 
-    /** @var Context */
-    protected $moduleContext;
+    protected Context $moduleContext;
+
+    protected ModuleSettings $moduleSettings;
 
     /**
      * @param PaymentExtensionLoader $paymentExtLoader
@@ -23,10 +24,12 @@ class PaymentValidator
      */
     public function __construct(
         PaymentExtensionLoader $paymentExtLoader,
-        Context $moduleContext
+        Context $moduleContext,
+        ModuleSettings $moduleSettings
     ) {
         $this->paymentExtLoader = $paymentExtLoader;
         $this->moduleContext = $moduleContext;
+        $this->moduleSettings = $moduleSettings;
     }
 
     /**
@@ -80,5 +83,28 @@ class PaymentValidator
         }
 
         return $isSecured;
+    }
+
+    public function isConfigurationHealthy(Payment $payment): bool
+    {
+        $paymentId = $payment->getId();
+        $privateKeys = $this->moduleSettings->getPrivateKeysWithContext();
+        $isHealthy = (!empty($privateKeys['shop'])); // default
+        if ($paymentId == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+            $isHealthy = (
+                !empty($privateKeys['b2ceur']) &&
+                !empty($privateKeys['b2cchf']) &&
+                !empty($privateKeys['b2beur']) &&
+                !empty($privateKeys['b2bchf'])
+            );
+        } elseif ($paymentId == UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
+            $isHealthy = (
+                !empty($this->moduleSettings->getApplePayMerchantCert()) &&
+                !empty($this->moduleSettings->getApplePayMerchantCertKey()) &&
+                !empty($this->moduleSettings->getApplePayMerchantIdentifier())
+            );
+        }
+
+        return $isHealthy;
     }
 }
