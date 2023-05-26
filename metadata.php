@@ -187,7 +187,7 @@ $aModule = [
             'group' => 'unzerwebhooks',
             'name' => 'webhookConfiguration',
             'type' => 'arr',
-            'value' => ''
+            'value' => []
         ],
         [
             'group' => 'unzercard',
