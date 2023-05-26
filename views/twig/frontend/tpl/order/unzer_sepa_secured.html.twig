@@ -30,13 +30,13 @@
         <label class="col-12 col-lg-3 req" for="oxDay">{{ translate({ ident: "BIRTHDATE" }) }}</label>
         <div class="col-3 col-lg-3">
             <input id="birthdate_day" class="oxDay form-control" type="text" maxlength="2" value="{% if iBirthdayDay > 0 %}{{ iBirthdayDay }}{% endif %}"
-                   placeholder="{{ translate({ ident: "DAY" }) }}" required>
+                   placeholder="{{ translate({ ident: "DAY" }) }}" required />
         </div>
         <div class="col-6 col-lg-3">
             <select id="birthdate_month" class="oxMonth form-control selectpicker" required>
                 <option value="" label="-">-</option>
                 {% for month in 1..13 %}
-                    <option value="[{loop.index0 %} selected="selected" {% endif %}>
+                    <option value="[{loop.index0" {% if %} selected="selected" {% endif %}>
                         {{ translate({ ident: "MONTH_NAME_"|cat(smarty.section.month.index) }) }}
                     </option>
                 {% endfor %}
@@ -44,7 +44,7 @@
         </div>
         <div class="col-3 col-lg-3">
             <input id="birthdate_year" class="oxYear form-control" type="text" maxlength="4" value="{% if iBirthdayYear %}{{ iBirthdayYear }}{% endif %}"
-                   placeholder="{{ translate({ ident: "YEAR" }) }}" required>
+                   placeholder="{{ translate({ ident: "YEAR" }) }}" required />
         </div>
         <div class="offset-lg-3 col-lg-9 col-12">
             <div class="help-block">

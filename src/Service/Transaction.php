@@ -51,10 +51,9 @@ class Transaction
      * @param UtilsDate $utilsDate
      */
     public function __construct(
-        Context   $context,
+        Context $context,
         UtilsDate $utilsDate
-    )
-    {
+    ) {
         $this->context = $context;
         $this->utilsDate = $utilsDate;
     }
@@ -139,12 +138,11 @@ class Transaction
      * @throws \Exception
      */
     public function writeTransactionToDB(
-        string    $orderid,
-        string    $userId,
-        ?Payment  $unzerPayment,
+        string $orderid,
+        string $userId,
+        ?Payment $unzerPayment,
         ?Shipment $unzerShipment = null
-    ): bool
-    {
+    ): bool {
         $transaction = $this->getNewTransactionObject();
 
         $params = [
@@ -339,12 +337,11 @@ class Transaction
      * @throws \Exception
      */
     public function writeInitOrderToDB(
-        string   $orderid,
-        string   $userId,
+        string $orderid,
+        string $userId,
         ?Payment $unzerPayment,
-        ?Basket  $basketModel
-    ): bool
-    {
+        ?Basket $basketModel
+    ): bool {
         $transaction = $this->getNewTransactionObject();
 
         $params = [

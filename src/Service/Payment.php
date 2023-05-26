@@ -75,14 +75,13 @@ class Payment
      * @param TransactionService $transactionService
      */
     public function __construct(
-        Session                $session,
+        Session $session,
         PaymentExtensionLoader $paymentExtLoader,
-        Translator             $translator,
-        Unzer                  $unzerService,
-        UnzerSDKLoader         $unzerSDKLoader,
-        TransactionService     $transactionService
-    )
-    {
+        Translator $translator,
+        Unzer $unzerService,
+        UnzerSDKLoader $unzerSDKLoader,
+        TransactionService $transactionService
+    ) {
         $this->session = $session;
         $this->paymentExtLoader = $paymentExtLoader;
         $this->translator = $translator;

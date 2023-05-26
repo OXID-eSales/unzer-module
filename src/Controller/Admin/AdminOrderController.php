@@ -98,6 +98,11 @@ class AdminOrderController extends AdminDetailsController_parent
     }
 
     public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
+    {
+        return $this->getServiceFromContainer(UnzerSDKLoader::class)
+            ->getUnzerSDK($customerType, $currency);
+    }
+
     /**
      * Method checks is order was made with unzer payment
      *
@@ -128,8 +133,6 @@ class AdminOrderController extends AdminDetailsController_parent
      */
     public function getEditObject(): ?object
     {
-        return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK($customerType, $currency);
         $soxId = $this->getEditObjectId();
         if ($this->editObject === null && $soxId != '-1') {
             $this->editObject = oxNew(Order::class);
@@ -260,12 +263,6 @@ class AdminOrderController extends AdminDetailsController_parent
     {
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
         return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());
-    }
-
-    public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
-    {
-        return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK($customerType, $currency);
     }
 
     protected function addAuthorizationViewData(Authorization $authorization): void
@@ -419,29 +416,6 @@ class AdminOrderController extends AdminDetailsController_parent
         }
     }
 
-    /**
-     * Method checks is order was made with unzer payment
-     *
-     * @return bool
-     */
-    public function isUnzerOrder(): bool
-    {
-        $isUnzer = false;
-
-        /** @var Order $order */
-        $order = $this->getEditObject();
-        /** @var string $oxPaymentType */
-        $oxPaymentType = $order->getFieldData('oxpaymenttype');
-        if ($order instanceof Order && strpos($oxPaymentType, "oscunzer") !== false) {
-            $this->oPayment = oxNew(Payment::class);
-            if ($this->oPayment->load($oxPaymentType)) {
-                $isUnzer = true;
-            }
-        }
-
-        return $isUnzer;
-    }
-
     public function canCollectFully(): bool
     {
         if (!($this->oPayment instanceof Payment)) {
@@ -481,32 +455,5 @@ class AdminOrderController extends AdminDetailsController_parent
         }
 
         return $this->oPayment->canRevertPartially();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCancelReasonRequired(): bool
-    {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
-        return $this->oPayment->isUnzerSecuredPayment();
-    }
-    /**
-     * Returns editable order object
-     *
-     * @return Order|null
-     */
-    public function getEditObject(): ?object
-    {
-        $soxId = $this->getEditObjectId();
-        if ($this->editObject === null && $soxId != '-1') {
-            $this->editObject = oxNew(Order::class);
-            $this->editObject->load($soxId);
-        }
-
-        return $this->editObject;
     }
 }
