@@ -73,18 +73,30 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     public function registerWebhooks(): void
     {
-        $this->unzerWebhooks->setPrivateKeys(
-            $this->moduleSettings->getPrivateKeysWithContext()
-        );
-        $this->unzerWebhooks->registerWebhookConfiguration();
+        try {
+            $this->unzerWebhooks->setPrivateKeys(
+                $this->moduleSettings->getPrivateKeysWithContext()
+            );
+            $this->unzerWebhooks->registerWebhookConfiguration();
+        } catch (Throwable $loggerException) {
+            Registry::getUtilsView()->addErrorToDisplay(
+                $loggerException->getMessage()
+            );
+        }
     }
 
     public function unregisterWebhooks(): void
     {
-        $this->unzerWebhooks->setPrivateKeys(
-            $this->moduleSettings->getPrivateKeysWithContext()
-        );
-        $this->unzerWebhooks->unregisterWebhookConfiguration();
+        try {
+            $this->unzerWebhooks->setPrivateKeys(
+                $this->moduleSettings->getPrivateKeysWithContext()
+            );
+            $this->unzerWebhooks->unregisterWebhookConfiguration();
+        } catch (Throwable $loggerException) {
+            Registry::getUtilsView()->addErrorToDisplay(
+                $loggerException->getMessage()
+            );
+        }
     }
 
     /**
