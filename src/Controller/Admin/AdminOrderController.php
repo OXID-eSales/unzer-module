@@ -162,7 +162,9 @@ class AdminOrderController extends AdminDetailsController_parent
             }
 
             $charges = [];
-            if (!$unzerPayment->isCanceled()) {
+            $isChargeBack = $unzerPayment->isChargeBack();
+            $this->_aViewData['isChargeBack']  = $isChargeBack;
+            if (!$unzerPayment->isCanceled() && !$isChargeBack) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
                     if ($charge->isSuccess()) {
