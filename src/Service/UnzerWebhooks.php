@@ -115,7 +115,7 @@ class UnzerWebhooks
         return $this->unzerSDKLoader->getUnzerSDKbyKey($unzerKey);
     }
 
-    protected function getMappedWebhookConfiguration(): array
+    public function getMappedWebhookConfiguration(): array
     {
         $resultConfig = [];
         $webhookConfiguration = $this->moduleSettings->getWebhookConfiguration();
@@ -132,14 +132,14 @@ class UnzerWebhooks
         $this->moduleSettings->saveWebhookConfiguration($webhookConfig);
     }
 
-    protected function addWebhookConfiguration(string $key, array $config): void
+    public function addWebhookConfiguration(string $key, array $config): void
     {
         $mappedConfig = $this->getMappedWebhookConfiguration();
         $mappedConfig[$key] = $config;
         $this->saveMappedWebhookConfiguration($mappedConfig);
     }
 
-    protected function removeWebhookConfiguration(string $key): void
+    public function removeWebhookConfiguration(string $key): void
     {
         $mappedConfig = $this->getMappedWebhookConfiguration();
         if (isset($mappedConfig[$key])) {
@@ -148,7 +148,7 @@ class UnzerWebhooks
         }
     }
 
-    protected function getWebhookURL(array $extraParams): string
+    public function getWebhookURL(array $extraParams): string
     {
         $withXDebug = ($this->moduleSettings->isSandboxMode() && $this->moduleSettings->isDebugMode());
         $extra = '';
@@ -175,7 +175,7 @@ class UnzerWebhooks
         }
     }
 
-    protected function createWebhookForKey(string $unzerKey, string $url, string $event): array
+    public function createWebhookForKey(string $unzerKey, string $url, string $event): array
     {
         try {
             /** @var UnzerSDK $unzer */
@@ -195,7 +195,7 @@ class UnzerWebhooks
         }
     }
 
-    protected function deleteWebhookForKey(string $unzerKey, string $webhookId): void
+    public function deleteWebhookForKey(string $unzerKey, string $webhookId): void
     {
         try {
             /** @var UnzerSDK $unzer */
@@ -206,7 +206,7 @@ class UnzerWebhooks
         }
     }
 
-    protected function getUnzerWebhooksByKey(string $unzerKey): array
+    public function getUnzerWebhooksByKey(string $unzerKey): array
     {
         $allHooks = [];
         try {
@@ -228,7 +228,7 @@ class UnzerWebhooks
         return $allHooks;
     }
 
-    protected function findWebhookByUrlAndEvent(string $url, string $event, array $webhooks): array
+    public function findWebhookByUrlAndEvent(string $url, string $event, array $webhooks): array
     {
         foreach ($webhooks as $webhook) {
             if ($url === $webhook['url'] && $event === $webhook['event']) {
@@ -238,7 +238,7 @@ class UnzerWebhooks
         return [];
     }
 
-    protected function findWebhookByUrlAndEventAndKey(string $url, string $event, string $key, array $webhooks): array
+    public function findWebhookByUrlAndEventAndKey(string $url, string $event, string $key, array $webhooks): array
     {
         foreach ($webhooks as $webhook) {
             if ($url === $webhook['url'] && $event === $webhook['event'] && $key === $webhook['key']) {

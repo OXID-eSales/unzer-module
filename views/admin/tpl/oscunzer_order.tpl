@@ -11,6 +11,14 @@
 [{assign var="canRefundPartially" value=$oView->canRefundPartially()}]
 [{assign var="canRevertPartially" value=$oView->canRevertPartially()}]
 
+[{if $isChargeBack}]
+    [{assign var="canCollectFully" value=false}]
+    [{assign var="canCollectPartially" value=false}]
+    [{assign var="canRefundFully" value=false}]
+    [{assign var="canRefundPartially" value=false}]
+    [{assign var="canRevertPartially" value=false}]
+[{/if}]
+
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="oxid" value="[{$oxid}]">
@@ -242,6 +250,9 @@
                 </tbody>
             </table>
         [{/if}]
+    [{if $isChargeBack}]
+    <div class="errorbox">[{oxmultilang ident="OSCUNZER_CHARGEBACK"}]</div>
+    [{/if}]
     [{/block}]
 
     [{block name="unzer_cancellation"}]

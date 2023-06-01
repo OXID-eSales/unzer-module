@@ -306,6 +306,8 @@ class Transaction
     {
         unset($params['oxactiondate']);
         unset($params['serialized_basket']);
+        unset($params['customertype']);
+
         /** @var string $jsonEncode */
         $jsonEncode = json_encode($params);
         return md5($jsonEncode);
@@ -510,7 +512,7 @@ class Transaction
         if ($orderid) {
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')",
+                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback')",
                 [$orderid]
             );
 
@@ -533,7 +535,7 @@ class Transaction
         if ($orderid) {
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT OXID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending')
+                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback')
                 ORDER BY OXTIMESTAMP DESC LIMIT 1",
                 [$orderid]
             );
