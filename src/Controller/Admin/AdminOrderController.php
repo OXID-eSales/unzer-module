@@ -131,7 +131,6 @@ class AdminOrderController extends AdminDetailsController_parent
                 $editObject->getFormattedTotalOrderSum(),
                 $unzerPayment->getCurrency()
             );
-            $isPrepaymentType = ($paymentType instanceof Prepayment);
             $this->_aViewData["blShipment"] = ($paymentType instanceof InstallmentSecured);
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
@@ -166,13 +165,13 @@ class AdminOrderController extends AdminDetailsController_parent
             if (!$unzerPayment->isCanceled()) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
-                    if ($charge->isSuccess() || ($isPrepaymentType && $charge->isPending())) {
+                    if ($charge->isSuccess()) {
                         $aRv = [];
                         $aRv['chargedAmount'] = $charge->getAmount();
                         $aRv['cancelledAmount'] = $charge->getCancelledAmount();
                         $aRv['chargeId'] = $charge->getId();
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
-                        $fCharged += ($charge->isSuccess()) ? $charge->getAmount() : 0.;
+                        $fCharged += $charge->getAmount();
                         $aRv['chargeDate'] = $charge->getDate();
 
                         $charges[] = $aRv;
