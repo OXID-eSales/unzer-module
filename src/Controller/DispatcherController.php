@@ -61,10 +61,13 @@ class DispatcherController extends FrontendController
         }
 
         if (
-            ($url['scheme'] != "https" || $url['host'] != "api.unzer.com")
-            || !$transaction->isValidTransactionTypeId($typeid)
+            ($url['scheme'] != "https" || ($url['host'] != "api.unzer.com" && $url['host'] != "sbx-api.heidelpay.com"))
         ) {
             Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
+        }
+
+        if (!$transaction->isValidTransactionTypeId($typeid)) {
+            Registry::getUtils()->showMessageAndExit("Invalid type id");
         }
 
         $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDKbyKey($unzerKey);
