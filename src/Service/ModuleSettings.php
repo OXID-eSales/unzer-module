@@ -470,13 +470,13 @@ class ModuleSettings
     public function isInvoiceEligibility(): bool
     {
         return (
-                $this->isB2CInvoiceEligibility() &&
-                $this->hasWebhookConfiguration('b2ceur') &&
-                $this->hasWebhookConfiguration('b2cchf')
+                ($this->isB2CInvoiceEligibility() &&
+                    $this->hasWebhookConfiguration('b2ceur') &&
+                    $this->hasWebhookConfiguration('b2cchf'))
             ||
-                $this->isB2BInvoiceEligibility() &&
-                $this->hasWebhookConfiguration('b2beur') &&
-                $this->hasWebhookConfiguration('b2bchf')
+                ($this->isB2BInvoiceEligibility() &&
+                    $this->hasWebhookConfiguration('b2beur') &&
+                    $this->hasWebhookConfiguration('b2bchf'))
         );
     }
 

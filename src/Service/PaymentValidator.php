@@ -90,9 +90,9 @@ class PaymentValidator
         $paymentId = $payment->getId();
         $isHealthy = $this->moduleSettings->isStandardEligibility();
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-            $isHealthy = ($isHealthy && $this->moduleSettings->isInvoiceEligibility());
+            $isHealthy = $this->moduleSettings->isInvoiceEligibility();
         } elseif ($paymentId === UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
-            $isHealthy = ($isHealthy && $this->moduleSettings->isApplePayEligibility());
+            $isHealthy = $this->moduleSettings->isApplePayEligibility();
         }
 
         return $isHealthy;
