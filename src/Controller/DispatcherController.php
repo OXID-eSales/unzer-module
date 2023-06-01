@@ -86,10 +86,7 @@ class DispatcherController extends FrontendController
                 /** @var string $oxTransStatus */
                 $oxTransStatus = $order->getFieldData('oxtransstatus');
                 if ($unzerPayment->getState() == 1 && $oxTransStatus == "OK") {
-                    $utilsDate = Registry::getUtilsDate();
-                    $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-                    $order->setFieldData('oxpaid', $date);
-                    $order->save();
+                    $order->markUnzerOrderAsPaid();
                 }
 
                 if ($unzerPayment->getState() == 2) {
