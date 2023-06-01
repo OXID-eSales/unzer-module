@@ -70,5 +70,5 @@ $aLang = [
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Getting certificate failed',
     'OSCUNZER_sandbox' => 'Sandbox',
     'OSCUNZER_production' => 'Production',
-    'OSCUNZER_CHARGEBACK' => 'Chargeback successful!',
+    'OSCUNZER_CHARGEBACK' => 'Chargeback occurred!',
 ];

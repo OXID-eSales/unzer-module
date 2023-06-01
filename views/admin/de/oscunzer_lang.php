@@ -70,5 +70,5 @@ $aLang = [
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT' => 'Konnte Zertifikat zur Zahlungsabwicklung nicht abgleichen',
     'OSCUNZER_sandbox' => 'Sandbox',
     'OSCUNZER_production' => 'Livebetrieb',
-    'OSCUNZER_CHARGEBACK' => 'Rückzahlung erfolgt!',
+    'OSCUNZER_CHARGEBACK' => 'Chargeback erfolgt!',
 ];
