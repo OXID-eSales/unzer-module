@@ -5,6 +5,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -42,7 +43,7 @@ class OrderMain extends OrderMain_parent
      */
     public function sendShipmentNotification(Order $oOrder): void
     {
-        $paymentService = $this->getServiceFromContainer(Payment::class);
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
         $oShipment = $paymentService->sendShipmentNotification($oOrder);
         if ($oShipment instanceof UnzerApiException) {
             $oxException = oxNew(
