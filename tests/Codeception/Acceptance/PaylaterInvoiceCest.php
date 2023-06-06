@@ -62,9 +62,9 @@ final class PaylaterInvoiceCest extends BaseCest
     {
         $I->wantToTest('PaylaterInvoice B2C EUR payment works');
         $this->_initializeSecuredTest();
-        $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
+        $this->_choosePayment($this->invoicePaymentLabel);
         $this->fillB2Cdata($I);
-        $orderPage->submitOrder();
+        $this->_submitOrder();
 
         $this->_checkSuccessfulPayment();
     }
@@ -83,9 +83,9 @@ final class PaylaterInvoiceCest extends BaseCest
             ['oxid' => 'unzersecureuser']
         );
         $this->_initializeSecuredTest();
-        $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
+        $this->_choosePayment($this->invoicePaymentLabel);
         $this->fillB2Bdata($I);
-        $orderPage->submitOrder();
+        $this->_submitOrder();
 
         $this->_checkSuccessfulPayment();
     }
