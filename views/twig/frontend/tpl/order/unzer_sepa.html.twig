@@ -11,7 +11,7 @@
             <input id="oscunzersepaagreement" type="checkbox" name="oscunzersepaagreement" value="0">
             <label for="oscunzersepaagreement">
                 {% ifcontent ident "oscunzersepamandateconfirmation" set oCont %}
-                {{ oCont.oxcontents__oxcontent.value }}
+                    {{ oCont.oxcontents__oxcontent.value|raw }}
                 {% endifcontent %}
             </label>
         </div>

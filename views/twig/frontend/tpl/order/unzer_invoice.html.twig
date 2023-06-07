@@ -79,7 +79,7 @@
                 <select id="birthdate_month" class="oxMonth form-control selectpicker" required>
                     <option value="" label="-">-</option>
                     {% for month in 1..12 %}
-                        <option value="[{ loop.index0 }]" {% if iBirthdayMonth == month %} selected="selected" {% endif %}>
+                        <option value="{{ month }}" {% if iBirthdayMonth == month %} selected="selected" {% endif %}>
                             {{ translate({ ident: "MONTH_NAME_"|cat(month) }) }}
                         </option>
                     {% endfor %}
@@ -185,7 +185,7 @@
                 let hiddenCustomerType = $(document.createElement('input'))
                     .attr('type', 'hidden')
                     .attr('name', 'unzer_customer_type')
-                    .val('[{$customerType}]');
+                    .val('{{ customerType }}');
                 $('#orderConfirmAgbBottom').find(".hidden").append(hiddenCustomerType);
 
                 let hiddenTypeId = $(document.createElement('input'))

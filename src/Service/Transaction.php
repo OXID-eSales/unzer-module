@@ -110,11 +110,12 @@ class Transaction
             $queryBuilder->select('typeid')
                 ->from('oscunzertransaction')
                 ->where('oxorderid = :oxorderid')
-                ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
+                ->andWhere($queryBuilder->expr()->in('oxaction', ':oxactions'))
                 ->distinct();
 
             $parameters = [
-                'oxorderid' => $orderid
+                'oxorderid' => $orderid,
+                'oxactions' => ["completed", "pending", "chargeback"]
             ];
 
             /** @var Result $result */
@@ -602,12 +603,13 @@ class Transaction
         $queryBuilder->select('oxid')
             ->from('oscunzertransaction')
             ->where('oxorderid = :oxorderid')
-            ->andWhere($queryBuilder->expr()->in('oxidaction', ['completed', 'pending']))
+            ->andWhere($queryBuilder->expr()->in('oxaction', 'oxactions'))
             ->orderBy('oxtimestamp')
             ->distinct();
 
         $parameters = [
-            'oxorderid' => $orderid
+            'oxorderid' => $orderid,
+            'oxactions' => ["completed", "pending", "chargeback"]
         ];
 
         /** @var Result $result */

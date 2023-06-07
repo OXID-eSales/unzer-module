@@ -94,7 +94,7 @@ class AdminOrderController extends AdminDetailsController_parent
             $this->_aViewData['sMessage'] = $translator->translate("OSCUNZER_NO_UNZER_ORDER");
         }
 
-        return "@unzer/admin/tpl/oscunzer_order";
+        return "@osc-unzer/admin/tpl/oscunzer_order";
     }
 
     public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer

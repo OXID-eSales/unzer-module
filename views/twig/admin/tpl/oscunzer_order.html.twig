@@ -7,7 +7,7 @@
 {% endif %}
 
 <form name="transfer" id="transfer" action="{{ oViewConf.getSelfLink() }}" method="post">
-    {{ oViewConf.getHiddenSid() }}
+    {{ oViewConf.getHiddenSid()|raw }}
     <input type="hidden" name="oxid" value="{{ oxid }}">
     <input type="hidden" name="cl" value="order_main">
 </form>
@@ -63,7 +63,7 @@
                             <tr>
                                 <td {{ unzStyle }}>{{ oUnzerShipment.shipingDate|escape }}</td>
                                 <td {{ unzStyle }}>{{ oUnzerShipment.shipId|escape }}</td>
-                                <td {{ unzStyle }}>{{ oUnzerShipment.amount|escape|string_format(" % .2f") }}</td>
+                                <td {{ unzStyle }}>{{ oUnzerShipment.amount|escape|number_format(2, '.', ' ') }}</td>
                                 <td {{ unzStyle }}>{{ oUnzerShipment.invoiceid|escape }}</td>
                             </tr>
                             {% endfor %}
@@ -98,10 +98,10 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <b>{{ translate({ ident: "OSCUNZER_REMAING_AMOUNT", suffix: "COLON" }) }}</b>{{ AuthAmountRemaining|string_format(" % .2f") }} {{ AuthCur }}<br>
-                                    <b>{{ translate({ ident: "OSCUNZER_ORDER_AMOUNT", suffix: "COLON" }) }}</b>{{ AuthAmount|string_format(" % .2f") }} {{ AuthCur }}<br>
+                                    <b>{{ translate({ ident: "OSCUNZER_REMAING_AMOUNT", suffix: "COLON" }) }}</b>{{ AuthAmountRemaining|number_format(2, '.', ' ') }} {{ AuthCur }}<br>
+                                    <b>{{ translate({ ident: "OSCUNZER_ORDER_AMOUNT", suffix: "COLON" }) }}</b>{{ AuthAmount|number_format(2, '.', ' ') }} {{ AuthCur }}<br>
                                 </td>
-                                <td><input type="text" name="amount" value="{{ AuthAmountRemaining|string_format(" % .2f") }}"> {{ AuthCur }}</td>
+                                <td><input type="text" name="amount" value="{{ AuthAmountRemaining|number_format(2, '.', ' ') }}"> {{ AuthCur }}</td>
                                 <td><button type="submit">{{ translate({ ident: "OSCUNZER_CHARGE_COLLECT" }) }}</button></td>
                             </tr>
                         </tbody>
@@ -161,10 +161,10 @@
 
                             <td>{{ oUnzerCharge.chargeDate|escape }}</td>
                             <td>{{ oUnzerCharge.chargeId|escape }}</td>
-                            <td>{{ oUnzerCharge.chargedAmount|escape|string_format(" % .2f") }} {{ uzrCurrency }}</td>
+                            <td>{{ oUnzerCharge.chargedAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
                             {% if oUnzerCharge.cancellationPossible %}
                                 <td>
-                                    {{ oUnzerCharge.cancelledAmount|escape|string_format(" % .2f") }} {{ uzrCurrency }}
+                                    {{ oUnzerCharge.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}
                                 </td>
                                 {% if blCancelReasonReq %}
                                     <td>
@@ -234,7 +234,7 @@
                     <tr>
                         <td>{{ oUnzerCancel.cancelDate|escape }}</td>
                         <td>{{ oUnzerCancel.cancellationId|escape }}</td>
-                        <td>{{ oUnzerCancel.cancelledAmount|escape|string_format(" % .2f") }} {{ uzrCurrency }}</td>
+                        <td>{{ oUnzerCancel.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
                         {% if blCancelReasonReq %}
                             <td>{{ oUnzerCancel.cancelReason|escape }}</td>
                         {% endif %}
