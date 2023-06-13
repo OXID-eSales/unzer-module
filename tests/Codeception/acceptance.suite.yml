@@ -46,13 +46,13 @@ modules:
         config_key: 'fq45QS09_fqyx09239QQ'
         depends: Db
     - \OxidEsales\Codeception\Module\SelectTheme:
-        theme_id: twig
+        theme_id: flow
         depends:
           - \OxidEsales\Codeception\Module\Database
           - Db
     - \OxidEsales\Codeception\Module\Translation\TranslationsModule:
         shop_path: '%SHOP_SOURCE_PATH%'
         paths:
-          - Application/views/admin_twig
-          - ../vendor/oxid-esales/unzer/views/admin_twig
+          - Application/views/admin_smarty
+          - ../vendor/oxid-esales/unzer/views/admin_smarty
           - ../vendor/oxid-esales/unzer/translations

@@ -215,9 +215,6 @@ abstract class BaseCest
     protected function _loginUser(string $type)
     {
         $accountMenuButton = "//div[contains(@class,'service-menu')]/button";
-            //"//button[@class='btn dropdown-toggle' and contains(@data-href, 'account')]";
-            //Locator::find('button', ['class' => 'btn dropdown-toggle', 'data-href' => 'false']);
-            // //"//div[contains(@class,'service-menu')]/button";
         $openAccountMenuButton = "//div[contains(@class,'service-menu')]/ul";
         $userLoginName = '#loginEmail';
         $userLoginPassword = '#loginPasword';

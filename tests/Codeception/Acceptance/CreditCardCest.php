@@ -109,6 +109,7 @@ final class CreditCardCest extends BaseCest
      * @param AcceptanceTester $I
      * @return void
      * @group CreditCardPaymentTest
+     * @group 1
      */
     public function checkPaymentUsingMastercardWithLastStockItemWorks(AcceptanceTester $I)
     {
