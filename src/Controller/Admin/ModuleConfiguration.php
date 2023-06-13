@@ -30,6 +30,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     protected $translator = null;
     /** @var ModuleSettings $moduleSettings */
     protected $moduleSettings = null;
+    /** @var UnzerWebhooks $unzerWebhooks */
+    protected $unzerWebhooks = null;
     protected string $_sModuleId; // phpcs:ignore PSR2.Classes.PropertyDeclaration.Underscore
 
     /**
@@ -40,6 +42,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         parent::__construct();
         $this->translator = $this->getServiceFromContainer(Translator::class);
         $this->moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+        $this->unzerWebhooks = $this->getServiceFromContainer(UnzerWebhooks::class);
     }
 
     /**
@@ -53,37 +56,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         if ($this->_sModuleId == Module::MODULE_ID) {
             try {
-                $pubKey = $this->moduleSettings->getShopPublicKey();
-                $privKey = $this->moduleSettings->getShopPrivateKey();
-                $registeredWebhookUrl = $this->moduleSettings->getRegisteredWebhook();
-                $registeredWebhookId = $this->moduleSettings->getRegisteredWebhookId();
-                $proposedWebhookUrl = $this->getProposedWebhookForActualShop();
-
-                if ($pubKey && $privKey) {
-                    /** @var Unzer $unzer */
-                    $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-                    $webhooks = $unzer->fetchAllWebhooks();
-                    $webhookUrl = '';
-                    $webhookId = '';
-                    foreach ($webhooks as $webhook) {
-                        if (
-                            $webhook->getId() == $registeredWebhookId ||
-                            $webhook->getUrl() == $proposedWebhookUrl
-                        ) {
-                            $webhookUrl = $webhook->getUrl();
-                            $webhookId = $webhook->getId();
-                            break;
-                        }
-                    }
-                    if ($webhookUrl && $webhookId && (!$registeredWebhookUrl || !$registeredWebhookId)) {
-                        $this->saveWebhookOption($webhookUrl, $webhookId);
-                    }
-                    $registeredWebhookUrl = $webhookUrl;
-
-                    $this->_aViewData["registeredwebhook"] = $registeredWebhookUrl;
-                    $this->_aViewData["showWebhookButtons"] = true;
-                }
-
+                $this->_aViewData["webhookConfiguration"] = $this->moduleSettings->getWebhookConfiguration();
                 $this->_aViewData['applePayMC'] = $this->moduleSettings->getApplePayMerchantCapabilities();
                 $this->_aViewData['applePayNetworks'] = $this->moduleSettings->getApplePayNetworks();
                 $this->_aViewData['applePayMerchantCert'] = $this->moduleSettings->getApplePayMerchantCert();
@@ -120,29 +93,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $this->moduleSettings->saveWebhookId($webhookId);
     }
 
-    /**
-     * @throws UnzerApiException
-     */
-    public function deleteWebhook(): void
+    public function registerWebhooks(): void
     {
         try {
-            /** @var Unzer $unzer */
-            $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $registeredWebhookId = $this->moduleSettings->getRegisteredWebhookId();
-
-            $webhooks = $unzer->fetchAllWebhooks();
-            foreach ($webhooks as $webhook) {
-                if ($webhook->getId() == $registeredWebhookId) {
-                    $unzer->deleteWebhook($webhook);
-                    $this->saveWebhookOption('', '');
-                }
-            }
+            $this->unzerWebhooks->setPrivateKeys(
+                $this->moduleSettings->getPrivateKeysWithContext()
+            );
+            $this->unzerWebhooks->registerWebhookConfiguration();
         } catch (Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
-                $this->translator->translateCode(
-                    (string)$loggerException->getCode(),
-                    $loggerException->getMessage()
-                )
+                $loggerException->getMessage()
             );
         }
     }
@@ -151,22 +111,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      * @throws UnzerApiException
      */
     public function registerWebhook(): void
+    public function unregisterWebhooks(): void
     {
         try {
-            /** @var Unzer $unzer */
-            $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK();
-            $url = $this->getProposedWebhookForActualShop();
-
-            $result = $unzer->createWebhook($url, "payment");
-            /** @var string $resultId */
-            $resultId = $result->getId();
-            $this->saveWebhookOption($url, $resultId);
+            $this->unzerWebhooks->setPrivateKeys(
+                $this->moduleSettings->getPrivateKeysWithContext()
+            );
+            $this->unzerWebhooks->unregisterWebhookConfiguration();
         } catch (Throwable $loggerException) {
             Registry::getUtilsView()->addErrorToDisplay(
-                $this->translator->translateCode(
-                    (string)$loggerException->getCode(),
-                    $loggerException->getMessage()
-                )
+                $loggerException->getMessage()
             );
         }
     }

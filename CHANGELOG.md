@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.0] - 2023-05-XX
+## [1.1.0] - 2023-06-02
 
 ### NEW
 - New Payment PayLater
 ### FIXED
+- Webhooks cleanup, registration is now based on key (context)
 - Fixed ApplePay admin settings not saving the merchant certificate properly.
 - New country restrictions based on the Unzer documentation
   - ALIPAY: DE, AT, BE, IT, ES, NL

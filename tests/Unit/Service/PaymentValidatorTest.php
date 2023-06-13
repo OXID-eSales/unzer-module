@@ -70,7 +70,7 @@ class PaymentValidatorTest extends IntegrationTestCase
         ];
     }
 
-    private function getSut($extensionMethods = [], $contextMethods = []): PaymentValidator
+    private function getSut($extensionMethods = [], $contextMethods = [], $settingsMethods = []): PaymentValidator
     {
         return new PaymentValidator(
             $this->createConfiguredMock(
@@ -80,6 +80,10 @@ class PaymentValidatorTest extends IntegrationTestCase
             $this->createConfiguredMock(
                 \OxidSolutionCatalysts\Unzer\Service\Context::class,
                 $contextMethods
+            ),
+            $this->createConfiguredMock(
+                \OxidSolutionCatalysts\Unzer\Service\ModuleSettings::class,
+                $settingsMethods
             )
         );
     }

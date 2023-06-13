@@ -118,18 +118,11 @@ class ModuleSettingsTest extends IntegrationTestCase
             ],
             [
                 'values' => [
-                    ['registeredWebhook', Module::MODULE_ID, 'Webhook'],
+                    ['webhookConfiguration', Module::MODULE_ID, ['foo' => 'bar']],
                 ],
-                'settingMethod' => 'getRegisteredWebhook',
-                'settingValue' => "Webhook"
+                'settingMethod' => 'getWebhookConfiguration',
+                'settingValue' => ['foo' => 'bar']
             ],
-            [
-                'values' => [
-                    ['registeredWebhookId', Module::MODULE_ID, 'WebhookId'],
-                ],
-                'settingMethod' => 'getRegisteredWebhookId',
-                'settingValue' => "WebhookId"
-            ]
         ];
     }
 
