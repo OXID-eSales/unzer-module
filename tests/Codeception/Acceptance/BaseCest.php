@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
-use OxidEsales\Codeception\Page\Checkout\OrderCheckout;
+use Codeception\Util\Locator;
+use OxidEsales\Codeception\Page\Home;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Codeception\Page\Page;
-use OxidEsales\Codeception\Step\Basket as BasketSteps;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 use OxidEsales\Codeception\Module\Translation\Translator;
 
@@ -215,6 +215,9 @@ abstract class BaseCest
     protected function _loginUser(string $type)
     {
         $accountMenuButton = "//div[contains(@class,'service-menu')]/button";
+            //"//button[@class='btn dropdown-toggle' and contains(@data-href, 'account')]";
+            //Locator::find('button', ['class' => 'btn dropdown-toggle', 'data-href' => 'false']);
+            // //"//div[contains(@class,'service-menu')]/button";
         $openAccountMenuButton = "//div[contains(@class,'service-menu')]/ul";
         $userLoginName = '#loginEmail';
         $userLoginPassword = '#loginPasword';
@@ -222,10 +225,10 @@ abstract class BaseCest
 
         $clientData = Fixtures::get($type);
 
+        $this->I->amOnPage('/index.php');
         $this->I->waitForPageLoad();
         $this->I->waitForElementVisible($accountMenuButton);
         $this->I->waitForElementClickable($accountMenuButton);
-        $this->I->moveMouseOver($accountMenuButton);
         $this->I->click($accountMenuButton);
         $this->I->waitForElementClickable($openAccountMenuButton);
 

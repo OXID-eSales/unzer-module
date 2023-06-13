@@ -1,4 +1,4 @@
-[{include file="@unzer/unzer_assets.tpl"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
 
     [{capture assign="unzerApplePayJS"}]
         const $errorHolder = $('#error-holder');

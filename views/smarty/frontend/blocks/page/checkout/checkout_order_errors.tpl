@@ -3,4 +3,4 @@
 [{if $sepaError == 1}]
     [{include file="message/error.tpl" statusMessage="ERROR_UNZER_SEPA_CONFIRMATION_MISSING"|oxmultilangassign}]
 [{/if}]
-[{include file="@unzer/message/js-errors.tpl"}]
+[{include file="@osc-unzer/frontend/tpl/message/js-errors"}]

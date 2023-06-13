@@ -7,9 +7,9 @@
 
     [{block name="checkout_installment_confirm_main"}]
         [{if $oViewConf->isFlowCompatibleTheme()}]
-            [{include file='@unzer/unzer_installment_confirm_flow.tpl'}]
+            [{include file='@osc-unzer/frontend/tpl/order/unzer_installment_confirm_flow'}]
         [{else}]
-            [{include file='@unzer/unzer_installment_confirm_wave.tpl'}]
+            [{include file='@osc-unzer/frontend/tpl/order/unzer_installment_confirm_wave'}]
         [{/if}]
     [{/block}]
 [{/capture}]

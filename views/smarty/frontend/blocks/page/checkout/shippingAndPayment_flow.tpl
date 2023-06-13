@@ -1,6 +1,6 @@
 [{assign var="payment" value=$oView->getPayment()}]
 [{if $oViewConf->checkUnzerHealth() && $payment->isUnzerPayment()}]
-    [{include file="@unzer/unzer_shippingAndPayment_flow.tpl"}]
+    [{include file="@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment_flow"}]
 [{else}]
     [{$smarty.block.parent}]
 [{/if}]

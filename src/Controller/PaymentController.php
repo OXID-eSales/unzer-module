@@ -9,8 +9,8 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Service\UserRepository;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions as UnzerDefinitionsService;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment;
@@ -50,7 +50,7 @@ class PaymentController extends PaymentController_parent
     {
         $paymentList = (array)parent::getPaymentList();
         $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
-        $unzerDefinitions = $this->getServiceFromContainer(UnzerDefinitionsService::class)
+        $unzerDefinitions = $this->getServiceFromContainer(UnzerDefinitions::class)
             ->getDefinitionsArray();
         $actShopCurrency = Registry::getConfig()->getActShopCurrencyObject();
         $userRepository = $this->getServiceFromContainer(UserRepository::class);
@@ -89,12 +89,12 @@ class PaymentController extends PaymentController_parent
             }
             // check ApplePay Eligibility
             if (!$moduleSettings->isApplePayEligibility()) {
-                unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
+                unset($paymentList[CoreUnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
             }
 
             //check Invoice Eligibility
             if (!$moduleSettings->isInvoiceEligibility()) {
-                unset($paymentList[UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID]);
+                unset($paymentList[CoreUnzerDefinitions::INVOICE_UNZER_PAYMENT_ID]);
             }
         }
 

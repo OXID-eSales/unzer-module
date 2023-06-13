@@ -1,4 +1,4 @@
-[{include file="@unzer/unzer_assets.tpl"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
 [{assign var="invadr" value=$oView->getInvoiceAddress()}]
 [{if isset( $invadr.oxuser__oxbirthdate.month )}]
     [{assign var="iBirthdayMonth" value=$invadr.oxuser__oxbirthdate.month}]

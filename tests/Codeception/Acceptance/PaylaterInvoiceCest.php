@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Locator;
-use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
