@@ -226,7 +226,7 @@ $aModule = [
             'group' => 'unzerapplepay',
             'name' => 'applepay_label',
             'type' => 'str',
-            'value' => ''
+            'value' => 'default lable please change'
         ],
         [
             'group' => 'unzerapplepay',

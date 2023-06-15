@@ -34,18 +34,21 @@ class ApplePaySessionHandler
             ),
             '/'
         );
-        /** @var string $applePatLabel */
-        $applePatLabel = $this->moduleSettings->getApplePayLabel();
-        $this->session = new ApplepaySession(
-            $this->moduleSettings->getApplePayMerchantIdentifier(),
-            $applePatLabel,
-            $domainName
-        );
-        $this->adapter = new ApplepayAdapter();
-        $this->adapter->init(
-            $this->moduleSettings->getApplePayMerchantCertFilePath(),
-            $this->moduleSettings->getApplePayMerchantCertKeyFilePath()
-        );
+        // if we have no credentials we could not initiate
+        if ($this->moduleSettings->isApplePayEligibility()) {
+            /** @var string $applePatLabel */
+            $applePatLabel = $this->moduleSettings->getApplePayLabel();
+            $this->session = new ApplepaySession(
+                $this->moduleSettings->getApplePayMerchantIdentifier(),
+                $applePatLabel,
+                $domainName
+            );
+            $this->adapter = new ApplepayAdapter();
+            $this->adapter->init(
+                $this->moduleSettings->getApplePayMerchantCertFilePath(),
+                $this->moduleSettings->getApplePayMerchantCertKeyFilePath()
+            );
+        }
     }
 
     /**
@@ -54,6 +57,11 @@ class ApplePaySessionHandler
      */
     public function validateMerchant(string $validationUrl): ?array
     {
+        // if we have no credentials we could not validate Merchant
+        if (!$this->moduleSettings->isApplePayEligibility()) {
+            return null;
+        }
+
         try {
             /** @var string $validApplePayMerch */
             $validApplePayMerch = $this->adapter->validateApplePayMerchant($validationUrl, $this->session);
