@@ -178,7 +178,7 @@ class ModuleSettings
     public function getApplePayLabel()
     {
         return $this->getSettingValue('applepay_label') ?:
-            $this->config->getActiveShop()->getFieldData('oxcompany');
+            $this->config->getActiveShop()->getFieldData('oxcompany') ?: 'default_label';
     }
 
     /**
