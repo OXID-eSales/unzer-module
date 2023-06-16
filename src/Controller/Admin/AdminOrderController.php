@@ -7,7 +7,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController as AdminDetailsController_parent;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
