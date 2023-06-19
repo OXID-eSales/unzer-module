@@ -15,6 +15,8 @@ use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\StaticContent;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions as UnzerDefinitionsService;
+use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 
 /**
  * Class defines what module does on Shop events.
@@ -38,6 +40,9 @@ class Events
         self::addStaticContents();
 
         self::removeNonExistingUnzerPaymentMethodsFromDatabase();
+
+        // init the webhooks (either create or load from unzer)
+        self::initializeWebhookConfiguration();
     }
 
     /**
@@ -133,5 +138,22 @@ class Events
             ->where("oxid like 'oscunzer\_%' ")
             ->andWhere(sprintf("oxid not in (%s)", implode(',', $unzerPaymentMethods)));
         $statement->execute();
+    }
+
+    private static function initializeWebhookConfiguration(): void
+    {
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()
+            ->getContainer();
+
+        /** @var UnzerWebhooks $webhooks */
+        $webhooks = $container->get(UnzerWebhooks::class);
+        /** @var ModuleSettings $moduleSettings */
+        $moduleSettings = $container->get(ModuleSettings::class);
+
+        $webhooks->setPrivateKeys(
+            $moduleSettings->getPrivateKeysWithContext()
+        );
+        $webhooks->registerWebhookConfiguration();
     }
 }
