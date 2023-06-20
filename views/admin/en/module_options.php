@@ -19,6 +19,7 @@ $aLang = [
     'SHOP_MODULE_GROUP_unzerwebhooks' => 'Webhook settings',
     'SHOP_MODULE_GROUP_unzerother' => 'Other',
 
+    'SHOP_MODULE_webhookConfiguration' => '',
     'SHOP_MODULE_webhook_id' => 'Webhook ID',
     'SHOP_MODULE_webhook_context' => 'Context',
     'SHOP_MODULE_webhook_register' => 'Create webhooks',
