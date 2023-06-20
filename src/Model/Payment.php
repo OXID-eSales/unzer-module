@@ -11,6 +11,7 @@ use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\PaymentValidator;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+
 class Payment extends Payment_parent
 {
     use ServiceContainer;

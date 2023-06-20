@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.1] - 2023-06-19
+
+### FIXED
+- apple pay session init only when eligible
+
 ## [1.1.0] - 2023-06-02
 
 ### NEW
