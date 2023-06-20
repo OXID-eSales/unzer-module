@@ -7,9 +7,9 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
@@ -19,10 +19,6 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
-use UnzerSDK\Resources\PaymentTypes\Invoice;
-use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
-use UnzerSDK\Resources\PaymentTypes\Prepayment;
-use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -37,7 +33,7 @@ use UnzerSDK\Unzer;
  * TODO: Decrease complexity to 50 or under
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AdminOrderController extends AdminDetailsController_parent
+class AdminOrderController extends AdminDetailsController
 {
     use ServiceContainer;
 
