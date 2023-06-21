@@ -25,8 +25,10 @@ class PaymentController extends PaymentController_parent
      */
     public function render()
     {
+        $template = parent::render();
+
         $this->checkForUnzerPaymentErrors();
-        return parent::render();
+        return $template;
     }
 
     /**
