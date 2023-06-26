@@ -370,27 +370,6 @@ class Transaction
         return false;
     }
 
-    /**
-     * @param (int|mixed|string)[] $params
-     *
-     */
-    public function deleteInitOrder(array $params): void
-    {
-        $transaction = $this->getNewTransactionObject();
-
-        $oxid = $this->getInitOrderOxid($params);
-        if ($transaction->load($oxid)) {
-            $transaction->delete();
-        }
-    }
-
-    public function deleteOldInitOrders(): void
-    {
-        DatabaseProvider::getDb()->Execute(
-            "DELETE from oscunzertransaction where OXACTION = 'init' AND OXACTIONDATE < NOW() - INTERVAL 1 DAY"
-        );
-    }
-
     public function cleanUpNotFinishedOrders(): void
     {
         /** @var ContainerInterface $container */
@@ -550,70 +529,6 @@ class Transaction
         return false;
     }
 
-    /**
-     * @param array $params
-     * @return string
-     */
-    protected function prepareTransactionOxid(array $params): string
-    {
-        unset($params['oxactiondate']);
-        unset($params['serialized_basket']);
-        unset($params['customertype']);
-
-        /** @var string $jsonEncode */
-        $jsonEncode = json_encode($params);
-        return md5($jsonEncode);
-    }
-
-    /**
-     * @param array $params
-     * @return string
-     */
-    protected function getInitOrderOxid(array $params): string
-    {
-        $params['oxaction'] = "init";
-        return $this->prepareTransactionOxid($params);
-    }
-
-    /**
-     * @param Payment $unzerPayment
-     * @return array
-     * @throws UnzerApiException
-     */
-    protected function getUnzerPaymentData(Payment $unzerPayment): array
-    {
-        $oxaction = preg_replace(
-            '/[^a-z]/',
-            '',
-            strtolower($unzerPayment->getStateName())
-        );
-        $params = [
-            'amount'   => $unzerPayment->getAmount()->getTotal(),
-            'currency' => $unzerPayment->getCurrency(),
-            'typeid'   => $unzerPayment->getId(),
-            'oxaction' => $oxaction,
-            'traceid'  => $unzerPayment->getTraceId()
-        ];
-
-        /** @var AbstractTransactionType $initialTransaction */
-        $initialTransaction = $unzerPayment->getInitialTransaction();
-        $params['shortid'] = $initialTransaction->getShortId() !== null ?
-            $initialTransaction->getShortId() :
-            Registry::getSession()->getVariable('ShortId');
-
-        $metadata = $unzerPayment->getMetadata();
-        if ($metadata instanceof Metadata) {
-            $params['metadata'] = $metadata->jsonSerialize();
-        }
-
-        $unzerCustomer = $unzerPayment->getCustomer();
-        if ($unzerCustomer instanceof Customer) {
-            $params['customerid'] = $unzerCustomer->getId();
-        }
-
-        return $params;
-    }
-
     protected function getUnzerChargeData(Charge $unzerCharge): array
     {
         $customerId = '';
@@ -636,62 +551,6 @@ class Transaction
         ];
     }
 
-    protected function getUnzerCancelData(Cancellation $unzerCancel): array
-    {
-        $currency = '';
-        $customerId = '';
-        $payment = $unzerCancel->getPayment();
-        if (is_object($payment)) {
-            $currency = $payment->getCurrency();
-            $customer = $payment->getCustomer();
-            if (is_object($customer)) {
-                $customerId = $customer->getId();
-            }
-        }
-        return [
-            'amount'     => $unzerCancel->getAmount(),
-            'currency'   => $currency,
-            'typeid'     => $unzerCancel->getId(),
-            'oxaction'   => 'canceled',
-            'customerid' => $customerId,
-            'traceid'    => $unzerCancel->getTraceId(),
-            'shortid'    => $unzerCancel->getShortId(),
-            'status'     => $this->getUzrStatus($unzerCancel),
-        ];
-    }
-
-    protected function getUnzerShipmentData(Shipment $unzerShipment, Payment $unzerPayment): array
-    {
-        $currency = '';
-        $customerId = '';
-        $payment = $unzerShipment->getPayment();
-        if (is_object($payment)) {
-            $currency = $payment->getCurrency();
-            $customer = $payment->getCustomer();
-            if (is_object($customer)) {
-                $customerId = $customer->getId();
-            }
-        }
-        $params = [
-            'amount'     => $unzerShipment->getAmount(),
-            'currency'   => $currency,
-            'fetchedAt'  => $unzerShipment->getFetchedAt(),
-            'typeid'     => $unzerShipment->getId(),
-            'oxaction'   => 'shipped',
-            'customerid' => $customerId,
-            'shortid'    => $unzerShipment->getShortId(),
-            'traceid'    => $unzerShipment->getTraceId(),
-            'metadata'   => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
-        ];
-
-        $unzerCustomer = $unzerPayment->getCustomer();
-        if ($unzerCustomer instanceof Customer) {
-            $params['customerid'] = $unzerCustomer->getId();
-        }
-
-        return $params;
-    }
-
     /**
      * @throws UnzerApiException
      */
@@ -702,100 +561,6 @@ class Transaction
         $params["serialized_basket"] = base64_encode(serialize($basketModel));
 
         return $params;
-    }
-
-    /**
-     * @return TransactionModel
-     */
-
-    protected function getNewTransactionObject(): TransactionModel
-    {
-        return oxNew(TransactionModel::class);
-    }
-
-    /**
-     * @param $paymentid
-     * @return array|false
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    public static function getTransactionDataByPaymentId(string $paymentid)
-    {
-        if ($paymentid) {
-            return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT DISTINCT OXORDERID, OXUSERID FROM oscunzertransaction WHERE TYPEID=?",
-                [$paymentid]
-            );
-        }
-
-        return false;
-    }
-
-    /**
-     * @param Cancellation|Charge $unzerObject
-     *
-     * @return null|string
-     */
-    protected static function getUzrStatus($unzerObject)
-    {
-        if ($unzerObject->isSuccess()) {
-            return "success";
-        }
-        if ($unzerObject->isError()) {
-            return "error";
-        }
-        if ($unzerObject->isPending()) {
-            return "pending";
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $orderid
-     * @return string
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    public static function getPaymentIdByOrderId(string $orderid)
-    {
-        $result = '';
-
-        if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT DISTINCT TYPEID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback')",
-                [$orderid]
-            );
-
-            $result = $rows[0]['TYPEID'];
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $orderid
-     * @return string
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    public function getTransactionIdByOrderId(string $orderid): string
-    {
-        $result = '';
-
-        if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT OXID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback')
-                ORDER BY OXTIMESTAMP DESC LIMIT 1",
-                [$orderid]
-            );
-
-            $result = $rows[0]['OXID'];
-        }
-
-        return $result;
     }
 
     /**

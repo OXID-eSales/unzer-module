@@ -76,7 +76,7 @@ $aModule = [
     ],
     'templates' => [
         // admin
-        '@osc-unzer/admin/tpl/oscunzer_order' => 'smarty/admin/tpl/oscunzer_order.tpl',
+        '@osc-unzer/admin/tpl/oscunzer_order.tpl' => 'views/smarty/admin/tpl/oscunzer_order.tpl',
 
         // frontend
         '@osc-unzer/frontend/tpl/order/unzer_assets' =>                    'views/smarty/frontend/tpl/order/unzer_assets.tpl',
