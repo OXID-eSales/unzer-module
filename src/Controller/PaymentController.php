@@ -49,7 +49,6 @@ class PaymentController extends PaymentController_parent
     public function getPaymentList()
     {
         $paymentList = (array)parent::getPaymentList();
-        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
         $unzerDefinitions = $this->getServiceFromContainer(UnzerDefinitions::class)
             ->getDefinitionsArray();
         $actShopCurrency = Registry::getConfig()->getActShopCurrencyObject();

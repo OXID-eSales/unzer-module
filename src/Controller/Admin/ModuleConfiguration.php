@@ -282,23 +282,4 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         parent::saveConfVars();
     }
-
-    protected function getProposedWebhookForActualShop(): string
-    {
-        $withXDebug = ($this->moduleSettings->isSandboxMode() && $this->moduleSettings->isDebugMode());
-        return Registry::getConfig()->getSslShopUrl()
-            . 'index.php?cl=unzer_dispatcher&fnc=updatePaymentTransStatus'
-            . ($withXDebug ? '&XDEBUG_SESSION_START' : '');
-    }
-
-    /**
-     * @param string $webhookUrl
-     * @param string $webhookId
-     * @return void
-     */
-    protected function saveWebhookOption(string $webhookUrl, string $webhookId): void
-    {
-        $this->moduleSettings->saveWebhook($webhookUrl);
-        $this->moduleSettings->saveWebhookId($webhookId);
-    }
 }
