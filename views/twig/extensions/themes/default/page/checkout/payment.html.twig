@@ -1,7 +1,7 @@
 {% extends "page/checkout/payment.html.twig" %}
 
 {% block select_payment %}
-    {% paymentmethod.isUnzerPayment() and paymentmethod.isUnzerPaymentTypeAllowed() %}
+    {% if paymentmethod.isUnzerPayment() and paymentmethod.isUnzerPaymentTypeAllowed() %}
         {% if sPaymentID == 'oscunzer_applepay' %}
             {% include "@osc-unzer/frontend/tpl/payment/applepay_availibility_check.html.twig" %}
         {% endif %}
