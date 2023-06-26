@@ -52,7 +52,7 @@ final class GiropayCest extends BaseCest
         $I->waitForElement($this->banknameInput);
         $I->fillField($this->banknameInput, $giropayPaymentData['BIC']);
         $I->waitForElement($this->banknameA);
-        $I->wait(2);
+        $I->wait(5);
         $I->canSeeAndClick($this->banknameA);
         $I->click($this->continueButton);
 
