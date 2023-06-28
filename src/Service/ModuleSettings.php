@@ -62,18 +62,6 @@ class ModuleSettings
     }
 
     /**
-     * Checks if module configurations are valid
-     */
-    public function checkHealth(): bool
-    {
-        return (
-            $this->getShopPublicKey() &&
-            $this->getShopPrivateKey() &&
-            $this->getRegisteredWebhookId()
-        );
-    }
-
-    /**
      * @return bool
      */
     public function isDebugMode(): bool
@@ -140,26 +128,6 @@ class ModuleSettings
     }
 
     /**
-     * @return string
-     */
-    public function getRegisteredWebhook(): string
-    {
-        /** @var string $registeredWebhook */
-        $registeredWebhook = $this->getSettingValue('registeredWebhook');
-        return $registeredWebhook;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegisteredWebhookId(): string
-    {
-        /** @var string $registeredWebhookId */
-        $registeredWebhookId = $this->getSettingValue('registeredWebhookId');
-        return $registeredWebhookId;
-    }
-
-    /**
      * @return bool
      */
     public function useModuleJQueryInFrontend(): bool
@@ -199,7 +167,8 @@ class ModuleSettings
     {
         return (
             $this->getApplePayMerchantCert() &&
-            $this->getApplePayMerchantCertKey()
+            $this->getApplePayMerchantCertKey() &&
+            $this->hasWebhookConfiguration('shop')
         );
     }
 
@@ -359,24 +328,6 @@ class ModuleSettings
     }
 
     /**
-     * @param string $webHook
-     * @return void
-     */
-    public function saveWebhook(string $webHook): void
-    {
-        $this->saveSetting('registeredWebhook', $webHook);
-    }
-
-    /**
-     * @param string $webHookId
-     * @return void
-     */
-    public function saveWebhookId(string $webHookId): void
-    {
-        $this->saveSetting('registeredWebhookId', $webHookId);
-    }
-
-    /**
      * @param string $paymentKeyId
      * @return void
      */
@@ -424,6 +375,47 @@ class ModuleSettings
     }
 
     /**
+     * @param array $webhookConfig
+     * @return void
+     */
+    public function saveWebhookConfiguration(array $webhookConfig): void
+    {
+        $this->moduleSettingBridge->save('webhookConfiguration', $webhookConfig, Module::MODULE_ID);
+    }
+
+    /**
+     * @return array
+     */
+    public function getWebhookConfiguration(): array
+    {
+        return $this->moduleSettingBridge->get('webhookConfiguration', Module::MODULE_ID);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrivateKeysWithContext(): array
+    {
+        $privateKeys = [];
+        if ('' !== $this->getShopPrivateKey()) {
+            $privateKeys['shop'] = $this->getShopPrivateKey();
+        }
+        if ('' !== $this->getShopPrivateKeyB2CInvoiceEUR()) {
+            $privateKeys['b2ceur'] = $this->getShopPrivateKeyB2CInvoiceEUR();
+        }
+        if ('' !== $this->getShopPrivateKeyB2CInvoiceCHF()) {
+            $privateKeys['b2cchf'] = $this->getShopPrivateKeyB2CInvoiceCHF();
+        }
+        if ('' !== $this->getShopPrivateKeyB2BInvoiceEUR()) {
+            $privateKeys['b2beur'] = $this->getShopPrivateKeyB2BInvoiceEUR();
+        }
+        if ('' !== $this->getShopPrivateKeyB2BInvoiceCHF()) {
+            $privateKeys['b2bchf'] = $this->getShopPrivateKeyB2BInvoiceCHF();
+        }
+        return $privateKeys;
+    }
+
+    /**
      * @param string $name
      * @param bool|int|string|array $setting
      * @return void
@@ -463,11 +455,28 @@ class ModuleSettings
     /**
      * @return bool
      */
+    public function isStandardEligibility(): bool
+    {
+        return (
+            $this->getShopPrivateKey() &&
+            $this->getShopPublicKey() &&
+            $this->hasWebhookConfiguration('shop')
+        );
+    }
+
+    /**
+     * @return bool
+     */
     public function isInvoiceEligibility(): bool
     {
         return (
-            $this->isB2CInvoiceEligibility() ||
-            $this->isB2BInvoiceEligibility()
+                ($this->isB2CInvoiceEligibility() &&
+                    $this->hasWebhookConfiguration('b2ceur') &&
+                    $this->hasWebhookConfiguration('b2cchf'))
+            ||
+                ($this->isB2BInvoiceEligibility() &&
+                    $this->hasWebhookConfiguration('b2beur') &&
+                    $this->hasWebhookConfiguration('b2bchf'))
         );
     }
 
@@ -586,13 +595,14 @@ class ModuleSettings
     }
 
     /**
+     * @param string $customerType
      * @return string
      */
-    public function getShopPublicKeyInvoice(): string
+    public function getShopPublicKeyInvoice(string $customerType = 'B2C'): string
     {
-        $result = '';
+        $result = $this->getShopPublicKey();
 
-        if ($this->isB2CInvoiceEligibility()) {
+        if ($this->isB2CInvoiceEligibility() && $customerType === 'B2C') {
             if ($this->isBasketCurrencyCHF()) {
                 $result = $this->getShopPublicKeyB2CInvoiceCHF();
             }
@@ -601,7 +611,7 @@ class ModuleSettings
             }
         }
 
-        if ($this->isB2BInvoiceEligibility()) {
+        if ($this->isB2BInvoiceEligibility() && $customerType === 'B2B') {
             if ($this->isBasketCurrencyCHF()) {
                 $result = $this->getShopPublicKeyB2BInvoiceCHF();
             }
@@ -614,13 +624,14 @@ class ModuleSettings
     }
 
     /**
+     * @param string $customerType
      * @return string
      */
-    public function getShopPrivateKeyInvoice(): string
+    public function getShopPrivateKeyInvoice(string $customerType = 'B2C'): string
     {
-        $result = '';
+        $result = $this->getShopPrivateKey();
 
-        if ($this->isB2CInvoiceEligibility()) {
+        if ($this->isB2CInvoiceEligibility() && $customerType === 'B2C') {
             if ($this->isBasketCurrencyCHF()) {
                 $result = $this->getShopPrivateKeyB2CInvoiceCHF();
             }
@@ -629,7 +640,7 @@ class ModuleSettings
             }
         }
 
-        if ($this->isB2BInvoiceEligibility()) {
+        if ($this->isB2BInvoiceEligibility() && $customerType === 'B2B') {
             if ($this->isBasketCurrencyCHF()) {
                 $result = $this->getShopPrivateKeyB2BInvoiceCHF();
             }
@@ -639,6 +650,46 @@ class ModuleSettings
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $customerType
+     * @param string $currency
+     * @return string
+     */
+    public function getShopPublicKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency): string
+    {
+        $key = '';
+        if ($customerType == 'B2C' && $currency == 'EUR') {
+            $key = $this->getShopPublicKeyB2CInvoiceEUR();
+        } elseif ($customerType == 'B2C' && $currency == 'CHF') {
+            $key = $this->getShopPublicKeyB2CInvoiceCHF();
+        } elseif ($customerType == 'B2B' && $currency == 'EUR') {
+            $key = $this->getShopPublicKeyB2BInvoiceEUR();
+        } elseif ($customerType == 'B2B' && $currency == 'CHF') {
+            $key = $this->getShopPublicKeyB2BInvoiceCHF();
+        }
+        return $key;
+    }
+
+    /**
+     * @param string $customerType
+     * @param string $currency
+     * @return string
+     */
+    public function getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency): string
+    {
+        $key = '';
+        if ($customerType == 'B2C' && $currency == 'EUR') {
+            $key = $this->getShopPrivateKeyB2CInvoiceEUR();
+        } elseif ($customerType == 'B2C' && $currency == 'CHF') {
+            $key = $this->getShopPrivateKeyB2CInvoiceCHF();
+        } elseif ($customerType == 'B2B' && $currency == 'EUR') {
+            $key = $this->getShopPrivateKeyB2BInvoiceEUR();
+        } elseif ($customerType == 'B2B' && $currency == 'CHF') {
+            $key = $this->getShopPrivateKeyB2BInvoiceCHF();
+        }
+        return $key;
     }
 
     /**
@@ -663,5 +714,15 @@ class ModuleSettings
     private function getBasketCurrency(): string
     {
         return $this->session->getBasket()->getBasketCurrency()->name;
+    }
+
+    /**
+     * @param $context
+     * @return bool
+     */
+    private function hasWebhookConfiguration(string $context): bool
+    {
+        $privateKeysContext = $this->getPrivateKeysWithContext();
+        return (!empty($privateKeysContext[$context]));
     }
 }

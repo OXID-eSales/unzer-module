@@ -8,10 +8,13 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Service\UserRepository;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Controller\PaymentController as PaymentController_parent;
 use OxidEsales\Eshop\Core\Registry;
 
 class PaymentController extends PaymentController_parent
@@ -41,34 +44,47 @@ class PaymentController extends PaymentController_parent
      * @return array<array-key, mixed>|object
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getPaymentList()
     {
         $paymentList = (array)parent::getPaymentList();
-        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+        $unzerDefinitions = $this->getServiceFromContainer(UnzerDefinitions::class)
+            ->getDefinitionsArray();
+        $actShopCurrency = Registry::getConfig()->getActShopCurrencyObject();
+        $userRepository = $this->getServiceFromContainer(UserRepository::class);
+        $userCountryIso = $userRepository->getUserCountryIso();
 
-        if (!$moduleSettings->checkHealth()) {
-            $paymentListRaw = $paymentList;
-            $paymentList = [];
+        $paymentListRaw = $paymentList;
+        $paymentList = [];
 
-            /**
-             * @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment
-             */
-            foreach ($paymentListRaw as $key => $payment) {
-                if (is_object($payment) && $payment->isUnzerPayment()) {
-                    continue;
-                }
+        /**
+         * @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment
+         */
+        foreach ($paymentListRaw as $key => $payment) {
+            if (!is_object($payment)) {
+                continue;
+            }
+            // any non-unzer payment ...
+            if (!$payment->isUnzerPayment()) {
                 $paymentList[$key] = $payment;
-            }
-        } else {
-            // check ApplePay Eligibility
-            if (!$moduleSettings->isApplePayEligibility()) {
-                unset($paymentList[UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID]);
+                continue;
             }
 
-            //check Invoice Eligibility
-            if (!$moduleSettings->isInvoiceEligibility()) {
-                unset($paymentList[UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID]);
+            if (
+                (
+                    $payment->isUnzerPaymentHealthy()
+                ) &&
+                (
+                    empty($unzerDefinitions[$key]['currencies']) ||
+                    in_array($actShopCurrency->name, $unzerDefinitions[$key]['currencies'], true)
+                ) &&
+                (
+                    empty($unzerDefinitions[$key]['countries']) ||
+                    in_array($userCountryIso, $unzerDefinitions[$key]['countries'], true)
+                )
+            ) {
+                $paymentList[$key] = $payment;
             }
         }
 

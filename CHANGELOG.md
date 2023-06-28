@@ -4,16 +4,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.0] - 2023-02-XX
+## [1.1.0] - 2023-06-02
 
 ### NEW
 - New Payment PayLater
 ### FIXED
+- Webhooks cleanup, registration is now based on key (context)
+- Fixed ApplePay admin settings not saving the merchant certificate properly.
+- New country restrictions based on the Unzer documentation
+  - ALIPAY: DE, AT, BE, IT, ES, NL
+  - Unzer Invoice (Paylater): DE, AT, CH, NL
+  - Prepayment: all Countries
+  - SEPA Direct Debit: DE, AT
+  - Sofort: DE, AT, BE, IT, ES, NL
+  - WeChat: AT, BE, DK, FI, FR, DE, ES, GB, GR, HU, IE, IS, IT, LI, LU, MT, NL, NO, PT, SE
+- New currency restrictions based on the Unzer documentation
+  - ALIPAY: AUD, CAD, CHF, CNY, EUR, GBP, HKD, NZD, SGD, USD
+  - ApplePay: AUD, CHF, CZK, DKK, EUR, GBP, NOK, PLN, SEK, USD, HUF, RON, BGN, HRK, ISK
+  - Bancontact: EUR
+  - EPS: EUR
+  - Giropay: EUR
+  - IDEAL: EUR
+  - Przelewy24: PLZ
+  - Sofort: EUR
+  - SEPA Direct Debit: EUR
+  - Unzer Invoice (Paylater): EUR, CHF
+  - Prepayment: EUR
+  - WeChat Pay: CHF, CNY, EUR, GBP, USD
+- Cleanup payment methods in database configuration
+- Correct Customer-Details for Unzer (e.g. OXID-customerId)
+- [0007453](https://bugs.oxid-esales.com/view.php?id=7453) Unzer prohibits changes in settings of other modules
+- [0007454](https://bugs.oxid-esales.com/view.php?id=7454) Unzer and Paypal cannot be activated at the same time
 - [0007436](https://bugs.oxid-esales.com/view.php?id=7436) add option to reverese a prepayment-transaction from the backend
+- [0007430](https://bugs.oxid-esales.com/view.php?id=7430) Update Basket version to V2
+- [0007429](https://bugs.oxid-esales.com/view.php?id=7429) Customer details - adjust addresses
+- [0007432](https://bugs.oxid-esales.com/view.php?id=7432) Basket Details - Discount is missed in the Basket
+- [0007447](https://bugs.oxid-esales.com/view.php?id=7447) Markup due to negative discount per shopping cart leads to maintainance mode
+- [0007439](https://bugs.oxid-esales.com/view.php?id=7439) Chargeback transactions do not appear in the backend
+- [0007442](https://bugs.oxid-esales.com/view.php?id=7442) Reversal after partial reversal
 
-### Fixed
+### CHANGES
+Unzer has **deprecated** following payment methods, which have been removed from the definitions:
+- Installment / Ratenzahlung
+- Unzer Direct Debit Secured/ SEPA Lastschrift (abgesichert durch Unzer)
+- Bank transfer
 
-* [0007430](https://bugs.oxid-esales.com/view.php?id=7430) Update Basket version to V2
 
 ## [1.0.1] - 2022-12-03
 

@@ -9,7 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
-use Webmozart\PathUtil\Path;
+use Symfony\Component\Filesystem\Path;
 
 class Context extends BasicContext
 {
@@ -30,11 +30,11 @@ class Context extends BasicContext
      */
     public function getUnzerLogFilePath(): string
     {
-        return Path::join([
+        return Path::join(
             $this->shopConfig->getLogsDir(),
             'unzer',
             $this->getUnzerLogFileName()
-        ]);
+        );
     }
 
     /**

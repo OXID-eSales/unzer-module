@@ -51,6 +51,13 @@ class Transaction extends BaseModel
     /**
      * @return string|null
      */
+    public function getUnzerCustomerType(): ?string
+    {
+        return $this->getRawField('CUSTOMERTYPE');
+    }
+    /**
+     * @return string|null
+     */
     public function getUnzerState(): ?string
     {
         return $this->getRawField('OXACTION');
@@ -70,6 +77,22 @@ class Transaction extends BaseModel
     public function getUnzerShortId(): ?string
     {
         return $this->getRawField('SHORTID');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUnzerCurrency(): ?string
+    {
+        return $this->getRawField('CURRENCY');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUnzerAmount(): ?string
+    {
+        return $this->getRawField('AMOUNT');
     }
 
     /**
@@ -102,11 +125,12 @@ class Transaction extends BaseModel
      */
     private function getRawField(string $sFieldName): ?string
     {
-        $sLongFieldName = $this->_getFieldLongName($sFieldName);
+        $sLongFieldName = $this->getFieldLongName($sFieldName);
 
         if (isset($this->{$sLongFieldName})) {
             $fieldData = $this->{$sLongFieldName};
             if ($fieldData instanceof Field) {
+                /** @var string|null $val */
                 $val = $fieldData->getRawValue();
 
                 // Fix for MariaDB empty default-value issue with some oxid versions:

@@ -1,0 +1,29 @@
+{% extends "page/checkout/order.html.twig" %}
+
+{% block shippingAndPayment %}
+    {% set payment = oView.getPayment() %}
+    {% if payment.isUnzerPayment() %}
+        {% include "@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment.html.twig" %}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+
+{% endblock %}
+
+{%  block checkout_order_errors %}
+    {{ parent() }}
+    {% set sepaError = oView.isSepaMandateConfirmationError() %}
+    {% if sepaError == 1 %}
+        {% include "message/error.html.twig" with {statusMessage: "ERROR_UNZER_SEPA_CONFIRMATION_MISSING"|translate} %}
+    {% endif %}
+    {% include "@osc-unzer/frontend/tpl/message/js-errors.html.twig" %}v
+{%  endblock %}
+
+{%  block checkout_order_btn_submit_bottom %}
+    {% set payment = oView.getPayment() %}
+    {% if payment.getId() is same as('oscunzer_applepay') %}
+        {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{%  endblock %}

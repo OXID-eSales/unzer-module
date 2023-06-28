@@ -13,17 +13,9 @@
   "license": [
     "GPL-3.0"
   ],
-  "extra": {
-    "oxideshop": {
-      "target-directory": "osc/unzer",
-      "blacklist-filter": [
-        "Tests/**/*"
-      ]
-    }
-  },
+  "minimum-stability": "dev",
   "require": {
     "unzerdev/php-sdk": "^v1.2.3.0",
-    "webmozart/path-util": "^2.3.0",
     "guzzlehttp/guzzle": "^7.4"
   },
   "require-dev": {
@@ -38,17 +30,17 @@
   "autoload": {
     "psr-4": {
       "OxidSolutionCatalysts\\Unzer\\": "src",
-      "OxidSolutionCatalysts\\Unzer\\Tests\\": "Tests"
+      "OxidSolutionCatalysts\\Unzer\\Tests\\": "tests"
     }
   },
   "scripts": {
-    "phpcs": "phpcs --standard=Tests/phpcs.xml",
-    "phpcbf": "phpcbf --standard=Tests/phpcs.xml",
-    "phpstan": "phpstan -cTests/PhpStan/phpstan.neon analyse src/",
-    "phpstan-report": "phpstan -cTests/PhpStan/phpstan.neon analyse src/ --error-format=json > phpstan.report.json",
-    "phpmd": "phpmd src ansi Tests/PhpMd/standard.xml",
-    "phpmd-excludestaticaccess": "phpmd src ansi Tests/PhpMd/exclude-static-access-rule.xml",
-    "phpmd-report": "phpmd src json Tests/PhpMd/standard.xml --reportfile tests/reports/phpmd.report.json",
+    "phpcs": "phpcs --standard=tests/phpcs.xml",
+    "phpcbf": "phpcbf --standard=tests/phpcs.xml",
+    "phpstan": "phpstan -ctests/PhpStan/phpstan.neon analyse src/",
+    "phpstan-report": "phpstan -ctests/PhpStan/phpstan.neon analyse src/ --error-format=json > phpstan.report.json",
+    "phpmd": "phpmd src ansi tests/PhpMd/standard.xml",
+    "phpmd-excludestaticaccess": "phpmd src ansi tests/PhpMd/exclude-static-access-rule.xml",
+    "phpmd-report": "phpmd src json tests/PhpMd/standard.xml --reportfile tests/reports/phpmd.report.json",
     "static": [
       "@phpcs",
       "@phpstan",

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Migrations;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
@@ -16,6 +17,7 @@ use Doctrine\Migrations\AbstractMigration;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\ConfigFile;
 use OxidEsales\Facts\Facts;
+use Psr\Log\LoggerInterface;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -23,9 +25,9 @@ use OxidEsales\Facts\Facts;
 final class Version20211216100154 extends AbstractMigration
 {
     /** @throws Exception */
-    public function __construct($version)
+    public function __construct(Connection $connection, LoggerInterface $logger)
     {
-        parent::__construct($version);
+        parent::__construct($connection, $logger);
 
         $this->platform->registerDoctrineTypeMapping('enum', 'string');
     }

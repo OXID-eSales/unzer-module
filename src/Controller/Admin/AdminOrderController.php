@@ -7,30 +7,37 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController as AdminDetailsController_parent;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
+use UnzerSDK\Resources\PaymentTypes\Invoice;
+use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
+use UnzerSDK\Unzer;
 
 /**
  * Order class wrapper for Unzer module
  *
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * TODO: Decrease complexity to 50 or under
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AdminOrderController extends AdminDetailsController
+class AdminOrderController extends AdminDetailsController_parent
 {
     use ServiceContainer;
 
@@ -41,8 +48,8 @@ class AdminOrderController extends AdminDetailsController
      */
     protected $editObject = null;
 
-    /** @var Payment $oPaymnet */
-    protected $oPaymnet = null;
+    /** @var Payment $oPayment */
+    protected $oPayment = null;
 
     /** @var string $sPaymentId */
     protected $sPaymentId;
@@ -73,6 +80,7 @@ class AdminOrderController extends AdminDetailsController
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
 
+            $this->_aViewData['paymentTitle'] = $this->oPayment->getFieldData('OXDESC');
             $this->_aViewData['oOrder'] = $oOrder;
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
@@ -86,32 +94,82 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['sMessage'] = $translator->translate("OSCUNZER_NO_UNZER_ORDER");
         }
 
-        return "oscunzer_order.tpl";
+        return "@osc-unzer/admin/tpl/oscunzer_order";
+    }
+
+    public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
+    {
+        return $this->getServiceFromContainer(UnzerSDKLoader::class)
+            ->getUnzerSDK($customerType, $currency);
+    }
+
+    /**
+     * Method checks is order was made with unzer payment
+     *
+     * @return bool
+     */
+    public function isUnzerOrder(): bool
+    {
+        $isUnzer = false;
+
+        /** @var Order $order */
+        $order = $this->getEditObject();
+        /** @var string $oxPaymentType */
+        $oxPaymentType = $order->getFieldData('oxpaymenttype');
+        if ($order instanceof Order && strpos($oxPaymentType, "oscunzer") !== false) {
+            $this->oPayment = oxNew(Payment::class);
+            if ($this->oPayment->load($oxPaymentType)) {
+                $isUnzer = true;
+            }
+        }
+
+        return $isUnzer;
+    }
+
+    /**
+     * Returns editable order object
+     *
+     * @return Order|null
+     */
+    public function getEditObject(): ?object
+    {
+        $soxId = $this->getEditObjectId();
+        if ($this->editObject === null && $soxId != '-1') {
+            $this->editObject = oxNew(Order::class);
+            $this->editObject->load($soxId);
+        }
+
+        return $this->editObject;
     }
 
     /**
      * @param string $sPaymentId
      * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function getUnzerViewData(string $sPaymentId): void
     {
         try {
+            $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
+            // initialize proper SDK object
+            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency']);
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
-            $unzerPayment = $this->getServiceFromContainer(UnzerSDKLoader::class)
-                ->getUnzerSDK()
-                ->fetchPayment($sPaymentId);
+            $unzerPayment = $sdk->fetchPayment($sPaymentId);
             $fCancelled = 0.0;
             $fCharged = 0.0;
 
             $paymentType = $unzerPayment->getPaymentType();
-
-            $this->_aViewData["blShipment"] = (
-                $paymentType instanceof InstallmentSecured
+            /** @var Order $editObject */
+            $editObject = $this->getEditObject();
+            $this->_aViewData['totalBasketAmount'] = $editObject->getTotalOrderSum();
+            $this->_aViewData['totalBasketPrice'] = sprintf(
+                '%s %s',
+                $editObject->getFormattedTotalOrderSum(),
+                $unzerPayment->getCurrency()
             );
-
-            $isPrepaymentType = ($paymentType instanceof Prepayment);
-
+            $this->_aViewData["blShipment"] = ($paymentType instanceof InstallmentSecured);
             $shipments = [];
             $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
@@ -134,31 +192,34 @@ class AdminOrderController extends AdminDetailsController
             if ($unzerPayment->getAuthorization()) {
                 /** @var Authorization $unzAuthorization */
                 $unzAuthorization = $unzerPayment->getAuthorization();
+                // an "auth-cancel" must be considered as "charged", to make the calculation work correctly
+                $fCharged = $unzAuthorization->getCancelledAmount();
                 $this->_aViewData["AuthAmountRemaining"] = $unzerPayment->getAmount()->getRemaining();
-                $this->_aViewData["AuthFetchedAt"] = $unzAuthorization->getFetchedAt();
-                $this->_aViewData["AuthShortId"] = $unzAuthorization->getShortId();
-                $this->_aViewData["AuthId"] = $unzAuthorization->getId();
-                $this->_aViewData["AuthAmount"] = $unzAuthorization->getAmount();
+                $this->addAuthorizationViewData($unzAuthorization);
                 $this->_aViewData['AuthCur'] = $unzerPayment->getCurrency();
             }
 
             $charges = [];
-            if (!$unzerPayment->isCanceled()) {
+            $isChargeBack = $unzerPayment->isChargeBack();
+            $this->_aViewData['isChargeBack']  = $isChargeBack;
+            if (!$unzerPayment->isCanceled() && !$isChargeBack) {
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
-                    if ($charge->isSuccess() || ($isPrepaymentType && $charge->isPending())) {
+                    if ($charge->isSuccess()) {
                         $aRv = [];
                         $aRv['chargedAmount'] = $charge->getAmount();
                         $aRv['cancelledAmount'] = $charge->getCancelledAmount();
                         $aRv['chargeId'] = $charge->getId();
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
-                        $fCharged += ($charge->isSuccess()) ? $charge->getAmount() : 0.;
+                        $fCharged += $charge->getAmount();
                         $aRv['chargeDate'] = $charge->getDate();
 
                         $charges[] = $aRv;
                     }
                 }
             }
+            $this->_aViewData['totalAmountCharge'] = $fCharged;
+            $this->_aViewData['remainingAmountCharge'] = floatval($editObject->getTotalOrderSum()) - $fCharged;
 
             $cancellations = [];
             /** @var Cancellation $cancellation */
@@ -173,15 +234,72 @@ class AdminOrderController extends AdminDetailsController
                     $cancellations[] = $aRv;
                 }
             }
+            $this->_aViewData['totalAmountCancel'] = $fCancelled;
+            $this->_aViewData['canCancelAmount'] = $fCharged - $fCancelled;
+
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;
             $this->_aViewData['aCancellations'] = $cancellations;
             $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
+
+            if (
+                $editObject->getFieldData('oxpaid') == '0000-00-00 00:00:00' &&
+                $fCharged == $unzerPayment->getAmount()->getTotal()
+            ) {
+                /** @var UnzerOrder $editObject */
+                $editObject->markUnzerOrderAsPaid();
+                $this->forceReloadListFrame();
+            }
         } catch (\Exception $e) {
             Registry::getUtilsView()->addErrorToDisplay(
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCustomerTypeAndCurrencyFromTransaction(): array
+    {
+        $transactionService = $this->getServiceFromContainer(TransactionService::class);
+        return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());
+    }
+
+    protected function addAuthorizationViewData(Authorization $authorization): void
+    {
+        $this->_aViewData["AuthFetchedAt"] = $authorization->getFetchedAt();
+        $this->_aViewData["AuthShortId"] = $authorization->getShortId();
+        $this->_aViewData["AuthId"] = $authorization->getId();
+        $this->_aViewData["AuthAmount"] = $authorization->getAmount();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCancelReasonRequired(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->isUnzerSecuredPayment();
+    }
+
+    public function getUnzerSDKbyPaymentId(string $sPaymentId): Unzer
+    {
+        return $this->getServiceFromContainer(UnzerSDKLoader::class)
+            ->getUnzerSDKbyPaymentType($sPaymentId);
+    }
+
+    /**
+     */
+    protected function forceReloadListFrame(): void
+    {
+        // we need to set the "edit object id", which will automatically be recognized to reload the list (admin area)
+        /** @var Order $oOrder */
+        $oOrder = $this->getEditObject();
+        $this->setEditObjectId($oOrder->getId());
     }
 
     /**
@@ -213,6 +331,7 @@ class AdminOrderController extends AdminDetailsController
      */
     public function doUnzerCollect(): void
     {
+        $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         /** @var float $amount */
@@ -235,6 +354,7 @@ class AdminOrderController extends AdminDetailsController
      */
     public function doUnzerCancel()
     {
+        $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         /** @var string $chargeid */
@@ -266,7 +386,6 @@ class AdminOrderController extends AdminDetailsController
         /** @var Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, (string)$reason);
-
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errCancel'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
         }
@@ -277,68 +396,65 @@ class AdminOrderController extends AdminDetailsController
      */
     public function doUnzerAuthorizationCancel()
     {
+        $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
+        /** @var float $amount */
+        $amount = Registry::getRequest()->getRequestParameter('amount');
+        /** @var string $sAmount */
+        $sAmount = Registry::getRequest()->getRequestParameter('amount');
+        $amount = floatval($sAmount);
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
-        $oStatus = $paymentService->doUnzerAuthorizationCancel($oOrder, $unzerid);
+        $oStatus = $paymentService->doUnzerAuthorizationCancel($oOrder, $unzerid, $amount);
 
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
         }
     }
 
-    /**
-     * Method checks is order was made with unzer payment
-     *
-     * @return bool
-     */
-    public function isUnzerOrder(): bool
+    public function canCollectFully(): bool
     {
-        $isUnzer = false;
-
-        /** @var Order $order */
-        $order = $this->getEditObject();
-        /** @var string $oxPaymentType */
-        $oxPaymentType = $order->getFieldData('oxpaymenttype');
-        if ($order instanceof Order && strpos($oxPaymentType, "oscunzer") !== false) {
-            $this->oPaymnet = oxNew(Payment::class);
-            if ($this->oPaymnet->load($oxPaymentType)) {
-                $isUnzer = true;
-            }
-        }
-
-        return $isUnzer;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCancelReasonRequired(): bool
-    {
-        if (!($this->oPaymnet instanceof Payment)) {
+        if (!($this->oPayment instanceof Payment)) {
             return false;
         }
 
-        return $this->oPaymnet->isUnzerSecuredPayment();
+        return $this->oPayment->canCollectFully();
     }
-    /**
-     * Returns editable order object
-     *
-     * @return Order|null
-     */
-    public function getEditObject(): ?object
+    public function canCollectPartially(): bool
     {
-        $soxId = $this->getEditObjectId();
-        if ($this->editObject === null && $soxId != '-1') {
-            $this->editObject = oxNew(Order::class);
-            $this->editObject->load($soxId);
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
         }
 
-        return $this->editObject;
+        return $this->oPayment->canCollectPartially();
+    }
+    public function canRefundFully(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canRefundFully();
+    }
+    public function canRefundPartially(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canRefundPartially();
+    }
+    public function canRevertPartially(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->canRevertPartially();
     }
 }

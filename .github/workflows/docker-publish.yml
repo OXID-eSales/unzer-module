@@ -9,7 +9,8 @@ on:
   schedule:
     - cron: '16 6 * * *'
   push:
-    branches: [ b-6.3.x ]
+    tags:
+      - '**'
   repository_dispatch:
     types: [docker-build]
 
@@ -20,8 +21,25 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  get_latest_tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.latest_tag.outputs.tag }}
 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: latest_tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+  build:
+    needs: get_latest_tag
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,6 +48,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.get_latest_tag.outputs.tag }}
 
       - name: Checkout dockerfiles
         uses: actions/checkout@v3
@@ -65,7 +85,7 @@ jobs:
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96
+        uses: docker/metadata-action@c4ee3adeed93b1fa6a762f209fb01608c1a22f1e
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 

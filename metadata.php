@@ -56,17 +56,17 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
-        \OxidEsales\Eshop\Core\Config::class => Config::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
-        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
-        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
-        \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
         \OxidEsales\Eshop\Application\Model\Article::class => Article::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
+        \OxidEsales\Eshop\Core\Config::class => Config::class,
+        \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
     ],
     'controllers' => [
         'unzer_admin_order' => AdminOrderController::class,
@@ -76,27 +76,27 @@ $aModule = [
     ],
     'templates' => [
         // admin
-        'oscunzer_order.tpl' => 'osc/unzer/views/admin/tpl/oscunzer_order.tpl',
+        '@osc-unzer/admin/tpl/oscunzer_order.tpl' => 'views/smarty/admin/tpl/oscunzer_order.tpl',
 
         // frontend
-        'modules/osc/unzer/unzer_assets.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_assets.tpl',
-        'modules/osc/unzer/unzer_card.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_card.tpl',
-        'modules/osc/unzer/unzer_eps_charge.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_eps_charge.tpl',
-        'modules/osc/unzer/unzer_installment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment.tpl',
-        'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
-        'modules/osc/unzer/unzer_installment_confirm_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
-        'modules/osc/unzer/unzer_installment_confirm_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
-        'modules/osc/unzer/unzer_invoice.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_invoice.tpl',
-        'modules/osc/unzer/unzer_applepay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl',
-        'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
-        'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
-        'modules/osc/unzer/unzer_ideal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_ideal.tpl',
-        'modules/osc/unzer/unzer_shippingAndPayment_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
-        'modules/osc/unzer/unzer_shippingAndPayment_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
-        'modules/osc/unzer/message/js-errors.tpl' => 'osc/unzer/views/frontend/tpl/message/js-errors.tpl',
-        'modules/osc/unzer/payment/applepay_availibility_check.tpl' => 'osc/unzer/views/frontend/tpl/payment/applepay_availibility_check.tpl',
-        'modules/osc/unzer/payment/payment_unzer.tpl' => 'osc/unzer/views/frontend/tpl/payment/payment_unzer.tpl',
-        'modules/osc/unzer/order/applepay_button.tpl' => 'osc/unzer/views/frontend/tpl/order/applepay_button.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_assets' =>                    'views/smarty/frontend/tpl/order/unzer_assets.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_card' =>                      'views/smarty/frontend/tpl/order/unzer_card.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_eps_charge' =>                'views/smarty/frontend/tpl/order/unzer_eps_charge.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_installment' =>               'views/smarty/frontend/tpl/order/unzer_installment.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_installment_confirm' =>       'views/smarty/frontend/tpl/order/unzer_installment_confirm.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_installment_confirm_flow' =>  'views/smarty/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_installment_confirm_wave' =>  'views/smarty/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_invoice' =>                   'views/smarty/frontend/tpl/order/unzer_invoice.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_applepay' =>                  'views/smarty/frontend/tpl/order/unzer_applepay.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_sepa' =>                      'views/smarty/frontend/tpl/order/unzer_sepa.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_sepa_secured' =>              'views/smarty/frontend/tpl/order/unzer_sepa_secured.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_ideal' =>                     'views/smarty/frontend/tpl/order/unzer_ideal.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment_flow' =>   'views/smarty/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment_wave' =>   'views/smarty/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
+        '@osc-unzer/frontend/tpl/message/js-errors' =>                     'views/smarty/frontend/tpl/message/js-errors.tpl',
+        '@osc-unzer/frontend/tpl/payment/applepay_availibility_check' =>   'views/smarty/frontend/tpl/payment/applepay_availibility_check.tpl',
+        '@osc-unzer/frontend/tpl/payment/payment_unzer' =>                 'views/smarty/frontend/tpl/payment/payment_unzer.tpl',
+        '@osc-unzer/frontend/tpl/order/applepay_button' =>                 'views/smarty/frontend/tpl/order/applepay_button.tpl',
     ],
     'blocks' => [
         //frontend
@@ -104,45 +104,45 @@ $aModule = [
             'theme' => 'flow',
             'template' => 'page/checkout/order.tpl',
             'block' => 'shippingAndPayment',
-            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment_flow.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/shippingAndPayment_flow.tpl'
         ],
         [
             'theme' => 'wave',
             'template' => 'page/checkout/order.tpl',
             'block' => 'shippingAndPayment',
-            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment_wave.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/shippingAndPayment_wave.tpl'
         ],
         [
             'template' => 'page/checkout/order.tpl',
             'block' => 'checkout_order_errors',
-            'file' => 'views/frontend/blocks/page/checkout/checkout_order_errors.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/checkout_order_errors.tpl'
         ],
         [
             'template' => 'page/checkout/order.tpl',
             'block' => 'checkout_order_btn_submit_bottom',
-            'file' => 'views/frontend/blocks/page/checkout/checkout_order_btn_submit_bottom.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/checkout_order_btn_submit_bottom.tpl'
         ],
         [
             'template' => 'page/checkout/payment.tpl',
             'block' => 'select_payment',
-            'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
+            'file' => 'views/smarty/frontend/blocks/page/checkout/select_payment.tpl'
         ],
         //admin
         [
             'template' => 'module_config.tpl',
             'block' => 'admin_module_config_var',
-            'file' => 'views/admin/blocks/admin_module_config_var.tpl'
+            'file' => 'views/smarty/admin/blocks/admin_module_config_var.tpl'
         ],
         //email
         [
             'template' => 'email/plain/order_cust.tpl',
             'block' => 'email_plain_order_cust_paymentinfo',
-            'file' => 'views/frontend/blocks/email/plain/email_plain_order_cust_paymentinfo.tpl'
+            'file' => 'views/smarty/frontend/blocks/email/plain/email_plain_order_cust_paymentinfo.tpl'
         ],
         [
             'template' => 'email/html/order_cust.tpl',
             'block' => 'email_html_order_cust_paymentinfo',
-            'file' => 'views/frontend/blocks/email/html/email_html_order_cust_paymentinfo.tpl'
+            'file' => 'views/smarty/frontend/blocks/email/html/email_html_order_cust_paymentinfo.tpl'
         ],
     ],
     'settings' => [
@@ -184,10 +184,10 @@ $aModule = [
             'value' => ''
         ],
         [
-            'group' => 'unzermerchant',
-            'name' => 'registeredWebhook',
-            'type' => 'str',
-            'value' => ''
+            'group' => 'unzerwebhooks',
+            'name' => 'webhookConfiguration',
+            'type' => 'arr',
+            'value' => []
         ],
         [
             'group' => 'unzercard',
@@ -202,12 +202,6 @@ $aModule = [
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1'
-        ],
-        [
-            'group' => 'unzerinstallment',
-            'name' => 'UnzerOption_oscunzer_installment_rate',
-            'type' => 'str',
-            'value' => '4.5'
         ],
         [
             'group' => 'unzerapplepay',
@@ -375,12 +369,6 @@ $aModule = [
             'value' => '0',
         ],
         // this options are invisible because of missing group
-        [
-            'group' => '',
-            'name' => 'registeredWebhookId',
-            'type' => 'str',
-            'value' => ''
-        ],
         [
             'group' => '',
             'name' => 'sandboxApplePayPaymentKeyId',

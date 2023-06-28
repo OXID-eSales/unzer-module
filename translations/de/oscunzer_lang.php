@@ -23,6 +23,16 @@ $aLang = [
     'OSCUNZER_CONSUMER_TARGET_B2B' => 'Firma',
     'OSCUNZER_CONSUMER_TARGET_B2C' => 'Privatperson',
 
+    'OSCUNZER_COMPANY_FORM' => 'Unternehmens-<br>form',
+    'OSCUNZER_COMPANY_FORM_authority' => 'Behörde',
+    'OSCUNZER_COMPANY_FORM_association' => 'Interessenverband',
+    'OSCUNZER_COMPANY_FORM_sole' => 'Einzelunternehmen',
+    'OSCUNZER_COMPANY_FORM_company' => 'Betrieb',
+    'OSCUNZER_COMPANY_FORM_other' => 'Sonstige',
+
+    'OSCUNZER_MISSING_INTAGIBLE_CONFIRMATION_MESSAGE' => 'Bitte bestätigen Sie den Hinweis für den Zugang zu digitalen Inhalten.',
+    'OSCUNZER_MISSING_SERVICEAGREEMENT_CONFIRMATION_MESSAGE' => 'Bitte bestätigen Sie die Serviceprodukt-Vereinbarung.',
+
     // Invoice Secured B2B
     'OSCUNZER_COMMERCIAL_SECTOR' => 'Wirtschaftszweig',
     'OSCUNZER_COMMERCIAL_SECTOR_OTHER' => 'Sonstige',

@@ -10,7 +10,6 @@ namespace OxidSolutionCatalysts\Unzer\Core;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use OxidEsales\Eshop\Core\ViewConfig as ViewConfig_parent;
 
 /**
  * @SuppressWarnings(PHPMD.LongVariable)
@@ -62,16 +61,6 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * Checks if module configurations are valid
-     *
-     * @return bool
-     */
-    public function checkUnzerHealth(): bool
-    {
-        return $this->moduleSettings->checkHealth();
-    }
-
-    /**
      * Returns unzer public key.
      *
      * @return string
@@ -99,6 +88,30 @@ class ViewConfig extends ViewConfig_parent
         return $this->moduleSettings->getShopPrivateKey();
     }
 
+    public function getUnzerB2BPubKey(): string
+    {
+        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2B');
+        return $key;
+    }
+
+    public function getUnzerB2BPrivKey(): string
+    {
+        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2B');
+        return $key;
+    }
+
+    public function getUnzerB2CPubKey(): string
+    {
+        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2C');
+        return $key;
+    }
+
+    public function getUnzerB2CPrivKey(): string
+    {
+        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2C');
+        return $key;
+    }
+
     /**
      * retrieve additional payment information from session
      *
@@ -107,7 +120,7 @@ class ViewConfig extends ViewConfig_parent
     public function getSessionPaymentInfo(): string
     {
         /** @var string $addPaymentInfo */
-        $addPaymentInfo = Registry::getSession()->getVariable('additionalPaymentInformation');
+        $addPaymentInfo = Registry::getSession()->getVariable('additionalPaymentInformation') ?? '';
         return $addPaymentInfo;
     }
 
@@ -195,5 +208,13 @@ class ViewConfig extends ViewConfig_parent
     public function isB2BInvoiceEligibility(): bool
     {
         return $this->moduleSettings->isB2BInvoiceEligibility();
+    }
+
+    public function getBasketCurrencyName(): string
+    {
+        $currencyName = '';
+        $basket = Registry::getSession()->getBasket();
+        $currencyName = $basket->getBasketCurrency()->name;
+        return $currencyName;
     }
 }

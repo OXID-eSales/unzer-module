@@ -2,12 +2,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Exception\Redirect;
-use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Service\ApplePaySessionHandler;
-use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
@@ -16,7 +14,7 @@ class ApplePayCallbackController extends FrontendController
     use ServiceContainer;
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function validateMerchant(): void
     {

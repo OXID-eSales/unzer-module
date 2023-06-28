@@ -8,19 +8,24 @@ services:
     class: OxidEsales\Eshop\Core\Registry
 
   OxidEsales\Eshop\Core\Config:
+    class: OxidEsales\Eshop\Core\Registry
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getConfig' ]
     public: true
 
   OxidEsales\Eshop\Core\Session:
+    class: OxidEsales\Eshop\Core\Registry
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getSession' ]
 
   OxidEsales\Eshop\Core\Language:
+    class: OxidEsales\Eshop\Core\Registry
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getLang' ]
 
   OxidEsales\Eshop\Core\UtilsDate:
+    class: OxidEsales\Eshop\Core\Registry
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getUtilsDate' ]
 
   OxidEsales\Eshop\Core\Request:
+    class: OxidEsales\Eshop\Core\Registry
     factory: [ '@OxidEsales\Eshop\Core\Registry', 'getRequest' ]
 
   OxidSolutionCatalysts\Unzer\Logger:

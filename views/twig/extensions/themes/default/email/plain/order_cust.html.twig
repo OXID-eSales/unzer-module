@@ -1,0 +1,8 @@
+{% extends "email/plain/order_cust.html.twig" %}
+
+{%  block email_plain_order_cust_paymentinfo %}
+    {% if payment.oxuserpayments__oxpaymentsid.value == "oscunzer_invoice" or payment.oxuserpayments__oxpaymentsid.value == "oscunzer_prepayment" %}
+        {{ oViewConf.getSessionPaymentInfo()|striptags }}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}

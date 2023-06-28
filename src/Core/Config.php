@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Core\Config as Config_parent;
 use OxidEsales\Eshop\Core\Registry;
 
 class Config extends Config_parent
