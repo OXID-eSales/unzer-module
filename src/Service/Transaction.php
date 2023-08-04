@@ -76,6 +76,9 @@ class Transaction
     ): bool {
         $transaction = $this->getNewTransactionObject();
 
+        $oOrder = oxNew(Order::class);
+        $oOrder->load($orderid);
+
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
@@ -90,8 +93,6 @@ class Transaction
 
             // for PaylaterInvoice, store the customer type
             if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice) {
-                $oOrder = oxNew(Order::class);
-                $oOrder->load($orderid);
                 $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
                 $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
                 $params['customertype'] = 'B2C';
@@ -113,6 +114,9 @@ class Transaction
             $transaction->setId($oxid);
             $transaction->save();
             $this->deleteInitOrder($params);
+
+            // Fallback: set ShortID as OXTRANSID
+            $oOrder->setUnzerTransId($params['shortid']);
 
             return true;
         }

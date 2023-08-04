@@ -104,9 +104,18 @@ class Order extends Order_parent
         if ($oxpaid == '0000-00-00 00:00:00') {
             $utilsDate = Registry::getUtilsDate();
             $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-            $this->_setFieldData('oxpaid', $date);
+            $this->setFieldData('oxpaid', $date);
             $this->save();
         }
+    }
+
+    /**
+     * Update order oxtransid
+     */
+    public function setUnzerTransId($sTransId): void
+    {
+        $this->setFieldData('oxtransid', $sTransId);
+        $this->save();
     }
 
     /**
