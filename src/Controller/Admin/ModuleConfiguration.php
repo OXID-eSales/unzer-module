@@ -47,7 +47,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function render(): string
+    public function render()
     {
         parent::render();
 

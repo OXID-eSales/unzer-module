@@ -60,7 +60,7 @@ class AdminOrderController extends AdminDetailsController
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function render(): string
+    public function render()
     {
         parent::render();
 
