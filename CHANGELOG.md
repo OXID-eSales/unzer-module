@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### FIXED
 - compatibility-issue against other modules that also extend the moduleconfiguration
+- [0007503](https://bugs.oxid-esales.com/view.php?id=7503) When ordering via the Unzer module, the OXID standard field OXORDER__OXTRANSID remains empty
 
 ## [1.1.1] - 2023-06-19
 
