@@ -134,7 +134,7 @@ class AdminOrderController extends AdminDetailsController
             /** @var Shipment $shipment */
             foreach ($unzerPayment->getShipments() as $shipment) {
                 $aRv = [];
-                $aRv['shipingDate'] = $shipment->getDate();
+                $aRv['shipingDate'] = $this->toLocalDateString($shipment->getDate());
                 $aRv['shipId'] = $shipment->getId();
                 $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
                 $aRv['amount'] = $shipment->getAmount();
@@ -170,11 +170,7 @@ class AdminOrderController extends AdminDetailsController
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                         $fCharged += $charge->getAmount();
                         // datetime from unzer is in GMT, convert it to local datetime
-                        $chargeDate = $charge->getDate();
-                        $dt = new \DateTime($chargeDate, new \DateTimeZone('GMT'));
-                        $dt->setTimezone(new \DateTimeZone(date_default_timezone_get()));
-                        $localDate = $dt->format('Y-m-d H:i:s');
-                        $aRv['chargeDate'] = $localDate;
+                        $aRv['chargeDate'] = $this->toLocalDateString($charge->getDate());
 
                         $charges[] = $aRv;
                     }
@@ -189,7 +185,7 @@ class AdminOrderController extends AdminDetailsController
                 if ($cancellation->isSuccess()) {
                     $aRv = [];
                     $aRv['cancelledAmount'] = $cancellation->getAmount();
-                    $aRv['cancelDate'] = $cancellation->getDate();
+                    $aRv['cancelDate'] = $this->toLocalDateString($cancellation->getDate());
                     $aRv['cancellationId'] = $cancellation->getId();
                     $aRv['cancelReason'] = $cancellation->getReasonCode();
                     $fCancelled += $cancellation->getAmount();
@@ -221,7 +217,7 @@ class AdminOrderController extends AdminDetailsController
 
     protected function addAuthorizationViewData(Authorization $authorization): void
     {
-        $this->_aViewData["AuthFetchedAt"] = $authorization->getFetchedAt();
+        $this->_aViewData["AuthFetchedAt"] = $this->toLocalDateString($authorization->getFetchedAt());
         $this->_aViewData["AuthShortId"] = $authorization->getShortId();
         $this->_aViewData["AuthId"] = $authorization->getId();
         $this->_aViewData["AuthAmount"] = $authorization->getAmount();
@@ -448,5 +444,12 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $this->editObject;
+    }
+
+    private function toLocalDateString(string $gmtDateString): string
+    {
+        $dt = new \DateTime($gmtDateString, new \DateTimeZone('GMT'));
+        $dt->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+        return $dt->format('Y-m-d H:i:s');
     }
 }
