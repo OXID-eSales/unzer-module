@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Utils;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
@@ -169,7 +170,12 @@ class AdminOrderController extends AdminDetailsController
                         $aRv['chargeId'] = $charge->getId();
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                         $fCharged += $charge->getAmount();
-                        $aRv['chargeDate'] = $charge->getDate();
+                        // datetime from unzer is in GMT, convert it to local datetime
+                        $chargeDate = $charge->getDate();
+                        $dt = new \DateTime($chargeDate, new \DateTimeZone('GMT'));
+                        $dt->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+                        $localDate = $dt->format('Y-m-d H:i:s');
+                        $aRv['chargeDate'] = $localDate;
 
                         $charges[] = $aRv;
                     }
