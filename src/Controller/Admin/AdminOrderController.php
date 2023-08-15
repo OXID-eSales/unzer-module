@@ -24,6 +24,8 @@ use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 use UnzerSDK\Unzer;
+use DateTime;
+use DateTimeZone;
 
 /**
  * Order class wrapper for Unzer module
@@ -134,7 +136,7 @@ class AdminOrderController extends AdminDetailsController
             /** @var Shipment $shipment */
             foreach ($unzerPayment->getShipments() as $shipment) {
                 $aRv = [];
-                $aRv['shipingDate'] = $shipment->getDate();
+                $aRv['shipingDate'] = $this->toLocalDateString($shipment->getDate() ?? '');
                 $aRv['shipId'] = $shipment->getId();
                 $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
                 $aRv['amount'] = $shipment->getAmount();
@@ -169,7 +171,8 @@ class AdminOrderController extends AdminDetailsController
                         $aRv['chargeId'] = $charge->getId();
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                         $fCharged += $charge->getAmount();
-                        $aRv['chargeDate'] = $charge->getDate();
+                        // datetime from unzer is in GMT, convert it to local datetime
+                        $aRv['chargeDate'] = $this->toLocalDateString($charge->getDate() ?? '');
 
                         $charges[] = $aRv;
                     }
@@ -184,7 +187,7 @@ class AdminOrderController extends AdminDetailsController
                 if ($cancellation->isSuccess()) {
                     $aRv = [];
                     $aRv['cancelledAmount'] = $cancellation->getAmount();
-                    $aRv['cancelDate'] = $cancellation->getDate();
+                    $aRv['cancelDate'] = $this->toLocalDateString($cancellation->getDate() ?? '');
                     $aRv['cancellationId'] = $cancellation->getId();
                     $aRv['cancelReason'] = $cancellation->getReasonCode();
                     $fCancelled += $cancellation->getAmount();
@@ -216,7 +219,12 @@ class AdminOrderController extends AdminDetailsController
 
     protected function addAuthorizationViewData(Authorization $authorization): void
     {
-        $this->_aViewData["AuthFetchedAt"] = $authorization->getFetchedAt();
+        $date = '';
+        $datetime = $authorization->getFetchedAt();
+        if ($datetime) {
+            $date = $datetime->format('Y-m-d H:i:s');
+        }
+        $this->_aViewData["AuthFetchedAt"] = $this->toLocalDateString($date);
         $this->_aViewData["AuthShortId"] = $authorization->getShortId();
         $this->_aViewData["AuthId"] = $authorization->getId();
         $this->_aViewData["AuthAmount"] = $authorization->getAmount();
@@ -443,5 +451,12 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $this->editObject;
+    }
+
+    private function toLocalDateString(string $gmtDateString): string
+    {
+        $datetime = new DateTime($gmtDateString, new DateTimeZone('GMT'));
+        $datetime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+        return $datetime->format('Y-m-d H:i:s');
     }
 }

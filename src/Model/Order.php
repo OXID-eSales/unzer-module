@@ -112,7 +112,7 @@ class Order extends Order_parent
     /**
      * Update order oxtransid
      */
-    public function setUnzerTransId($sTransId): void
+    public function setUnzerTransId(string $sTransId): void
     {
         $this->setFieldData('oxtransid', $sTransId);
         $this->save();
