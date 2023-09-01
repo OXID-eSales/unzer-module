@@ -10,11 +10,13 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\Basket;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
@@ -117,7 +119,7 @@ class InstallmentController extends FrontendController
 
             // payment is set ?
             $sPaymentid = $oBasket->getPaymentId();
-            $oPayment = oxNew(\OxidSolutionCatalysts\Unzer\Model\Payment::class);
+            $oPayment = oxNew(PaymentModel::class);
 
             /** @var string $sShipSet */
             $sShipSet = Registry::getSession()->getVariable('sShipSet');
@@ -156,7 +158,7 @@ class InstallmentController extends FrontendController
         if ($this->uzrPayment === null) {
             /** @var \OxidSolutionCatalysts\Unzer\Service\Payment $payment */
             $payment = $this->getServiceFromContainer(
-                \OxidSolutionCatalysts\Unzer\Service\Payment::class
+                PaymentService::class
             );
             /** @var Payment $sessionUnzerPayment */
             $sessionUnzerPayment = $payment->getSessionUnzerPayment();
@@ -170,7 +172,7 @@ class InstallmentController extends FrontendController
      */
     public function cancelInstallment()
     {
-        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
         $paymentService->removeTemporaryOrder();
 
         $unzerService = $this->getServiceFromContainer(Unzer::class);
