@@ -29,6 +29,7 @@
             event.preventDefault();
             $( "#payment-form-card" ).submit();
         }
+        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
 
     // Create an Unzer instance with your public key

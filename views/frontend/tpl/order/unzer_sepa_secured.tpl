@@ -131,6 +131,7 @@
             event.preventDefault();
             $( "#payment-form-sepa-secured" ).submit();
         }
+        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
     [{/capture}]
 [{oxscript add=$unzerSepaDirectSecurredJS}]
