@@ -16,6 +16,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
@@ -246,5 +247,33 @@ class OrderController extends OrderController_parent
             }
         }
         return $this->companyTypes;
+    }
+
+    /**
+     * execute Unzer defined via getExecuteFnc
+     */
+    public function executeoscunzer(): ?string
+    {
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
+        $payment = $this->getPayment();
+        $paymentService->executeUnzerPayment2($payment);
+
+        return null;
+    }
+
+    /**
+     * OXID-Core
+     * @inheritDoc
+     */
+    public function getExecuteFnc()
+    {
+        $payment = $this->getPayment();
+        if (
+            $payment->isUnzerPayment()
+        ) {
+            return 'executeoscunzer';
+        }
+        return parent::getExecuteFnc();
     }
 }

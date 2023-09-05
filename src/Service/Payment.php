@@ -160,6 +160,69 @@ class Payment
     }
 
     /**
+     * @throws Redirect
+     * @throws RedirectWithMessage
+     */
+    public function executeUnzerPayment2(PaymentModel $paymentModel): bool
+    {
+        try {
+            /** @var string $customerType */
+            $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
+            $user = $this->session->getUser();
+            $basket = $this->session->getBasket();
+            $currency = $basket->getBasketCurrency()->name;
+
+            /** @var AbstractUnzerPayment $paymentExtension */
+            $paymentExtension = $this->paymentExtLoader->getPaymentExtensionByCustomerTypeAndCurrency(
+                $paymentModel,
+                $customerType,
+                $currency
+            );
+            $paymentExtension->execute(
+                $user,
+                $basket
+            );
+
+            /** @var string $sess_challenge */
+            $sess_challenge = $this->session->getVariable('sess_challenge');
+            $this->transactionService->writeTransactionToDB(
+                $sess_challenge,
+                $this->session->getUser()->getId(),
+                $this->getSessionUnzerPayment()
+            );
+
+            $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
+
+            if ($this->redirectUrl) {
+                throw new Redirect($this->redirectUrl);
+            }
+
+            if ($this->pdfLink) {
+                throw new Redirect($this->unzerService->preparePdfConfirmRedirectUrl());
+            }
+        } catch (Redirect $e) {
+            throw $e;
+        } catch (UnzerApiException $e) {
+            throw new RedirectWithMessage(
+                $this->unzerService->prepareOrderRedirectUrl(
+//                    $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
+                ),
+                $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
+            );
+        } catch (Exception $e) {
+
+            throw new RedirectWithMessage(
+                $this->unzerService->prepareOrderRedirectUrl(
+//                    $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
+                ),
+                $e->getMessage()
+            );
+        }
+
+        return $paymentStatus;
+    }
+
+    /**
      * @return bool
      */
     public function removeTemporaryOrder(): bool

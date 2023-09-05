@@ -19,18 +19,20 @@ class PaymentGateway extends PaymentGateway_parent
      *
      * @param Order $oOrder
      */
-    public function executePayment($dAmount, &$oOrder)
+    public function executePayment_notnecessary($dAmount, &$oOrder)
     {
+        $success = parent::executePayment($dAmount, $oOrder);
+
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $oOrder->getFieldData('oxpaymenttype');
         $oPayment = oxNew(Payment::class);
         if ($oPayment->load($oxpaymenttype)) {
             if ($oPayment->isUnzerPayment()) {
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
-                $paymentService->executeUnzerPayment($oPayment);
+                $success = $paymentService->executeUnzerPayment($oPayment);
             }
         }
 
-        return parent::executePayment($dAmount, $oOrder);
+        return $success;
     }
 }

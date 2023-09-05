@@ -45,7 +45,12 @@ class DispatcherController extends FrontendController
         $jsonRequest = file_get_contents('php://input');
 
         /** @var array $aJson */
-        $aJson = json_decode($jsonRequest, true, 512, JSON_THROW_ON_ERROR);
+        try {
+            $aJson = json_decode($jsonRequest, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            Registry::getUtils()->showMessageAndExit("Invalid Json");
+        }
+
         /** @var array $url */
         $url = parse_url($aJson['retrieveUrl']);
         /** @var Transaction $transaction */
