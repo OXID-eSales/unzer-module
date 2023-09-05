@@ -30,12 +30,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
             ref: b-7.0.x
 
       - name: Checkout dockerfiles
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: OXID-eSales/module-demoshop-images
           token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains your PAT
