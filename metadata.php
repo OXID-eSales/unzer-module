@@ -61,7 +61,6 @@ $aModule = [
         \OxidEsales\Eshop\Core\Config::class => Config::class,
         \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
         \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
         \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
