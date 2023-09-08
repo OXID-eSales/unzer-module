@@ -113,7 +113,7 @@ class Order extends Order_parent
     {
         /** @var string $oxpaid */
         $oxpaid = $this->getFieldData('oxpaid');
-        if ($oxpaid === '0000-00-00 00:00:00') {
+        if ($oxpaid === '0000-00-00 00:00:00' || is_null($oxpaid)) {
             $utilsDate = Registry::getUtilsDate();
             $date = date('Y-m-d H:i:s', $utilsDate->getTime());
             $this->setFieldData('oxpaid', $date);
