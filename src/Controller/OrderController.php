@@ -9,7 +9,9 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
@@ -99,6 +101,7 @@ class OrderController extends OrderController_parent
 
     /**
      * @throws Redirect
+     * @throws DatabaseErrorException
      */
     public function unzerExecuteAfterRedirect(): void
     {
@@ -106,27 +109,32 @@ class OrderController extends OrderController_parent
         $oUser = $this->getUser();
         $oBasket = $this->getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
-            try {
-                /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
-                $oOrder = $this->getActualOrder();
 
-                //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
-                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+            $oDB = DatabaseProvider::getDb();
 
-                // performing special actions after user finishes order (assignment to special user groups)
-                $oUser->onOrderExecute($oBasket, $iSuccess);
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            $oOrder = $this->getActualOrder();
 
-                $nextStep = $this->_getNextStep($iSuccess);
+            $oDB->startTransaction();
 
-                // proceeding to next view
-                $unzerService = $this->getServiceFromContainer(Unzer::class);
-                throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
-            } catch (OutOfStockException $oEx) {
-                $oEx->setDestination('basket');
-                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
-            } catch (NoArticleException | ArticleInputException $oEx) {
-                Registry::getUtilsView()->addErrorToDisplay($oEx);
+            //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
+            $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+
+            // performing special actions after user finishes order (assignment to special user groups)
+            $oUser->onOrderExecute($oBasket, $iSuccess);
+
+            $nextStep = $this->_getNextStep($iSuccess);
+
+            if ('thankyou' ===  $nextStep) {
+                $oDB->commitTransaction();
             }
+            else {
+                $oDB->rollbackTransaction();
+            }
+
+            // proceeding to next view
+            $unzerService = $this->getServiceFromContainer(Unzer::class);
+            throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
         }
     }
 
