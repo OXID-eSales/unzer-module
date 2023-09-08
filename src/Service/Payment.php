@@ -167,8 +167,12 @@ class Payment
     {
         $result = self::STATUS_ERROR;
 
-        /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
+        if (is_null($sessionUnzerPayment)) {
+            return $result;
+        }
+
+        /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {

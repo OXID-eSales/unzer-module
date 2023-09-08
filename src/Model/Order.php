@@ -37,8 +37,13 @@ class Order extends Order_parent
     ) {
         $orderId = Registry::getSession()->getVariable('sess_challenge');
         $orderId = is_string($orderId) ? $orderId : '';
-        $this->setId($orderId);
+        $iRet = self::ORDER_STATE_PAYMENTERROR;
 
+        if (!$orderId) {
+            return $iRet;
+        }
+
+        $this->setId($orderId);
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus !== "ERROR") {
@@ -94,7 +99,7 @@ class Order extends Order_parent
         } else {
             // payment is canceled
             $this->delete();
-            $iRet = self::ORDER_STATE_PAYMENTERROR;
+
         }
 
         return $iRet;

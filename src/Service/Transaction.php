@@ -350,7 +350,7 @@ class Transaction
 
         /** @var AbstractTransactionType $initialTransaction */
         $initialTransaction = $unzerPayment->getInitialTransaction();
-        $params['shortid'] = $initialTransaction->getShortId() !== null ?
+        $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
             $initialTransaction->getShortId() :
             Registry::getSession()->getVariable('ShortId');
 
