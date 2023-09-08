@@ -10,10 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-use OxidEsales\Eshop\Core\Exception\NoArticleException;
-use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -102,6 +99,8 @@ class OrderController extends OrderController_parent
     /**
      * @throws Redirect
      * @throws DatabaseErrorException
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function unzerExecuteAfterRedirect(): void
     {
@@ -109,7 +108,6 @@ class OrderController extends OrderController_parent
         $oUser = $this->getUser();
         $oBasket = $this->getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
-
             $oDB = DatabaseProvider::getDb();
 
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
@@ -125,10 +123,9 @@ class OrderController extends OrderController_parent
 
             $nextStep = $this->_getNextStep($iSuccess);
 
-            if ('thankyou' ===  $nextStep) {
+            if ('thankyou' === $nextStep) {
                 $oDB->commitTransaction();
-            }
-            else {
+            } else {
                 $oDB->rollbackTransaction();
             }
 
@@ -265,7 +262,7 @@ class OrderController extends OrderController_parent
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
         /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
         $payment = $this->getPayment();
-        $paymentService->executeUnzerPayment2($payment);
+        $paymentService->executeUnzerPayment($payment);
 
         return null;
     }
@@ -276,6 +273,7 @@ class OrderController extends OrderController_parent
      */
     public function getExecuteFnc()
     {
+        /** @var Payment $payment */
         $payment = $this->getPayment();
         if (
             $payment->isUnzerPayment()

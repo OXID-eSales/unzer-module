@@ -36,12 +36,12 @@ class Order extends Order_parent
         User $oUser
     ) {
         $orderId = Registry::getSession()->getVariable('sess_challenge');
+        $orderId = is_string($orderId) ? $orderId : '';
         $this->setId($orderId);
 
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus !== "ERROR") {
-
             // copies user info
             $this->_setUser($oUser);
 

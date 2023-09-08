@@ -99,6 +99,7 @@ class Payment
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
+        $paymentExtension = null;
         try {
             /** @var string $customerType */
             $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');

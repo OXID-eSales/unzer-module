@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use Exception;
+use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -36,6 +37,7 @@ class DispatcherController extends FrontendController
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function updatePaymentTransStatus(): void
     {
@@ -44,14 +46,18 @@ class DispatcherController extends FrontendController
         /** @var string $jsonRequest */
         $jsonRequest = file_get_contents('php://input');
 
-        /** @var array $aJson */
+        $aJson = [];
+
         try {
+            /** @var array $aJson */
             $aJson = json_decode($jsonRequest, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
+            if (!count($aJson)) {
+                throw new JsonException('Invalid Json');
+            }
+        } catch (JsonException $e) {
             Registry::getUtils()->showMessageAndExit("Invalid Json");
         }
 
-        /** @var array $url */
         $url = parse_url($aJson['retrieveUrl']);
         /** @var Transaction $transaction */
         $transaction = $this->getServiceFromContainer(Transaction::class);
@@ -69,7 +75,11 @@ class DispatcherController extends FrontendController
         }
 
         if (
-            ($url['scheme'] !== "https" || ($url['host'] !== "api.unzer.com" && $url['host'] !== "sbx-api.heidelpay.com"))
+            $url['scheme'] !== "https" ||
+            (
+                $url['host'] !== "api.unzer.com" &&
+                $url['host'] !== "sbx-api.heidelpay.com"
+            )
         ) {
             Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
         }
