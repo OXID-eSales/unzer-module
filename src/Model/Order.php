@@ -50,15 +50,15 @@ class Order extends Order_parent
 
             $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
 
+            // set folder information, order is new
+            $this->_setFolder();
+
             //saving all order data to DB
             $this->save();
 
             if (!$this->getFieldData('oxordernr')) {
                 $this->_setNumber();
             }
-
-            // set folder information, order is new
-            $this->_setFolder();
 
             // deleting remark info only when order is finished
             Registry::getSession()->deleteVariable('ordrem');
