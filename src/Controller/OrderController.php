@@ -67,10 +67,6 @@ class OrderController extends OrderController_parent
      */
     public function execute()
     {
-        if (!$this->isSepaConfirmed()) {
-            return '';
-        }
-
         $ret = parent::execute();
 
         if ($ret && str_starts_with($ret, 'thankyou')) {
@@ -87,10 +83,6 @@ class OrderController extends OrderController_parent
             $response->setData([
                 'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
             ])->sendJson();
-        } elseif ($this->isSepaPayment()) {
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
-            $order = $this->getActualOrder();
-            $order->markUnzerOrderAsPaid();
         }
 
         return $ret;
@@ -259,10 +251,24 @@ class OrderController extends OrderController_parent
      */
     public function executeoscunzer(): ?string
     {
+        if (!$this->isSepaConfirmed()) {
+            return null;
+        }
+
+        if (!$this->_validateTermsAndConditions()) {
+            $this->_blConfirmAGBError = 1;
+            return null;
+        }
+
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
         /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
         $payment = $this->getPayment();
-        $paymentService->executeUnzerPayment($payment);
+        $paymentOk = $paymentService->executeUnzerPayment($payment);
+
+        // all orders without redirect would be finalized now
+        if ($paymentOk) {
+            $this->unzerExecuteAfterRedirect();
+        }
 
         return null;
     }
