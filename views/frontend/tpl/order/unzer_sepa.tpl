@@ -28,6 +28,7 @@
             event.preventDefault();
             $( "#payment-form-sepa" ).submit();
         }
+        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
 
     // Create an Unzer instance with your public key
