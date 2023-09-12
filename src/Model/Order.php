@@ -23,9 +23,6 @@ class Order extends Order_parent
 {
     use ServiceContainer;
 
-    /** @var bool $isRedirectOrder */
-    protected $isRedirectOrder = false;
-
     /**
      * @param Basket $oBasket
      * @param User $oUser
@@ -38,27 +35,44 @@ class Order extends Order_parent
         Basket $oBasket,
         User $oUser
     ) {
-        $this->isRedirectOrder = true;
+        $orderId = Registry::getSession()->getVariable('sess_challenge');
+        $orderId = is_string($orderId) ? $orderId : '';
+        $iRet = self::ORDER_STATE_PAYMENTERROR;
 
+        if (!$orderId) {
+            return $iRet;
+        }
+
+        $this->setId($orderId);
         $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
 
-        if ($unzerPaymentStatus != "ERROR") {
+        if ($unzerPaymentStatus !== "ERROR") {
+            // copies user info
+            $this->_setUser($oUser);
+
+            // copies basket info
+            $this->_loadFromBasket($oBasket);
+
+            $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
+
+            // set folder information, order is new
+            $this->_setFolder();
+
+            //saving all order data to DB
+            $this->save();
+
             if (!$this->getFieldData('oxordernr')) {
                 $this->_setNumber();
             }
-            // else {
-            //    oxNew(\OxidEsales\Eshop\Core\Counter::class)
-            //        ->update($this->_getCounterIdent(), $this->oxorder__oxordernr->value);
-            //}
 
             // deleting remark info only when order is finished
-            \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable('ordrem');
+            Registry::getSession()->deleteVariable('ordrem');
 
             //#4005: Order creation time is not updated when order processing is complete
             $this->_updateOrderDate();
 
             // store orderid
-            $oBasket->setOrderId($this->getId());
+            $oBasket->setOrderId($orderId);
 
             // updating wish lists
             $this->_updateWishlist($oBasket->getContents(), $oUser);
@@ -69,9 +83,7 @@ class Order extends Order_parent
             // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
             $this->_markVouchers($oBasket, $oUser);
 
-            $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
             // send order by email to shop owner and current user
-
             // don't let order fail due to stock check while sending out the order mail
             Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
             $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
@@ -79,7 +91,7 @@ class Order extends Order_parent
 
             $this->_setOrderStatus($unzerPaymentStatus);
 
-            if ($unzerPaymentStatus == 'OK') {
+            if ($unzerPaymentStatus === 'OK') {
                 $this->markUnzerOrderAsPaid();
             }
 
@@ -87,7 +99,7 @@ class Order extends Order_parent
         } else {
             // payment is canceled
             $this->delete();
-            $iRet = self::ORDER_STATE_PAYMENTERROR;
+
         }
 
         return $iRet;
@@ -101,7 +113,7 @@ class Order extends Order_parent
     {
         /** @var string $oxpaid */
         $oxpaid = $this->getFieldData('oxpaid');
-        if ($oxpaid == '0000-00-00 00:00:00') {
+        if ($oxpaid === '0000-00-00 00:00:00' || is_null($oxpaid)) {
             $utilsDate = Registry::getUtilsDate();
             $date = date('Y-m-d H:i:s', $utilsDate->getTime());
             $this->setFieldData('oxpaid', $date);
@@ -116,18 +128,6 @@ class Order extends Order_parent
     {
         $this->setFieldData('oxtransid', $sTransId);
         $this->save();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function _checkOrderExist($sOxId = null): bool // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        if ($this->isRedirectOrder) {
-            return false;
-        }
-
-        return parent::_checkOrderExist($sOxId);
     }
 
     /**

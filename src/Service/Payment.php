@@ -99,6 +99,7 @@ class Payment
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
+        $paymentExtension = null;
         try {
             /** @var string $customerType */
             $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
@@ -117,14 +118,6 @@ class Payment
                 $basket
             );
 
-            /** @var string $sess_challenge */
-            $sess_challenge = $this->session->getVariable('sess_challenge');
-            $this->transactionService->writeTransactionToDB(
-                $sess_challenge,
-                $this->session->getUser()->getId(),
-                $this->getSessionUnzerPayment()
-            );
-
             $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
 
             if ($this->redirectUrl) {
@@ -137,8 +130,6 @@ class Payment
         } catch (Redirect $e) {
             throw $e;
         } catch (UnzerApiException $e) {
-            $this->removeTemporaryOrder();
-
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
                     $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
@@ -146,8 +137,6 @@ class Payment
                 $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
             );
         } catch (Exception $e) {
-            $this->removeTemporaryOrder();
-
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
                     $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
@@ -178,8 +167,12 @@ class Payment
     {
         $result = self::STATUS_ERROR;
 
-        /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
+        if (is_null($sessionUnzerPayment)) {
+            return $result;
+        }
+
+        /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {

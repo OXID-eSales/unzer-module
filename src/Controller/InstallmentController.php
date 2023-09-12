@@ -37,7 +37,7 @@ class InstallmentController extends FrontendController
     /** @var Payment $uzrPayment */
     protected $uzrPayment;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $oxPayment */
+    /** @var PaymentModel $oxPayment */
     protected $oxPayment;
 
     /**

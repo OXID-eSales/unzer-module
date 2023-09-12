@@ -116,7 +116,8 @@ class Transaction
             $this->deleteInitOrder($params);
 
             // Fallback: set ShortID as OXTRANSID
-            $oOrder->setUnzerTransId($params['shortid']);
+            $shortId = $params['shortid'] ?? '';
+            $oOrder->setUnzerTransId($shortId);
 
             return true;
         }
@@ -349,7 +350,7 @@ class Transaction
 
         /** @var AbstractTransactionType $initialTransaction */
         $initialTransaction = $unzerPayment->getInitialTransaction();
-        $params['shortid'] = $initialTransaction->getShortId() !== null ?
+        $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
             $initialTransaction->getShortId() :
             Registry::getSession()->getVariable('ShortId');
 
