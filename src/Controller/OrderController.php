@@ -262,7 +262,7 @@ class OrderController extends OrderController_parent
         }
 
         if (!$this->_validateTermsAndConditions()) {
-            $this->_blConfirmAGBError = 1;
+            $this->_blConfirmAGBError = true;
             return null;
         }
 
