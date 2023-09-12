@@ -96,6 +96,7 @@
                 event.preventDefault();
                 $( '#payment-form-installment' ).submit();
             }
+            $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
         });
 
         // Handling payment form submission
