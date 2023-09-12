@@ -162,6 +162,7 @@ class Payment
     /**
      * @return string
      * @throws UnzerApiException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getUnzerPaymentStatus(): string
     {

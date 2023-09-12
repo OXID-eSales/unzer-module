@@ -348,7 +348,6 @@ class Transaction
             'traceid'  => $unzerPayment->getTraceId()
         ];
 
-        /** @var AbstractTransactionType $initialTransaction */
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
             $initialTransaction->getShortId() :

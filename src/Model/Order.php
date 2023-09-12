@@ -99,7 +99,6 @@ class Order extends Order_parent
         } else {
             // payment is canceled
             $this->delete();
-
         }
 
         return $iRet;
@@ -111,7 +110,6 @@ class Order extends Order_parent
      */
     public function markUnzerOrderAsPaid(): void
     {
-        /** @var string $oxpaid */
         $oxpaid = $this->getFieldData('oxpaid');
         if ($oxpaid === '0000-00-00 00:00:00' || is_null($oxpaid)) {
             $utilsDate = Registry::getUtilsDate();

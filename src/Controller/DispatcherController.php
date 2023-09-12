@@ -58,6 +58,7 @@ class DispatcherController extends FrontendController
             Registry::getUtils()->showMessageAndExit("Invalid Json");
         }
 
+        /** @var array $url */
         $url = parse_url($aJson['retrieveUrl']);
         /** @var Transaction $transaction */
         $transaction = $this->getServiceFromContainer(Transaction::class);
