@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
+use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -115,15 +116,20 @@ class OrderController extends OrderController_parent
 
             $nextStep = $this->_getNextStep($iSuccess);
 
+            // commit transaction and proceeding to next view
+            $unzerService = $this->getServiceFromContainer(Unzer::class);
+
             if ('thankyou' === $nextStep) {
                 $oDB->commitTransaction();
-            } else {
-                $oDB->rollbackTransaction();
+                throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
             }
 
-            // proceeding to next view
-            $unzerService = $this->getServiceFromContainer(Unzer::class);
-            throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
+            $oDB->rollbackTransaction();
+            $translator = $this->getServiceFromContainer(Translator::class);
+            throw new RedirectWithMessage(
+                $unzerService->prepareRedirectUrl($nextStep),
+                $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT')
+            );
         }
     }
 

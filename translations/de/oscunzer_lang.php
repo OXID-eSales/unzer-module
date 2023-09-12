@@ -13,6 +13,9 @@ $sLangName = 'Deutsch';
 $aLang = [
     'charset' => 'UTF-8',
 
+    // Error
+    'OSCUNZER_ERROR_DURING_CHECKOUT' => 'Bei der Abwicklung der Zahlung ist ein Fehler aufgetreten. Der Prozess wurde rückgängig gemacht. Bitte wählen Sie alternativ eine andere Zahlart aus.',
+
     // Invoice
     'OSCUNZER_BANK_DETAILS_AMOUNT' => 'Bitte überweisen sie den Betrag von %s %s auf folgendes Bankkonto:<br /><br />',
     'OSCUNZER_BANK_DETAILS_HOLDER' => 'Kontoinhaber: %s<br/>',
