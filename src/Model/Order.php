@@ -138,8 +138,7 @@ class Order extends Order_parent
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $this->getFieldData('oxpaymenttype');
         if (
-            $this->getFieldData('oxtransstatus') == "OK"
-            && strpos($oxpaymenttype, "oscunzer") !== false
+            strpos($oxpaymenttype, "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             return $transactionService->writeTransactionToDB(
