@@ -42,8 +42,8 @@
                                 {% block checkout_installment_confirm_button %}
                                     <form action="{{ oViewConf.getSslSelfLink() }}" method="post" id="orderConfirmInstallmentBottom" class="form-horizontal">
                                         <div class="hidden">
-                                            {{ oViewConf.getHiddenSid() }}
-                                            {{ oViewConf.getNavFormParams() }}
+                                            {{ oViewConf.getHiddenSid()|raw }}
+                                            {{ oViewConf.getNavFormParams()|raw }}
                                             <input type="hidden" name="cl" value="unzer_installment" />
                                             <input type="hidden" name="fnc" value="{{ oView.getExecuteFnc() }}" />
                                             <input type="hidden" name="challenge" value="{{ challenge }}" />
@@ -61,8 +61,8 @@
                             <div class="col-6">
                                 {% block checkout_installment_confirm_cancel %}
                                     <form action="{{ oViewConf.getSslSelfLink() }}" method="post" id="orderConfirmInstallmentCancel" class="form-horizontal">
-                                        {{ oViewConf.getHiddenSid() }}
-                                        {{ oViewConf.getNavFormParams() }}
+                                        {{ oViewConf.getHiddenSid()|raw }}
+                                        {{ oViewConf.getNavFormParams()|raw }}
                                         <input type="hidden" name="cl" value="unzer_installment">
                                         <input type="hidden" name="fnc" value="cancelInstallment">
                                         <input type="hidden" name="challenge" value="{{ challenge }}">

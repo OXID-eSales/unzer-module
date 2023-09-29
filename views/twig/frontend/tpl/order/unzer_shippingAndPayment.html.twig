@@ -4,7 +4,7 @@
     <div class="col-xs-12 col-md-6" id="orderShipping">
         <form action="{{ oViewConf.getSslSelfLink() }}" method="post">
             <div class="hidden">
-                {{ oViewConf.getHiddenSid() }}
+                {{ oViewConf.getHiddenSid()|raw }}
                 <input type="hidden" name="cl" value="payment">
                 <input type="hidden" name="fnc" value="">
             </div>

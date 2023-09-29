@@ -151,7 +151,7 @@
                     {% for oUnzerCharge in aCharges %}
                     <tr>
                         <form name="uzr" id="uzr_{{ oUnzerCharge.chargeId }}" action="{{ oViewConf.getSelfLink() }}" method="post">
-                            {{ oViewConf.getHiddenSid() }}
+                            {{ oViewConf.getHiddenSid()|raw }}
                             <input type="hidden" name="chargeid" value="{{ oUnzerCharge.chargeId }}">
                             <input type="hidden" name="chargedamount" value="{{ oUnzerCharge.chargedAmount }}">
                             <input type="hidden" name="unzerid" value="{{ sPaymentId }}">
