@@ -3,16 +3,25 @@ services:
   _defaults:
     public: false
     autowire: true
-    bind:
-      OxidEsales\Eshop\Core\Config: '@=service("OxidSolutionCatalysts\\Unzer\\Core\\Registry").getConfig()'
-      OxidEsales\Eshop\Core\Session: '@=service("OxidSolutionCatalysts\\Unzer\\Core\\Registry").getSession()'
-      OxidEsales\Eshop\Core\Language: '@=service("OxidSolutionCatalysts\\Unzer\\Core\\Registry").getLang()'
-      OxidEsales\Eshop\Core\UtilsDate: '@=service("OxidSolutionCatalysts\\Unzer\\Core\\Registry").getUtilsDate()'
-      OxidEsales\Eshop\Core\Request: '@=service("OxidSolutionCatalysts\\Unzer\\Core\\Registry").getRequest()'
 
-  OxidSolutionCatalysts\Unzer\Core\Registry:
+  OxidEsales\Eshop\Core\Registry:
     class: OxidEsales\Eshop\Core\Registry
+
+  OxidEsales\Eshop\Core\Config:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getConfig' ]
     public: true
+
+  OxidEsales\Eshop\Core\Session:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getSession' ]
+
+  OxidEsales\Eshop\Core\Language:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getLang' ]
+
+  OxidEsales\Eshop\Core\UtilsDate:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getUtilsDate' ]
+
+  OxidEsales\Eshop\Core\Request:
+    factory: [ '@OxidEsales\Eshop\Core\Registry', 'getRequest' ]
 
   OxidSolutionCatalysts\Unzer\Logger:
     class: Monolog\Logger
