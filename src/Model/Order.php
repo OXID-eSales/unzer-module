@@ -167,31 +167,6 @@ class Order extends Order_parent
     }
 
     /**
-     * @throws DatabaseErrorException
-     * @throws DatabaseConnectionException
-     *
-     * @return false|int
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function reinitializeOrder()
-    {
-        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $rowSelect = $oDB->getRow("SELECT OXUSERID, SERIALIZED_BASKET from oscunzertransaction
-                            where OXORDERID = :oxorderid AND OXACTION = 'init'", [':oxorderid' => $this->getId()]);
-        if ($rowSelect) {
-            $oUser = oxNew(User::class);
-            $oUser->load($rowSelect['OXUSERID']);
-            if ($oUser->isLoaded()) {
-                /** @var Basket $oBasket */
-                $oBasket = unserialize(base64_decode($rowSelect['SERIALIZED_BASKET']));
-                return $this->finalizeOrder($oBasket, $oUser, true);
-            }
-        }
-        return false;
-    }
-
-    /**
      * @inerhitDoc
      *
      * @param string $sOxId Ordering ID (default null)

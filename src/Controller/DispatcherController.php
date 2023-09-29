@@ -113,15 +113,8 @@ class DispatcherController extends FrontendController
                 }
 
                 $translator = $this->getServiceFromContainer(Translator::class);
-
-                if ($oxTransStatus !== "OK" && $unzerPayment->getState() !== 2) {
-                    $ret = $order->reinitializeOrder();
-                    if ($ret !== 1) {
-                        $unzer->debugLog("Order-Recalculation failed and returned with code: " . $ret);
-                    }
-                }
-
                 $transactionService = $this->getServiceFromContainer(Transaction::class);
+
                 if (
                     $transactionService->writeTransactionToDB(
                         $order->getId(),
@@ -139,7 +132,6 @@ class DispatcherController extends FrontendController
                 }
             }
         }
-        $transaction->cleanUpNotFinishedOrders();
 
         Registry::getUtils()->showMessageAndExit($result);
     }
