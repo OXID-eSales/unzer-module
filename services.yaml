@@ -42,12 +42,11 @@ services:
       $logFilePath: '@=service("OxidSolutionCatalysts\\Unzer\\Service\\Context").getUnzerLogFilePath()'
       $logLevel: !php/const Psr\Log\LogLevel::INFO
 
-  OxidSolutionCatalysts\Unzer\Service\:
-    resource: 'src/Service/*'
-    exclude: 'src/Service/{DebugHandler}'
+  OxidSolutionCatalysts\Unzer\Core\Response:
     public: true
 
-  OxidSolutionCatalysts\Unzer\Core\Response:
+  OxidSolutionCatalysts\Unzer\Service\:
+    resource: 'src/Service/*'
     public: true
 
   OxidSolutionCatalysts\Unzer\Service\DebugHandler:
