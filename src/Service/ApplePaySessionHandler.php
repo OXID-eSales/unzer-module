@@ -3,11 +3,14 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use Psr\Log\LoggerInterface;
 use UnzerSDK\Adapter\ApplepayAdapter;
 use UnzerSDK\Resources\ExternalResources\ApplepaySession;
 
 class ApplePaySessionHandler
 {
+    use ServiceContainer;
     private ApplepaySession $session;
     private ApplepayAdapter $adapter;
     private ModuleSettings $moduleSettings;
@@ -74,7 +77,9 @@ class ApplePaySessionHandler
             );
             return $jsonDecoded;
         } catch (\Throwable $e) {
-            Registry::getLogger()->error($e->getMessage());
+            /** @var LoggerInterface $logger */
+            $logger = $this->getServiceFromContainer('OxidSolutionCatalysts\Unzer\Logger');
+            $logger->error($e->getMessage());
             return null;
         }
     }

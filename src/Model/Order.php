@@ -138,7 +138,8 @@ class Order extends Order_parent
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $this->getFieldData('oxpaymenttype');
         if (
-            strpos($oxpaymenttype, "oscunzer") !== false
+            $this->getFieldData('oxtransstatus') === "OK"
+            && strpos($oxpaymenttype, "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             return $transactionService->writeTransactionToDB(
@@ -163,31 +164,6 @@ class Order extends Order_parent
             $this->getFieldData('OXINVOICENR') :
             $this->getFieldData('OXORDERNR');
         return $number;
-    }
-
-    /**
-     * @throws DatabaseErrorException
-     * @throws DatabaseConnectionException
-     *
-     * @return false|int
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function reinitializeOrder()
-    {
-        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $rowSelect = $oDB->getRow("SELECT OXUSERID, SERIALIZED_BASKET from oscunzertransaction
-                            where OXORDERID = :oxorderid AND OXACTION = 'init'", [':oxorderid' => $this->getId()]);
-        if ($rowSelect) {
-            $oUser = oxNew(User::class);
-            $oUser->load($rowSelect['OXUSERID']);
-            if ($oUser->isLoaded()) {
-                /** @var Basket $oBasket */
-                $oBasket = unserialize(base64_decode($rowSelect['SERIALIZED_BASKET']));
-                return $this->finalizeOrder($oBasket, $oUser, true);
-            }
-        }
-        return false;
     }
 
     /**
