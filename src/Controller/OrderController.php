@@ -116,10 +116,10 @@ class OrderController extends OrderController_parent
 
             $nextStep = $this->_getNextStep($iSuccess);
 
-            // commit transaction and proceeding to next view
             $unzerService = $this->getServiceFromContainer(Unzer::class);
 
             if ('thankyou' === $nextStep) {
+                // commit transaction and proceeding to next view
                 $oDB->commitTransaction();
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
             }

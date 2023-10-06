@@ -75,6 +75,6 @@ class ShopControl extends ShopControl_parent
 
         Registry::getUtilsView()->addErrorToDisplay($displayError);
 
-        $this->handleUnzerRedirectException($redirectException);
+        $this->handleUnzerRedirectException($redirectException, false);
     }
 }
