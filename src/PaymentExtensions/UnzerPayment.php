@@ -89,6 +89,15 @@ abstract class UnzerPayment
     ): bool {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
+        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Paypal) {
+            $paymentData = $request->getRequestParameter('paymentData');
+            $aPaymentData = json_decode($paymentData,true);
+            if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
+                $paymentType->setId($aPaymentData['id']);
+
+            }
+
+        }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
 

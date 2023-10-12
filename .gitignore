@@ -9,3 +9,4 @@ php-cs-fixer.phar
 /Tests/Codeception/_support/
 /files/*
 !/files/.htaccess
+.idea

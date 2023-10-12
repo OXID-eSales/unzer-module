@@ -13,9 +13,6 @@ $sLangName = 'Deutsch';
 $aLang = [
     'charset' => 'UTF-8',
 
-    // Error
-    'OSCUNZER_ERROR_DURING_CHECKOUT' => 'Bei der Abwicklung der Zahlung ist ein Fehler aufgetreten. Der Prozess wurde rückgängig gemacht. Bitte wählen Sie alternativ eine andere Zahlart aus.',
-
     // Invoice
     'OSCUNZER_BANK_DETAILS_AMOUNT' => 'Bitte überweisen sie den Betrag von %s %s auf folgendes Bankkonto:<br /><br />',
     'OSCUNZER_BANK_DETAILS_HOLDER' => 'Kontoinhaber: %s<br/>',
@@ -115,4 +112,12 @@ $aLang = [
     'OSCUNZER_PAYMENT_METHOD_SEPA-SECURED' => 'SEPA Lastschrift (abgesichert durch Unzer)',
     'OSCUNZER_PAYMENT_METHOD_SOFORT' => 'Sofort',
     'OSCUNZER_PAYMENT_METHOD_WECHATPAY' => 'WeChat Pay',
+    'OSCUNZER_SAVED_PAYMENTS' => 'Gespeicherte Zahlungsarten',
+    'OSCUNZER_SAVE_PAYMENT' => 'Zahlungsart speichern',
+    'OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS' => 'Keine Zahlungsarten gespeichert',
+    'OSCUNZER_BRAND' => 'Marke',
+    'OSCUNZER_HOLDER' => 'Inhaber',
+    'OSCUNZER_IBAN' => 'IBAN',
+    'OSCUNZER_CARD_NUMBER' => 'Kartennummer',
+    'OSCUNZER_EXPIRY_DATE' => 'Ablaufdatum',
 ];

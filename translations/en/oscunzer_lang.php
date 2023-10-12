@@ -13,9 +13,6 @@ $sLangName = 'English';
 $aLang = [
     'charset' => 'UTF-8',
 
-    // Error
-    'OSCUNZER_ERROR_DURING_CHECKOUT' => 'An error occurred while processing the payment. The process was reversed. Alternatively, please select another payment method.',
-
     //Invoice
     'OSCUNZER_BANK_DETAILS_AMOUNT' => 'Please transfer the amount of %s %s to the following account:<br /><br />',
     'OSCUNZER_BANK_DETAILS_HOLDER' => 'Holder: %s<br/>',
@@ -115,5 +112,13 @@ $aLang = [
     'OSCUNZER_PAYMENT_METHOD_SEPA-SECURED' => 'SEPA Direct Debit with Unzer',
     'OSCUNZER_PAYMENT_METHOD_SOFORT' => 'Sofort',
     'OSCUNZER_PAYMENT_METHOD_WECHATPAY' => 'WeChat Pay',
+    'OSCUNZER_SAVED_PAYMENTS' => 'Saved Payments',
+    'OSCUNZER_SAVE_PAYMENT' => ' Save Payment / New Payment',
+    'OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS' => 'No saved Payments',
+    'OSCUNZER_BRAND' => 'Brand',
+    'OSCUNZER_HOLDER' => 'Holder',
+    'OSCUNZER_IBAN' => 'IBAN',
+    'OSCUNZER_CARD_NUMBER' => 'Card Number',
+    'OSCUNZER_EXPIRY_DATE' => 'Expiry Date',
 
 ];

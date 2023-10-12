@@ -10,16 +10,17 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
-use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
-use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
@@ -60,14 +61,18 @@ class OrderController extends OrderController_parent
         // generate always a new threat metrix session id
         $unzer = $this->getServiceFromContainer(Unzer::class);
         $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();
+        $this->getSavedPayment();
         return parent::render();
     }
-
     /**
      * @inerhitDoc
      */
     public function execute()
     {
+        if (!$this->isSepaConfirmed()) {
+            return '';
+        }
+
         $ret = parent::execute();
 
         if ($ret && str_starts_with($ret, 'thankyou')) {
@@ -84,6 +89,10 @@ class OrderController extends OrderController_parent
             $response->setData([
                 'redirectUrl' => $unzer->prepareRedirectUrl('thankyou')
             ])->sendJson();
+        } elseif ($this->isSepaPayment()) {
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+            $order = $this->getActualOrder();
+            $order->markUnzerOrderAsPaid();
         }
 
         return $ret;
@@ -91,9 +100,6 @@ class OrderController extends OrderController_parent
 
     /**
      * @throws Redirect
-     * @throws DatabaseErrorException
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function unzerExecuteAfterRedirect(): void
     {
@@ -101,35 +107,27 @@ class OrderController extends OrderController_parent
         $oUser = $this->getUser();
         $oBasket = $this->getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
-            $oDB = DatabaseProvider::getDb();
+            try {
+                /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+                $oOrder = $this->getActualOrder();
 
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
-            $oOrder = $this->getActualOrder();
+                //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
+                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
-            $oDB->startTransaction();
+                // performing special actions after user finishes order (assignment to special user groups)
+                $oUser->onOrderExecute($oBasket, $iSuccess);
 
-            //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
-            $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+                $nextStep = $this->_getNextStep($iSuccess);
 
-            // performing special actions after user finishes order (assignment to special user groups)
-            $oUser->onOrderExecute($oBasket, $iSuccess);
-
-            $nextStep = $this->_getNextStep($iSuccess);
-
-            $unzerService = $this->getServiceFromContainer(Unzer::class);
-
-            if ('thankyou' === $nextStep) {
-                // commit transaction and proceeding to next view
-                $oDB->commitTransaction();
+                // proceeding to next view
+                $unzerService = $this->getServiceFromContainer(Unzer::class);
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
+            } catch (OutOfStockException $oEx) {
+                $oEx->setDestination('basket');
+                Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'basket');
+            } catch (NoArticleException | ArticleInputException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
-
-            $oDB->rollbackTransaction();
-            $translator = $this->getServiceFromContainer(Translator::class);
-            throw new RedirectWithMessage(
-                $unzerService->prepareRedirectUrl($nextStep),
-                $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT')
-            );
         }
     }
 
@@ -151,7 +149,7 @@ class OrderController extends OrderController_parent
         return (
         ($payment instanceof Payment) ?
             ( $payment->getId() === CoreUnzerDefinitions::SEPA_UNZER_PAYMENT_ID
-            || $payment->getId() === CoreUnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
+                || $payment->getId() === CoreUnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
         );
     }
 
@@ -233,6 +231,18 @@ class OrderController extends OrderController_parent
         return $this->actualOrder;
     }
 
+    public function getPaymentSaveSetting() {
+        $bSavedPayment = Registry::getConfig()->getConfigParam('UnzerSavePaymentsForUser');
+
+        // no guests allowed
+        $user = $this->getUser();
+        $passwordField = 'oxuser__oxpassword';
+        if ( !$user || (!$user->$passwordField->value) ) {
+            $bSavedPayment = 0;
+            return $bSavedPayment;
+        }
+        return $bSavedPayment;
+    }
     /**
      * @return array
      *
@@ -252,46 +262,39 @@ class OrderController extends OrderController_parent
         return $this->companyTypes;
     }
 
-    /**
-     * execute Unzer defined via getExecuteFnc
-     */
-    public function executeoscunzer(): ?string
+    protected function getSavedPayment()
     {
-        if (!$this->isSepaConfirmed()) {
-            return null;
+        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
+        $unzerSDK = $UnzerSdk->getUnzerSDK();
+
+        $ids = $this->getTrancactionIds();
+        $paymentTypes = false;
+        if ($ids) {
+            foreach ($ids as $typeId) {
+                if (!empty($typeId['PAYMENTTYPEID'])) {
+                    $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
+
+                    if (strpos($typeId['PAYMENTTYPEID'], 'crd')) {
+                        $paymentTypes['card'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    }
+                    if (strpos($typeId['PAYMENTTYPEID'], 'ppl')) {
+                        $paymentTypes['paypal'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    }
+                    if (strpos($typeId['PAYMENTTYPEID'], 'sdd')) {
+                        $paymentTypes['sepa'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    }
+                }
+            }
         }
+        $this->_aViewData['unzerPaymentType'] = $paymentTypes;
 
-        if (!$this->_validateTermsAndConditions()) {
-            $this->_blConfirmAGBError = true;
-            return null;
-        }
 
-        $paymentService = $this->getServiceFromContainer(PaymentService::class);
-        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
-        $payment = $this->getPayment();
-        $paymentOk = $paymentService->executeUnzerPayment($payment);
-
-        // all orders without redirect would be finalized now
-        if ($paymentOk) {
-            $this->unzerExecuteAfterRedirect();
-        }
-
-        return null;
     }
 
-    /**
-     * OXID-Core
-     * @inheritDoc
-     */
-    public function getExecuteFnc()
-    {
-        /** @var Payment $payment */
-        $payment = $this->getPayment();
-        if (
-            $payment->isUnzerPayment()
-        ) {
-            return 'executeoscunzer';
-        }
-        return parent::getExecuteFnc();
+    protected function getTrancactionIds() {
+        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
+        $rowSelect = $oDB->getAll("SELECT PAYMENTTYPEID from oscunzertransaction
+                            where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL GROUP BY PAYMENTTYPEID ", [':oxuserid' => $this->getUser()->getId()]);
+        return $rowSelect;
     }
 }
