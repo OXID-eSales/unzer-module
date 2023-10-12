@@ -9,6 +9,7 @@
  * Metadata version
  */
 
+use OxidSolutionCatalysts\Unzer\Controller\AccountSavedPaymentController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain;
@@ -51,7 +52,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.1.3-rc.2',
+    'version' => '1.1.2',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -61,6 +62,7 @@ $aModule = [
         \OxidEsales\Eshop\Core\Config::class => Config::class,
         \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
+        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
         \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
         \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
@@ -72,14 +74,15 @@ $aModule = [
         'unzer_dispatcher' => DispatcherController::class,
         'unzer_installment' => InstallmentController::class,
         'unzer_applepay_callback' => ApplePayCallbackController::class,
+        'unzer_saved_payments' => AccountSavedPaymentController::class,
     ],
     'templates' => [
         // admin
         'oscunzer_order.tpl' => 'osc/unzer/views/admin/tpl/oscunzer_order.tpl',
-
         // frontend
         'modules/osc/unzer/unzer_assets.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_assets.tpl',
         'modules/osc/unzer/unzer_card.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_card.tpl',
+        'modules/osc/unzer/unzer_paypal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_paypal.tpl',
         'modules/osc/unzer/unzer_eps_charge.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_eps_charge.tpl',
         'modules/osc/unzer/unzer_installment.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment.tpl',
         'modules/osc/unzer/unzer_installment_confirm.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_confirm.tpl',
@@ -96,6 +99,7 @@ $aModule = [
         'modules/osc/unzer/payment/applepay_availibility_check.tpl' => 'osc/unzer/views/frontend/tpl/payment/applepay_availibility_check.tpl',
         'modules/osc/unzer/payment/payment_unzer.tpl' => 'osc/unzer/views/frontend/tpl/payment/payment_unzer.tpl',
         'modules/osc/unzer/order/applepay_button.tpl' => 'osc/unzer/views/frontend/tpl/order/applepay_button.tpl',
+        'modules/osc/unzer/account_saved_payments.tpl' => 'osc/unzer/views/frontend/tpl/account/account_saved_payments.tpl',
     ],
     'blocks' => [
         //frontend
@@ -126,6 +130,11 @@ $aModule = [
             'block' => 'select_payment',
             'file' => 'views/frontend/blocks/page/checkout/select_payment.tpl'
         ],
+        [
+            'template' => 'page/account/inc/account_menu.tpl',
+            'block' => 'account_menu',
+            'file' => 'views/frontend/blocks/page/account/inc/account_menu.tpl'
+        ],
         //admin
         [
             'template' => 'module_config.tpl',
@@ -155,6 +164,12 @@ $aModule = [
         [
             'group' => 'unzerenvironment',
             'name' => 'UnzerDebug',
+            'type' => 'bool',
+            'value' => '0',
+        ],
+        [
+            'group' => 'unzerenvironment',
+            'name' => 'UnzerSavePaymentsForUser',
             'type' => 'bool',
             'value' => '0',
         ],
