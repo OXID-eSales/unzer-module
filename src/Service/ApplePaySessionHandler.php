@@ -11,6 +11,7 @@ use UnzerSDK\Resources\ExternalResources\ApplepaySession;
 class ApplePaySessionHandler
 {
     use ServiceContainer;
+
     private ApplepaySession $session;
     private ApplepayAdapter $adapter;
     private ModuleSettings $moduleSettings;
@@ -78,6 +79,7 @@ class ApplePaySessionHandler
             return $jsonDecoded;
         } catch (\Throwable $e) {
             /** @var LoggerInterface $logger */
+            /** @phpstan-ignore-next-line */
             $logger = $this->getServiceFromContainer('OxidSolutionCatalysts\Unzer\Logger');
             $logger->error($e->getMessage());
             return null;
