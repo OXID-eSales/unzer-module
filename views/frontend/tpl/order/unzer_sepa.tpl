@@ -42,9 +42,12 @@
     [{/if}]
     [{/foreach}]
 </div>
+[{if $unzerPaymentType.sepa != false }]
+<br>
 <label>
     <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue IBAN
 </label>
+[{/if}]
 <div id="newsepa" style="display:none;">
     <form id="payment-form-sepa">
         <br/>
@@ -104,20 +107,33 @@
         }
         $('#orderConfirmAgbBottom').removeClass('new-card-selected');
     });
+
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
-    $('input[name="newccard"]').on('change', function() {
-        SepaDirectDebit = unzerInstance.SepaDirectDebit();
-        if ($(this).prop('checked')) {
+    if ($('input[name="newccard"]').length === 0) {
+        $('#orderConfirmAgbBottom').addClass('new-card-selected');
+        $('#newsepa').show();
+        let SepaDirectDebit = unzerInstance.SepaDirectDebit();
 
-            SepaDirectDebit.create('sepa-direct-debit', {
-                containerId: 'sepa-IBAN'
-            });
-        } else {
-            removeCardElements();
-            console.log('remove');
-        }
-    });
+        SepaDirectDebit.create('sepa-direct-debit', {
+            containerId: 'sepa-IBAN'
+        });
+    } else {
+        $('input[name="newccard"]').on('change', function() {
+            SepaDirectDebit = unzerInstance.SepaDirectDebit();
+
+            if ($(this).prop('checked')) {
+
+                SepaDirectDebit.create('sepa-direct-debit', {
+                    containerId: 'sepa-IBAN'
+                });
+            } else {
+                removeCardElements();
+                console.log('remove');
+            }
+        });
+    }
+
 
     // Create a SEPA Direct Debit instance and render the form
     let SepaDirectDebit = unzerInstance.SepaDirectDebit();
@@ -142,9 +158,9 @@
                 let hiddenInput1 = $(document.createElement('input'))
                     .attr('type', 'hidden')
                     .attr('name', 'sepaConfirmation')
-                    .val($('#oscunzersepaagreement').is(':checked') ? '1' : '0');
+                    .val($('.sepaagreement #oscunzersepaagreement').is(':checked') ? '1' : '0');
                 $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput1);
-
+                console.log(hiddenInput1);
                 let hiddenInput2 = $(document.createElement('input'))
                     .attr('type', 'hidden')
                     .attr('name', 'oscunzersavepayment')
