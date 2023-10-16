@@ -102,4 +102,5 @@ $aLang = [
     'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CEUR' => 'Live privater Schlüssel für B2C-Käufe in EUR',
     'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CCHF' => 'Live öffentlicher Schlüssel für B2C-Käufe in CHF',
     'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CCHF' => 'Live privater Schlüssel für B2C-Käufe in CHF',
+    'SHOP_MODULE_UnzerSavePaymentsForUser' => 'Speichern von Zahlungsdaten des Kunden zulassen',
 ];
