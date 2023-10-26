@@ -20,6 +20,7 @@ use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class DispatcherController extends FrontendController
@@ -104,11 +105,11 @@ class DispatcherController extends FrontendController
             if ($order->load($data[0]['OXORDERID'])) {
                 /** @var string $oxTransStatus */
                 $oxTransStatus = $order->getFieldData('oxtransstatus');
-                if ($oxTransStatus === "OK" && $unzerPayment->getState() === 1) {
+                if ($oxTransStatus === "OK" && $unzerPayment->getState() === PaymentState::STATE_COMPLETED) {
                     $order->markUnzerOrderAsPaid();
                 }
 
-                if ($unzerPayment->getState() === 2) {
+                if ($unzerPayment->getState() === PaymentState::STATE_CANCELED) {
                     $order->cancelOrder();
                 }
 
