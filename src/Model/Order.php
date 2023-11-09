@@ -7,8 +7,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -16,6 +18,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 
@@ -27,7 +30,7 @@ class Order extends Order_parent
      * @param Basket $oBasket
      * @param User $oUser
      * @return int|bool
-     * @throws \Exception
+     * @throws Exception
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -44,7 +47,9 @@ class Order extends Order_parent
         }
 
         $this->setId($orderId);
-        $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
+        /** @var Unzer $paymentService */
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus !== "ERROR") {
             // copies user info
@@ -64,6 +69,10 @@ class Order extends Order_parent
             if (!$this->getFieldData('oxordernr')) {
                 $this->_setNumber();
             }
+
+            // setUnzerOrderId
+            $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
+            $paymentService->resetUnzerOrderId();
 
             // deleting remark info only when order is finished
             Registry::getSession()->deleteVariable('ordrem');
@@ -102,6 +111,41 @@ class Order extends Order_parent
         }
 
         return $iRet;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUnzerPayment(): bool
+    {
+        return stripos($this->getFieldData('oxpaymenttype'), "oscunzer") !== false;
+    }
+
+    public function getUnzerOrderNr(): int
+    {
+        return (int)$this->getFieldData('oxunzerordernr');
+    }
+
+    /**
+     * @throws DatabaseErrorException
+     * @throws DatabaseConnectionException
+     * @throws Exception
+     */
+    public function setUnzerOrderNr(int $unzerOrderId): int
+    {
+        $db = DatabaseProvider::getDb();
+
+        $sQ = "update oxorder set oxunzerordernr = :oxunzerordernr where oxid = :oxid";
+        $isUpdated = (bool) $db->execute($sQ, [
+            ':oxunzerordernr' => $unzerOrderId,
+            ':oxid' => $this->getId()
+        ]);
+
+        if ($isUpdated) {
+            $this->oxorder__oxunzerordernr = new Field($unzerOrderId);
+        }
+
+        return $unzerOrderId;
     }
 
     /**
@@ -198,7 +242,7 @@ class Order extends Order_parent
      * @param int $dataType
      * @return false|void
      */
-    public function setFieldData($fieldName, $value, $dataType = \OxidEsales\Eshop\Core\Field::T_TEXT)
+    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
     {
         return parent::_setFieldData($fieldName, $value, $dataType);
     }

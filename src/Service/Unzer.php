@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
@@ -629,10 +630,25 @@ class Unzer
 
     /**
      * @return string
+     * @throws Exception
      */
     public function generateUnzerOrderId(): string
     {
-        return 'o' . str_replace(['0.', ' '], '', microtime(false));
+//        return 'o' . str_replace(['0.', ' '], '', microtime(false));
+        $config = Registry::getConfig();
+        $session = Registry::getSession();
+        if (!($unzerOrderId = $session->getVariable('UnzerOrderId'))) {
+            $separateNumbering = $config->getConfigParam('blSeparateNumbering');
+            $counterIdent = $separateNumbering ? 'oxUnzerOrder_' . $config->getShopId() : 'oxUnzerOrder';
+            $unzerOrderId = oxNew(Counter::class)->getNext($counterIdent);
+            $session->setVariable('UnzerOrderId', $unzerOrderId);
+        }
+        return $unzerOrderId;
+    }
+
+    public function resetUnzerOrderId(): void
+    {
+        Registry::getSession()->deleteVariable('UnzerOrderId');
     }
 
     /**
