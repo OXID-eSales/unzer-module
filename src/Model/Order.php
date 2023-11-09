@@ -10,15 +10,15 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use Psr\Container\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
@@ -123,27 +123,30 @@ class Order extends Order_parent
     }
 
     /**
-     * @throws DatabaseErrorException
-     * @throws DatabaseConnectionException
-     * @throws Exception
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function setUnzerOrderNr(int $unzerOrderId): int
     {
-        $oDB = DatabaseProvider::getDb();
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()
+            ->getContainer();
 
-        $sSQL = "update oxorder set oxunzerordernr = :oxunzerordernr where oxid = :oxid";
-        $isUpdated = (bool) $oDB->execute($sSQL, [
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->update('oxorder')
+            ->set("oxunzerordernr", ":oxunzerordernr")
+            ->where("oxid = :oxid");
+
+        $parameters = [
             ':oxunzerordernr' => $unzerOrderId,
             ':oxid' => $this->getId()
-        ]);
+        ];
 
-        if ($isUpdated) {
-            // TODO fixme Access to an undefined property
-            // OxidSolutionCatalysts\Unzer\Model\Order::$oxorder__oxunzerordernr.
-            /** @phpstan-ignore-next-line */
-            $this->oxorder__oxunzerordernr = new Field($unzerOrderId);
-        }
+        $query->setParameters($parameters)->execute();
 
         return $unzerOrderId;
     }
