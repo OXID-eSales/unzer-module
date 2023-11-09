@@ -13,4 +13,5 @@ namespace OxidSolutionCatalysts\Unzer;
 class Module
 {
     public const MODULE_ID = 'osc-unzer';
+    public const GITHUB_NAME = 'OXID-eSales/unzer-module';
 }
