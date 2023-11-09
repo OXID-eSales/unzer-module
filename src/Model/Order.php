@@ -148,6 +148,11 @@ class Order extends Order_parent
 
         $query->setParameters($parameters)->execute();
 
+        // TODO fixme Access to an undefined property
+        // OxidSolutionCatalysts\Unzer\Model\Order::$oxorder__oxunzerordernr.
+        /** @phpstan-ignore-next-line */
+        $this->oxorder__oxunzerordernr = new Field($unzerOrderId);
+
         return $unzerOrderId;
     }
 
