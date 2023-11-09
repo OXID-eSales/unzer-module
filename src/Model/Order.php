@@ -10,7 +10,6 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -22,6 +21,10 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Order extends Order_parent
 {
     use ServiceContainer;
@@ -115,25 +118,30 @@ class Order extends Order_parent
 
     public function getUnzerOrderNr(): int
     {
-        return (int)$this->getFieldData('oxunzerordernr');
+        $value = $this->getFieldData('oxunzerordernr');
+        return is_numeric($value) ? (int)$value : 0;
     }
 
     /**
      * @throws DatabaseErrorException
      * @throws DatabaseConnectionException
      * @throws Exception
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function setUnzerOrderNr(int $unzerOrderId): int
     {
-        $db = DatabaseProvider::getDb();
+        $oDB = DatabaseProvider::getDb();
 
-        $sQ = "update oxorder set oxunzerordernr = :oxunzerordernr where oxid = :oxid";
-        $isUpdated = (bool) $db->execute($sQ, [
+        $sSQL = "update oxorder set oxunzerordernr = :oxunzerordernr where oxid = :oxid";
+        $isUpdated = (bool) $oDB->execute($sSQL, [
             ':oxunzerordernr' => $unzerOrderId,
             ':oxid' => $this->getId()
         ]);
 
         if ($isUpdated) {
+            // TODO fixme Access to an undefined property
+            // OxidSolutionCatalysts\Unzer\Model\Order::$oxorder__oxunzerordernr.
+            /** @phpstan-ignore-next-line */
             $this->oxorder__oxunzerordernr = new Field($unzerOrderId);
         }
 

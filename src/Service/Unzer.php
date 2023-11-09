@@ -629,15 +629,17 @@ class Unzer
     }
 
     /**
-     * @return string
+     * @return int
      * @throws Exception
+     * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function generateUnzerOrderId(): string
+    public function generateUnzerOrderId(): int
     {
-//        return 'o' . str_replace(['0.', ' '], '', microtime(false));
         $config = Registry::getConfig();
         $session = Registry::getSession();
-        if (!($unzerOrderId = $session->getVariable('UnzerOrderId'))) {
+        $unzerOrderId = $session->getVariable('UnzerOrderId');
+        $unzerOrderId = is_numeric($unzerOrderId) ? (int)$unzerOrderId : 0;
+        if (!$unzerOrderId) {
             $separateNumbering = $config->getConfigParam('blSeparateNumbering');
             $counterIdent = $separateNumbering ? 'oxUnzerOrder_' . $config->getShopId() : 'oxUnzerOrder';
             $unzerOrderId = oxNew(Counter::class)->getNext($counterIdent);
