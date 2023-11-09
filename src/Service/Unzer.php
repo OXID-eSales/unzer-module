@@ -621,7 +621,8 @@ class Unzer
         $metadata->addMetadata('shopid', (string)Registry::getConfig()->getShopId());
         $metadata->addMetadata('paymentmethod', $paymentMethod);
         $metadata->addMetadata('paymentprocedure', $this->getPaymentProcedure($paymentMethod));
-        $metadata->addMetadata('moduleversion', $this->moduleSettings->getModuleVersion());
+        $metadata->addMetadata('pluginType', $this->moduleSettings->getGitHubName());
+        $metadata->addMetadata('pluginVersion', $this->moduleSettings->getModuleVersion());
 
         return $metadata;
     }
