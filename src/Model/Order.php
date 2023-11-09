@@ -47,8 +47,8 @@ class Order extends Order_parent
         }
 
         $this->setId($orderId);
-        /** @var Unzer $paymentService */
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        $unzerService = $this->getServiceFromContainer(Unzer::class);
         $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus !== "ERROR") {
@@ -72,7 +72,7 @@ class Order extends Order_parent
 
             // setUnzerOrderId
             $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
-            $paymentService->resetUnzerOrderId();
+            $unzerService->resetUnzerOrderId();
 
             // deleting remark info only when order is finished
             Registry::getSession()->deleteVariable('ordrem');
@@ -111,14 +111,6 @@ class Order extends Order_parent
         }
 
         return $iRet;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUnzerPayment(): bool
-    {
-        return stripos($this->getFieldData('oxpaymenttype'), "oscunzer") !== false;
     }
 
     public function getUnzerOrderNr(): int
