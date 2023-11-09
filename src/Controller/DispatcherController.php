@@ -103,9 +103,7 @@ class DispatcherController extends FrontendController
             $unzerPayment = $unzer->fetchPayment($paymentId);
 
             if ($order->load($data[0]['OXORDERID'])) {
-                /** @var string $oxTransStatus */
-                $oxTransStatus = $order->getFieldData('oxtransstatus');
-                if ($oxTransStatus === "OK" && $unzerPayment->getState() === PaymentState::STATE_COMPLETED) {
+                if ($unzerPayment->getState() === PaymentState::STATE_COMPLETED) {
                     $order->markUnzerOrderAsPaid();
                 }
 

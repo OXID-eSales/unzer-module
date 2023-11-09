@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\StandardException;
@@ -43,6 +44,9 @@ abstract class UnzerPayment
     /** @var array */
     protected $allowedCurrencies = [];
 
+    /**
+     * @throws Exception
+     */
     public function __construct(
         Unzer $unzerSDK,
         UnzerService $unzerService
@@ -50,7 +54,7 @@ abstract class UnzerPayment
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
-        $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
+        $this->unzerOrderId = (string)$this->unzerService->generateUnzerOrderId();
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
     }
