@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\UserRepository;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions as UnzerDefinitionsService;
@@ -63,6 +64,8 @@ class PaymentController extends PaymentController_parent
                 continue;
             }
 
+            $invAndDelAddrIdent = !Registry::getSession()->getVariable('blshowshipaddress');
+
             if (
                 (
                     $payment->isUnzerPaymentHealthy()
@@ -74,6 +77,10 @@ class PaymentController extends PaymentController_parent
                 (
                     empty($unzerDefinitions[$key]['countries']) ||
                     in_array($userCountryIso, $unzerDefinitions[$key]['countries'], true)
+                ) &&
+                (
+                    $key !== CoreUnzerDefinitions::INVOICE_UNZER_PAYMENT_ID ||
+                    ($key === CoreUnzerDefinitions::INVOICE_UNZER_PAYMENT_ID && $invAndDelAddrIdent)
                 )
             ) {
                 $paymentList[$key] = $payment;
