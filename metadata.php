@@ -132,6 +132,11 @@ $aModule = [
             'block' => 'admin_module_config_var',
             'file' => 'views/admin/blocks/admin_module_config_var.tpl'
         ],
+        [
+            'template' => 'order_list.tpl',
+            'block' => 'admin_order_list_item',
+            'file' => 'views/admin/blocks/admin_order_list_item.tpl'
+        ],
         //email
         [
             'template' => 'email/plain/order_cust.tpl',

@@ -1,7 +1,7 @@
 [{include file="headitem.tpl" title="GENERAL_ADMIN_TITLE"|oxmultilangassign}]
 
 [{if $paymentTitle && $totalBasketPrice}]
-    <h3>[{$paymentTitle}] : [{$totalBasketPrice}]</h3>
+    <h3>[{$paymentTitle}] : [{$totalBasketPrice}] / [{oxmultilang ident='OSCUNZER_TRANSACTION_ORDERNR' suffix='COLON'}] [{$oOrder->oxorder__oxunzerordernr->value}]</h3>
 [{/if}]
 
 [{* payment abilities *}]
