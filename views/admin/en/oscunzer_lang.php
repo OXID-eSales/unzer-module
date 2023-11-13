@@ -51,6 +51,7 @@ $aLang = [
     'OSCUNZER_CHARGE_COLLECT' => 'Collect',
     'OSCUNZER_CHARGE_ID' => 'Charge-ID',
     'OSCUNZER_CANCEL_ID' => 'Cancel-ID',
+    'OSCUNZER_BANK_HOLDER_DETAILS' => 'Bankdetails',
     'OSCUNZER_AUTHORIZATION' => 'Authorization',
     'OSCUNZER_NOSHIPINGYET' => 'order has not yet been marked as shipped',
     'OSCUNZER_SHIPMENTS' => 'Shipments',

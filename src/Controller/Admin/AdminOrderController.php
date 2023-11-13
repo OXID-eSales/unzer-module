@@ -228,6 +228,12 @@ class AdminOrderController extends AdminDetailsController
         $this->_aViewData["AuthShortId"] = $authorization->getShortId();
         $this->_aViewData["AuthId"] = $authorization->getId();
         $this->_aViewData["AuthAmount"] = $authorization->getAmount();
+        $holderData = [];
+        $holderData['bic'] =  $authorization->getBic();
+        $holderData['iban'] =  $authorization->getIban();
+        $holderData['descriptor'] =  $authorization->getDescriptor();
+        $holderData['holder'] =  $authorization->getHolder();
+        $this->_aViewData["holderData"] = $holderData;
     }
 
     /**
