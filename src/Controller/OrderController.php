@@ -150,9 +150,11 @@ class OrderController extends OrderController_parent
         $payment = $this->getPayment();
 
         return (
-        ($payment instanceof Payment) ?
-            ( $payment->getId() === CoreUnzerDefinitions::SEPA_UNZER_PAYMENT_ID
-            || $payment->getId() === CoreUnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID) : false
+            $payment instanceof Payment &&
+            (
+                $payment->getId() === CoreUnzerDefinitions::SEPA_UNZER_PAYMENT_ID ||
+                $payment->getId() === CoreUnzerDefinitions::SEPA_SECURED_UNZER_PAYMENT_ID
+            )
         );
     }
 

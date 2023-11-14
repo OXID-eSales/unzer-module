@@ -7,18 +7,24 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use Psr\Container\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 
+/**
+ * TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Order extends Order_parent
 {
     use ServiceContainer;
@@ -27,7 +33,7 @@ class Order extends Order_parent
      * @param Basket $oBasket
      * @param User $oUser
      * @return int|bool
-     * @throws \Exception
+     * @throws Exception
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -44,7 +50,9 @@ class Order extends Order_parent
         }
 
         $this->setId($orderId);
-        $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        $unzerService = $this->getServiceFromContainer(Unzer::class);
+        $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
 
         if ($unzerPaymentStatus !== "ERROR") {
             // copies user info
@@ -64,6 +72,10 @@ class Order extends Order_parent
             if (!$this->getFieldData('oxordernr')) {
                 $this->_setNumber();
             }
+
+            // setUnzerOrderId
+            $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
+            $unzerService->resetUnzerOrderId();
 
             // deleting remark info only when order is finished
             Registry::getSession()->deleteVariable('ordrem');
@@ -104,6 +116,46 @@ class Order extends Order_parent
         return $iRet;
     }
 
+    public function getUnzerOrderNr(): int
+    {
+        $value = $this->getFieldData('oxunzerordernr');
+        return is_numeric($value) ? (int)$value : 0;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function setUnzerOrderNr(int $unzerOrderId): int
+    {
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()
+            ->getContainer();
+
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->update('oxorder')
+            ->set("oxunzerordernr", ":oxunzerordernr")
+            ->where("oxid = :oxid");
+
+        $parameters = [
+            ':oxunzerordernr' => $unzerOrderId,
+            ':oxid' => $this->getId()
+        ];
+
+        $query->setParameters($parameters)->execute();
+
+        // TODO fixme Access to an undefined property
+        // OxidSolutionCatalysts\Unzer\Model\Order::$oxorder__oxunzerordernr.
+        /** @phpstan-ignore-next-line */
+        $this->oxorder__oxunzerordernr = new Field($unzerOrderId);
+
+        return $unzerOrderId;
+    }
+
     /**
      * @return void
      * @SuppressWarnings(PHPMD.StaticAccess)
@@ -117,6 +169,9 @@ class Order extends Order_parent
             $this->setFieldData('oxpaid', $date);
             $this->save();
         }
+        // e.g. prepayments start with "NO_FINISHED", if they are marked as paid,
+        // we set the status to OK here
+        $this->_setOrderStatus('OK');
     }
 
     /**
@@ -138,8 +193,7 @@ class Order extends Order_parent
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $this->getFieldData('oxpaymenttype');
         if (
-            $this->getFieldData('oxtransstatus') === "OK"
-            && strpos($oxpaymenttype, "oscunzer") !== false
+            strpos($oxpaymenttype, "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             return $transactionService->writeTransactionToDB(
@@ -196,7 +250,7 @@ class Order extends Order_parent
      * @param int $dataType
      * @return false|void
      */
-    public function setFieldData($fieldName, $value, $dataType = \OxidEsales\Eshop\Core\Field::T_TEXT)
+    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
     {
         return parent::_setFieldData($fieldName, $value, $dataType);
     }

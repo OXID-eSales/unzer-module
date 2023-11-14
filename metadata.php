@@ -52,7 +52,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.1.3-rc.3',
+    'version' => '1.1.3',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -133,6 +133,11 @@ $aModule = [
             'template' => 'module_config.tpl',
             'block' => 'admin_module_config_var',
             'file' => 'views/admin/blocks/admin_module_config_var.tpl'
+        ],
+        [
+            'template' => 'order_list.tpl',
+            'block' => 'admin_order_list_item',
+            'file' => 'views/admin/blocks/admin_order_list_item.tpl'
         ],
         //email
         [

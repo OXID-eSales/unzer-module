@@ -206,6 +206,23 @@ class Payment
     }
 
     /**
+     * @return int
+     * @throws UnzerApiException
+     */
+    public function getUnzerOrderId(): int
+    {
+        $result = 0;
+        $sessionUnzerPayment = $this->getSessionUnzerPayment();
+        if ($sessionUnzerPayment) {
+            $transaction = $sessionUnzerPayment->getInitialTransaction();
+            if ($transaction) {
+                $result = (int)$transaction->getOrderId();
+            }
+        }
+        return $result;
+    }
+
+    /**
      * @param string $customerType
      * @param string $currency
      * @return \UnzerSDK\Unzer
