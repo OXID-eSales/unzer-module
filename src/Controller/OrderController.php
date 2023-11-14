@@ -121,6 +121,7 @@ class OrderController extends OrderController_parent
             if ('thankyou' === $nextStep) {
                 // commit transaction and proceeding to next view
                 $oDB->commitTransaction();
+                Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
             }
 
