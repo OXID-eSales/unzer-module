@@ -51,7 +51,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.1.0',
+    'version' => '2.0.0',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -63,8 +63,8 @@ $aModule = [
         \OxidEsales\Eshop\Application\Model\Article::class => Article::class,
         \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
         \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
-        \OxidEsales\Eshop\Application\Model\PaymentGateway::class => PaymentGateway::class,
-        \OxidEsales\Eshop\Core\Config::class => Config::class,
+        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
         \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
         \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
     ],
@@ -132,6 +132,11 @@ $aModule = [
             'template' => 'module_config.tpl',
             'block' => 'admin_module_config_var',
             'file' => 'views/smarty/admin/blocks/admin_module_config_var.tpl'
+        ],
+        [
+            'template' => 'order_list.tpl',
+            'block' => 'admin_order_list_item',
+            'file' => 'views/admin/blocks/admin_order_list_item.tpl'
         ],
         //email
         [
@@ -226,7 +231,7 @@ $aModule = [
             'group' => 'unzerapplepay',
             'name' => 'applepay_label',
             'type' => 'str',
-            'value' => ''
+            'value' => 'default lable please change'
         ],
         [
             'group' => 'unzerapplepay',

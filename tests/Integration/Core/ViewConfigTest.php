@@ -13,7 +13,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\Mod
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
-use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
+use OxidEsales\Eshop\Core\ViewConfig;
 
 class ViewConfigTest extends IntegrationTestCase
 {

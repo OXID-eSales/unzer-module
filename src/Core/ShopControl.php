@@ -61,7 +61,8 @@ class ShopControl extends ShopControl_parent
      */
     protected function handleUnzerRedirectException(Redirect $redirectException, bool $blAddRedirectParam = true): void
     {
-        Registry::getUtils()->redirect($redirectException->getDestination(), $blAddRedirectParam);
+        $url = $redirectException->getDestination();
+        Registry::getUtils()->redirect($url, $blAddRedirectParam);
     }
 
     /**
@@ -75,6 +76,6 @@ class ShopControl extends ShopControl_parent
 
         Registry::getUtilsView()->addErrorToDisplay($displayError);
 
-        $this->handleUnzerRedirectException($redirectException);
+        $this->handleUnzerRedirectException($redirectException, false);
     }
 }

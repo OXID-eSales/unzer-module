@@ -7,21 +7,19 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use Doctrine\DBAL\ForwardCompatibility\Result;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order as Order_parent;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
@@ -31,9 +29,6 @@ use UnzerSDK\Exceptions\UnzerApiException;
 class Order extends Order_parent
 {
     use ServiceContainer;
-
-    /** @var bool $isRedirectOrder */
-    protected $isRedirectOrder = false;
 
     /**
      * @param Basket $oBasket
@@ -47,48 +42,69 @@ class Order extends Order_parent
         Basket $oBasket,
         User $oUser
     ) {
-        $this->isRedirectOrder = true;
+        $orderId = Registry::getSession()->getVariable('sess_challenge');
+        $orderId = is_string($orderId) ? $orderId : '';
+        $iRet = self::ORDER_STATE_PAYMENTERROR;
 
-        $unzerPaymentStatus = $this->getServiceFromContainer(PaymentService::class)->getUnzerPaymentStatus();
+        if (!$orderId) {
+            return $iRet;
+        }
 
-        if ($unzerPaymentStatus != "ERROR") {
+        $this->setId($orderId);
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        $unzerService = $this->getServiceFromContainer(Unzer::class);
+        $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
+
+        if ($unzerPaymentStatus !== "ERROR") {
+            // copies user info
+            $this->_setUser($oUser);
+
+            // copies basket info
+            $this->_loadFromBasket($oBasket);
+
+            $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
+
+            // set folder information, order is new
+            $this->_setFolder();
+
+            //saving all order data to DB
+            $this->save();
+
             if (!$this->getFieldData('oxordernr')) {
-                $this->setNumber();
+                $this->_setNumber();
             }
-            // else {
-            //    oxNew(\OxidEsales\Eshop\Core\Counter::class)
-            //        ->update($this->_getCounterIdent(), $this->oxorder__oxordernr->value);
-            //}
+
+            // setUnzerOrderId
+            $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
+            $unzerService->resetUnzerOrderId();
 
             // deleting remark info only when order is finished
             Registry::getSession()->deleteVariable('ordrem');
 
             //#4005: Order creation time is not updated when order processing is complete
-            $this->updateOrderDate();
+            $this->_updateOrderDate();
 
             // store orderid
-            $oBasket->setOrderId($this->getId());
+            $oBasket->setOrderId($orderId);
 
             // updating wish lists
-            $this->updateWishlist($oBasket->getContents(), $oUser);
+            $this->_updateWishlist($oBasket->getContents(), $oUser);
 
             // updating users notice list
-            $this->updateNoticeList($oBasket->getContents(), $oUser);
+            $this->_updateNoticeList($oBasket->getContents(), $oUser);
 
             // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
-            $this->markVouchers($oBasket, $oUser);
+            $this->_markVouchers($oBasket, $oUser);
 
-            $oUserPayment = $this->setPayment($oBasket->getPaymentId());
             // send order by email to shop owner and current user
-
             // don't let order fail due to stock check while sending out the order mail
             Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
-            $iRet = $this->sendOrderByEmail($oUser, $oBasket, $oUserPayment);
+            $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
             Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
 
-            $this->setOrderStatus($unzerPaymentStatus);
+            $this->_setOrderStatus($unzerPaymentStatus);
 
-            if ($unzerPaymentStatus == 'OK') {
+            if ($unzerPaymentStatus === 'OK') {
                 $this->markUnzerOrderAsPaid();
             }
 
@@ -96,10 +112,49 @@ class Order extends Order_parent
         } else {
             // payment is canceled
             $this->delete();
-            $iRet = self::ORDER_STATE_PAYMENTERROR;
         }
 
         return $iRet;
+    }
+
+    public function getUnzerOrderNr(): int
+    {
+        $value = $this->getFieldData('oxunzerordernr');
+        return is_numeric($value) ? (int)$value : 0;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function setUnzerOrderNr(int $unzerOrderId): int
+    {
+        /** @var ContainerInterface $container */
+        $container = ContainerFactory::getInstance()
+            ->getContainer();
+
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->update('oxorder')
+            ->set("oxunzerordernr", ":oxunzerordernr")
+            ->where("oxid = :oxid");
+
+        $parameters = [
+            ':oxunzerordernr' => $unzerOrderId,
+            ':oxid' => $this->getId()
+        ];
+
+        $query->setParameters($parameters)->execute();
+
+        // TODO fixme Access to an undefined property
+        // OxidSolutionCatalysts\Unzer\Model\Order::$oxorder__oxunzerordernr.
+        /** @phpstan-ignore-next-line */
+        $this->oxorder__oxunzerordernr = new Field($unzerOrderId);
+
+        return $unzerOrderId;
     }
 
     /**
@@ -108,21 +163,25 @@ class Order extends Order_parent
      */
     public function markUnzerOrderAsPaid(): void
     {
-        $utilsDate = Registry::getUtilsDate();
-        $date = date('Y-m-d H:i:s', $utilsDate->getTime());
-        $this->setFieldData('oxpaid', $date);
-        $this->save();
+        $oxpaid = $this->getFieldData('oxpaid');
+        if ($oxpaid === '0000-00-00 00:00:00' || is_null($oxpaid)) {
+            $utilsDate = Registry::getUtilsDate();
+            $date = date('Y-m-d H:i:s', $utilsDate->getTime());
+            $this->setFieldData('oxpaid', $date);
+            $this->save();
+        }
+        // e.g. prepayments start with "NO_FINISHED", if they are marked as paid,
+        // we set the status to OK here
+        $this->_setOrderStatus('OK');
     }
 
     /**
-     * @param string $fieldName
-     * @param string $value
-     * @param int $dataType
-     * @return false|void
+     * Update order oxtransid
      */
-    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
+    public function setUnzerTransId(string $sTransId): void
     {
-        return parent::setFieldData($fieldName, $value, $dataType);
+        $this->setFieldData('oxtransid', $sTransId);
+        $this->save();
     }
 
     /**
@@ -135,8 +194,7 @@ class Order extends Order_parent
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $this->getFieldData('oxpaymenttype');
         if (
-            $this->getFieldData('oxtransstatus') == "OK"
-            && strpos($oxpaymenttype, "oscunzer") !== false
+            strpos($oxpaymenttype, "oscunzer") !== false
         ) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             return $transactionService->writeTransactionToDB(
@@ -149,6 +207,18 @@ class Order extends Order_parent
         }
 
         return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUnzerInvoiceNr()
+    {
+        /** @var int $number */
+        $number = $this->getFieldData('OXINVOICENR') !== 0 ?
+            $this->getFieldData('OXINVOICENR') :
+            $this->getFieldData('OXORDERNR');
+        return $number;
     }
 
     /**
@@ -176,71 +246,13 @@ class Order extends Order_parent
     }
 
     /**
-     * @return mixed
+     * @param string $fieldName
+     * @param string $value
+     * @param int $dataType
+     * @return false|void
      */
-    public function getUnzerInvoiceNr()
+    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
     {
-        /** @var int $number */
-        $number = $this->getFieldData('OXINVOICENR') !== 0 ?
-            $this->getFieldData('OXINVOICENR') :
-            $this->getFieldData('OXORDERNR');
-        return $number;
-    }
-
-    /**
-     * @return false|int
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     * @throws DatabaseConnectionException
-     *
-     * @throws DatabaseErrorException
-     */
-    public function reinitializeOrder()
-    {
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()->getContainer();
-        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-
-        $queryBuilder = $queryBuilderFactory->create();
-        $queryBuilder->select('oxuserid', 'serialized_basket')
-            ->from('oscunzertransaction')
-            ->where('oxorderid = :oxorderid')->andWhere('oxaction = :oxaction');
-
-        $parameters = [
-            'oxorderid' => $this->getId(),
-            'oxaction' => 'init'
-        ];
-
-        /** @var Result $result */
-        $result = $queryBuilder->setParameters($parameters)->execute();
-        $rowSelect = $result->fetchAllAssociative();
-
-        if ($rowSelect) {
-            $oUser = oxNew(User::class);
-            /** @var string $oxuserid */
-            $oxuserid = $rowSelect[0]['oxuserid'];
-            /** @var string $serialBasket */
-            $serialBasket = $rowSelect[0]['serialized_basket'];
-            $oUser->load($oxuserid);
-            if ($oUser->isLoaded()) {
-                /** @var Basket $oBasket */
-                $oBasket = unserialize(base64_decode($serialBasket));
-                return $this->finalizeOrder($oBasket, $oUser, true);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function checkOrderExist($sOxId = null): bool
-    {
-        if ($this->isRedirectOrder) {
-            return false;
-        }
-
-        return parent::checkOrderExist($sOxId);
+        return parent::_setFieldData($fieldName, $value, $dataType);
     }
 }

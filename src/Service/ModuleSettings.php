@@ -161,6 +161,14 @@ class ModuleSettings
     }
 
     /**
+     * @return string
+     */
+    public function getGitHubName(): string
+    {
+        return Module::GITHUB_NAME;
+    }
+
+    /**
      * @return bool
      */
     public function isApplePayEligibility(): bool
@@ -178,7 +186,7 @@ class ModuleSettings
     public function getApplePayLabel()
     {
         return $this->getSettingValue('applepay_label') ?:
-            $this->config->getActiveShop()->getFieldData('oxcompany');
+            $this->config->getActiveShop()->getFieldData('oxcompany') ?: 'default_label';
     }
 
     /**

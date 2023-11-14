@@ -29,6 +29,7 @@
             event.preventDefault();
             $( "#payment-form-card" ).submit();
         }
+        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
 
     // Create an Unzer instance with your public key
@@ -37,16 +38,16 @@
     // Create a Card instance and render the input fields
     let Card = unzerInstance.Card();
     Card.create('number', {
-    containerId: 'card-element-id-number',
-    onlyIframe: false
+        containerId: 'card-element-id-number',
+        onlyIframe: false
     });
     Card.create('expiry', {
-    containerId: 'card-element-id-expiry',
-    onlyIframe: false
+        containerId: 'card-element-id-expiry',
+        onlyIframe: false
     });
     Card.create('cvc', {
-    containerId: 'card-element-id-cvc',
-    onlyIframe: false
+        containerId: 'card-element-id-cvc',
+        onlyIframe: false
     });
 
     $( "#payment-form-card" ).submit(function( event ) {
@@ -65,6 +66,14 @@
             $('html, body').animate({
             scrollTop: $("#orderPayment").offset().top - 150
             }, 350);
+
+            errorField = $("#card-element-id-number");
+            errorField.find('div').first().addClass('error');
+            errorEl = errorField.find('div.error.message');
+            errorEl.css('display', 'inline-block');
+            errorEl.text(error.message);
+
+            $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
         })
     });
 

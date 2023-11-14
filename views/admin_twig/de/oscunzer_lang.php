@@ -19,6 +19,7 @@ $aLang = [
     'OSCUNZER_TRANSACTION_CREATED' => 'Transaktion erstellt',
     'OSCUNZER_TRANSACTION_CUSTOMERID' => 'Unzer Kunden-ID',
     'OSCUNZER_TRANSACTION_STATUS' => 'Unzer Auftragsstatus',
+    'OSCUNZER_TRANSACTION_ORDERNR' => 'Unzer OrderNr',
     'OSCUNZER_TRANSACTION_TYPEID' => 'Unzer Type-ID',
     'OSCUNZER_TRANSACTION_AMOUNT' => 'Betrag',
     'OSCUNZER_TRANSACTION_STATUS_pending' => 'ausstehend',

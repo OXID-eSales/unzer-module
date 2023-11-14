@@ -7,7 +7,10 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use Exception;
+use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
@@ -17,6 +20,7 @@ use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 class DispatcherController extends FrontendController
@@ -28,11 +32,13 @@ class DispatcherController extends FrontendController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @throws UnzerApiException
+     * @throws Exception
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function updatePaymentTransStatus(): void
     {
@@ -41,8 +47,18 @@ class DispatcherController extends FrontendController
         /** @var string $jsonRequest */
         $jsonRequest = file_get_contents('php://input');
 
-        /** @var array $aJson */
-        $aJson = json_decode($jsonRequest, true);
+        $aJson = [];
+
+        try {
+            /** @var array $aJson */
+            $aJson = json_decode($jsonRequest, true, 512, JSON_THROW_ON_ERROR);
+            if (!count($aJson)) {
+                throw new JsonException('Invalid Json');
+            }
+        } catch (JsonException $e) {
+            Registry::getUtils()->showMessageAndExit("Invalid Json");
+        }
+
         /** @var array $url */
         $url = parse_url($aJson['retrieveUrl']);
         /** @var Transaction $transaction */
@@ -61,7 +77,11 @@ class DispatcherController extends FrontendController
         }
 
         if (
-            ($url['scheme'] != "https" || ($url['host'] != "api.unzer.com" && $url['host'] != "sbx-api.heidelpay.com"))
+            $url['scheme'] !== "https" ||
+            (
+                $url['host'] !== "api.unzer.com" &&
+                $url['host'] !== "sbx-api.heidelpay.com"
+            )
         ) {
             Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
         }
@@ -76,33 +96,24 @@ class DispatcherController extends FrontendController
         $paymentId = $resource->getId();
         if (is_string($paymentId)) {
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
-            $order = oxNew(\OxidSolutionCatalysts\Unzer\Model\Order::class);
+            $order = oxNew(Order::class);
             /** @var array $data */
-            $data = $transaction->getTransactionDataByPaymentId($paymentId);
+            $data = $transaction::getTransactionDataByPaymentId($paymentId);
 
             $unzerPayment = $unzer->fetchPayment($paymentId);
 
             if ($order->load($data[0]['OXORDERID'])) {
-                /** @var string $oxTransStatus */
-                $oxTransStatus = $order->getFieldData('oxtransstatus');
-                if ($unzerPayment->getState() == 1 && $oxTransStatus == "OK") {
+                if ($unzerPayment->getState() === PaymentState::STATE_COMPLETED) {
                     $order->markUnzerOrderAsPaid();
                 }
 
-                if ($unzerPayment->getState() == 2) {
+                if ($unzerPayment->getState() === PaymentState::STATE_CANCELED) {
                     $order->cancelOrder();
                 }
 
                 $translator = $this->getServiceFromContainer(Translator::class);
-
-                if ($unzerPayment->getState() != 2 && $oxTransStatus != "OK") {
-                    $ret = $order->reinitializeOrder();
-                    if ($ret != 1) {
-                        $unzer->debugLog("Order-Recalculation failed and returned with code: " . $ret);
-                    }
-                }
-
                 $transactionService = $this->getServiceFromContainer(Transaction::class);
+
                 if (
                     $transactionService->writeTransactionToDB(
                         $order->getId(),
@@ -120,7 +131,6 @@ class DispatcherController extends FrontendController
                 }
             }
         }
-        $transaction->cleanUpNotFinishedOrders();
 
         Registry::getUtils()->showMessageAndExit($result);
     }

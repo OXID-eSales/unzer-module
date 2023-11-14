@@ -11,31 +11,30 @@ use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\Eshop\Core\UtilsView;
-use OxidEsales\EshopCommunity\Application\Model\Shop;
-use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidEsales\TestingLibrary\UnitTestCase;
 use OxidSolutionCatalysts\Unzer\Core\ShopControl;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 
-class ShopControlTest extends IntegrationTestCase
+class ShopControlTest extends UnitTestCase
 {
     /**
      * @dataProvider customStandardExceptionTestDataProvider
      */
     public function testHandleCustomException($expectedException): void
     {
-        class_alias(
-            \OxidEsales\Eshop\Core\ShopControl::class,
-            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
-        );
-        $someException = new $expectedException();
-
-        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin', 'logException']);
-        $mock->method('isAdmin')->willThrowException($someException);
-
-        $this->addToAssertionCount(1);
-        $mock->expects($this->once())->method('logException')->with($someException);
+        /** @var \Throwable $exceptionMock */
+        $exceptionMock = $this->createPartialMock($expectedException, ['debugOut']);
+        $exceptionMock->expects($this->once())->method('debugOut');
+        /* _runOnce is the earliest method call in the ShopControl.
+         That is why the exception is simulated in this method.
+         !Important, this test only works with Config "iDebug" = 0,
+         since in the other cases with exceptions too much OXID is made,
+         which makes further mocking very time-consuming.
+        */
+        $mock = $this->createPartialMock(ShopControl::class, ['_runOnce']);
+        $mock->method('_runOnce')->willThrowException($exceptionMock);
 
         $mock->start();
     }
@@ -52,12 +51,14 @@ class ShopControlTest extends IntegrationTestCase
     {
         $redirectDestination = 'someDestination';
 
-        class_alias(
-            \OxidEsales\Eshop\Core\ShopControl::class,
-            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
-        );
-        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin']);
-        $mock->method('isAdmin')->willThrowException(new Redirect($redirectDestination));
+        /* _runOnce is the earliest method call in the ShopControl.
+         That is why the exception is simulated in this method.
+         !Important, this test only works with Config "iDebug" = 0,
+         since in the other cases with exceptions too much OXID is made,
+         which makes further mocking very time-consuming.
+        */
+        $mock = $this->createPartialMock(ShopControl::class, ['_runOnce']);
+        $mock->method('_runOnce')->willThrowException(new Redirect($redirectDestination));
 
         $utilsMock = $this->createPartialMock(Utils::class, ['redirect']);
         $utilsMock->expects($this->once())
@@ -73,12 +74,14 @@ class ShopControlTest extends IntegrationTestCase
     {
         $redirectDestination = 'someDestination';
 
-        class_alias(
-            \OxidEsales\Eshop\Core\ShopControl::class,
-            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
-        );
-        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin']);
-        $mock->method('isAdmin')->willThrowException(
+        /* _runOnce is the earliest method call in the ShopControl.
+         That is why the exception is simulated in this method.
+         !Important, this test only works with Config "iDebug" = 0,
+         since in the other cases with exceptions too much OXID is made,
+         which makes further mocking very time-consuming.
+        */
+        $mock = $this->createPartialMock(ShopControl::class, ['_runOnce']);
+        $mock->method('_runOnce')->willThrowException(
             new RedirectWithMessage($redirectDestination, 'MESSAGE', ['param1'])
         );
 
