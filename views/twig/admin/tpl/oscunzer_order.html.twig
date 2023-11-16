@@ -1,15 +1,28 @@
 {% include "headitem.html.twig" with {title: "GENERAL_ADMIN_TITLE"|translate} %}
 
-{% if readonly %}
-    {% set readonly = "readonly disabled" %}
-{% else %}
-    {% set readonly = "" %}
+{% if paymentTitle and totalBasketPrice %}
+    <h3>{{ paymentTitle }} : {{ totalBasketPrice }} / {{ translate({ ident: 'OSCUNZER_TRANSACTION_ORDERNR', suffix: 'COLON' }) }} {{ oOrder.oxorder__oxunzerordernr.value }}</h3>
+{% endif %}
+
+{# payment abilities #}
+{% set canCollectFully = oView.canCollectFully() %}
+{% set canCollectPartially = oView.canCollectPartially() %}
+{% set canRefundFully = oView.canRefundFully() %}
+{% set canRefundPartially = oView.canRefundPartially() %}
+{% set canRevertPartially = oView.canRevertPartially() %}
+
+{% if isChargeBack %}
+    {% set canCollectFully = false %}
+    {% set canCollectPartially = false %}
+    {% set canRefundFully = false %}
+    {% set canRefundPartially = false %}
+    {% set canRevertPartially = false %}
 {% endif %}
 
 <form name="transfer" id="transfer" action="{{ oViewConf.getSelfLink() }}" method="post">
     {{ oViewConf.getHiddenSid()|raw }}
     <input type="hidden" name="oxid" value="{{ oxid }}">
-    <input type="hidden" name="cl" value="order_main">
+    <input type="hidden" name="cl" value="unzer_admin_order">
 </form>
 
 <div id="liste" style="margin:0;">
@@ -18,25 +31,29 @@
     {% else %}
         <table>
             <tbody>
+            <tr>
+                <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_CREATED" }) }}</td>
+                <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_SHORTID" }) }}</td>
+                <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_TRACEID" }) }}</td>
+                <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_CUSTOMERID" }) }}</td>
+                <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_STATUS" }) }}</td>
+                <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_TYPEID" }) }}</td>
+                <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_AMOUNT" }) }}</td>
+            </tr>
+            {% for oUnzerTransaction in oUnzerTransactions %}
+                {% set transaction_state = oUnzerTransaction.getUnzerState()|escape %}
                 <tr>
-                    <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_CREATED" }) }}</td>
-                    <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_SHORTID" }) }}</td>
-                    <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_TRACEID" }) }}</td>
-                    <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_CUSTOMERID" }) }}</td>
-                    <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_STATUS" }) }}</td>
-                    <td class="listheader">{{ translate({ ident: "OSCUNZER_TRANSACTION_TYPEID" }) }}</td>
+                    <td>{{ oUnzerTransaction.getUnzerCreated()|escape }}</td>
+                    <td>{{ oUnzerTransaction.getUnzerShortId()|escape }}</td>
+                    <td>{{ oUnzerTransaction.getUnzerTraceId()|escape }}</td>
+                    <td>{{ oUnzerTransaction.getUnzerCustomerId()|escape }}</td>
+                    <td>{{ 'OSCUNZER_TRANSACTION_STATUS_'|cat("transaction_state")|translate }}</td>
+                    <td>{{ oUnzerTransaction.getUnzerTypeId()|escape }}</td>
+                    <td>{{ oUnzerTransaction.getUnzerAmount()|number_format(2, '.', ' ') }}
+                        {{ oUnzerTransaction.getUnzerCurrency() }}
+                    </td>
                 </tr>
-                {% for oUnzerTransaction in oUnzerTransactions %}
-                    {% set transaction_state = oUnzerTransaction.getUnzerState()|escape %}
-                    <tr>
-                        <td>{{ oUnzerTransaction.getUnzerCreated()|escape }}</td>
-                        <td>{{ oUnzerTransaction.getUnzerShortId()|escape }}</td>
-                        <td>{{ oUnzerTransaction.getUnzerTraceId()|escape }}</td>
-                        <td>{{ oUnzerTransaction.getUnzerCustomerId()|escape }}</td>
-                        <td>{{ 'OSCUNZER_TRANSACTION_STATUS_'|cat("transaction_state")|translate }}</td>
-                        <td>{{ oUnzerTransaction.getUnzerTypeId()|escape }}</td>
-                    </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
     {% endif %}
@@ -48,25 +65,25 @@
             {% if aShipments %}
                 <table>
                     <tbody>
+                    <tr>
+                        <td class="listheader">{{ translate({ ident: "GENERAL_DATE" }) }}</td>
+                        <td class="listheader">{{ translate({ ident: "OSCUNZER_SHIP_ID" }) }}</td>
+                        <td class="listheader">{{ translate({ ident: "OSCUNZER_ORDER_AMOUNT" }) }}</td>
+                        <td class="listheader">{{ translate({ ident: "ORDER_MAIN_BILLNUM" }) }}</td>
+                    </tr>
+                    {% for oUnzerShipment in aShipments %}
+                        {% if not oUnzerShipment.success %}
+                            {% set unzStyle = 'class ="listitem3"' %}
+                        {% else %}
+                            {% set unzStyle = '' %}
+                        {% endif %}
                         <tr>
-                            <td class="listheader">{{ translate({ ident: "GENERAL_DATE" }) }}</td>
-                            <td class="listheader">{{ translate({ ident: "OSCUNZER_SHIP_ID" }) }}</td>
-                            <td class="listheader">{{ translate({ ident: "OSCUNZER_ORDER_AMOUNT" }) }}</td>
-                            <td class="listheader">{{ translate({ ident: "ORDER_MAIN_BILLNUM" }) }}</td>
+                            <td {{ unzStyle }}>{{ oUnzerShipment.shipingDate|escape }}</td>
+                            <td {{ unzStyle }}>{{ oUnzerShipment.shipId|escape }}</td>
+                            <td {{ unzStyle }}>{{ oUnzerShipment.amount|escape|number_format(2, '.', ' ') }}</td>
+                            <td {{ unzStyle }}>{{ oUnzerShipment.invoiceid|escape }}</td>
                         </tr>
-                        {% for oUnzerShipment in aShipments %}
-                            {% if not oUnzerShipment.success %}
-                                {% set unzStyle = 'class ="listitem3"' %}
-                            {% else %}
-                                {% set unzStyle = '' %}
-                            {% endif %}
-                            <tr>
-                                <td {{ unzStyle }}>{{ oUnzerShipment.shipingDate|escape }}</td>
-                                <td {{ unzStyle }}>{{ oUnzerShipment.shipId|escape }}</td>
-                                <td {{ unzStyle }}>{{ oUnzerShipment.amount|escape|number_format(2, '.', ' ') }}</td>
-                                <td {{ unzStyle }}>{{ oUnzerShipment.invoiceid|escape }}</td>
-                            </tr>
-                            {% endfor %}
+                    {% endfor %}
                     </tbody>
                 </table>
             {% endif %}
@@ -108,8 +125,8 @@
                     </table>
                 </form>
             {% endif %}
-            {% if AuthAmountRemaining == AuthAmount %}
-                <form name="uzr" id="uzr_collect" action="{{ oViewConf.getSelfLink() }}" method="post">
+            {% if AuthAmountRemaining > 0 %}
+                <form name="uzr" id="uzr_authorize" action="{{ oViewConf.getSelfLink() }}" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerAuthorizationCancel">
                     <input type="hidden" name="oxid" value="{{ oxid }}">
@@ -118,6 +135,13 @@
                         <tbody>
                         <tr>
                             <td>{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE" }) }}</td>
+                            {% if canRevertPartially %}
+                                <td><input type="text" id ="amount_authorize" name="amount"
+                                           value="{{ AuthAmountRemaining|number_format(2, '.', ' ') }}"> {{ AuthCur }}</td>
+                            {% else %}
+                                <td><input type="hidden" id ="amount_authorize" name="amount"
+                                           value="{{ AuthAmountRemaining|number_format(2, '.', ' ') }}"></td>
+                            {% endif %}
                             <td><button type="submit">{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL" }) }}</button></td>
                         </tr>
                         </tbody>
@@ -136,19 +160,18 @@
             <h3>{{ translate({ ident: "OSCUNZER_CHARGES" }) }}</h3>
             <table>
                 <tbody>
-                    <tr>
-                        <td class="listheader">{{ translate({ ident: "GENERAL_DATE" }) }}</td>
-                        <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_ID" }) }}</td>
-                        <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGED_AMOUNT" }) }}</td>
-                        <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGED_CANCELLED" }) }}</td>
-                        {% if blCancelReasonReq %}
-                            <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_CANCELREASON" }) }}</td>
-                        {% endif %}
-                        <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_CANCELAMOUNT" }) }}</td>
-                        <td class="listheader"> </td>
-                    </tr>
-
-                    {% for oUnzerCharge in aCharges %}
+                <tr>
+                    <td class="listheader">{{ translate({ ident: "GENERAL_DATE" }) }}</td>
+                    <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_ID" }) }}</td>
+                    <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGED_AMOUNT" }) }}</td>
+                    <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGED_CANCELLED" }) }}</td>
+                    {% if blCancelReasonReq %}
+                        <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_CANCELREASON" }) }}</td>
+                    {% endif %}
+                    <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_CANCELAMOUNT" }) }}</td>
+                    <td class="listheader"> </td>
+                </tr>
+                {% for oUnzerCharge in aCharges %}
                     <tr>
                         <form name="uzr" id="uzr_{{ oUnzerCharge.chargeId }}" action="{{ oViewConf.getSelfLink() }}" method="post">
                             {{ oViewConf.getHiddenSid()|raw }}
@@ -162,63 +185,78 @@
                             <td>{{ oUnzerCharge.chargeDate|escape }}</td>
                             <td>{{ oUnzerCharge.chargeId|escape }}</td>
                             <td>{{ oUnzerCharge.chargedAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
-                            {% if oUnzerCharge.cancellationPossible %}
+                            <td>{{ oUnzerCharge.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
+                            {% if blCancelReasonReq %}
                                 <td>
-                                    {{ oUnzerCharge.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}
+                                    <select name="reason" id="reason_{{ oUnzerCharge.chargeId }}">
+                                        <option value="CANCEL">{{ translate({ ident: "OSCUNZER_REASON_CANCEL" }) }}</option>
+                                        <option value="RETURN">{{ translate({ ident: "OSCUNZER_REASON_RETURN" }) }}</option>
+                                        <option value="CREDIT">{{ translate({ ident: "OSCUNZER_REASON_CREDIT" }) }}</option>
+                                    </select>
                                 </td>
-                                {% if blCancelReasonReq %}
-                                    <td>
-                                        <select name="reason" id="reason_{{ oUnzerCharge.chargeId }}">
-                                            <option value="CANCEL">{{ translate({ ident: "OSCUNZER_REASON_CANCEL" }) }}</option>
-                                            <option value="RETURN">{{ translate({ ident: "OSCUNZER_REASON_RETURN" }) }}</option>
-                                            <option value="CREDIT">{{ translate({ ident: "OSCUNZER_REASON_CREDIT" }) }}</option>
-                                        </select>
-                                    </td>
-                                {% endif %}
-                                <td>
+                            {% endif %}
+                            <td>
+                                {% if canRefundPartially %}
                                     <input type="text"
                                            name="amount"
                                            id="amount_{{ oUnzerCharge.chargeId }}"
                                            value="{{ oUnzerCharge.chargedAmount - oUnzerCharge.cancelledAmount | format("%.2f") }}"
                                            {% if not oUnzerCharge.cancellationPossible %}disabled{% endif %}>
-                                    {{ uzrCurrency }}
-                                </td>
-                                <td>
+                                {% else %}
+                                    {{ oUnzerCharge.chargedAmount - oUnzerCharge.cancelledAmount | format("%.2f") }}
+                                {% endif %}
+                                {{ uzrCurrency }}
+                            </td>
+                            <td>
+                                {% if canRefundPartially %}
                                     <input type="submit"
                                            id="submit_{{ oUnzerCharge.chargeId }}"
                                            {% if not oUnzerCharge.cancellationPossible %}disabled{% endif %}
                                            value="{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}">
-                                </td>
-                                {% capture assign = "cancelConfirm" %}
-                                    const inAmount = document.getElementById('amount_{{ oUnzerCharge.chargeId }}');
-                                    const form = document.getElementById('uzr_{{ oUnzerCharge.chargeId }}');
-                                    form.addEventListener('submit', function (e) {
-                                    if (window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + inAmount.value)) {
-                                    return true;
-                                    } else {
-                                    return false;
-                                    }
-                                    });
-                                {% endcapture %}
-                                {{ script({ add: cancelConfirm, dynamic: __oxid_include_dynamic }) }}
-                            {% else %}
-                                <td colspan="3"></td>
-                            {% endif %}
+                                {% endif %}
                         </form>
                     </tr>
-                    {% endfor %}
-                    {% if errCancel %}
+                {% endfor %}
+                {% if canCancelAmount > 0 %}
+                    <form name="uzr" id="uzr_s-chg_payout" action="{{ oViewConf.getSelfLink() }}" method="post">
+                        {{ oViewConf.getHiddenSid() }}
+                        <input type="hidden" name="unzerid" value="{{ sPaymentId }}">
+                        <input type="hidden" name="chargedamount" value="{{ canCancelAmount }}">
+                        <input type="hidden" name="cl" value="unzer_admin_order">
+                        <input type="hidden" name="fnc" value="doUnzerCancel">
+                        <input type="hidden" name="oxid" value="{{ oxid }}">
                         <tr>
-                            <td colspan="{% if blCancelReasonReq %}7{% else %}6{% endif %}"><div style="color: red">{{ errCancel }}</div></td>
+                            <td colspan="{% if blCancelReasonReq %}3{% else %}2{% endif %}" align="right">
+                                {{ translate({ ident: "OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT" }) }}
+                            </td>
+                            <td>{{ totalAmountCharge|string_format(" % .2f") }} {{ uzrCurrency }}</td>
+                            <td>{{ totalAmountCancel|string_format(" % .2f") }} {{ uzrCurrency }}</td>
+                            {% if canRefundFully %}
+                                <td><input type="text" id="amount_s-chg_payout"
+                                           name="amount" value="{{ canCancelAmount|string_format(" % .2f") }}"> {{ uzrCurrency }}</td>
+                                <td><button type="submit">{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}</button></td>
+                            {% else %}
+                                <td>{{ canCancelAmount|string_format(" % .2f") }} {{ uzrCurrency }}</td>
+                                <td></td>
+                            {% endif %}
                         </tr>
-                    {% endif %}
+                    </form>
+                {% endif %}
+                {% if errCancel %}
+                    <tr>
+                        <td colspan="{% if blCancelReasonReq %}7{% else %}6{% endif %}"><div style="color: red">{{ errCancel }}</div></td>
+                    </tr>
+                {% endif %}
                 </tbody>
             </table>
         {% endif %}
-        {% endblock %}
+        {% if isChargeBack %}
+            <div class="errorbox">{{ translate({ ident: "OSCUNZER_CHARGEBACK" }) }}</div>
+        {% endif %}
+    {% endblock %}
 
     {% block unzer_cancellation %}
-    <br><br>
+        <br><br>
         {% if aCancellations %}
             <h3>{{ translate({ ident: "OSCUNZER_CANCELLATIONS" }) }}</h3>
             <table>
@@ -244,6 +282,66 @@
         {% endif %}
     {% endblock %}
 </div>
+{% capture assign = "cancelConfirm" %}
+    let handleUnzerForm = function(formElement) {
+        if(formElement.id.indexOf('uzr_') is same as(0) { // make absolutely sure to start with "uzr_")
+            let paymentId = formElement.id.slice(4);
+            let amountId = 'amount_' + paymentId; // f.e. "uzr_s-chg-1"
+            let inAmount = document.getElementById(amountId);
+
+            if (null !== inAmount) {
+                return window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + inAmount.value + ' {{ uzrCurrency }}');
+            }
+            return false;
+        }
+        // if it is not a form we want to process, let it proceed
+        return true;
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let forms = document.querySelectorAll('form[id^="uzr_s-chg"]');
+        for(var i = 0; i < forms.length; i++) {
+            forms[i].addEventListener('submit', function(event) {
+                let returnValue = handleUnzerForm(this);
+                if (!returnValue) {
+                    event.preventDefault();
+                }
+                return returnValue;
+            });
+        }
+    }, false);
+{% endcapture %}
+{{ script({ add: cancelConfirm, dynamic: __oxid_include_dynamic }) }}
+
+{% capture assign = "cancelAuthConfirm" %}
+    let handleUnzerAuthForm = function(formElement) {
+        if(formElement.id.indexOf('uzr_authorize') is same as(0)) {
+            let paymentId = formElement.id.slice(4);
+            let amountId = 'amount_' + paymentId;
+            let inAmount = document.getElementById(amountId);
+
+            if (null !== inAmount) {
+                return window.confirm('{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL_ALERT" }) }}' + ' ' + inAmount.value + ' {{ uzrCurrency }}');
+            }
+            return false;
+        }
+        return true;
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let forms = document.querySelectorAll('form[id^="uzr_authorize"]');
+        for(var i = 0; i < forms.length; i++) {
+            forms[i].addEventListener('submit', function(event) {
+                let returnValue = handleUnzerAuthForm(this);
+                if (!returnValue) {
+                    event.preventDefault();
+                }
+                return returnValue;
+            });
+        }
+    }, false);
+{% endcapture %}
+{{ script({ add: cancelAuthConfirm, dynamic: __oxid_include_dynamic }) }}
 
 {% include "bottomnaviitem.html.twig" %}
 

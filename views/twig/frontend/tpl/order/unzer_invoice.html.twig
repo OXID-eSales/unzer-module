@@ -1,7 +1,9 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
+<script type="text/javascript" async
+        src="https://h.online-metrix.net/fp/tags.js?org_id=363t8kgq&session_id={{ unzerThreatMetrixSessionID }}">
+</script>
 
 {% set invadr = oView.getInvoiceAddress() %}
-{% set deladr = oView.getDelAddress() %}
 {% set iBirthdayMonth = 0 %}
 {% set iBirthdayDay = 0 %}
 {% set iBirthdayYear = 0 %}
@@ -9,25 +11,24 @@
 {% set isBoth = false %}
 {% set isB2B = false %}
 {% set isB2C = false %}
-{% set customerType = "" %}
 {% if isset( invadr.oxuser__oxbirthdate.month ) %}
     {% set iBirthdayMonth = invadr.oxuser__oxbirthdate.month %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4})[-]/", "")|regex_replace("/[-]([0-9]{1,2})$/", "") %}
+    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]/":""|regex_replace("/[-]([0-9]{1,) 2})$/":"" %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.day ) %}
     {% set iBirthdayDay = invadr.oxuser__oxbirthdate.day %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4})[-]([0-9]{1,2})[-]/", "") %}
+    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]([0-9]{1, 2})[-]/":"" %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.year ) %}
     {% set iBirthdayYear = invadr.oxuser__oxbirthdate.year %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/[-]([0-9]{1,2})[-]([0-9]{1,2})$/", "") %}
+    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/[-]([0-9]{1,) 2})[-]([0-9]{1, 2})$/":"" %}
 {% endif %}
-{% if (oxcmp_user.oxuser__oxcompany.value or (deladr and deladr.oxaddress__oxcompany.value)) %}
+{% if (oxcmp_user.oxuser__oxcompany.value or (invadr and invadr.oxaddress__oxcompany.value)) %}
     {% set isCompany = true %}
 {% endif %}
 
@@ -47,8 +48,8 @@
 {% endif %}
 
 {% block unzer_inv_secured_birthdate %}
-    <form id="payment-form" class="js-oxValidate form-horizontal" novalidate="novalidate">
-        {% if isBoth %}
+    <form id="payment-form" class="js-oxValidate form-horizontal unzerUI form" novalidate="novalidate">
+        {% if false and isBoth %}
             <div class="form-group row unzerConsumer text-danger">
                 <div class="col-12 col-lg-9 col-lg-offset-3">
                     <select id="unzer_select_consumer" class="form-control selectpicker" required>
@@ -143,7 +144,6 @@
         showB2C();
         let unzerInstance = new unzer('{{ oViewConf.getUnzerB2CPubKey() }}', {locale: "{{ unzerLocale }}"});
     {% endif %}
-
     let paylaterInvoice = unzerInstance.PaylaterInvoice();
     paylaterInvoice.create({
         containerId: 'paylater-invoice',
@@ -213,6 +213,7 @@
             event.preventDefault();
             $("#payment-form").submit();
         }
+        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
 
     {% endcapture %}
