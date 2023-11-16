@@ -10,12 +10,9 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\UserRepository;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment;
-use OxidEsales\Eshop\Application\Controller\PaymentController as PaymentController_parent;
 use OxidEsales\Eshop\Core\Registry;
 
 class PaymentController extends PaymentController_parent

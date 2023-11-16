@@ -99,7 +99,7 @@ class OrderController extends OrderController_parent
     {
         // get basket contents
         $oUser = $this->getUser();
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
@@ -114,7 +114,7 @@ class OrderController extends OrderController_parent
             // performing special actions after user finishes order (assignment to special user groups)
             $oUser->onOrderExecute($oBasket, $iSuccess);
 
-            $nextStep = $this->_getNextStep($iSuccess);
+            $nextStep = $this->getNextStep($iSuccess);
 
             $unzerService = $this->getServiceFromContainer(Unzer::class);
 
@@ -263,7 +263,7 @@ class OrderController extends OrderController_parent
             return null;
         }
 
-        if (!$this->_validateTermsAndConditions()) {
+        if (!$this->validateTermsAndConditions()) {
             $this->_blConfirmAGBError = true;
             return null;
         }

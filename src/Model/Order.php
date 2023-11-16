@@ -9,7 +9,6 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
-use OxidEsales\Eshop\Application\Model\Order as Order_parent;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -57,21 +56,21 @@ class Order extends Order_parent
 
         if ($unzerPaymentStatus !== "ERROR") {
             // copies user info
-            $this->_setUser($oUser);
+            $this->setUser($oUser);
 
             // copies basket info
-            $this->_loadFromBasket($oBasket);
+            $this->loadFromBasket($oBasket);
 
-            $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
+            $oUserPayment = $this->setPayment($oBasket->getPaymentId());
 
             // set folder information, order is new
-            $this->_setFolder();
+            $this->setFolder();
 
             //saving all order data to DB
             $this->save();
 
             if (!$this->getFieldData('oxordernr')) {
-                $this->_setNumber();
+                $this->setNumber();
             }
 
             // setUnzerOrderId
@@ -82,27 +81,27 @@ class Order extends Order_parent
             Registry::getSession()->deleteVariable('ordrem');
 
             //#4005: Order creation time is not updated when order processing is complete
-            $this->_updateOrderDate();
+            $this->updateOrderDate();
 
             // store orderid
             $oBasket->setOrderId($orderId);
 
             // updating wish lists
-            $this->_updateWishlist($oBasket->getContents(), $oUser);
+            $this->updateWishlist($oBasket->getContents(), $oUser);
 
             // updating users notice list
-            $this->_updateNoticeList($oBasket->getContents(), $oUser);
+            $this->updateNoticeList($oBasket->getContents(), $oUser);
 
             // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
-            $this->_markVouchers($oBasket, $oUser);
+            $this->markVouchers($oBasket, $oUser);
 
             // send order by email to shop owner and current user
             // don't let order fail due to stock check while sending out the order mail
             Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
-            $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
+            $iRet = $this->sendOrderByEmail($oUser, $oBasket, $oUserPayment);
             Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
 
-            $this->_setOrderStatus($unzerPaymentStatus);
+            $this->setOrderStatus($unzerPaymentStatus);
 
             if ($unzerPaymentStatus === 'OK') {
                 $this->markUnzerOrderAsPaid();
@@ -172,7 +171,7 @@ class Order extends Order_parent
         }
         // e.g. prepayments start with "NO_FINISHED", if they are marked as paid,
         // we set the status to OK here
-        $this->_setOrderStatus('OK');
+        $this->setOrderStatus('OK');
     }
 
     /**
@@ -243,16 +242,5 @@ class Order extends Order_parent
         }
 
         return parent::delete($sOxId);
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $value
-     * @param int $dataType
-     * @return false|void
-     */
-    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
-    {
-        return parent::_setFieldData($fieldName, $value, $dataType);
     }
 }
