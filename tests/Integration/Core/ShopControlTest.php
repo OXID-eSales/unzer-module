@@ -24,17 +24,17 @@ class ShopControlTest extends IntegrationTestCase
      */
     public function testHandleCustomException($expectedException): void
     {
-        /** @var \Throwable $exceptionMock */
-        $exceptionMock = $this->createPartialMock($expectedException, ['debugOut']);
-        $exceptionMock->expects($this->once())->method('debugOut');
-        /* _runOnce is the earliest method call in the ShopControl.
-         That is why the exception is simulated in this method.
-         !Important, this test only works with Config "iDebug" = 0,
-         since in the other cases with exceptions too much OXID is made,
-         which makes further mocking very time-consuming.
-        */
-        $mock = $this->createPartialMock(ShopControl::class, ['_runOnce']);
-        $mock->method('_runOnce')->willThrowException($exceptionMock);
+        class_alias(
+            \OxidEsales\Eshop\Core\ShopControl::class,
+            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
+        );
+        $someException = new $expectedException();
+
+        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin', 'logException']);
+        $mock->method('isAdmin')->willThrowException($someException);
+
+        $this->addToAssertionCount(1);
+        $mock->expects($this->once())->method('logException')->with($someException);
 
         $mock->start();
     }
@@ -51,14 +51,12 @@ class ShopControlTest extends IntegrationTestCase
     {
         $redirectDestination = 'someDestination';
 
-        /* _runOnce is the earliest method call in the ShopControl.
-         That is why the exception is simulated in this method.
-         !Important, this test only works with Config "iDebug" = 0,
-         since in the other cases with exceptions too much OXID is made,
-         which makes further mocking very time-consuming.
-        */
-        $mock = $this->createPartialMock(ShopControl::class, ['_runOnce']);
-        $mock->method('_runOnce')->willThrowException(new Redirect($redirectDestination));
+        class_alias(
+            \OxidEsales\Eshop\Core\ShopControl::class,
+            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
+        );
+        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin']);
+        $mock->method('isAdmin')->willThrowException(new Redirect($redirectDestination));
 
         $utilsMock = $this->createPartialMock(Utils::class, ['redirect']);
         $utilsMock->expects($this->once())
@@ -74,14 +72,12 @@ class ShopControlTest extends IntegrationTestCase
     {
         $redirectDestination = 'someDestination';
 
-        /* _runOnce is the earliest method call in the ShopControl.
-         That is why the exception is simulated in this method.
-         !Important, this test only works with Config "iDebug" = 0,
-         since in the other cases with exceptions too much OXID is made,
-         which makes further mocking very time-consuming.
-        */
-        $mock = $this->createPartialMock(ShopControl::class, ['_runOnce']);
-        $mock->method('_runOnce')->willThrowException(
+        class_alias(
+            \OxidEsales\Eshop\Core\ShopControl::class,
+            'OxidSolutionCatalysts\Unzer\Core\ShopControl_parent'
+        );
+        $mock = $this->createPartialMock(ShopControl::class, ['isAdmin']);
+        $mock->method('isAdmin')->willThrowException(
             new RedirectWithMessage($redirectDestination, 'MESSAGE', ['param1'])
         );
 
