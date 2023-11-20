@@ -1,29 +1,252 @@
-{% extends "page/checkout/order.html.twig" %}
+{% capture append = "oxidBlock_content" %}
 
-{% block shippingAndPayment %}
-    {% set payment = oView.getPayment() %}
-    {% if payment.isUnzerPayment() %}
-        {% include "@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment.html.twig" %}
-    {% else %}
-        {{ parent() }}
-    {% endif %}
+    {%  block checkout_order_errors %}
+        {% if oView.isConfirmAGBActive() and oView.isConfirmAGBError() == 1 %}
+            {% include "message/error.html.twig" with {statusMessage: "READ_AND_CONFIRM_TERMS"|translate} %}
+        {% endif %}
+        {% set iError = oView.getAddressError() %}
+        {% if iError == 1 %}
+            {% include "message/error.html.twig" with {statusMessage: "ERROR_DELIVERY_ADDRESS_WAS_CHANGED_DURING_CHECKOUT"|translate} %}
+        {% endif %}
 
-{% endblock %}
+        {% set sepaError = oView.isSepaMandateConfirmationError() %}
+        {% if sepaError == 1 %}
+            {% include "message/error.html.twig" with {statusMessage: "ERROR_UNZER_SEPA_CONFIRMATION_MISSING"|translate} %}
+        {% endif %}
+        {% include "@osc-unzer/frontend/tpl/message/js-errors.html.twig" %}v
+    {%  endblock %}
 
-{%  block checkout_order_errors %}
-    {{ parent() }}
-    {% set sepaError = oView.isSepaMandateConfirmationError() %}
-    {% if sepaError == 1 %}
-        {% include "message/error.html.twig" with {statusMessage: "ERROR_UNZER_SEPA_CONFIRMATION_MISSING"|translate} %}
-    {% endif %}
-    {% include "@osc-unzer/frontend/tpl/message/js-errors.html.twig" %}v
-{%  endblock %}
+    <div class="container-md py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-8 col-xl-8 col-xxl-6">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="card mb-3">
+                            {% block checkout_order_main %}
 
-{%  block checkout_order_btn_submit_bottom %}
-    {% set payment = oView.getPayment() %}
-    {% if payment.getId() is same as('oscunzer_applepay') %}
-        {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
-    {% else %}
-        {{ parent() }}
-    {% endif %}
-{%  endblock %}
+                                {% block checkout_order_details %}
+                                    {% if not oxcmp_basket.getProductsCount() %}
+                                        {% block checkout_order_emptyshippingcart %}
+                                            <div class="card-body">
+                                                <div class="alert alert-danger">{{ translate({ ident: "BASKET_EMPTY" }) }}</div>
+                                            </div>
+                                        {% endblock %}
+                                    {% else %}
+                                        {% set currency = oView.getActCurrency() %}
+                                        {% block checkout_order_address %}
+                                            <div id="orderAddress">
+                                                <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post">
+                                                    {{ oViewConf.getHiddenSid()|raw }}
+                                                    <input type="hidden" name="cl" value="user">
+                                                    <input type="hidden" name="fnc" value="">
+                                                    <h4 class="card-header card-title card-header-edit d-flex justify-content-between align-items-center">
+                                                        {{ translate({ ident: "BILLING_ADDRESS" }) }}
+                                                        <button type="submit" class="btn"
+                                                                title="{{ translate({ ident: "EDIT" }) }}">
+                                                            <svg aria-hidden="true">
+                                                                <use xlink:href="#pencil"></use>
+                                                            </svg>
+                                                        </button>
+                                                    </h4>
+                                                    <div class="card-body">
+                                                        {% include "widget/address/billing_address.html.twig" %}
+                                                    </div>
+                                                </form>
+                                                <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post">
+                                                    {{ oViewConf.getHiddenSid()|raw }}
+                                                    <input type="hidden" name="cl" value="user">
+                                                    <input type="hidden" name="fnc" value="">
+                                                    <h4 class="card-header card-title card-header-edit d-flex justify-content-between align-items-center">
+                                                        {{ translate({ ident: "SHIPPING_ADDRESS" }) }}
+                                                        <button type="submit" class="btn"
+                                                                title="{{ translate({ ident: "EDIT" }) }}">
+                                                            <svg aria-hidden="true">
+                                                                <use xlink:href="#pencil"></use>
+                                                            </svg>
+                                                        </button>
+                                                    </h4>
+                                                    <div class="card-body">
+                                                        {% set oDelAdress = oView.getDelAddress() %}
+                                                        {% if oDelAdress %}
+                                                            {% include "widget/address/shipping_address.html.twig" with {delivadr: oDelAdress} %}
+                                                        {% else %}
+                                                            {% include "widget/address/billing_address.html.twig" %}
+                                                        {% endif %}
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        {% endblock %}
+
+                                        {% block shippingAndPayment %}
+                                            {% set payment = oView.getPayment() %}
+                                            {% if payment.isUnzerPayment() %}
+                                                {% include "@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment.html.twig" %}
+                                            {% else %}
+                                                <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post"
+                                                      id="orderShipping">
+                                                    {{ oViewConf.getHiddenSid()|raw }}
+                                                    <input type="hidden" name="cl" value="payment">
+                                                    <input type="hidden" name="fnc" value="">
+                                                    <h4 class="card-header card-title card-header-edit d-flex justify-content-between align-items-center">
+                                                        {{ translate({ ident: "SHIPPING_CARRIER" }) }}
+                                                        <button type="submit" class="btn"
+                                                                title="{{ translate({ ident: "EDIT" }) }}">
+                                                            <svg aria-hidden="true">
+                                                                <use xlink:href="#pencil"></use>
+                                                            </svg>
+                                                        </button>
+                                                    </h4>
+                                                    {% set oShipSet = oView.getShipSet() %}
+                                                    <div class="card-body">
+                                                        {{ oShipSet.oxdeliveryset__oxtitle.value }}
+                                                    </div>
+                                                </form>
+                                                <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post"
+                                                      id="orderPayment">
+                                                    {{ oViewConf.getHiddenSid()|raw }}
+                                                    <input type="hidden" name="cl" value="payment">
+                                                    <input type="hidden" name="fnc" value="">
+                                                    <h4 class="card-header card-title card-header-edit d-flex justify-content-between align-items-center">
+                                                        {{ translate({ ident: "PAYMENT_METHOD" }) }}
+                                                        <button type="submit" class="btn"
+                                                                title="{{ translate({ ident: "EDIT" }) }}">
+                                                            <svg aria-hidden="true">
+                                                                <use xlink:href="#pencil"></use>
+                                                            </svg>
+                                                        </button>
+                                                    </h4>
+                                                    <div class="card-body">
+                                                        {% set payment = oView.getPayment() %}
+                                                        {{ payment.oxpayments__oxdesc.value }}
+                                                    </div>
+                                                </form>
+                                            {% endif %}
+                                        {% endblock %}
+
+                                        {% block checkout_order_remark %}
+                                            {% if oView.getOrderRemark() %}
+                                                <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post">
+                                                    {{ oViewConf.getHiddenSid()|raw }}
+                                                    <input type="hidden" name="cl" value="user">
+                                                    <input type="hidden" name="fnc" value="">
+                                                    <h4 class="card-header card-title card-header-edit d-flex justify-content-between align-items-center">
+                                                        {{ translate({ ident: "WHAT_I_WANTED_TO_SAY" }) }}
+                                                        <button type="submit" class="btn"
+                                                                title="{{ translate({ ident: "EDIT" }) }}">
+                                                            <svg aria-hidden="true">
+                                                                <use xlink:href="#pencil"></use>
+                                                            </svg>
+                                                        </button>
+                                                    </h4>
+                                                    <div class="card-body">
+                                                        {{ oView.getOrderRemark()|nl2br }}
+                                                    </div>
+                                                </form>
+                                            {% endif %}
+                                        {% endblock %}
+
+                                        <div id="orderEditCart">
+                                            <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post">
+                                                {{ oViewConf.getHiddenSid()|raw }}
+                                                <input type="hidden" name="cl" value="basket">
+                                                <input type="hidden" name="fnc" value="">
+                                                <h4 class="card-header card-title card-header-edit d-flex justify-content-between align-items-center">
+                                                    {{ translate({ ident: "CART" }) }}
+                                                    <button type="submit" class="btn"
+                                                            title="{{ translate({ ident: "EDIT" }) }}">
+                                                        <svg aria-hidden="true">
+                                                            <use xlink:href="#pencil"></use>
+                                                        </svg>
+                                                    </button>
+                                                </h4>
+                                                {% block order_basket %}
+                                                    <div class="card-body">
+                                                        {% include "page/checkout/inc/basketcontents.html.twig" with {editable: false} %}
+                                                    </div>
+                                                {% endblock %}
+                                            </form>
+                                        </div>
+                                    {% endif %}
+
+                                    {% block checkout_order_next_step_bottom %}
+                                        {% if oView.isLowOrderPrice() %}
+                                            {% block checkout_order_loworderprice_bottom %}
+                                                <div class="alert alert-info">
+                                                    <div>{{ translate({ ident: "MIN_ORDER_PRICE" }) }} {{ oView.getMinOrderPrice() }} {{ currency.sign }}</div>
+                                                </div>
+                                            {% endblock %}
+                                        {% else %}
+                                            {% block checkout_order_btn_confirm_bottom %}
+                                                <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post"
+                                                      id="orderConfirmAgbBottom">
+                                                    {{ oViewConf.getHiddenSid()|raw }}
+                                                    {{ oViewConf.getNavFormParams()|raw }}
+                                                    <input type="hidden" name="cl" value="order">
+                                                    <input type="hidden" name="fnc" value="{{ oView.getExecuteFnc() }}">
+                                                    <input type="hidden" name="challenge" value="{{ challenge }}">
+                                                    <input type="hidden" name="sDeliveryAddressMD5"
+                                                           value="{{ oView.getDeliveryAddressMD5() }}">
+
+                                                    {% if oView.isActive('PsLogin') or not oView.isConfirmAGBActive() %}
+                                                        <input type="hidden" name="ord_agb" value="1">
+                                                    {% else %}
+                                                        <input type="hidden" name="ord_agb" value="0">
+                                                    {% endif %}
+                                                    <input type="hidden" name="oxdownloadableproductsagreement"
+                                                           value="0">
+                                                    <input type="hidden" name="oxserviceproductsagreement" value="0">
+
+                                                    {%  block checkout_order_btn_submit_bottom %}
+                                                        {% set payment = oView.getPayment() %}
+                                                        {% if payment.getId() is same as('oscunzer_applepay') %}
+                                                            {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
+                                                        {% else %}
+                                                            <button type="submit" class="btn btn-lg btn-primary w-100">
+                                                                {{ translate({ ident: "SUBMIT_ORDER" }) }}
+                                                            </button>
+                                                        {% endif %}
+                                                    {% endblock %}
+                                                </form>
+                                            {% endblock %}
+                                        {% endif %}
+                                    {% endblock %}
+                                {% endblock %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="sticky-md-top">
+                            {% include "page/checkout/inc/summary_sidebar.html.twig" %}
+
+                            {% if not oView.isLowOrderPrice() %}
+                                <div id="orderAgbTop">
+                                    <form action="{{ oViewConf.getSslSelfLink()|raw }}" method="post"
+                                          id="orderConfirmAgbTop">
+                                        {{ oViewConf.getHiddenSid()|raw }}
+                                        {{ oViewConf.getNavFormParams()|raw }}
+                                        <input type="hidden" name="cl" value="order">
+                                        <input type="hidden" name="fnc" value="{{ oView.getExecuteFnc() }}">
+                                        <input type="hidden" name="challenge" value="{{ challenge }}">
+                                        <input type="hidden" name="sDeliveryAddressMD5"
+                                               value="{{ oView.getDeliveryAddressMD5() }}">
+
+                                        {% include "page/checkout/inc/agb.html.twig" %}
+                                    </form>
+                                </div>
+                            {% endif %}
+
+                            <button type="button" class="btn btn-highlight btn-lg w-100"
+                                    onclick="executeUnzerPayment(event)">
+                                {{ translate({ ident: "SUBMIT_ORDER" }) }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ insert_tracker({title: template_title}) }}
+{% endcapture %}
+
+{% set template_title = "REVIEW_YOUR_ORDER"|translate %}
+{% include "layout/page.html.twig" with {title: template_title, location: template_title, active_step: 3} %}

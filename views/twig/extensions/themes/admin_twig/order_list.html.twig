@@ -1,15 +1,15 @@
 {% extends "order_list.html.twig" %}
 
 {% block admin_order_list_item %}
-    {% set isUnzerPayment = listitem.oxorder__oxpaymenttype.value|stripos("oscunzer") %}
+    {% set isUnzerPayment = "oscunzer" in listitem.oxorder__oxpaymenttype.value %}
     {% if isUnzerPayment != false %}
         {% if listitem.oxorder__oxstorno.value == 1 %}
             {% set listclass = "listitem3" %}
         {% else %}
-            {% if listitem.blacklist == 1 %}
+            {% if listitem['blacklist'] is defined and listitem.blacklist == 1 %}
                 {% set listclass = "listitem3" %}
             {% else %}
-                {% set listclass = "listitem"|blWhite %}
+                {% set listclass = "listitem"~blWhite %}
             {% endif %}
         {% endif %}
         {% if listitem.getId() == oxid %}

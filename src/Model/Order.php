@@ -58,6 +58,9 @@ class Order extends Order_parent
             // copies user info
             $this->setUser($oUser);
 
+            // copies user info
+            $this->assignUserInformation($oUser);
+
             // copies basket info
             $this->loadFromBasket($oBasket);
 
