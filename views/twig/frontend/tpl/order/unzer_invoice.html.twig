@@ -14,19 +14,19 @@
 {% if isset( invadr.oxuser__oxbirthdate.month ) %}
     {% set iBirthdayMonth = invadr.oxuser__oxbirthdate.month %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]/":""|regex_replace("/[-]([0-9]{1,) 2})$/":"" %}
+    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]/","")|regex_replace("/[-]([0-9]{1,) 2})$/","") %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.day ) %}
     {% set iBirthdayDay = invadr.oxuser__oxbirthdate.day %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]([0-9]{1, 2})[-]/":"" %}
+    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]([0-9]{1, 2})[-]/","") %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.year ) %}
     {% set iBirthdayYear = invadr.oxuser__oxbirthdate.year %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/[-]([0-9]{1,) 2})[-]([0-9]{1, 2})$/":"" %}
+    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/[-]([0-9]{1,) 2})[-]([0-9]{1, 2})$/","") %}
 {% endif %}
 {% if (oxcmp_user.oxuser__oxcompany.value or (invadr and invadr.oxaddress__oxcompany.value)) %}
     {% set isCompany = true %}

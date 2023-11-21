@@ -219,7 +219,7 @@
                 {% endfor %}
                 {% if canCancelAmount > 0 %}
                     <form name="uzr" id="uzr_s-chg_payout" action="{{ oViewConf.getSelfLink() }}" method="post">
-                        {{ oViewConf.getHiddenSid() }}
+                        {{ oViewConf.getHiddenSid()|raw }}
                         <input type="hidden" name="unzerid" value="{{ sPaymentId }}">
                         <input type="hidden" name="chargedamount" value="{{ canCancelAmount }}">
                         <input type="hidden" name="cl" value="unzer_admin_order">
@@ -229,14 +229,14 @@
                             <td colspan="{% if blCancelReasonReq %}3{% else %}2{% endif %}" align="right">
                                 {{ translate({ ident: "OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT" }) }}
                             </td>
-                            <td>{{ totalAmountCharge|string_format(" % .2f") }} {{ uzrCurrency }}</td>
-                            <td>{{ totalAmountCancel|string_format(" % .2f") }} {{ uzrCurrency }}</td>
+                            <td>{{ totalAmountCharge|number_format(2, '.') }} {{ uzrCurrency }}</td>
+                            <td>{{ totalAmountCancel|number_format(2, '.') }} {{ uzrCurrency }}</td>
                             {% if canRefundFully %}
                                 <td><input type="text" id="amount_s-chg_payout"
-                                           name="amount" value="{{ canCancelAmount|string_format(" % .2f") }}"> {{ uzrCurrency }}</td>
+                                           name="amount" value="{{ canCancelAmount|number_format(2, '.') }}"> {{ uzrCurrency }}</td>
                                 <td><button type="submit">{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}</button></td>
                             {% else %}
-                                <td>{{ canCancelAmount|string_format(" % .2f") }} {{ uzrCurrency }}</td>
+                                <td>{{ canCancelAmount|number_format(2, '.') }} {{ uzrCurrency }}</td>
                                 <td></td>
                             {% endif %}
                         </tr>
