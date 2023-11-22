@@ -111,6 +111,8 @@ class OrderList extends OrderList_parent
     /**
      * Returns list filter array
      *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
      * @return array
      */
     public function getListFilter()
