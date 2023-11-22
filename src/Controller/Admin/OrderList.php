@@ -47,6 +47,7 @@ class OrderList extends OrderList_parent
      * @param string $filterQuery
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.StaticAccess)
      *
      * @return string
      * @throws DatabaseConnectionException
