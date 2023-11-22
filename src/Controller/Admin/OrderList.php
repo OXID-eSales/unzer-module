@@ -3,13 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Model\Payment;
-use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
-use OxidSolutionCatalysts\Unzer\Model\Order;
-use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use UnzerSDK\Exceptions\UnzerApiException;
 
 class OrderList extends OrderList_parent
 {
