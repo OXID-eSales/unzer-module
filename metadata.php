@@ -12,6 +12,7 @@
 use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain;
+use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderList;
 use OxidSolutionCatalysts\Unzer\Controller\ApplePayCallbackController;
 use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
 use OxidSolutionCatalysts\Unzer\Controller\InstallmentController;
@@ -58,6 +59,7 @@ $aModule = [
     'extend' => [
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderList::class => OrderList::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
         \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
         \OxidEsales\Eshop\Application\Model\Article::class => Article::class,

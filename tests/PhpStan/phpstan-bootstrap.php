@@ -13,6 +13,11 @@ class_alias(
 );
 
 class_alias(
+    \OxidEsales\Eshop\Application\Controller\Admin\OrderList::class,
+    \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderList_parent::class
+);
+
+class_alias(
     \OxidEsales\Eshop\Application\Controller\OrderController::class,
     \OxidSolutionCatalysts\Unzer\Controller\OrderController_parent::class
 );
