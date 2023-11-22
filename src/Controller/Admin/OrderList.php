@@ -2,6 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -12,6 +13,15 @@ use UnzerSDK\Exceptions\UnzerApiException;
 
 class OrderList extends OrderList_parent
 {
+    /**
+     * @param $queries
+     * @param $queryForAppending
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
     protected function prepareWhereQuery($queries, $queryForAppending)
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
@@ -31,6 +41,16 @@ class OrderList extends OrderList_parent
 
         return $query;
     }
+
+    /**
+     * @param array $whereQuery
+     * @param string $filterQuery
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
     protected function prepareOrderListQuery(array $whereQuery, string $filterQuery): string
     {
         if (is_array($whereQuery) && count($whereQuery)) {
@@ -46,43 +66,46 @@ class OrderList extends OrderList_parent
                 //removing % symbols
                 $fieldValue = $this->processFilter($fieldValue);
                 if (strlen($fieldValue)) {
+                    $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
                     $values = explode(' ', $fieldValue);
                     //for each search field using AND action
                     $queryBoolAction = ' and (';
 
-                    $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+                    //oxordernr is combined with oxunzerordernr
                     if ("oxorder.oxordernr" === $identifierName) {
-                        $quotedOxOrderNrIdentifierName = $db->quoteIdentifier("oxorder.oxordernr");
-                        $quotedOxUnzerOrderNrIdentifierName = $db->quoteIdentifier("oxorder.oxunzerordernr");
+                        $oxOrderNr = $database->quoteIdentifier("oxorder.oxordernr");
+                        $oxUnzerOrderNr = $database->quoteIdentifier("oxorder.oxunzerordernr");
                         $orderNrQuery = [];
                         foreach ($values as $value) {
-                            $orderNrQuery[] = "({$quotedOxOrderNrIdentifierName} like '{$value}'"
-                                . " or {$quotedOxUnzerOrderNrIdentifierName} like '{$value}')";
+                            $orderNrQuery[] = "({$oxOrderNr} like '{$value}'"
+                                . " or {$oxUnzerOrderNr} like '{$value}')";
                         }
                         $filterQuery .= "and (" . implode(" or ", $orderNrQuery) . ")";
-                    } else {
-                        foreach ($values as $value) {
-                            // trying to search spec chars in search value
-                            // if found, add cleaned search value to search sql
-                            $uml = $myUtilsString->prepareStrForSearch($value);
-                            if ($uml) {
-                                $queryBoolAction .= '(';
-                            }
-                            $quotedIdentifierName = $db->quoteIdentifier($identifierName);
-                            $filterQuery .= " {$queryBoolAction} {$quotedIdentifierName} ";
-                            //for search in same field for different values using AND
-                            $queryBoolAction = ' and ';
-                            $filterQuery .= $this->buildFilter($value, $isSearchValue);
-                            if ($uml) {
-                                $filterQuery .= " or {$quotedIdentifierName} ";
 
-                                $filterQuery .= $this->buildFilter($uml, $isSearchValue);
-                                $filterQuery .= ')'; // end of OR section
-                            }
+                        continue;
+                    }
+
+                    foreach ($values as $value) {
+                        // trying to search spec chars in search value
+                        // if found, add cleaned search value to search sql
+                        $uml = $myUtilsString->prepareStrForSearch($value);
+                        if ($uml) {
+                            $queryBoolAction .= '(';
                         }
+                        $quotedIdentifierName = $database->quoteIdentifier($identifierName);
+                        $filterQuery .= " {$queryBoolAction} {$quotedIdentifierName} ";
+                        //for search in same field for different values using AND
+                        $queryBoolAction = ' and ';
+                        $filterQuery .= $this->buildFilter($value, $isSearchValue);
+                        if ($uml) {
+                            $filterQuery .= " or {$quotedIdentifierName} ";
+
+                            $filterQuery .= $this->buildFilter($uml, $isSearchValue);
+                            $filterQuery .= ')'; // end of OR section
+                        }
+                    }
                         // end for AND action
                         $filterQuery .= ' ) ';
-                    }
                 }
             }
         }
