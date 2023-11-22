@@ -31,7 +31,7 @@ class OrderList extends OrderList_parent
 
         return $query;
     }
-    protected function prepareOrderListQuery($whereQuery, $filterQuery)
+    protected function prepareOrderListQuery(array $whereQuery, string $filterQuery): string
     {
         if (is_array($whereQuery) && count($whereQuery)) {
             $myUtilsString = \OxidEsales\Eshop\Core\Registry::getUtilsString();
@@ -50,12 +50,14 @@ class OrderList extends OrderList_parent
                     //for each search field using AND action
                     $queryBoolAction = ' and (';
 
+                    $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
                     if ("oxorder.oxordernr" === $identifierName) {
-                        $quotedOxOrderNrIdentifierName = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteIdentifier("oxorder.oxordernr");
-                        $quotedOxUnzerOrderNrIdentifierName = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteIdentifier("oxorder.oxunzerordernr");
+                        $quotedOxOrderNrIdentifierName = $db->quoteIdentifier("oxorder.oxordernr");
+                        $quotedOxUnzerOrderNrIdentifierName = $db->quoteIdentifier("oxorder.oxunzerordernr");
                         $orderNrQuery = [];
                         foreach ($values as $value) {
-                            $orderNrQuery[] = "({$quotedOxOrderNrIdentifierName} like '{$value}' or {$quotedOxUnzerOrderNrIdentifierName} like '{$value}')";
+                            $orderNrQuery[] = "({$quotedOxOrderNrIdentifierName} like '{$value}'"
+                                . " or {$quotedOxUnzerOrderNrIdentifierName} like '{$value}')";
                         }
                         $filterQuery .= "and (" . implode(" or ", $orderNrQuery) . ")";
                     } else {
@@ -66,7 +68,7 @@ class OrderList extends OrderList_parent
                             if ($uml) {
                                 $queryBoolAction .= '(';
                             }
-                            $quotedIdentifierName = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteIdentifier($identifierName);
+                            $quotedIdentifierName = $db->quoteIdentifier($identifierName);
                             $filterQuery .= " {$queryBoolAction} {$quotedIdentifierName} ";
                             //for search in same field for different values using AND
                             $queryBoolAction = ' and ';
