@@ -9,11 +9,11 @@
  * Metadata version
  */
 
-use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderList;
 use OxidSolutionCatalysts\Unzer\Model\DiscountList;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderMain;
+use OxidSolutionCatalysts\Unzer\Controller\Admin\OrderList;
 use OxidSolutionCatalysts\Unzer\Controller\ApplePayCallbackController;
 use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
 use OxidSolutionCatalysts\Unzer\Controller\InstallmentController;
