@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)
 - Discounts with time restrictions may not be invalidated directly in the checkout...
-- 
+- provided additional Order-Number is searchable
+
 ## [1.1.3] - 2023-11-14
 
 - [0007526](https://bugs.oxid-esales.com/view.php?id=7526) Order would be saved only, if everything is correct. In all other cases redirect to checkout
