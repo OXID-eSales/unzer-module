@@ -9,8 +9,8 @@ use OxidEsales\Eshop\Core\Registry;
 class OrderList extends OrderList_parent
 {
     /**
-     * @param $queries
-     * @param $queryForAppending
+     * @param array $queries
+     * @param string $queryForAppending
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      *
@@ -58,9 +58,9 @@ class OrderList extends OrderList_parent
                 }
                 $fieldValue = trim($fieldValue);
                 //check if this is search string (contains % sign at beginning and end of string)
-                $isSearchValue = $this->isSearchValue($fieldValue);
+                $isSearchValue = $this->_isSearchValue($fieldValue);
                 //removing % symbols
-                $fieldValue = $this->processFilter($fieldValue);
+                $fieldValue = $this->_processFilter($fieldValue);
                 if ($fieldValue !== '') {
                     $database = DatabaseProvider::getDb();
                     $values = explode(' ', $fieldValue);
@@ -92,11 +92,11 @@ class OrderList extends OrderList_parent
                         $filterQuery .= " {$queryBoolAction} {$quotedIdentifierName} ";
                         //for search in same field for different values using AND
                         $queryBoolAction = ' and ';
-                        $filterQuery .= $this->buildFilter($value, $isSearchValue);
+                        $filterQuery .= $this->_buildFilter($value, $isSearchValue);
                         if ($uml) {
                             $filterQuery .= " or {$quotedIdentifierName} ";
 
-                            $filterQuery .= $this->buildFilter($uml, $isSearchValue);
+                            $filterQuery .= $this->_buildFilter($uml, $isSearchValue);
                             $filterQuery .= ')'; // end of OR section
                         }
                     }
