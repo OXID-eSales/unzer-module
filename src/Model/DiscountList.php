@@ -49,7 +49,7 @@ class DiscountList extends DiscountList_parent
      *
      * @inheritdoc
      */
-    protected function _getFilterSelect($oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getFilterSelect($oUser)
     {
         $oBaseObject = $this->getBaseObject();
         $bDisableSqlActive = Registry::getSession()->getVariable('disableSqlActiveSnippet');
