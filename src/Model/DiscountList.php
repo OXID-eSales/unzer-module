@@ -11,8 +11,6 @@ use OxidEsales\Eshop\Core\Registry;
 
 class DiscountList extends DiscountList_parent
 {
-
-
     /**
      * Returns array of discounts that can be globally (transparently) applied
      *
