@@ -1,9 +1,9 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
-    [{if $oView->getPaymentSaveSetting()}]
+[{if $oView->getPaymentSaveSetting()}]
     <div class="savedpayment">
         <form id="payment-saved-cards" class="unzerUI form" novalidate>
-        [{foreach from=$unzerPaymentType item="setting" key="type"}]
-        [{if $type == 'paypal'}]
+            [{foreach from=$unzerPaymentType item="setting" key="type"}]
+            [{if $type == 'paypal'}]
 
             <table class="table">
                 <thead>
@@ -31,8 +31,8 @@
             </table>
 
 
-        [{/if}]
-        [{/foreach}]
+            [{/if}]
+            [{/foreach}]
             [{if $oView->getPaymentSaveSetting()}]
             <div id="payment-sepa-confirm">
                 <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
@@ -49,44 +49,44 @@
 
     [{if false}]
     <script>
-    [{/if}]
-        [{capture assign="unzerPaypalJS"}]
-            $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+        [{/if}]
+            [{capture assign="unzerPaypalJS"}]
+        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
             if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
-            event.preventDefault();
-            $( "#payment-saved-cards" ).submit();
-            }
-            });
-
-            // Handling payment form submission
-            $( "#payment-saved-cards" ).submit(function( event ) {
                 event.preventDefault();
-                let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
-                let paymentData = {
-                    id: selectedPaymentTypeId,
-                    resources: {
-                        typeId: selectedPaymentTypeId
-                    }
-                };
-                let paymentDataString = JSON.stringify(paymentData);
+                $( "#payment-saved-cards" ).submit();
+            }
+        });
 
-                let hiddenInput3 = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'paymentData')
-                    .val(paymentDataString);
-                let hiddenInput2 = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'oscunzersavepayment')
-                    .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput3);
+        // Handling payment form submission
+        $( "#payment-saved-cards" ).submit(function( event ) {
+            event.preventDefault();
+            let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
+            let paymentData = {
+                id: selectedPaymentTypeId,
+                resources: {
+                    typeId: selectedPaymentTypeId
+                }
+            };
+            let paymentDataString = JSON.stringify(paymentData);
 
-                $('#orderConfirmAgbBottom').addClass("submitable");
-                $("#orderConfirmAgbBottom").submit();
-            });
+            let hiddenInput3 = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'paymentData')
+                .val(paymentDataString);
+            let hiddenInput2 = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'oscunzersavepayment')
+                .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
+            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput3);
+
+            $('#orderConfirmAgbBottom').addClass("submitable");
+            $("#orderConfirmAgbBottom").submit();
+        });
         [{/capture}]
-    [{if false}]
+            [{if false}]
     </script>
     [{/if}]
     [{oxscript add=$unzerPaypalJS}]
-[{/if}]
+    [{/if}]
