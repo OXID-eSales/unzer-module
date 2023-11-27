@@ -62,6 +62,6 @@ class_alias(
 );
 
 class_alias(
-    \OxidEsales\Eshop\Application\Model\PaymentGateway::class,
-    \OxidSolutionCatalysts\Unzer\Model\PaymentGateway_parent::class
+    \OxidEsales\Eshop\Application\Model\DiscountList::class,
+    \OxidSolutionCatalysts\Unzer\Model\DiscountList_parent::class
 );

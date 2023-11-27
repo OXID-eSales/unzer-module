@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - Update module for OXID 7.0
 
+## [1.1.4] - 2023-??-??
+
+- [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)
+- Discounts with time restrictions may not be invalidated directly in the checkout...
+- provided additional Order-Number is searchable
+- increase line spacing for the error messages
+
 ## [1.1.3] - 2023-??-??
 
 - [0007526](https://bugs.oxid-esales.com/view.php?id=7526) Order would be saved only, if everything is correct. In all other cases redirect to checkout
@@ -36,9 +43,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [0007544](https://bugs.oxid-esales.com/view.php?id=7544) Add Error handling When unsupported Credit Card is used (e.g. Amex)
 - [0007553](https://bugs.oxid-esales.com/view.php?id=7553) The billing and delivery address must be identical for invoice purchases (Paylater)
 - [0007546](https://bugs.oxid-esales.com/view.php?id=7546): We provide an additional Order Number to Unzer for identify the Order in OXID-Backend and Unzer-Insights
-
 - Prepayment - Adjust payment date when the payment has been completed
 - change information for Unzer-Metadata
+- Unzer Invoice (Paylater): Display bank details for invoice
 
 ## [1.1.2] - 2023-08-18
 

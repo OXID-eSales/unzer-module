@@ -62,8 +62,6 @@ class PaymentController extends PaymentController_parent
                 continue;
             }
 
-            $invAndDelAddrIdent = !Registry::getSession()->getVariable('blshowshipaddress');
-
             if (
                 (
                     $payment->isUnzerPaymentHealthy()
@@ -75,10 +73,6 @@ class PaymentController extends PaymentController_parent
                 (
                     empty($unzerDefinitions[$key]['countries']) ||
                     in_array($userCountryIso, $unzerDefinitions[$key]['countries'], true)
-                ) &&
-                (
-                    $key !== CoreUnzerDefinitions::INVOICE_UNZER_PAYMENT_ID ||
-                    ($key === CoreUnzerDefinitions::INVOICE_UNZER_PAYMENT_ID && $invAndDelAddrIdent)
                 )
             ) {
                 $paymentList[$key] = $payment;
