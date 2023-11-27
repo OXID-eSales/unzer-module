@@ -58,13 +58,13 @@ class AccountSavedPaymentController extends AccountController
             $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
 
             if (strpos($typeId['PAYMENTTYPEID'], 'crd')) {
-                $paymentTypes[$paymentType->getBrand()][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                $paymentTypes[$paymentType->getBrand()][$typeId['OXID']] = $paymentType->expose();
             }
             if (strpos($typeId['PAYMENTTYPEID'], 'ppl')) {
-                $paymentTypes['paypal'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                $paymentTypes['paypal'][$typeId['OXID']] = $paymentType->expose();
             }
             if (strpos($typeId['PAYMENTTYPEID'], 'sdd')) {
-                $paymentTypes['sepa'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                $paymentTypes['sepa'][$typeId['OXID']] = $paymentType->expose();
             }
 
         }
@@ -78,7 +78,7 @@ class AccountSavedPaymentController extends AccountController
     {
        if ($this->getUser()) {
            $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-           $rowSelect = $oDB->getAll("SELECT PAYMENTTYPEID from oscunzertransaction
+           $rowSelect = $oDB->getAll("SELECT OXID, PAYMENTTYPEID from oscunzertransaction
                             where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL GROUP BY PAYMENTTYPEID ", [':oxuserid' => $this->getUser()->getId()]);
 
            return $rowSelect;
@@ -91,8 +91,8 @@ class AccountSavedPaymentController extends AccountController
         $paymenttypeid = Registry::getRequest()->getRequestParameter('paymenttypeid');
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         $oDB->getAll("UPDATE oscunzertransaction SET PAYMENTTYPEID = NULL
-                           WHERE OXUSERID = :oxuserid AND PAYMENTTYPEID = :paymenttypeid",
-            [':oxuserid' => $this->getUser()->getId(), 'paymenttypeid' => $paymenttypeid]);
+                           WHERE OXUSERID = :oxuserid AND OXID = :oxid",
+            [':oxuserid' => $this->getUser()->getId(), 'oxid' => $paymenttypeid]);
     }
 
 

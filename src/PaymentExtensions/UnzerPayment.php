@@ -7,11 +7,15 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Model\Transaction;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -22,6 +26,8 @@ use UnzerSDK\Unzer;
  */
 abstract class UnzerPayment
 {
+    use ServiceContainer;
+
     /** @var Unzer */
     protected $unzerSDK;
 
@@ -43,6 +49,9 @@ abstract class UnzerPayment
     /** @var array */
     protected $allowedCurrencies = [];
 
+    /**
+     * @throws Exception
+     */
     public function __construct(
         Unzer $unzerSDK,
         UnzerService $unzerService
@@ -50,7 +59,7 @@ abstract class UnzerPayment
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
-        $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
+        $this->unzerOrderId = (string)$this->unzerService->generateUnzerOrderId();
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
     }
@@ -141,7 +150,18 @@ abstract class UnzerPayment
         if ($request->getRequestParameter('birthdate')) {
             $userModel->save();
         }
+        $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
 
+        if ($savePayment === "1" && $userModel->getId()) {
+            $transactionService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Transaction::class);
+            $payment = $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment();
+            try {
+                $transactionService->writeTransactionToDB(Registry::getSession()->getSessionChallengeToken(), $userModel->getId(), $payment);
+            } catch (Exception $e) {
+                Registry::getLogger()->info(
+                    'Could not save Transaction for PaymentID (savePayment): '.$e->getMessage());
+            }
+        }
         return true;
     }
 }

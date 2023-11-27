@@ -1,49 +1,48 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
-
-    [{if $unzerPaymentType}]
-    <div class="savedpayment">
+[{if $unzerPaymentType}]
+<div class="savedpayment">
     [{foreach from=$unzerPaymentType item="setting" key="type"}]
     [{if $type != 'paypal' && $type != 'sepa'}]
-        <form id="payment-saved-cards" class="unzerUI form" novalidate>
-            <table class="table">
-                <thead>
+    <form id="payment-saved-cards" class="unzerUI form" novalidate>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">[{oxmultilang ident="OSCUNZER_CARD_NUMBER"}]</th>
+                <th scope="col">[{oxmultilang ident="OSCUNZER_EXPIRY_DATE"}]</th>
+                <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            [{assign var="counter" value=0}]
+
+
+            [{foreach from=$setting item="paymentType" key=paymenttypeid }]
                 <tr>
-                    <th scope="col">[{oxmultilang ident="OSCUNZER_CARD_NUMBER"}]</th>
-                    <th scope="col">[{oxmultilang ident="OSCUNZER_EXPIRY_DATE"}]</th>
-                    <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
-                    <th scope="col"></th>
+                    <th scope="row">[{$paymentType.number}]</th>
+                    <td>[{$paymentType.expiryDate}]</td>
+                    <td>[{$type}]</td>
+
+                    <td>
+                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymenttypeid}]" style="-webkit-appearance: radio">
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                [{assign var="counter" value=0}]
+                [{/foreach}]
 
 
-                [{foreach from=$setting item="paymentType" key=paymenttypeid }]
-                    <tr>
-                        <th scope="row">[{$paymentType.number}]</th>
-                        <td>[{$paymentType.expiryDate}]</td>
-                        <td>[{$type}]</td>
-
-                        <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymenttypeid}]" style="-webkit-appearance: radio">
-                        </td>
-                    </tr>
-                    [{/foreach}]
-
-
-                </tbody>
-            </table>
-        </form>
+            </tbody>
+        </table>
+    </form>
     [{/if}]
     [{/foreach}]
     [{/if}]
-    </div>
+</div>
 [{if $unzerPaymentType != false }]
 <br>
     <label>
         <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue Kreditkarte
     </label>
-[{/if}]
+    [{/if}]
 <div id="newcc" style="display:none;">
     <form id="payment-form-card" class="unzerUI form" novalidate>
 
@@ -66,18 +65,19 @@
 
         </div>
         [{if $oView->getPaymentSaveSetting()}]
-            <div id="payment-sepa-confirm">
-                <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
-                    <input id="oscunzersavepayment" type="checkbox" name="oscunzersavepayment" value="0" style="-webkit-appearance: checkbox">
-                    <label for="oscunzersavepayment">
-                        [{oxmultilang ident="OSCUNZER_SAVE_PAYMENT"}]
-                    </label>
-                </div>
+        <div id="payment-sepa-confirm">
+            <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
+                <input id="oscunzersavepayment" type="checkbox" name="oscunzersavepayment" value="0" style="-webkit-appearance: checkbox">
+                <label for="oscunzersavepayment">
+                    [{oxmultilang ident="OSCUNZER_SAVE_PAYMENT"}]
+                </label>
             </div>
+        </div>
         [{/if}]
 
     </form>
 </div>
+
 [{if false}]
 <script>
 [{/if}]
@@ -107,7 +107,7 @@ $('#orderConfirmAgbBottom').submit(function(event) {
     }
     $('#orderConfirmAgbBottom').removeClass('new-card-selected');
 });
-    // Create an Unzer instance with your public key
+// Create an Unzer instance with your public key
 let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
 
 if ($('input[name="newccard"]').length === 0) {
@@ -132,34 +132,34 @@ if ($('input[name="newccard"]').length === 0) {
 }
 
 
-    $( "#payment-form-card" ).submit(function( event ) {
-        console.log('submit new card event');
+$( "#payment-form-card" ).submit(function( event ) {
+    console.log('submit new card event');
 
-        event.preventDefault();
-        if (Card) {
-            Card.createResource()
-                .then(function(result) {
-                    let hiddenInput = $(document.createElement('input'))
-                        .attr('type', 'hidden')
-                        .attr('name', 'paymentData')
-                        .val(JSON.stringify(result));
-                    let hiddenInput2 = $(document.createElement('input'))
-                        .attr('type', 'hidden')
-                        .attr('name', 'oscunzersavepayment')
-                        .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+    event.preventDefault();
+    if (Card) {
+        Card.createResource()
+            .then(function(result) {
+                let hiddenInput = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentData')
+                    .val(JSON.stringify(result));
+                let hiddenInput2 = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'oscunzersavepayment')
+                    .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
 
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
-                    $('#orderConfirmAgbBottom' ).addClass("submitable");
-                    $('#orderConfirmAgbBottom').submit();
-                })
-                .catch(function(error) {
-                    $('html, body').animate({
-                        scrollTop: $("#orderPayment").offset().top - 150
-                    }, 350);
-                })
-        }
-    });
+                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
+                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+                $('#orderConfirmAgbBottom' ).addClass("submitable");
+                $('#orderConfirmAgbBottom').submit();
+            })
+            .catch(function(error) {
+                $('html, body').animate({
+                    scrollTop: $("#orderPayment").offset().top - 150
+                }, 350);
+            })
+    }
+});
 $( "#payment-saved-cards" ).submit(function( event ) {
     console.log('submit saved cards event');
 
@@ -218,7 +218,6 @@ function addPaymentElements(Card) {
     });
 
 }
-
     [{/capture}]
 [{if false}]
 </script>

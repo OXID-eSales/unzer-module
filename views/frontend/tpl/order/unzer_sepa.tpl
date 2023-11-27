@@ -1,6 +1,6 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
+[{if $unzerPaymentType != false }]
 <div class="savedpayment">
-
     [{foreach from=$unzerPaymentType item="setting" key="type"}]
     [{if $type == 'sepa'}]
     <form id="payment-saved-cards" class="unzerUI form" novalidate>
@@ -42,12 +42,13 @@
     [{/if}]
     [{/foreach}]
 </div>
+[{/if}]
 [{if $unzerPaymentType.sepa != false }]
 <br>
-<label>
-    <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue IBAN
-</label>
-[{/if}]
+    <label>
+        <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue IBAN
+    </label>
+    [{/if}]
 <div id="newsepa" style="display:none;">
     <form id="payment-form-sepa">
         <br/>
@@ -146,36 +147,36 @@
         event.preventDefault();
         // Creating a SEPA resource
         if (SepaDirectDebit) {
-        SepaDirectDebit.createResource()
-            .then(function (result) {
+            SepaDirectDebit.createResource()
+                .then(function (result) {
 
-                let hiddenInput = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'paymentData')
-                    .val(JSON.stringify(result));
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+                    let hiddenInput = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'paymentData')
+                        .val(JSON.stringify(result));
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
 
-                let hiddenInput1 = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'sepaConfirmation')
-                    .val($('.sepaagreement #oscunzersepaagreement').is(':checked') ? '1' : '0');
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput1);
-                console.log(hiddenInput1);
-                let hiddenInput2 = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'oscunzersavepayment')
-                    .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
+                    let hiddenInput1 = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'sepaConfirmation')
+                        .val($('.sepaagreement #oscunzersepaagreement').is(':checked') ? '1' : '0');
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput1);
+                    console.log(hiddenInput1);
+                    let hiddenInput2 = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'oscunzersavepayment')
+                        .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
 
-                $('#orderConfirmAgbBottom').addClass("submitable");
-                $("#orderConfirmAgbBottom").submit();
-            })
-            .catch(function (error) {
-                $('#error-holder').html(error.message);
-                $('html, body').animate({
-                    scrollTop: $("#orderPayment").offset().top - 150
-                }, 350);
-            })
+                    $('#orderConfirmAgbBottom').addClass("submitable");
+                    $("#orderConfirmAgbBottom").submit();
+                })
+                .catch(function (error) {
+                    $('#error-holder').html(error.message);
+                    $('html, body').animate({
+                        scrollTop: $("#orderPayment").offset().top - 150
+                    }, 350);
+                })
         }
     });
     $( "#payment-saved-cards" ).submit(function( event ) {

@@ -11,6 +11,7 @@ $aLang = [
     "charset" => "UTF-8",
     'SHOP_MODULE_GROUP_unzermerchant' => 'Zugangsdaten',
     'SHOP_MODULE_GROUP_unzerenvironment' => 'Betriebsmodus',
+    'SHOP_MODULE_UnzerSavePaymentsForUser' => 'Speicherung der UserPayments (ID)',
     'SHOP_MODULE_GROUP_unzercard' => 'zusätzliche Optionen für Kreditkarten',
     'SHOP_MODULE_GROUP_unzerpaypal' => 'zusätzliche Optionen für PayPal',
     'SHOP_MODULE_GROUP_unzerinstallment' => 'zusätzliche Optionen für Ratenzahlung',
@@ -92,5 +93,4 @@ $aLang = [
     'SHOP_MODULE_production-UnzerPrivateKeyB2CCHF' => 'Live privater Schlüssel für B2C-Käufe in CHF',
     'SHOP_MODULE_production-UnzerPublicKeyB2BCHF' => 'Live öffentlicher Schlüssel für B2B-Käufe in CHF',
     'SHOP_MODULE_production-UnzerPrivateKeyB2BCHF' => 'Live privater Schlüssel für B2B-Käufe in CHF',
-    'SHOP_MODULE_UnzerSavePaymentsForUser' => 'Speichern von Zahlungsdaten des Kunden zulassen',
 ];

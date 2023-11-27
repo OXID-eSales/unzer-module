@@ -11,6 +11,7 @@ $aLang = [
     "charset" => "UTF-8",
     'SHOP_MODULE_GROUP_unzermerchant' => 'Access Data',
     'SHOP_MODULE_GROUP_unzerenvironment' => 'Operation mode',
+    'SHOP_MODULE_UnzerSavePaymentsForUser' => 'Save Userpayments (id)',
     'SHOP_MODULE_GROUP_unzercard' => 'additional options for credit cards',
     'SHOP_MODULE_GROUP_unzerpaypal' => 'additional options for PayPal',
     'SHOP_MODULE_GROUP_unzerinstallment' => 'additional options for Installment',
@@ -92,5 +93,4 @@ $aLang = [
     'SHOP_MODULE_production-UnzerPrivateKeyB2CCHF' => 'Live Private-Key for B2C-purchases in CHF',
     'SHOP_MODULE_production-UnzerPublicKeyB2BCHF' => 'Live Public-Key for B2B-purchases in CHF',
     'SHOP_MODULE_production-UnzerPrivateKeyB2BCHF' => 'Live Private-Key for B2B-purchases in CHF',
-    'SHOP_MODULE_UnzerSavePaymentsForUser' => 'Allow saving payment data of the customer',
 ];

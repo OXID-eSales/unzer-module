@@ -102,10 +102,6 @@ class Transaction
             }
         }
 
-        if ($unzerPayment && $unzerPayment->getState() == 2) {
-            $this->deleteOldInitOrders();
-        }
-
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
         $oxid = $this->prepareTransactionOxid($params);
@@ -116,48 +112,8 @@ class Transaction
             $this->deleteInitOrder($params);
 
             // Fallback: set ShortID as OXTRANSID
-            $oOrder->setUnzerTransId($params['shortid']);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $orderid
-     * @param string $userId
-     * @param Payment|null $unzerPayment
-     * @param Basket|null $basketModel
-     * @return bool
-     * @throws \Exception
-     */
-    public function writeInitOrderToDB(
-        string $orderid,
-        string $userId,
-        ?Payment $unzerPayment,
-        ?Basket $basketModel
-    ): bool {
-        $transaction = $this->getNewTransactionObject();
-
-        $params = [
-            'oxorderid' => $orderid,
-            'oxshopid' => $this->context->getCurrentShopId(),
-            'oxuserid' => $userId,
-            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-        ];
-
-        if ($unzerPayment instanceof Payment && $basketModel instanceof Basket) {
-            $params = array_merge($params, $this->getUnzerInitOrderData($unzerPayment, $basketModel));
-        }
-
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = $this->prepareTransactionOxid($params);
-        if (!$transaction->load($oxid)) {
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
+            $shortId = $params['shortid'] ?? '';
+            $oOrder->setUnzerTransId($shortId);
 
             return true;
         }
@@ -176,56 +132,6 @@ class Transaction
         $oxid = $this->getInitOrderOxid($params);
         if ($transaction->load($oxid)) {
             $transaction->delete();
-        }
-    }
-
-    public function deleteOldInitOrders(): void
-    {
-        DatabaseProvider::getDb()->Execute(
-            "DELETE from oscunzertransaction where OXACTION = 'init' AND OXACTIONDATE < NOW() - INTERVAL 1 DAY"
-        );
-    }
-
-    public function cleanUpNotFinishedOrders(): void
-    {
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()->getContainer();
-        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $queryBuilderFactory->create();
-
-        $parameters = [
-            'oxordernr' => '0',
-            'oxtransstatus' => 'NOT_FINISHED',
-            'oxpaymenttype' => 'oscunzer',
-            'sessiontime' => 600
-        ];
-
-        $queryBuilder->select('oxid')
-            ->from('oxorder')
-            ->where('oxordernr = :oxordernr')
-            ->andWhere('oxtransstatus = :oxtransstatus')
-            ->andWhere($queryBuilder->expr()->like(
-                'oxpaymenttype',
-                $queryBuilder->expr()->literal('%' . $parameters['oxpaymenttype'] . '%')
-            ))
-            ->andWhere('oxorderdate < now() - interval :sessiontime SECOND');
-
-        /** @var Result $result */
-        $result = $queryBuilder->setParameters($parameters)->execute();
-        $ids = $result->fetchAllAssociative();
-
-        /** @var string $id */
-        foreach ($ids as $id) {
-            $order = oxNew(EshopModelOrder::class);
-            if ($order->load($id)) {
-                // storno
-                $order->cancelOrder();
-                // delete
-                $order->delete();
-            }
         }
     }
 
@@ -339,22 +245,20 @@ class Transaction
             '',
             strtolower($unzerPayment->getStateName())
         );
-
         $params = [
-            'amount'            => $unzerPayment->getAmount()->getTotal(),
-            'currency'          => $unzerPayment->getCurrency(),
-            'typeid'            => $unzerPayment->getId(),
-            'oxaction'          => $oxaction,
-            'traceid'           => $unzerPayment->getTraceId()
+            'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'currency' => $unzerPayment->getCurrency(),
+            'typeid'   => $unzerPayment->getId(),
+            'oxaction' => $oxaction,
+            'traceid'  => $unzerPayment->getTraceId()
         ];
         $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
         if ($savePayment === "1") {
             $typeId = $unzerPayment->getPaymentType()->getId();
             $params['paymenttypeid'] = $typeId;
         }
-        /** @var AbstractTransactionType $initialTransaction */
         $initialTransaction = $unzerPayment->getInitialTransaction();
-        $params['shortid'] = $initialTransaction->getShortId() !== null ?
+        $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
             $initialTransaction->getShortId() :
             Registry::getSession()->getVariable('ShortId');
 
@@ -384,15 +288,15 @@ class Transaction
         $typeId = $unzerCharge->getPayment()->getPaymentType()->getId();
 
         return [
-            'amount'            => $unzerCharge->getAmount(),
-            'currency'          => $unzerCharge->getCurrency(),
-            'typeid'            => $unzerCharge->getId(),
+            'amount'     => $unzerCharge->getAmount(),
+            'currency'   => $unzerCharge->getCurrency(),
+            'typeid'     => $unzerCharge->getId(),
             'paymenttypeid'     => $typeId,
-            'oxaction'          => 'charged',
-            'customerid'        => $customerId,
-            'traceid'           => $unzerCharge->getTraceId(),
-            'shortid'           => $unzerCharge->getShortId(),
-            'status'            => $this->getUzrStatus($unzerCharge),
+            'oxaction'   => 'charged',
+            'customerid' => $customerId,
+            'traceid'    => $unzerCharge->getTraceId(),
+            'shortid'    => $unzerCharge->getShortId(),
+            'status'     => $this->getUzrStatus($unzerCharge),
         ];
     }
 
@@ -448,18 +352,6 @@ class Transaction
         if ($unzerCustomer instanceof Customer) {
             $params['customerid'] = $unzerCustomer->getId();
         }
-
-        return $params;
-    }
-
-    /**
-     * @throws UnzerApiException
-     */
-    protected function getUnzerInitOrderData(Payment $unzerPayment, Basket $basketModel): array
-    {
-        $params = $this->getUnzerPaymentData($unzerPayment);
-        $params["oxaction"] = 'init';
-        $params["serialized_basket"] = base64_encode(serialize($basketModel));
 
         return $params;
     }
