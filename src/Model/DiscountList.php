@@ -14,6 +14,8 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Application\Model\DiscountList as CoreDisCountList;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use oxtableviewnamegenerator;
 
 class DiscountList extends DiscountList_parent
 {
@@ -30,7 +32,7 @@ class DiscountList extends DiscountList_parent
         $aList = [];
         $this->forceReload();
         /** @var CoreDisCountList $oDiscList */
-        $oDiscList = $this->_getList($oUser);
+        $oDiscList = $this->getDiscountList($oUser);
         $aDiscList = $oDiscList->getArray();
         foreach ($aDiscList as $oDiscount) {
             if ($oDiscount->isForArticle($oArticle)) {
@@ -49,7 +51,7 @@ class DiscountList extends DiscountList_parent
      *
      * @inheritdoc
      */
-    protected function _getFilterSelect($oUser)
+    protected function getFilterSelect($oUser)
     {
         $oBaseObject = $this->getBaseObject();
         $bDisableSqlActive = Registry::getSession()->getVariable('disableSqlActiveSnippet');
@@ -81,9 +83,10 @@ class DiscountList extends DiscountList_parent
             }
         }
 
-        $sUserTable = getViewName('oxuser');
-        $sGroupTable = getViewName('oxgroups');
-        $sCountryTable = getViewName('oxcountry');
+        $tabViewNameGenerator = oxNew(TableViewNameGenerator::class);
+        $sUserTable = $tabViewNameGenerator->getViewName('oxuser');
+        $sGroupTable = $tabViewNameGenerator->getViewName('oxgroups');
+        $sCountryTable = $tabViewNameGenerator->getViewName('oxcountry');
 
         $sCountrySql = $sCountryId ?
             "EXISTS(select oxobject2discount.oxid from oxobject2discount where

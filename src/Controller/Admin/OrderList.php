@@ -18,7 +18,7 @@ class OrderList extends OrderList_parent
      *
      * @return string
      */
-    protected function _prepareWhereQuery($whereQuery, $fullQuery)
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
     {
         // seperate oxordernr
         $orderNrSearch = '';
@@ -28,10 +28,9 @@ class OrderList extends OrderList_parent
         }
 
         $database = DatabaseProvider::getDb();
-        $query = parent::_prepareWhereQuery($whereQuery, $fullQuery);
-        $config = $this->getConfig();
-        $folders = $config->getConfigParam('aOrderfolder');
-        $folder = Registry::getConfig()->getRequestParameter('folder');
+        $query = parent::prepareWhereQuery($whereQuery, $fullQuery);
+        $folders = Registry::getConfig()->getConfigParam('aOrderfolder');
+        $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder !== '-1') {
             $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";
