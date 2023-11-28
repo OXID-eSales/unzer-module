@@ -282,28 +282,25 @@
         [{/if}]
     [{/block}]
     [{block name="unzer_holder"}]
-    [{if $holderData }]
-    <h3>[{oxmultilang ident="OSCUNZER_BANK_HOLDER_DETAILS"}]</h3>
-
-    <table style="width:50%">
-        <tbody>
-        <tr>
-            <td class="listheader">IBAN</td>
-            <td class="listheader">BIC</td>
-            <td class="listheader">Holder</td>
-            <td class="listheader">Descriptor</td>
-
-        </tr>
-        <tr>
-            <td>[{$holderData.iban}]</td>
-            <td>[{$holderData.bic}]</td>
-            <td>[{$holderData.holder}]</td>
-            <td>[{$holderData.descriptor}]</td>
-
-        </tr>
-        </tbody>
-    </table>
-    [{/if}]
+        [{if $holderData }]
+            <h3>[{oxmultilang ident="OSCUNZER_BANK_HOLDER_DETAILS"}]</h3>
+            <table style="width:50%">
+                <tbody>
+                <tr>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_IBAN"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_BIC"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_HOLDER"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_DESCRIPTOR"}]</td>
+                </tr>
+                <tr>
+                    <td>[{$holderData.iban}]</td>
+                    <td>[{$holderData.bic}]</td>
+                    <td>[{$holderData.holder}]</td>
+                    <td>[{$holderData.descriptor}]</td>
+                </tr>
+                </tbody>
+            </table>
+        [{/if}]
     [{/block}]
 </div>
 [{capture assign="cancelConfirm"}]
