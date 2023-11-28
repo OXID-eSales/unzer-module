@@ -165,6 +165,7 @@ class AdminOrderController extends AdminDetailsController
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
                     if ($charge->isSuccess()) {
+                        $this->addChargeViewData($charge);
                         $aRv = [];
                         $aRv['chargedAmount'] = $charge->getAmount();
                         $aRv['cancelledAmount'] = $charge->getCancelledAmount();
@@ -217,6 +218,29 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
+    /**
+     * Adding HolderData to View (if there is any)
+     *
+     * @param Charge $charge
+     * @return void
+     */
+    protected function addChargeViewData(Charge $charge) {
+        $holderData = [];
+        $holderData['bic'] =  $charge->getBic();
+        $holderData['iban'] =  $charge->getIban();
+        $holderData['descriptor'] =  $charge->getDescriptor();
+        $holderData['holder'] =  $charge->getHolder();
+        $isDataSet = true;
+        foreach ($holderData as $wert) {
+            if (empty($wert)) {
+                $isDataSet = false;
+                break;
+            }
+        }
+        if ($isDataSet === true) {
+            $this->_aViewData["holderData"] = $holderData;
+        }
+    }
     protected function addAuthorizationViewData(Authorization $authorization): void
     {
         $date = '';
@@ -233,7 +257,16 @@ class AdminOrderController extends AdminDetailsController
         $holderData['iban'] =  $authorization->getIban();
         $holderData['descriptor'] =  $authorization->getDescriptor();
         $holderData['holder'] =  $authorization->getHolder();
-        $this->_aViewData["holderData"] = $holderData;
+        $isDataSet = true;
+        foreach ($holderData as $wert) {
+            if (empty($wert)) {
+                $isDataSet = false;
+                break;
+            }
+        }
+        if ($isDataSet === true) {
+            $this->_aViewData["holderData"] = $holderData;
+        }
     }
 
     /**
