@@ -15,7 +15,6 @@ use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Application\Model\DiscountList as CoreDisCountList;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use oxtableviewnamegenerator;
 
 class DiscountList extends DiscountList_parent
 {
@@ -94,7 +93,7 @@ class DiscountList extends DiscountList_parent
             oxobject2discount.OXOBJECTID = " . $oDb->quote($sCountryId) . ")" :
             '0';
         $sUserSql = $sUserId ?
-            "EXISTS(select oxo bject2discount.oxid from oxobject2discount where
+            "EXISTS(select oxobject2discount.oxid from oxobject2discount where
             oxobject2discount.OXDISCOUNTID = $sTable.OXID and oxobject2discount.oxtype = 'oxuser' and
             oxobject2discount.OXOBJECTID = " . $oDb->quote($sUserId) . ")" :
             '0';
