@@ -100,8 +100,6 @@ abstract class UnzerPayment implements UnzerPaymentInterface
      * @throws \JsonException
      * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
      * @throws \UnzerSDK\Exceptions\UnzerApiException
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function execute(
         User $userModel,
