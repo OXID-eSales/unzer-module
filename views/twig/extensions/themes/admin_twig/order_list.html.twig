@@ -1,0 +1,36 @@
+{% extends "order_list.html.twig" %}
+
+{% block admin_order_list_item %}
+    {% set isUnzerPayment = "oscunzer" in listitem.oxorder__oxpaymenttype.value %}
+    {% if isUnzerPayment != false %}
+        {% if listitem.oxorder__oxstorno.value == 1 %}
+            {% set listclass = "listitem3" %}
+        {% else %}
+            {% if listitem['blacklist'] is defined and listitem.blacklist == 1 %}
+                {% set listclass = "listitem3" %}
+            {% else %}
+                {% set listclass = "listitem"~blWhite %}
+            {% endif %}
+        {% endif %}
+        {% if listitem.getId() == oxid %}
+            {% set listclass = "listitem4" %}
+        {% endif %}
+        <td style="vertical-align: top;" class="{{ listclass }} order_time" height="15"><div class="listitemfloating">&nbsp;<a href="Javascript:top.oxid.admin.editThis('{{ listitem.oxorder__oxid.value }}');" class="{{ listclass }}">{{ listitem.oxorder__oxorderdate|format_date('datetime', true) }}</a></div></td>
+        <td style="vertical-align: top;" class="{{ listclass }} payment_date" height="15"><div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('{{ listitem.oxorder__oxid.value }}');" class="{{ listclass }}">{{ listitem.oxorder__oxpaid|format_date }}</a></div></td>
+        <td style="vertical-align: top;" class="{{ listclass }} order_no" height="15">
+            <div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('{{ listitem.oxorder__oxid.value }}');" class="{{ listclass }}">
+                    {{ listitem.oxorder__oxordernr.value }} ({{ translate({ ident: 'OSCUNZER_TRANSACTION_ORDERNR', suffix: 'COLON' }) }} {{ listitem.oxorder__oxunzerordernr.value }})
+                </a></div>
+        </td>
+        <td style="vertical-align: top;" class="{{ listclass }} first_name" height="15"><div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('{{ listitem.oxorder__oxid.value }}');" class="{{ listclass }}">{{ listitem.oxorder__oxbillfname.value }}</a></div></td>
+        <td style="vertical-align: top;" class="{{ listclass }} last_name" height="15"><div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('{{ listitem.oxorder__oxid.value }}');" class="{{ listclass }}">{{ listitem.oxorder__oxbilllname.value }}</a></div></td>
+        <td class="{{ listclass }}">
+            {% if not readonly %}
+                <a href="Javascript:top.oxid.admin.deleteThis('{{ listitem.oxorder__oxid.value }}');" class="delete" id="del.{{ _cnt }}" {% include "help.html.twig" with {helpid: "item_delete"} %}></a>
+                <a href="Javascript:StornoThisArticle('{{ listitem.oxorder__oxid.value }}');" class="pause" id="pau.{{ _cnt }}" {% include "help.html.twig" with {helpid: "item_storno"} %}></a>
+            {% endif %}
+        </td>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}

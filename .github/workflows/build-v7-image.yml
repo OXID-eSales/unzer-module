@@ -1,4 +1,4 @@
-name: Docker
+name: Build image for v7 Demoshop
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -9,8 +9,8 @@ on:
   schedule:
     - cron: '16 6 * * *'
   push:
-    tags:
-      - '**'
+    branches:
+      - b-7.0.x
   repository_dispatch:
     types: [docker-build]
 
@@ -21,25 +21,8 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  get_latest_tag:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    outputs:
-      tag: ${{ steps.latest_tag.outputs.tag }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get latest tag
-        id: latest_tag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
   build:
-    needs: get_latest_tag
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -49,7 +32,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.get_latest_tag.outputs.tag }}
+            ref: b-7.0.x
 
       - name: Checkout dockerfiles
         uses: actions/checkout@v4
@@ -95,10 +78,11 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.v7
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO }}:latest
+            ${{ env.REGISTRY }}/${{ env.REPO }}:v7
           secrets: |
             "github_token=${{ secrets.GITHUB_TOKEN }}"
 

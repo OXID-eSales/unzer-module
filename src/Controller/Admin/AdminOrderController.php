@@ -7,7 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController as AdminDetailsController_parent;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -18,16 +18,14 @@ use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
-use UnzerSDK\Resources\PaymentTypes\Invoice;
-use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
-use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 use UnzerSDK\Unzer;
+use DateTime;
+use DateTimeZone;
 
 /**
  * Order class wrapper for Unzer module
@@ -37,7 +35,7 @@ use UnzerSDK\Unzer;
  * TODO: Decrease complexity to 50 or under
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AdminOrderController extends AdminDetailsController_parent
+class AdminOrderController extends AdminDetailsController
 {
     use ServiceContainer;
 
@@ -64,7 +62,7 @@ class AdminOrderController extends AdminDetailsController_parent
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function render(): string
+    public function render()
     {
         parent::render();
 
@@ -104,45 +102,6 @@ class AdminOrderController extends AdminDetailsController_parent
     }
 
     /**
-     * Method checks is order was made with unzer payment
-     *
-     * @return bool
-     */
-    public function isUnzerOrder(): bool
-    {
-        $isUnzer = false;
-
-        /** @var Order $order */
-        $order = $this->getEditObject();
-        /** @var string $oxPaymentType */
-        $oxPaymentType = $order->getFieldData('oxpaymenttype');
-        if ($order instanceof Order && strpos($oxPaymentType, "oscunzer") !== false) {
-            $this->oPayment = oxNew(Payment::class);
-            if ($this->oPayment->load($oxPaymentType)) {
-                $isUnzer = true;
-            }
-        }
-
-        return $isUnzer;
-    }
-
-    /**
-     * Returns editable order object
-     *
-     * @return Order|null
-     */
-    public function getEditObject(): ?object
-    {
-        $soxId = $this->getEditObjectId();
-        if ($this->editObject === null && $soxId != '-1') {
-            $this->editObject = oxNew(Order::class);
-            $this->editObject->load($soxId);
-        }
-
-        return $this->editObject;
-    }
-
-    /**
      * @param string $sPaymentId
      * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -177,7 +136,7 @@ class AdminOrderController extends AdminDetailsController_parent
             /** @var Shipment $shipment */
             foreach ($unzerPayment->getShipments() as $shipment) {
                 $aRv = [];
-                $aRv['shipingDate'] = $shipment->getDate();
+                $aRv['shipingDate'] = $this->toLocalDateString($shipment->getDate() ?? '');
                 $aRv['shipId'] = $shipment->getId();
                 $aRv['invoiceid'] = $unzerPayment->getInvoiceId();
                 $aRv['amount'] = $shipment->getAmount();
@@ -206,13 +165,15 @@ class AdminOrderController extends AdminDetailsController_parent
                 /** @var Charge $charge */
                 foreach ($unzerPayment->getCharges() as $charge) {
                     if ($charge->isSuccess()) {
+                        $this->addChargeViewData($charge);
                         $aRv = [];
                         $aRv['chargedAmount'] = $charge->getAmount();
                         $aRv['cancelledAmount'] = $charge->getCancelledAmount();
                         $aRv['chargeId'] = $charge->getId();
                         $aRv['cancellationPossible'] = $charge->getAmount() > $charge->getCancelledAmount();
                         $fCharged += $charge->getAmount();
-                        $aRv['chargeDate'] = $charge->getDate();
+                        // datetime from unzer is in GMT, convert it to local datetime
+                        $aRv['chargeDate'] = $this->toLocalDateString($charge->getDate() ?? '');
 
                         $charges[] = $aRv;
                     }
@@ -227,7 +188,7 @@ class AdminOrderController extends AdminDetailsController_parent
                 if ($cancellation->isSuccess()) {
                     $aRv = [];
                     $aRv['cancelledAmount'] = $cancellation->getAmount();
-                    $aRv['cancelDate'] = $cancellation->getDate();
+                    $aRv['cancelDate'] = $this->toLocalDateString($cancellation->getDate() ?? '');
                     $aRv['cancellationId'] = $cancellation->getId();
                     $aRv['cancelReason'] = $cancellation->getReasonCode();
                     $fCancelled += $cancellation->getAmount();
@@ -258,38 +219,64 @@ class AdminOrderController extends AdminDetailsController_parent
     }
 
     /**
+     * Adding HolderData to View (if there is any)
+     *
+     * @param Charge $charge
+     * @return void
+     */
+    protected function addChargeViewData(Charge $charge)
+    {
+        $holderData = [];
+        $holderData['bic'] = $charge->getBic();
+        $holderData['iban'] = $charge->getIban();
+        $holderData['descriptor'] = $charge->getDescriptor();
+        $holderData['holder'] = $charge->getHolder();
+        $isDataSet = true;
+        foreach ($holderData as $wert) {
+            if (empty($wert)) {
+                $isDataSet = false;
+                break;
+            }
+        }
+        if ($isDataSet === true) {
+            $this->_aViewData["holderData"] = $holderData;
+        }
+    }
+    protected function addAuthorizationViewData(Authorization $authorization): void
+    {
+        $date = '';
+        $datetime = $authorization->getFetchedAt();
+        if ($datetime) {
+            $date = $datetime->format('Y-m-d H:i:s');
+        }
+        $this->_aViewData["AuthFetchedAt"] = $this->toLocalDateString($date);
+        $this->_aViewData["AuthShortId"] = $authorization->getShortId();
+        $this->_aViewData["AuthId"] = $authorization->getId();
+        $this->_aViewData["AuthAmount"] = $authorization->getAmount();
+        $holderData = [];
+        $holderData['bic'] = $authorization->getBic();
+        $holderData['iban'] = $authorization->getIban();
+        $holderData['descriptor'] = $authorization->getDescriptor();
+        $holderData['holder'] = $authorization->getHolder();
+        $isDataSet = true;
+        foreach ($holderData as $wert) {
+            if (empty($wert)) {
+                $isDataSet = false;
+                break;
+            }
+        }
+        if ($isDataSet === true) {
+            $this->_aViewData["holderData"] = $holderData;
+        }
+    }
+
+    /**
      * @return array
      */
     protected function getCustomerTypeAndCurrencyFromTransaction(): array
     {
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
         return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());
-    }
-
-    protected function addAuthorizationViewData(Authorization $authorization): void
-    {
-        $this->_aViewData["AuthFetchedAt"] = $authorization->getFetchedAt();
-        $this->_aViewData["AuthShortId"] = $authorization->getShortId();
-        $this->_aViewData["AuthId"] = $authorization->getId();
-        $this->_aViewData["AuthAmount"] = $authorization->getAmount();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCancelReasonRequired(): bool
-    {
-        if (!($this->oPayment instanceof Payment)) {
-            return false;
-        }
-
-        return $this->oPayment->isUnzerSecuredPayment();
-    }
-
-    public function getUnzerSDKbyPaymentId(string $sPaymentId): Unzer
-    {
-        return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDKbyPaymentType($sPaymentId);
     }
 
     /**
@@ -417,6 +404,29 @@ class AdminOrderController extends AdminDetailsController_parent
         }
     }
 
+    /**
+     * Method checks is order was made with unzer payment
+     *
+     * @return bool
+     */
+    public function isUnzerOrder(): bool
+    {
+        $isUnzer = false;
+
+        /** @var Order $order */
+        $order = $this->getEditObject();
+        /** @var string $oxPaymentType */
+        $oxPaymentType = $order->getFieldData('oxpaymenttype');
+        if ($order instanceof Order && strpos($oxPaymentType, "oscunzer") !== false) {
+            $this->oPayment = oxNew(Payment::class);
+            if ($this->oPayment->load($oxPaymentType)) {
+                $isUnzer = true;
+            }
+        }
+
+        return $isUnzer;
+    }
+
     public function canCollectFully(): bool
     {
         if (!($this->oPayment instanceof Payment)) {
@@ -456,5 +466,39 @@ class AdminOrderController extends AdminDetailsController_parent
         }
 
         return $this->oPayment->canRevertPartially();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCancelReasonRequired(): bool
+    {
+        if (!($this->oPayment instanceof Payment)) {
+            return false;
+        }
+
+        return $this->oPayment->isUnzerSecuredPayment();
+    }
+    /**
+     * Returns editable order object
+     *
+     * @return Order|null
+     */
+    public function getEditObject(): ?object
+    {
+        $soxId = $this->getEditObjectId();
+        if ($this->editObject === null && $soxId != '-1') {
+            $this->editObject = oxNew(Order::class);
+            $this->editObject->load($soxId);
+        }
+
+        return $this->editObject;
+    }
+
+    private function toLocalDateString(string $gmtDateString): string
+    {
+        $datetime = new DateTime($gmtDateString, new DateTimeZone('GMT'));
+        $datetime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+        return $datetime->format('Y-m-d H:i:s');
     }
 }

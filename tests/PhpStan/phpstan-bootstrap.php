@@ -13,10 +13,19 @@ class_alias(
 );
 
 class_alias(
+    \OxidEsales\Eshop\Application\Controller\Admin\OrderList::class,
+    \OxidSolutionCatalysts\Unzer\Controller\Admin\OrderList_parent::class
+);
+
+class_alias(
     \OxidEsales\Eshop\Application\Controller\OrderController::class,
     \OxidSolutionCatalysts\Unzer\Controller\OrderController_parent::class
 );
 
+class_alias(
+    \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class,
+    \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminDetailsController_parent::class
+);
 class_alias(
     \OxidEsales\Eshop\Application\Controller\PaymentController::class,
     \OxidSolutionCatalysts\Unzer\Controller\PaymentController_parent::class
@@ -53,6 +62,6 @@ class_alias(
 );
 
 class_alias(
-    \OxidEsales\Eshop\Application\Model\PaymentGateway::class,
-    \OxidSolutionCatalysts\Unzer\Model\PaymentGateway_parent::class
+    \OxidEsales\Eshop\Application\Model\DiscountList::class,
+    \OxidSolutionCatalysts\Unzer\Model\DiscountList_parent::class
 );

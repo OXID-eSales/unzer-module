@@ -212,6 +212,7 @@
             event.preventDefault();
             $("#payment-form").submit();
         }
+        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
 
     [{/capture}]

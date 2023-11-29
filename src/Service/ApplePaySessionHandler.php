@@ -3,11 +3,15 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use Psr\Log\LoggerInterface;
 use UnzerSDK\Adapter\ApplepayAdapter;
 use UnzerSDK\Resources\ExternalResources\ApplepaySession;
 
 class ApplePaySessionHandler
 {
+    use ServiceContainer;
+
     private ApplepaySession $session;
     private ApplepayAdapter $adapter;
     private ModuleSettings $moduleSettings;
@@ -34,18 +38,21 @@ class ApplePaySessionHandler
             ),
             '/'
         );
-        /** @var string $applePatLabel */
-        $applePatLabel = $this->moduleSettings->getApplePayLabel();
-        $this->session = new ApplepaySession(
-            $this->moduleSettings->getApplePayMerchantIdentifier(),
-            $applePatLabel,
-            $domainName
-        );
-        $this->adapter = new ApplepayAdapter();
-        $this->adapter->init(
-            $this->moduleSettings->getApplePayMerchantCertFilePath(),
-            $this->moduleSettings->getApplePayMerchantCertKeyFilePath()
-        );
+        // if we have no credentials we could not initiate
+        if ($this->moduleSettings->isApplePayEligibility()) {
+            /** @var string $applePatLabel */
+            $applePatLabel = $this->moduleSettings->getApplePayLabel();
+            $this->session = new ApplepaySession(
+                $this->moduleSettings->getApplePayMerchantIdentifier(),
+                $applePatLabel,
+                $domainName
+            );
+            $this->adapter = new ApplepayAdapter();
+            $this->adapter->init(
+                $this->moduleSettings->getApplePayMerchantCertFilePath(),
+                $this->moduleSettings->getApplePayMerchantCertKeyFilePath()
+            );
+        }
     }
 
     /**
@@ -54,6 +61,11 @@ class ApplePaySessionHandler
      */
     public function validateMerchant(string $validationUrl): ?array
     {
+        // if we have no credentials we could not validate Merchant
+        if (!$this->moduleSettings->isApplePayEligibility()) {
+            return null;
+        }
+
         try {
             /** @var string $validApplePayMerch */
             $validApplePayMerch = $this->adapter->validateApplePayMerchant($validationUrl, $this->session);
@@ -66,7 +78,10 @@ class ApplePaySessionHandler
             );
             return $jsonDecoded;
         } catch (\Throwable $e) {
-            Registry::getLogger()->error($e->getMessage());
+            /** @var LoggerInterface $logger */
+            /** @phpstan-ignore-next-line */
+            $logger = $this->getServiceFromContainer('OxidSolutionCatalysts\Unzer\Logger');
+            $logger->error($e->getMessage());
             return null;
         }
     }

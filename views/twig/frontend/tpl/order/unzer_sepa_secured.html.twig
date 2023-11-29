@@ -61,7 +61,7 @@
             <input id="oscunzersepaagreement" type="checkbox" name="oscunzersepaagreement" value="0">
             <label for="oscunzersepaagreement">
                 {% ifcontent ident "oscunzersepamandateconfirmation" set oCont %}
-                {{ oCont.oxcontents__oxcontent.value }}
+                    {{ oCont.oxcontents__oxcontent.value }}
                 {% endifcontent %}
             </label>
         </div>
@@ -73,7 +73,7 @@
 
 {% capture assign = "unzerSepaDirectSecurredJS" %}
     // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('{{ unzerpub }}');
+    let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
 
     // Create a SEPA Direct Debit Secured instance and render the form
     let SepaDirectDebitSecured = unzerInstance.SepaDirectDebitSecured();
@@ -131,6 +131,7 @@
             event.preventDefault();
             $( "#payment-form-sepa-secured" ).submit();
         }
+        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
     {% endcapture %}
 {{ script({ add: unzerSepaDirectSecurredJS, dynamic: __oxid_include_dynamic }) }}
