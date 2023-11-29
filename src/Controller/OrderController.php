@@ -120,6 +120,7 @@ class OrderController extends OrderController_parent
             $nextStep = $this->_getNextStep($iSuccess);
 
             $unzerService = $this->getServiceFromContainer(Unzer::class);
+            Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
             if ('thankyou' === $nextStep) {
                 // commit transaction and proceeding to next view

@@ -1,7 +1,7 @@
 [{include file="headitem.tpl" title="GENERAL_ADMIN_TITLE"|oxmultilangassign}]
 
 [{if $paymentTitle && $totalBasketPrice}]
-    <h3>[{$paymentTitle}] : [{$totalBasketPrice}]</h3>
+    <h3>[{$paymentTitle}] : [{$totalBasketPrice}] / [{oxmultilang ident='OSCUNZER_TRANSACTION_ORDERNR' suffix='COLON'}] [{$oOrder->oxorder__oxunzerordernr->value}]</h3>
 [{/if}]
 
 [{* payment abilities *}]
@@ -278,6 +278,27 @@
                         [{/if}]
                     </tr>
                 [{/foreach}]
+            </table>
+        [{/if}]
+    [{/block}]
+    [{block name="unzer_holder"}]
+        [{if $holderData }]
+            <h3>[{oxmultilang ident="OSCUNZER_BANK_HOLDER_DETAILS"}]</h3>
+            <table style="width:50%">
+                <tbody>
+                <tr>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_IBAN"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_BIC"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_HOLDER"}]</td>
+                    <td class="listheader">[{oxmultilang ident="OSCUNZER_DESCRIPTOR"}]</td>
+                </tr>
+                <tr>
+                    <td>[{$holderData.iban}]</td>
+                    <td>[{$holderData.bic}]</td>
+                    <td>[{$holderData.holder}]</td>
+                    <td>[{$holderData.descriptor}]</td>
+                </tr>
+                </tbody>
             </table>
         [{/if}]
     [{/block}]

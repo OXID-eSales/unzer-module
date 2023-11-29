@@ -161,6 +161,14 @@ class ModuleSettings
     }
 
     /**
+     * @return string
+     */
+    public function getGitHubName(): string
+    {
+        return Module::GITHUB_NAME;
+    }
+
+    /**
      * @return bool
      */
     public function isApplePayEligibility(): bool
