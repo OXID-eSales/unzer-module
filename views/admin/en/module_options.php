@@ -11,6 +11,7 @@ $aLang = [
     "charset" => "UTF-8",
     'SHOP_MODULE_GROUP_unzermerchant' => 'Access Data',
     'SHOP_MODULE_GROUP_unzerenvironment' => 'Operation mode',
+    'SHOP_MODULE_UnzerSavePaymentsForUser' => 'Save Userpayments (id)',
     'SHOP_MODULE_GROUP_unzercard' => 'additional options for credit cards',
     'SHOP_MODULE_GROUP_unzerpaypal' => 'additional options for PayPal',
     'SHOP_MODULE_GROUP_unzerinstallment' => 'additional options for Installment',

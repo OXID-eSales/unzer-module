@@ -10,19 +10,24 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Model\Transaction;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
+use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
-use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
+use JsonException;
 
 /**
  * @SuppressWarnings(PHPMD.NumberOfChildren)
  */
 abstract class UnzerPayment
 {
+    use ServiceContainer;
+
     /** @var Unzer */
     protected $unzerSDK;
 
@@ -85,7 +90,10 @@ abstract class UnzerPayment
      * @param Basket $basketModel
      * @return bool
      *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws JsonException
+     * @throws UnzerApiException
      */
     public function execute(
         User $userModel,
@@ -93,6 +101,14 @@ abstract class UnzerPayment
     ): bool {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
+        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Paypal) {
+            $paymentData = $request->getRequestParameter('paymentData');
+            $paymentData = is_string($paymentData) ? $paymentData : '';
+            $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
+            if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
+                $paymentType->setId($aPaymentData['id']);
+            }
+        }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
 
@@ -136,7 +152,27 @@ abstract class UnzerPayment
         if ($request->getRequestParameter('birthdate')) {
             $userModel->save();
         }
+        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
 
+        if ($savePayment === "1" && $userModel->getId()) {
+            /** @var TransactionService $transactionService */
+            $transactionService = $this->getServiceFromContainer(
+                Transaction::class
+            );
+            $payment = $this->getServiceFromContainer(PaymentService::class)
+                ->getSessionUnzerPayment();
+            try {
+                $transactionService->writeTransactionToDB(
+                    Registry::getSession()->getSessionChallengeToken(),
+                    $userModel->getId(),
+                    $payment
+                );
+            } catch (Exception $e) {
+                Registry::getLogger()->info(
+                    'Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage()
+                );
+            }
+        }
         return true;
     }
 }

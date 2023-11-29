@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Discounts with time restrictions may not be invalidated directly in the checkout...
 - provided additional Order-Number is searchable
 - increase line spacing for the error messages
+- Save Payment Data for registered Users 
 
 ## [1.1.3] - 2023-11-14
 

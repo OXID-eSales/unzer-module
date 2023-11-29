@@ -9,7 +9,6 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
@@ -20,12 +19,10 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerP
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
-use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
-use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 /**
@@ -99,7 +96,6 @@ class Payment
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
-        $paymentExtension = null;
         try {
             /** @var string $customerType */
             $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
@@ -118,6 +114,14 @@ class Payment
                 $basket
             );
 
+            /** @var string $sess_challenge */
+            $sess_challenge = $this->session->getVariable('sess_challenge');
+            $this->transactionService->writeTransactionToDB(
+                $sess_challenge,
+                $this->session->getUser()->getId(),
+                $this->getSessionUnzerPayment()
+            );
+
             $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
 
             if ($this->redirectUrl) {
@@ -130,6 +134,8 @@ class Payment
         } catch (Redirect $e) {
             throw $e;
         } catch (UnzerApiException $e) {
+            $this->removeTemporaryOrder();
+
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
                     $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
@@ -137,6 +143,8 @@ class Payment
                 $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
             );
         } catch (Exception $e) {
+            $this->removeTemporaryOrder();
+
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
                     $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
@@ -162,18 +170,13 @@ class Payment
     /**
      * @return string
      * @throws UnzerApiException
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getUnzerPaymentStatus(): string
     {
         $result = self::STATUS_ERROR;
 
-        $sessionUnzerPayment = $this->getSessionUnzerPayment();
-        if (is_null($sessionUnzerPayment)) {
-            return $result;
-        }
-
         /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
+        $sessionUnzerPayment = $this->getSessionUnzerPayment();
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {
@@ -227,7 +230,7 @@ class Payment
      * @param string $currency
      * @return \UnzerSDK\Unzer
      */
-    protected function getUnzerSDK(string $customerType = '', string $currency = ''): \UnzerSDK\Unzer
+    public function getUnzerSDK(string $customerType = '', string $currency = ''): \UnzerSDK\Unzer
     {
         return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
     }
@@ -331,9 +334,9 @@ class Payment
             );
             $payment = $charge->getPayment();
             if (
-                $charge->isSuccess() &&
+                ($charge->isSuccess()) &&
                 ($payment instanceof \UnzerSDK\Resources\Payment) &&
-                $payment->getAmount()->getRemaining() == 0
+                $payment->getAmount()->getRemaining() === 0.0
             ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
