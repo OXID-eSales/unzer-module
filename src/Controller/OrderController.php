@@ -242,13 +242,13 @@ class OrderController extends OrderController_parent
     /**
      * @return int|mixed
      */
-    public function getPaymentSaveSetting() {
+    public function getPaymentSaveSetting()
+    {
         $bSavedPayment = Registry::getConfig()->getConfigParam('UnzerSavePaymentsForUser');
 
         // no guests allowed
         $user = $this->getUser();
-        $passwordField = 'oxuser__oxpassword';
-        if ( !$user || (!$user->$passwordField->value) ) {
+        if (!$user || (!$user->getFieldData('oxpassword'))) {
             $bSavedPayment = 0;
             return $bSavedPayment;
         }
@@ -315,7 +315,7 @@ class OrderController extends OrderController_parent
         }
         return parent::getExecuteFnc();
     }
-    protected function getSavedPayment()
+    protected function getSavedPayment(): void
     {
         $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
         $unzerSDK = $UnzerSdk->getUnzerSDK();
@@ -341,17 +341,23 @@ class OrderController extends OrderController_parent
         }
 
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
-
-
     }
 
-    protected function getTrancactionIds() {
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected function getTrancactionIds(): array
+    {
+        $result = [];
         if ($this->getUser()->getId() !== null) {
             $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $rowSelect = $oDB->getAll("SELECT PAYMENTTYPEID from oscunzertransaction
-                            where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL GROUP BY PAYMENTTYPEID ", [':oxuserid' => $this->getUser()->getId()]);
-            return $rowSelect;
+            $result = $oDB->getAll(
+                "SELECT PAYMENTTYPEID from oscunzertransaction
+                where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL
+                GROUP BY PAYMENTTYPEID ",
+                [':oxuserid' => $this->getUser()->getId()]
+            );
         }
-        return false;
+        return $result;
     }
 }

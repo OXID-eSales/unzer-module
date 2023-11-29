@@ -9,7 +9,6 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
@@ -20,12 +19,10 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerP
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
-use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
-use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 /**
@@ -327,7 +324,6 @@ class Payment
                 return false;
             }
             $charge = $authorization->charge($amount);
-            $typeId = $charge->getPayment()->getPaymentType()->getId();
 
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
@@ -338,9 +334,9 @@ class Payment
             );
             $payment = $charge->getPayment();
             if (
-                $charge->isSuccess() &&
+                ($charge->isSuccess()) &&
                 ($payment instanceof \UnzerSDK\Resources\Payment) &&
-                $payment->getAmount()->getRemaining() == 0
+                $payment->getAmount()->getRemaining() === 0.0
             ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
