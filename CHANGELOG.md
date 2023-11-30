@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.0.3] - 2023-11-??
+## [2.1.4] - 2023-11-??
 
 ### FIXED
 - [0007503](https://bugs.oxid-esales.com/view.php?id=7503) When ordering via the Unzer module, the OXID standard field OXORDER__OXTRANSID remains empty
@@ -22,19 +22,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Prepayment - Adjust payment date when the payment has been completed
 - change information for Unzer-Metadata
 
-## [2.0.0] - 2023-07-XX
+## [2.0.0] - only DEV
 
 ### NEW
 - Update module for OXID 7.0
+- split from Version 1.1.3
 
-## [1.1.4] - 2023-??-??
-
-- [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)
-- Discounts with time restrictions may not be invalidated directly in the checkout...
-- provided additional Order-Number is searchable
-- increase line spacing for the error messages
-
-## [1.1.3] - 2023-??-??
+## [1.1.3] - 2023-11-14
 
 - [0007526](https://bugs.oxid-esales.com/view.php?id=7526) Order would be saved only, if everything is correct. In all other cases redirect to checkout
 - [0007509](https://bugs.oxid-esales.com/view.php?id=7509) Order would be saved only, if everything is correct. In all other cases redirect to checkout
