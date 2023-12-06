@@ -72,8 +72,8 @@ class OrderList extends OrderList_parent
                         $oxUnzerOrderNr = $database->quoteIdentifier("oxorder.oxunzerordernr");
                         $orderNrQuery = [];
                         foreach ($values as $value) {
-                            $orderNrQuery[] = "({$oxOrderNr} like '{$value}'"
-                                . " or {$oxUnzerOrderNr} like '{$value}')";
+                            $orderNrQuery[] = "({$oxOrderNr} like '%{$value}%'"
+                                . " or {$oxUnzerOrderNr} like '%{$value}%')";
                         }
                         $filterQuery .= "and (" . implode(" or ", $orderNrQuery) . ")";
 
