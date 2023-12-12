@@ -123,4 +123,5 @@ $aLang = [
     'OSCUNZER_IBAN' => 'IBAN',
     'OSCUNZER_CARD_NUMBER' => 'Kartennummer',
     'OSCUNZER_EXPIRY_DATE' => 'Ablaufdatum',
+    'OSCUNZER_NEW_CARD' => 'Neue Kreditkarte',
 ];
