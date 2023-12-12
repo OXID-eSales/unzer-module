@@ -36,7 +36,7 @@
 [{if $unzerPaymentType != false }]
 <br>
     <label>
-        <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue Kreditkarte
+        <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox">[{oxmultilang ident="OSCUNZER_NEW_CARD"}]
     </label>
 [{/if}]
 <div id="newcc" style="display:none;">
@@ -71,8 +71,8 @@
         [{/if}]
     </form>
     <style>
-        .unzerUI.form .field.error .compact.error.message:not(:empty), .unzerUI.form .fields.error .field .compact.error.message:not(:empty){
-            line-height: 100%;
+        .unzerUI.form .error.message {
+            line-height: 2rem;
         }
     </style>
 </div>
@@ -150,6 +150,8 @@
                     $('html, body').animate({
                         scrollTop: $("#orderPayment").offset().top - 150
                     }, 350);
+                    let errorBox = $('#card-element-id-number .unzerUI.compact.error.message');
+                    errorBox.show().text(error.message);
                 })
         }
     });
@@ -172,7 +174,7 @@
 
     $('input[name="newccard"]').on('change', function() {
         if ($(this).prop('checked')) {
-            // Gespeicherte Zahlungsarten ausblenden und Radiobuttons abwählen
+            // Hide saved payment methods and deselect radio buttons
             $('.savedpayment').fadeOut();
             $('input[name="paymenttypeid"]').prop('checked', false);
 
