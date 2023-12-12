@@ -130,4 +130,5 @@ $aLang = [
     'OSCUNZER_REMOVE_PAYMENT' => 'Delete Payment?',
     'OSCUNZER_NEW_CARD' => 'New Card',
     'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Invalid payment method',
+    'OSCUNZER_NEW_CARD' => 'New Card',
 ];
