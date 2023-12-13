@@ -157,7 +157,7 @@ abstract class UnzerPayment
         if ($savePayment === "1" && $userModel->getId()) {
             /** @var TransactionService $transactionService */
             $transactionService = $this->getServiceFromContainer(
-                Transaction::class
+                TransactionService::class
             );
             $payment = $this->getServiceFromContainer(PaymentService::class)
                 ->getSessionUnzerPayment();

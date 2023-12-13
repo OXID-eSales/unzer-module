@@ -1,8 +1,10 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
 [{if $oView->getPaymentSaveSetting()}]
+
     <div class="savedpayment">
         <form id="payment-saved-cards" class="unzerUI form" novalidate>
             [{foreach from=$unzerPaymentType item="setting" key="type"}]
+            [{if $unzerPaymentType != false}]
             [{if $type == 'paypal'}]
 
             <table class="table">
@@ -29,7 +31,7 @@
 
                 </tbody>
             </table>
-
+            [{/if}]
 
             [{/if}]
             [{/foreach}]
