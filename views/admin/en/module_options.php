@@ -19,6 +19,7 @@ $aLang = [
     'SHOP_MODULE_GROUP_unzerinvoice' => 'additional options for Unzer Invoice (Paylater)',
     'SHOP_MODULE_GROUP_unzerwebhooks' => 'Webhook settings',
     'SHOP_MODULE_GROUP_unzerother' => 'Other',
+    'SHOP_MODULE_GROUP_unzerpaylater' => 'additional options for Unzer installment (Paylater)',
 
     'SHOP_MODULE_webhookConfiguration' => '',
     'SHOP_MODULE_webhook_id' => 'Webhook ID',
@@ -93,4 +94,12 @@ $aLang = [
     'SHOP_MODULE_production-UnzerPrivateKeyB2CCHF' => 'Live Private-Key for B2C-purchases in CHF',
     'SHOP_MODULE_production-UnzerPublicKeyB2BCHF' => 'Live Public-Key for B2B-purchases in CHF',
     'SHOP_MODULE_production-UnzerPrivateKeyB2BCHF' => 'Live Private-Key for B2B-purchases in CHF',
+    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2CEUR' => 'Sandbox Public-Key for B2B-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2CEUR' => 'Sandbox Private-Key for B2B-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2CCHF' => 'Sandbox Public-Key for B2B-purchases in CHF',
+    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2CCHF' => 'Sandbox Private-Key for B2B-purchases in CHF',
+    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CEUR' => 'Live Public-Key for B2B-purchases in EUR',
+    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CEUR' => 'Live Private-Key for B2B-purchases in EUR',
+    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CCHF' => 'Live Public-Key for B2B-purchases in CHF',
+    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CCHF' => 'Live Private-Key for B2B-purchases in CHF',
 ];

@@ -23,6 +23,7 @@ use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
 use OxidSolutionCatalysts\Unzer\Core\Config;
 use OxidSolutionCatalysts\Unzer\Core\ShopControl;
 use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
+use OxidSolutionCatalysts\Unzer\Model\PaymentGateway;
 use OxidSolutionCatalysts\Unzer\Model\Article;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -95,6 +96,7 @@ $aModule = [
         'modules/osc/unzer/unzer_applepay.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl',
         'modules/osc/unzer/unzer_sepa.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa.tpl',
         'modules/osc/unzer/unzer_sepa_secured.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_sepa_secured.tpl',
+        'modules/osc/unzer/unzer_installment_paylater.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_installment_paylater.tpl',
         'modules/osc/unzer/unzer_ideal.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_ideal.tpl',
         'modules/osc/unzer/unzer_shippingAndPayment_flow.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_flow.tpl',
         'modules/osc/unzer/unzer_shippingAndPayment_wave.tpl' => 'osc/unzer/views/frontend/tpl/order/unzer_shippingAndPayment_wave.tpl',
@@ -381,6 +383,54 @@ $aModule = [
         [
             'group' => 'unzerinvoice',
             'name' => 'production-UnzerPrivateKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPublicKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2CCHF',
             'type' => 'str',
             'value' => ''
         ],

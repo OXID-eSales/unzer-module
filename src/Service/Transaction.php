@@ -27,6 +27,7 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
+use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -92,7 +93,7 @@ class Transaction
                 array_merge($params, $this->getUnzerPaymentData($unzerPayment));
 
             // for PaylaterInvoice, store the customer type
-            if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice) {
+            if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice || $unzerPayment->getPaymentType() instanceof PaylaterInstallment) {
                 $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
                 $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
                 $params['customertype'] = 'B2C';
@@ -252,13 +253,10 @@ class Transaction
             'oxaction' => $oxaction,
             'traceid'  => $unzerPayment->getTraceId()
         ];
-        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-        $paymentType = $unzerPayment->getPaymentType();
-        if (
-            $savePayment === "1" &&
-            $paymentType
-        ) {
-            $params['paymenttypeid'] = $paymentType->getId();
+        $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+        if ($savePayment === "1") {
+            $typeId = $unzerPayment->getPaymentType()->getId();
+            $params['paymenttypeid'] = $typeId;
         }
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
@@ -281,18 +279,14 @@ class Transaction
     protected function getUnzerChargeData(Charge $unzerCharge): array
     {
         $customerId = '';
-        $typeId = '';
         $payment = $unzerCharge->getPayment();
-        if (!is_null($payment)) {
+        if (is_object($payment)) {
             $customer = $payment->getCustomer();
-            if (!is_null($customer)) {
+            if (is_object($customer)) {
                 $customerId = $customer->getId();
             }
-            $paymentType = $payment->getPaymentType();
-            if (!is_null($paymentType)) {
-                $typeId = $paymentType->getId();
-            }
         }
+        $typeId = $unzerCharge->getPayment()->getPaymentType()->getId();
 
         return [
             'amount'     => $unzerCharge->getAmount(),
