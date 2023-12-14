@@ -176,12 +176,6 @@ $aModule = [
             'value' => '0',
         ],
         [
-            'group' => 'unzerenvironment',
-            'name' => 'UnzerSavePaymentsForUser',
-            'type' => 'bool',
-            'value' => '0',
-        ],
-        [
             'group' => 'unzermerchant',
             'name' => 'sandbox-UnzerPublicKey',
             'type' => 'str',

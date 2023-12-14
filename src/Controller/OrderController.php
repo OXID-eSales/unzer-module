@@ -244,7 +244,7 @@ class OrderController extends OrderController_parent
      */
     public function getPaymentSaveSetting()
     {
-        $bSavedPayment = Registry::getConfig()->getConfigParam('UnzerSavePaymentsForUser');
+        $bSavedPayment = 1;
 
         // no guests allowed
         $user = $this->getUser();
