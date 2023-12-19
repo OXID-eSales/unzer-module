@@ -88,6 +88,7 @@ class Invoice extends UnzerPayment
             $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending())
         );
         $authObj->setRiskData($uzrRiskData);
+        $authObj->setOrderId($this->unzerOrderId);
         $metadataObj = $this->unzerService->getShopMetadata($this->paymentMethod);
 
         $transaction = $this->unzerSDK->performAuthorization(

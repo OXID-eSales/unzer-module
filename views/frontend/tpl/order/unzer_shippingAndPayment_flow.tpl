@@ -65,6 +65,8 @@
                         [{include file="modules/osc/unzer/unzer_sepa_secured.tpl"}]
                     [{elseif $sPaymentID == "oscunzer_paypal"}]
                         [{include file="modules/osc/unzer/unzer_paypal.tpl"}]
+                    [{elseif $sPaymentID == "oscunzer_installment_paylater"}]
+                        [{include file="modules/osc/unzer/unzer_installment_paylater.tpl"}]
                     [{/if}]
                 </div>
             </div>

@@ -17,6 +17,7 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\EPS;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\GiroPay;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Ideal;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Installment;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\InstallmentPaylater;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\InvoiceOld;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\PayPal;
@@ -40,6 +41,7 @@ class PaymentExtensionLoader
         UnzerDefinitions::GIROPAY_UNZER_PAYMENT_ID => GiroPay::class,
         UnzerDefinitions::IDEAL_UNZER_PAYMENT_ID => Ideal::class,
         UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID => Installment::class,
+        UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID => InstallmentPaylater::class,
         UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID => Invoice::class,
         UnzerDefinitions::OLD_INVOICE_UNZER_PAYMENT_ID => InvoiceOld::class,
         UnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID => PayPal::class,
@@ -98,6 +100,13 @@ class PaymentExtensionLoader
         string $customerType,
         string $currency
     ): AbstractUnzerPayment {
+        if ($payment->getId() === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
+            return oxNew(
+                self::UNZERCLASSNAMEMAPPING[$payment->getId()],
+                $this->unzerSdkLoader->getUnzerSDK($customerType, $currency, true),
+                $this->unzerService
+            );
+        }
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $this->unzerSdkLoader->getUnzerSDK($customerType, $currency),

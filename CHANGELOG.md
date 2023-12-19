@@ -4,13 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.1.4] - 2023-??-??
+## [1.2.0] - 2023-??-??
 
+### NEW
+- new Paymentmethod Unzer installment (Paylater)
+
+### FIXED
 - [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)
 - Discounts with time restrictions may not be invalidated directly in the checkout...
 - provided additional Order-Number is searchable
 - increase line spacing for the error messages
-- Save Payment Data for registered Users 
+- Save Payment Data for registered Users
+- fix inconsistent data for Paylater payment methods
 
 ## [1.1.3] - 2023-11-14
 
