@@ -51,10 +51,10 @@ class UnzerSDKLoader
      * @param string $currency
      * @return Unzer
      */
-    public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
+    public function getUnzerSDK(string $customerType = '', string $currency = '', $type = false): Unzer
     {
         if ($customerType != '' && $currency != '') {
-            return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency);
+            return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency, $type);
         }
         $key = $this->moduleSettings->getShopPrivateKey();
         $sdk = oxNew(Unzer::class, $key);
@@ -71,14 +71,25 @@ class UnzerSDKLoader
      * @param string $currency
      * @return Unzer
      */
-    public function getUnzerSDKbyCustomerTypeAndCurrency(string $customerType, string $currency): Unzer
+    public function getUnzerSDKbyCustomerTypeAndCurrency(string $customerType, string $currency, $type = false): Unzer
     {
         if ($customerType == '' || $currency == '') {
             return $this->getUnzerSDK();
         }
+        if ($type === false) {
+            $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(
+                $customerType,
+                $currency
+            );
+            $sdk = oxNew(Unzer::class, $key);
+        } else {
+            $key = $this->moduleSettings->getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
+                $customerType,
+                $currency
+            );
+            $sdk = oxNew(Unzer::class, $key);
+        }
 
-        $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency($customerType, $currency);
-        $sdk = oxNew(Unzer::class, $key);
         if ($this->moduleSettings->isDebugMode()) {
             $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
         }
@@ -109,10 +120,10 @@ class UnzerSDKLoader
     public function getUnzerSDKbyPaymentType(string $sPaymentId): Unzer
     {
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $row = $oDB->getRow("SELECT u.CURRENCY, o.OXDELCOMPANY, o.OXBILLCOMPANY, o.OXPAYMENTTYPE 
-                            FROM oscunzertransaction u 
+        $row = $oDB->getRow("SELECT u.CURRENCY, o.OXDELCOMPANY, o.OXBILLCOMPANY, o.OXPAYMENTTYPE
+                            FROM oscunzertransaction u
                             LEFT JOIN oxorder o ON u.OXORDERID = o.OXID
-                            WHERE u.TYPEID = :typeid 
+                            WHERE u.TYPEID = :typeid
                             ORDER BY u.OXTIMESTAMP DESC LIMIT 1", [':typeid' => $sPaymentId]);
 
         $customerType = '';
@@ -125,6 +136,9 @@ class UnzerSDKLoader
                 if (!empty($row['OXDELCOMPANY']) || !empty($row['OXBILLCOMPANY'])) {
                     $customerType = 'B2B';
                 }
+            }
+            if ($paymentType === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
+                $customerType = 'B2C';
             }
         }
         return $this->getUnzerSDK($customerType, $currency);

@@ -93,6 +93,8 @@ class PaymentValidator
             $isHealthy = $this->moduleSettings->isInvoiceEligibility();
         } elseif ($paymentId === UnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
             $isHealthy = $this->moduleSettings->isApplePayEligibility();
+        } elseif ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
+            $isHealthy = $this->moduleSettings->isInstallmentEligibility();
         }
 
         return $isHealthy;

@@ -130,7 +130,6 @@ class AdminOrderController extends AdminDetailsController
             );
             $this->_aViewData["blShipment"] = ($paymentType instanceof InstallmentSecured);
             $shipments = [];
-            $this->_aViewData["uzrCurrency"] = $unzerPayment->getCurrency();
 
             $blShipped = false;
             /** @var Shipment $shipment */

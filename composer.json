@@ -22,7 +22,7 @@
     }
   },
   "require": {
-    "unzerdev/php-sdk": "^v1.2.3.0",
+    "unzerdev/php-sdk": "^v3.4.1",
     "webmozart/path-util": "^2.3.0",
     "guzzlehttp/guzzle": "^7.7"
   },
