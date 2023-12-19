@@ -11,6 +11,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
@@ -119,7 +120,7 @@ class Payment
             $this->transactionService->writeTransactionToDB(
                 $sess_challenge,
                 $this->session->getUser()->getId(),
-                $this->getSessionUnzerPayment()
+                $this->getSessionUnzerPayment($paymentExtension, $currency)
             );
 
             $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
@@ -239,7 +240,7 @@ class Payment
      * @return \UnzerSDK\Resources\Payment|null
      * @throws UnzerApiException
      */
-    public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
+    public function getSessionUnzerPayment($paymentExtension = null, $currency = null): ?\UnzerSDK\Resources\Payment
     {
         $paymentId = $this->session->getVariable('PaymentId');
         if (is_string($paymentId)) {
@@ -248,17 +249,29 @@ class Payment
             /** @var Order $order */
             $order = oxNew(Order::class);
             $order->load($sessionOrderId);
-
             $customerType = '';
-            /** @var string $currency */
-            $currency = $order->getFieldData('oxcurrency') ?? '';
+            if ($currency === null) {
+                /** @var string $currency */
+                $currency = $order->getFieldData('oxcurrency') ?? '';
+            }
+
+            if ($paymentExtension !== null && $currency !== null) {
+                $oRequest = oxNew(Request::class);
+                if ($paymentExtension instanceof \OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice) {
+                    if ($oRequest->getRequestParameter('unzer_customer_type') === 'B2C') {
+                        $customerType = 'B2C';
+                    } else {
+                        $customerType = 'B2B';
+                    }
+                }
+            }
+
             if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
                 $customerType = 'B2C';
                 if (!empty($order->getFieldData('oxbillcompany')) || !empty($order->getFieldData('oxdelcompany'))) {
                     $customerType = 'B2B';
                 }
             }
-
             $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
             return $sdk->fetchPayment($paymentId);
         }
