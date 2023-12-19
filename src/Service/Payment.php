@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
@@ -129,6 +130,7 @@ class Payment
             }
         } catch (Redirect $e) {
             throw $e;
+
         } catch (UnzerApiException $e) {
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
@@ -136,6 +138,7 @@ class Payment
                 ),
                 $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
             );
+
         } catch (Exception $e) {
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
@@ -167,13 +170,13 @@ class Payment
     public function getUnzerPaymentStatus(): string
     {
         $result = self::STATUS_ERROR;
-
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
         if (is_null($sessionUnzerPayment)) {
             return $result;
         }
 
         /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
+        $sessionUnzerPayment = $this->getSessionUnzerPayment();
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {
@@ -226,17 +229,19 @@ class Payment
      * @param string $customerType
      * @param string $currency
      * @return \UnzerSDK\Unzer
-     */
+    */
     protected function getUnzerSDK(string $customerType = '', string $currency = ''): \UnzerSDK\Unzer
     {
         return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
     }
 
     /**
+     * @param null $paymentExtension
+     * @param null $currency
      * @return \UnzerSDK\Resources\Payment|null
      * @throws UnzerApiException
      */
-    public function getSessionUnzerPayment(): ?\UnzerSDK\Resources\Payment
+    public function getSessionUnzerPayment($paymentExtension = null, $currency = null): ?\UnzerSDK\Resources\Payment
     {
         $paymentId = $this->session->getVariable('PaymentId');
         if (is_string($paymentId)) {
@@ -245,22 +250,18 @@ class Payment
             /** @var Order $order */
             $order = oxNew(Order::class);
             $order->load($sessionOrderId);
-
-            $customerType = '';
+            $customerType = 'B2C';
             /** @var string $currency */
             $currency = $order->getFieldData('oxcurrency') ?? '';
-            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-                $customerType = 'B2C';
-                if (!empty($order->getFieldData('oxbillcompany')) || !empty($order->getFieldData('oxdelcompany'))) {
-                    $customerType = 'B2B';
+
+            if ($paymentExtension !== null && $currency !== null) {
+                if ($order->getFieldData('oxpaymenttype') === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+                    if (Registry::getRequest()->getRequestParameter('unzer_customer_type') !== 'B2C') {
+                        $customerType = 'B2B';
+                    }
                 }
             }
-            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-                $customerType = 'B2C';
-            }
-
-            $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
-            return $sdk->fetchPayment($paymentId);
+            return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
         }
 
         return null;
@@ -335,8 +336,8 @@ class Payment
             $payment = $charge->getPayment();
             if (
                 $charge->isSuccess() &&
-                ($payment instanceof \UnzerSDK\Resources\Payment) &&
-                $payment->getAmount()->getRemaining() == 0
+                ($charge->isSuccess()) &&
+                $payment->getAmount()->getRemaining() === 0.0
             ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
