@@ -231,12 +231,13 @@ class AdminOrderController extends AdminDetailsController
      * @param Charge $charge
      * @return void
      */
-    protected function addChargeViewData(Charge $charge) {
+    protected function addChargeViewData(Charge $charge)
+    {
         $holderData = [];
-        $holderData['bic'] =  $charge->getBic();
-        $holderData['iban'] =  $charge->getIban();
-        $holderData['descriptor'] =  $charge->getDescriptor();
-        $holderData['holder'] =  $charge->getHolder();
+        $holderData['bic'] = $charge->getBic();
+        $holderData['iban'] = $charge->getIban();
+        $holderData['descriptor'] = $charge->getDescriptor();
+        $holderData['holder'] = $charge->getHolder();
         $isDataSet = true;
         foreach ($holderData as $wert) {
             if (empty($wert)) {
@@ -260,10 +261,10 @@ class AdminOrderController extends AdminDetailsController
         $this->_aViewData["AuthId"] = $authorization->getId();
         $this->_aViewData["AuthAmount"] = $authorization->getAmount();
         $holderData = [];
-        $holderData['bic'] =  $authorization->getBic();
-        $holderData['iban'] =  $authorization->getIban();
-        $holderData['descriptor'] =  $authorization->getDescriptor();
-        $holderData['holder'] =  $authorization->getHolder();
+        $holderData['bic'] = $authorization->getBic();
+        $holderData['iban'] = $authorization->getIban();
+        $holderData['descriptor'] = $authorization->getDescriptor();
+        $holderData['holder'] = $authorization->getHolder();
         $isDataSet = true;
         foreach ($holderData as $wert) {
             if (empty($wert)) {
