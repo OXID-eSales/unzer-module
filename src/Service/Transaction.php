@@ -93,7 +93,10 @@ class Transaction
                 array_merge($params, $this->getUnzerPaymentData($unzerPayment));
 
             // for PaylaterInvoice, store the customer type
-            if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice || $unzerPayment->getPaymentType() instanceof PaylaterInstallment) {
+            if (
+                $unzerPayment->getPaymentType() instanceof PaylaterInvoice ||
+                $unzerPayment->getPaymentType() instanceof PaylaterInstallment
+            ) {
                 $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
                 $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
                 $params['customertype'] = 'B2C';
@@ -253,7 +256,7 @@ class Transaction
             'oxaction' => $oxaction,
             'traceid'  => $unzerPayment->getTraceId()
         ];
-        $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
         if ($savePayment === "1") {
             $typeId = $unzerPayment->getPaymentType()->getId();
             $params['paymenttypeid'] = $typeId;

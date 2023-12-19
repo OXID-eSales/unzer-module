@@ -77,10 +77,16 @@ class UnzerSDKLoader
             return $this->getUnzerSDK();
         }
         if ($type === false) {
-            $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency($customerType, $currency);
+            $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(
+                $customerType,
+                $currency
+            );
             $sdk = oxNew(Unzer::class, $key);
         } else {
-            $key = $this->moduleSettings->getShopPrivateKeyInstallmentByCustomerTypeAndCurrency($customerType, $currency);
+            $key = $this->moduleSettings->getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
+                $customerType,
+                $currency
+            );
             $sdk = oxNew(Unzer::class, $key);
         }
 

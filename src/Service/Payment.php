@@ -130,7 +130,6 @@ class Payment
             }
         } catch (Redirect $e) {
             throw $e;
-
         } catch (UnzerApiException $e) {
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(
@@ -138,7 +137,6 @@ class Payment
                 ),
                 $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
             );
-
         } catch (Exception $e) {
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(

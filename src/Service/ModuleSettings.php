@@ -812,8 +812,10 @@ class ModuleSettings
      * @param string $currency
      * @return string
      */
-    public function getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(string $customerType, string $currency): string
-    {
+    public function getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
+        string $customerType,
+        string $currency
+    ): string {
         $key = '';
         if ($customerType == 'B2C' && $currency == 'EUR') {
             $key = $this->getShopPrivateKeyB2CInstallmentEUR();

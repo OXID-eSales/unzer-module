@@ -348,8 +348,6 @@ class OrderController extends OrderController_parent
         }
 
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
-
-
     }
 
     /**
