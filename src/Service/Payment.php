@@ -258,7 +258,7 @@ class Payment
             if ($paymentExtension !== null && $currency !== null) {
                 $oRequest = oxNew(Request::class);
                 if ($paymentExtension instanceof \OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice) {
-                    if ($oRequest->getRequestParameter('unzer_customer_type') === 'B2C' ) {
+                    if ($oRequest->getRequestParameter('unzer_customer_type') === 'B2C') {
                         $customerType = 'B2C';
                     } else {
                         $customerType = 'B2B';
