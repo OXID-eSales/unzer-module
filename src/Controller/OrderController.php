@@ -318,7 +318,7 @@ class OrderController extends OrderController_parent
         }
         return parent::getExecuteFnc();
     }
-    protected function getSavedPayment()
+    protected function getSavedPayment(): void
     {
         $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
         $unzerSDK = $UnzerSdk->getUnzerSDK();

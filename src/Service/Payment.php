@@ -333,8 +333,8 @@ class Payment
             );
             $payment = $charge->getPayment();
             if (
+                !is_null($payment) &&
                 $charge->isSuccess() &&
-                ($charge->isSuccess()) &&
                 $payment->getAmount()->getRemaining() === 0.0
             ) {
                 $oOrder->markUnzerOrderAsPaid();

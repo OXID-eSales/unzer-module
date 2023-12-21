@@ -10,20 +10,25 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Service\Transaction;
+use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
+use UnzerSDK\Resources\PaymentTypes\Paypal;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
+use JsonException;
 
 /**
+ *  TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.NumberOfChildren)
  */
 abstract class UnzerPayment
@@ -92,7 +97,10 @@ abstract class UnzerPayment
      * @param Basket $basketModel
      * @return bool
      *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws JsonException
+     * @throws UnzerApiException
      */
     public function execute(
         User $userModel,
@@ -100,9 +108,10 @@ abstract class UnzerPayment
     ): bool {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
-        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Paypal) {
+        if ($paymentType instanceof Paypal) {
             $paymentData = $request->getRequestParameter('paymentData');
-            $aPaymentData = json_decode($paymentData, true);
+            $paymentData = is_string($paymentData) ? $paymentData : '';
+            $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
             if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
                 $paymentType->setId($aPaymentData['id']);
             }
@@ -142,8 +151,12 @@ abstract class UnzerPayment
         $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
 
         if ($savePayment === "1" && $userModel->getId()) {
-            $transactionService = $this->getServiceFromContainer(Transaction::class);
-            $payment = $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment();
+            /** @var TransactionService $transactionService */
+            $transactionService = $this->getServiceFromContainer(
+                TransactionService::class
+            );
+            $payment = $this->getServiceFromContainer(PaymentService::class)
+                ->getSessionUnzerPayment();
             try {
                 $transactionService->writeTransactionToDB(
                     Registry::getSession()->getSessionChallengeToken(),
@@ -159,12 +172,19 @@ abstract class UnzerPayment
         return true;
     }
 
-    protected function doTransactions($basketModel, $customer, $userModel, $paymentType)
-    {
+    /**
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    protected function doTransactions(
+        Basket $basketModel,
+        Customer $customer,
+        User $userModel,
+        BasePaymentType $paymentType
+    ): AbstractTransactionType {
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
-        /** @var $paymentType PaylaterInstallment */
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
-        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\PaylaterInstallment) {
+        /** @var $paymentType PaylaterInstallment */
+        if ($paymentType instanceof PaylaterInstallment) {
             $auth = oxNew(Authorization::class);
             $auth->setAmount($basketModel->getPrice()->getPrice());
             $currency = $basketModel->getBasketCurrency();

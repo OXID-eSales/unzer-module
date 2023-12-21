@@ -49,9 +49,12 @@ class UnzerSDKLoader
     /**
      * @param string $customerType
      * @param string $currency
+     * @param bool $type
      * @return Unzer
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getUnzerSDK(string $customerType = '', string $currency = '', $type = false): Unzer
+    public function getUnzerSDK(string $customerType = '', string $currency = '', bool $type = false): Unzer
     {
         if ($customerType != '' && $currency != '') {
             return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency, $type);
@@ -69,10 +72,17 @@ class UnzerSDKLoader
      * Relevant for PaylaterInvoice. If $customerType or $currency is empty, the regular key is used.
      * @param string $customerType
      * @param string $currency
+     * @param bool $type
      * @return Unzer
+     *
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function getUnzerSDKbyCustomerTypeAndCurrency(string $customerType, string $currency, $type = false): Unzer
-    {
+    public function getUnzerSDKbyCustomerTypeAndCurrency(
+        string $customerType,
+        string $currency,
+        bool $type = false
+    ): Unzer {
         if ($customerType == '' || $currency == '') {
             return $this->getUnzerSDK();
         }
