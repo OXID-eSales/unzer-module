@@ -20,6 +20,7 @@ use Exception;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class ModuleSettings
 {

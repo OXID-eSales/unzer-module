@@ -257,8 +257,9 @@ class Transaction
             'traceid'  => $unzerPayment->getTraceId()
         ];
         $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-        if ($savePayment === "1") {
-            $typeId = $unzerPayment->getPaymentType()->getId();
+        $paymentType = $unzerPayment->getPaymentType();
+        if ($savePayment === "1" && $paymentType) {
+            $typeId = $paymentType->getId();
             $params['paymenttypeid'] = $typeId;
         }
         $initialTransaction = $unzerPayment->getInitialTransaction();
@@ -282,25 +283,29 @@ class Transaction
     protected function getUnzerChargeData(Charge $unzerCharge): array
     {
         $customerId = '';
+        $typeId = '';
+        /** @var Payment $payment */
         $payment = $unzerCharge->getPayment();
-        if (is_object($payment)) {
+        if ($payment) {
+            /** @var Customer $customer */
             $customer = $payment->getCustomer();
-            if (is_object($customer)) {
+            if ($customer) {
                 $customerId = $customer->getId();
             }
+            $paymentType = $payment->getPaymentType();
+            $typeId = $paymentType ? $paymentType->getId() : '';
         }
-        $typeId = $unzerCharge->getPayment()->getPaymentType()->getId();
 
         return [
-            'amount'     => $unzerCharge->getAmount(),
-            'currency'   => $unzerCharge->getCurrency(),
-            'typeid'     => $unzerCharge->getId(),
-            'paymenttypeid'     => $typeId,
-            'oxaction'   => 'charged',
-            'customerid' => $customerId,
-            'traceid'    => $unzerCharge->getTraceId(),
-            'shortid'    => $unzerCharge->getShortId(),
-            'status'     => $this->getUzrStatus($unzerCharge),
+            'amount'        => $unzerCharge->getAmount(),
+            'currency'      => $unzerCharge->getCurrency(),
+            'typeid'        => $unzerCharge->getId(),
+            'paymenttypeid' => $typeId,
+            'oxaction'      => 'charged',
+            'customerid'    => $customerId,
+            'traceid'       => $unzerCharge->getTraceId(),
+            'shortid'       => $unzerCharge->getShortId(),
+            'status'        => self::getUzrStatus($unzerCharge),
         ];
     }
 
