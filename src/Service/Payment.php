@@ -241,6 +241,7 @@ class Payment
      */
     public function getSessionUnzerPayment($paymentExtension = null, $currency = null): ?\UnzerSDK\Resources\Payment
     {
+        $result = null;
         $paymentId = $this->session->getVariable('PaymentId');
         if (is_string($paymentId)) {
             /** @var string $sessionOrderId */
@@ -259,10 +260,16 @@ class Payment
                     }
                 }
             }
-            return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
+            try {
+                $result = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
+            } catch (UnzerApiException $e) {
+                Registry::getLogger()->warning(
+                    'Payment not found with key: ' . $paymentId
+                );
+            }
         }
 
-        return null;
+        return $result;
     }
 
     /**
