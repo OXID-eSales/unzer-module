@@ -75,7 +75,6 @@ class Transaction
         ?Payment $unzerPayment,
         ?Shipment $unzerShipment = null
     ): bool {
-        $transaction = $this->getNewTransactionObject();
 
         $oOrder = oxNew(Order::class);
         $oOrder->load($orderid);
@@ -106,13 +105,7 @@ class Transaction
             }
         }
 
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = $this->prepareTransactionOxid($params);
-        if (!$transaction->load($oxid)) {
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
+        if ($this->saveTransaction($params)) {
             $this->deleteInitOrder($params);
 
             // Fallback: set ShortID as OXTRANSID
@@ -148,8 +141,6 @@ class Transaction
      */
     public function writeCancellationToDB(string $orderid, string $userId, ?Cancellation $unzerCancel): bool
     {
-        $transaction = $this->getNewTransactionObject();
-
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
@@ -161,19 +152,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
         }
 
-
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = $this->prepareTransactionOxid($params);
-        if (!$transaction->load($oxid)) {
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
-
-            return true;
-        }
-
-        return false;
+        return $this->saveTransaction($params);
     }
 
     /**
@@ -185,8 +164,6 @@ class Transaction
      */
     public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
     {
-        $transaction = $this->getNewTransactionObject();
-
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
@@ -198,18 +175,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
         }
 
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = $this->prepareTransactionOxid($params);
-        if (!$transaction->load($oxid)) {
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
-
-            return true;
-        }
-
-        return false;
+        return $this->saveTransaction($params);
     }
 
     /**
@@ -225,6 +191,28 @@ class Transaction
         /** @var string $jsonEncode */
         $jsonEncode = json_encode($params);
         return md5($jsonEncode);
+    }
+
+    protected function saveTransaction(array $params): bool
+    {
+        $result = false;
+
+        $transaction = $this->getNewTransactionObject();
+
+        //check if metadata exists
+        $params['metadata'] = $params['metadata'] ?? json_encode('', JSON_THROW_ON_ERROR);
+
+        // building oxid from unique index columns
+        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
+        $oxid = $this->prepareTransactionOxid($params);
+        if (!$transaction->load($oxid)) {
+            $transaction->assign($params);
+            $transaction->setId($oxid);
+            $transaction->save();
+
+            $result = true;
+        }
+        return $result;
     }
 
     /**
