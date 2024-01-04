@@ -18,7 +18,6 @@ use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
-use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -55,6 +54,9 @@ class OrderController extends OrderController_parent
     {
         $lang = Registry::getLang();
 
+        $basketHashBefore = $this->getBasketHash();
+        Registry::getSession()->setVariable('unzerBasketHashBefore', $basketHashBefore);
+
         /** @var int $iLang */
         $iLang = $lang->getBaseLanguage();
         $sLang = $lang->getLanguageAbbr($iLang);
@@ -66,6 +68,7 @@ class OrderController extends OrderController_parent
         $this->_aViewData['uzrcurrency'] = $this->getActCurrency();
         ;
         $this->getSavedPayment();
+
         return parent::render();
     }
 
@@ -123,7 +126,6 @@ class OrderController extends OrderController_parent
             $nextStep = $this->_getNextStep($iSuccess);
 
             $unzerService = $this->getServiceFromContainer(Unzer::class);
-            Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
             if ('thankyou' === $nextStep) {
                 // commit transaction and proceeding to next view
@@ -278,6 +280,7 @@ class OrderController extends OrderController_parent
 
     /**
      * execute Unzer defined via getExecuteFnc
+     * @throws \JsonException
      */
     public function executeoscunzer(): ?string
     {
@@ -287,6 +290,17 @@ class OrderController extends OrderController_parent
 
         if (!$this->_validateTermsAndConditions()) {
             $this->_blConfirmAGBError = true;
+            return null;
+        }
+
+        // validate Basket
+        $basketHashAfter = $this->getBasketHash();
+        $basketHashBefore = Registry::getSession()->getVariable('unzerBasketHashBefore');
+
+        if ($basketHashBefore !== $basketHashAfter) {
+            Registry::getUtilsView()->addErrorToDisplay(
+                Registry::getLang()->translateString('oscunzer_ERROR_CHANGE_BASKET')
+            );
             return null;
         }
 
@@ -366,5 +380,21 @@ class OrderController extends OrderController_parent
             );
         }
         return $result;
+    }
+
+    protected function getBasketHash(): string
+    {
+        $oBasket = $this->getBasket();
+        if (!$oBasket) {
+            return '';
+        }
+        $oBasket->calculateBasket();
+        $oBasket->onUpdate();
+        $basketSummery = $oBasket->getBasketSummary();
+        $basketContents = $oBasket->getContents();
+        return md5(
+            serialize($basketSummery) .
+            serialize($basketContents)
+        );
     }
 }
