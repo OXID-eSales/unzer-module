@@ -7,10 +7,12 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -299,7 +301,10 @@ class OrderController extends OrderController_parent
 
         if ($basketHashBefore !== $basketHashAfter) {
             Registry::getUtilsView()->addErrorToDisplay(
-                Registry::getLang()->translateString('oscunzer_ERROR_CHANGE_BASKET')
+                oxNew(
+                    StandardException::class,
+                    Registry::getLang()->translateString('oscunzer_ERROR_CHANGE_BASKET')
+                )
             );
             return null;
         }
@@ -384,6 +389,7 @@ class OrderController extends OrderController_parent
 
     protected function getBasketHash(): string
     {
+        /** @var ?Basket $oBasket */
         $oBasket = $this->getBasket();
         if (!$oBasket) {
             return '';
