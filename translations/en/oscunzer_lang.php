@@ -115,5 +115,14 @@ $aLang = [
     'OSCUNZER_PAYMENT_METHOD_SEPA-SECURED' => 'SEPA Direct Debit with Unzer',
     'OSCUNZER_PAYMENT_METHOD_SOFORT' => 'Sofort',
     'OSCUNZER_PAYMENT_METHOD_WECHATPAY' => 'WeChat Pay',
-
+    'OSCUNZER_SAVED_PAYMENTS' => 'Saved Payments',
+    'OSCUNZER_SAVE_PAYMENT' => ' Save Payment / New Payment',
+    'OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS' => 'No saved Payments',
+    'OSCUNZER_BRAND' => 'Brand',
+    'OSCUNZER_HOLDER' => 'Holder',
+    'OSCUNZER_IBAN' => 'IBAN',
+    'OSCUNZER_CARD_NUMBER' => 'Card Number',
+    'OSCUNZER_EXPIRY_DATE' => 'Expiry Date',
+    'OSCUNZER_DELETE' => 'Delete',
+    'OSCUNZER_REMOVE_PAYMENT' => 'Delete Payment?',
 ];

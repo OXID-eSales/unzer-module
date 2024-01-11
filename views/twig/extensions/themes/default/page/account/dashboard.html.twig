@@ -1,0 +1,14 @@
+{% extends "page/account/dashboard.html.twig" %}
+{% block account_dashboard_col1 %}
+    <div class="col mb-3">
+        <div class="card card-lg h-100">
+            <h4 class="card-header card-title">{{ translate({ ident: "OSCUNZER_SAVED_PAYMENTS" }) }}</h4>
+            <div class="card-body">
+
+                <a class="btn btn-outline-primary stretched-link" href="{{ seo_url({ ident: oViewConf.getSslSelfLink()|cat("cl=unzer_saved_payments") }) }}">
+                    {{ translate({ ident: "MORE" }) }}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
+{% if oView.getPaymentSaveSetting() %}
+    <div class="savedpayment">
+        <form id="payment-saved-cards" class="unzerUI form" novalidate>
+            {% for type, setting in unzerPaymentType %}
+            {% if type == 'paypal' %}
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">{{ translate({ ident: "EMAIL" }) }}</th>
+                    <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set counter = 0 %}
+
+                {% for paymenttypeid, paymentType in setting %}
+                    <tr>
+                        <th scope="row">{{ paymentType.email }}</th>
+                        <td>{{ type }}</td>
+                        <td>
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+
+                </tbody>
+            </table>
+
+
+            {% endif %}
+            {% endfor %}
+            {% if oView.getPaymentSaveSetting() %}
+            <div id="payment-sepa-confirm">
+                <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
+                    <input id="oscunzersavepayment" type="checkbox" name="oscunzersavepayment" value="0" style="-webkit-appearance: checkbox">
+                    <label for="oscunzersavepayment">
+                        {{ translate({ ident: "OSCUNZER_SAVE_PAYMENT" }) }}
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+
+    {% if false %}
+    <script>
+        {% endif %}
+{% capture assign = "unzerPaypalJS" %}
+        function executeUnzerPayment(event){
+
+            event.stopPropagation();
+            $( "#payment-saved-cards" ).submit();
+        }
+        // Handling payment form submission
+        $( "#payment-saved-cards" ).submit(function( event ) {
+            event.preventDefault();
+            let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
+            let paymentData = {
+                id: selectedPaymentTypeId,
+                resources: {
+                    typeId: selectedPaymentTypeId
+                }
+            };
+            let paymentDataString = JSON.stringify(paymentData);
+
+            let hiddenInput = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'paymentData')
+                .val(paymentDataString);
+            let hiddenInput1 = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'oscunzersavepayment')
+                .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+
+            $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).append(hiddenInput1).submit();
+        });
+{% endcapture %}
+    {% if false %}
+    </script>
+    {% endif %}
+    {{ script({ add: unzerPaypalJS, dynamic: __oxid_include_dynamic }) }}
+    {% endif %}

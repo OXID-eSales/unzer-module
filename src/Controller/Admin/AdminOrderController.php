@@ -69,8 +69,13 @@ class AdminOrderController extends AdminDetailsController
 
         $this->_aViewData["sOxid"] = $this->getEditObjectId();
 
+        /** @var Order $oOrder */
+        $oOrder = $this->getEditObject();
         $transactionList = oxNew(TransactionList::class);
-        $transactionList->getTransactionList($this->getEditObjectId());
+        $transactionList->getTransactionList(
+            $this->getEditObjectId(),
+            $oOrder->getFieldData('OXTRANSID')
+        );
         if ($transactionList->count()) {
             $this->_aViewData['oUnzerTransactions'] = $transactionList;
         }

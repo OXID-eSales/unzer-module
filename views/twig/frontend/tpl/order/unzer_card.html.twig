@@ -1,24 +1,82 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
+{% if unzerPaymentType %}
+<div class="savedpayment">
+    {% for type, setting in unzerPaymentType %}
+    {% if type != 'paypal' and type != 'sepa' %}
+    <form id="payment-saved-cards" class="unzerUI form" novalidate>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</th>
+                <th scope="col">{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</th>
+                <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = 0 %}
 
-<form id="payment-form-card" class="unzerUI form" novalidate>
-    <div class="field">
-        <div id="card-element-id-number" class="unzerInput">
-            <!-- Card number UI Element will be inserted here. -->
-        </div>
-    </div>
-    <div class="two fields">
-        <div class="field ten wide">
-            <div id="card-element-id-expiry" class="unzerInput">
-                <!-- Card expiry date UI Element will be inserted here. -->
+
+            {% for paymenttypeid, paymentType in setting %}
+                <tr>
+                    <th scope="row">{{ paymentType.number }}</th>
+                    <td>{{ paymentType.expiryDate }}</td>
+                    <td>{{ type }}</td>
+
+                    <td>
+                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
+                    </td>
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+    </form>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+</div>
+{% if unzerPaymentType != false  %}
+<br>
+    <label>
+        <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue Kreditkarte
+    </label>
+{% endif %}
+<div id="newcc" style="display:none;" class="card-body">
+    <form id="payment-form-card" class="unzerUI form" novalidate>
+
+        <div class="field">
+            <div id="card-element-id-number" class="unzerInput">
+                <!-- Card number UI Element will be inserted here. -->
             </div>
         </div>
-        <div class="field six wide">
-            <div id="card-element-id-cvc" class="unzerInput">
-                <!-- Card CVC UI Element will be inserted here. -->
+        <div class="two fields">
+            <div class="field ten wide">
+                <div id="card-element-id-expiry" class="unzerInput">
+                    <!-- Card expiry date UI Element will be inserted here. -->
+                </div>
+            </div>
+            <div class="field six wide">
+                <div id="card-element-id-cvc" class="unzerInput">
+                    <!-- Card CVC UI Element will be inserted here. -->
+                </div>
+            </div>
+
+        </div>
+        {% if oView.getPaymentSaveSetting() %}
+        <div id="payment-sepa-confirm">
+            <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
+                <input id="oscunzersavepayment" type="checkbox" name="oscunzersavepayment" value="0" style="-webkit-appearance: checkbox">
+                <label for="oscunzersavepayment">
+                    {{ translate({ ident: "OSCUNZER_SAVE_PAYMENT" }) }}
+                </label>
             </div>
         </div>
-    </div>
-</form>
+        {% endif %}
+
+    </form>
+</div>
 <style>
     .unzerUI.form .field.error .compact.error.message:not(:empty), .unzerUI.form .fields.error .field .compact.error.message:not(:empty){
         line-height: 100%;
@@ -28,22 +86,87 @@
 {% if false %}<script>{% endif %}
 {% capture assign = "unzerCardJS" %}
     function executeUnzerPayment(event){
+        if (!Card) {
+            let Card = unzerInstance.Card();
+        }
         event.stopPropagation();
         document.querySelector( "#payment-form-card" ).requestSubmit();
     }
-
-    document.querySelector( '#orderConfirmAgbBottom' ).addEventListener('submit', function( event ) {
-        if(!document.querySelector( '#orderConfirmAgbBottom' ).classList.contains("submitable")){
-            event.preventDefault();
-            document.querySelector( "#payment-form-card" ).requestSubmit();
-        }
-    });
-
-    // Create an Unzer instance with your public key
     let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
-
-    // Create a Card instance and render the input fields
     let Card = unzerInstance.Card();
+    if ($('input[name="newccard"]').length === 0) {
+
+        $('#orderConfirmAgbBottom').addClass('new-card-selected');
+        $('#newcc').show();
+        addPaymentElements(Card);
+    } else     {
+        $('input[name="newccard"]').on('change', function() {
+
+            if ($(this).prop('checked')) {
+                $('.savedpayment').fadeOut();
+                $('input[name="paymenttypeid"]').prop('checked', false);
+
+                $('#newcc').fadeIn();
+                // Create a Card instance and render the input fields
+                addPaymentElements(Card);
+            } else {
+                $('.savedpayment').fadeIn();
+                // Neue Kreditkarte ausblenden
+                $('#newcc').fadeOut();
+                removeCardElements();
+                if (Card && Card.destroy) {
+                    Card.destroy();
+                }
+            }
+        });
+    }
+    $( "#payment-form-card" ).on('submit', function( event ) {
+        event.preventDefault();
+        var checkedInput = $('input[name=paymenttypeid]:checked');
+        if (checkedInput.length > 0) {
+            // saved Payment
+            let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
+            let paymentData = {
+                id: selectedPaymentTypeId
+            };
+            let paymentDataString = JSON.stringify(paymentData);
+            let hiddenInput = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'paymentData')
+                .val(paymentDataString);
+            $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).submit();
+        }
+        Card.createResource()
+            .then(function(result) {
+                    //new payment
+                    let hiddenInput = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'paymentData')
+                        .val(JSON.stringify(result));
+                    let hiddenInput2 = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'oscunzersavepayment')
+                        .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+                    $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).append(hiddenInput2).submit();
+            })
+            .catch(function(error) {
+                console.log('error'+ error.message)
+
+                $('html, body').animate({
+                    scrollTop: $("#orderPayment").offset().top - 150
+                }, 350);
+
+                errorField = $("#card-element-id-number");
+                errorField.find('div').first().addClass('error');
+                errorEl = errorField.find('div.error.message');
+                errorEl.css('display', 'inline-block');
+                errorEl.text(error.message);
+
+                $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+            })
+    });
+function addPaymentElements(Card) {
+    // Clear the contents of the Card-Element containers
     Card.create('number', {
         containerId: 'card-element-id-number',
         onlyIframe: false
@@ -57,32 +180,14 @@
         onlyIframe: false
     });
 
-    document.querySelector( "#payment-form-card" ).addEventListener('submit', function( event ) {
-        event.preventDefault();
-        Card.createResource()
-            .then(function(result) {
-                let hiddenInput = document.createElement('input');
-                hiddenInput.setAttribute('type', 'hidden');
-                hiddenInput.setAttribute('name', 'paymentData');
-                hiddenInput.value = JSON.stringify(result);
-                document.querySelector('#orderConfirmAgbBottom').append(hiddenInput);
+}
+    function removeCardElements() {
+        // Clear the contents of the Card-Element containers
+        $('#card-element-id-number').empty();
+        $('#card-element-id-expiry').empty();
+        $('#card-element-id-cvc').empty();
 
-                document.querySelector('#orderConfirmAgbBottom' ).classList.add("submitable");
-                document.querySelector("#orderConfirmAgbBottom" ).submit();
-            })
-            .catch(function(error) {
-                document.querySelector('html, body').animate({
-                    scrollTop: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY  - 150
-                }, 350);
-
-                errorField = document.querySelector("#card-element-id-number");
-                errorField.querySelectorAll("div").item(0).classList.add('error');
-                errorEl = errorField.querySelector("div.error.message");
-                errorEl.setAttribute("style", "display: inline-block");
-                errorEl.innerHTML = error.message;
-            })
-    });
-
+    }
 {% endcapture %}
 {% if false %}</script>{% endif %}
 {{ script({ add: unzerCardJS, dynamic: __oxid_include_dynamic }) }}

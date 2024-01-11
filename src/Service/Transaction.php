@@ -246,7 +246,11 @@ class Transaction
             'oxaction' => $oxaction,
             'traceid'  => $unzerPayment->getTraceId()
         ];
-
+        $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+        if ($savePayment === "1") {
+            $typeId = $unzerPayment->getPaymentType()->getId();
+            $params['paymenttypeid'] = $typeId;
+        }
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
             $initialTransaction->getShortId() :
@@ -275,15 +279,17 @@ class Transaction
                 $customerId = $customer->getId();
             }
         }
+        $typeId = $unzerCharge->getPayment()->getPaymentType()->getId();
         return [
-            'amount'     => $unzerCharge->getAmount(),
-            'currency'   => $unzerCharge->getCurrency(),
-            'typeid'     => $unzerCharge->getId(),
-            'oxaction'   => 'charged',
-            'customerid' => $customerId,
-            'traceid'    => $unzerCharge->getTraceId(),
-            'shortid'    => $unzerCharge->getShortId(),
-            'status'     => $this->getUzrStatus($unzerCharge),
+            'amount'            => $unzerCharge->getAmount(),
+            'currency'          => $unzerCharge->getCurrency(),
+            'typeid'            => $unzerCharge->getId(),
+            'paymenttypeid'     => $typeId,
+            'oxaction'          => 'charged',
+            'customerid'        => $customerId,
+            'traceid'           => $unzerCharge->getTraceId(),
+            'shortid'           => $unzerCharge->getShortId(),
+            'status'            => $this->getUzrStatus($unzerCharge),
         ];
     }
 

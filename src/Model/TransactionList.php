@@ -22,17 +22,23 @@ class TransactionList extends ListModel
     /**
      * @return void
      */
-    public function getTransactionList(string $orderId)
+    public function getTransactionList(string $orderId, $shortId = null)
     {
         $oListObject = $this->getBaseObject();
         $sFieldList = $oListObject->getSelectFields();
 
         $shopId = Registry::getConfig()->getShopId();
-
-        $params = [':shopid' => $shopId, ':orderid' => $orderId];
-
-        $query = "select $sFieldList from " . $oListObject->getViewName() . "
+        if ($shortId === null) {
+            $params = [':shopid' => $shopId, ':orderid' => $orderId];
+            $query = "select $sFieldList from " . $oListObject->getViewName() . "
             where oxshopid = :shopid and oxorderid = :orderid order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
+
+        } else {
+            $params = [':shopid' => $shopId, ':orderid' => $orderId, ':shortid' => $shortId];
+            $query = "select $sFieldList from " . $oListObject->getViewName() . "
+            where oxshopid = :shopid and oxorderid = :orderid
+            and shortid = :shortid order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
+        }
 
         $this->selectString($query, $params);
     }

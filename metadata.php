@@ -8,7 +8,7 @@
 /**
  * Metadata version
  */
-
+use OxidSolutionCatalysts\Unzer\Controller\AccountSavedPaymentController;
 use OxidSolutionCatalysts\Unzer\Model\DiscountList;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
@@ -75,6 +75,7 @@ $aModule = [
         'unzer_dispatcher' => DispatcherController::class,
         'unzer_installment' => InstallmentController::class,
         'unzer_applepay_callback' => ApplePayCallbackController::class,
+        'unzer_saved_payments' => AccountSavedPaymentController::class,
     ],
     'templates' => [
         // admin
@@ -83,6 +84,7 @@ $aModule = [
         // frontend
         '@osc-unzer/frontend/tpl/order/unzer_assets' =>                    'views/smarty/frontend/tpl/order/unzer_assets.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_card' =>                      'views/smarty/frontend/tpl/order/unzer_card.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_paypal' =>                    'views/smarty/frontend/tpl/order/unzer_paypal.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_eps_charge' =>                'views/smarty/frontend/tpl/order/unzer_eps_charge.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_installment' =>               'views/smarty/frontend/tpl/order/unzer_installment.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_installment_confirm' =>       'views/smarty/frontend/tpl/order/unzer_installment_confirm.tpl',
@@ -100,6 +102,7 @@ $aModule = [
         '@osc-unzer/frontend/tpl/payment/applepay_availibility_check' =>   'views/smarty/frontend/tpl/payment/applepay_availibility_check.tpl',
         '@osc-unzer/frontend/tpl/payment/payment_unzer' =>                 'views/smarty/frontend/tpl/payment/payment_unzer.tpl',
         '@osc-unzer/frontend/tpl/order/applepay_button' =>                 'views/smarty/frontend/tpl/order/applepay_button.tpl',
+        '@osc-unzer/frontend/tpl/account/account_saved_payments' =>        'views/smarty/frontend/tpl/account/account_saved_payments.tpl',
     ],
     'blocks' => [
         //frontend
@@ -129,6 +132,11 @@ $aModule = [
             'template' => 'page/checkout/payment.tpl',
             'block' => 'select_payment',
             'file' => 'views/smarty/frontend/blocks/page/checkout/select_payment.tpl'
+        ],
+        [
+            'template' => 'page/account/inc/account_menu.tpl',
+            'block' => 'account_menu',
+            'file' => 'views/smarty/frontend/blocks/page/account/inc/account_menu.tpl'
         ],
         //admin
         [

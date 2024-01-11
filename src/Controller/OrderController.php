@@ -20,9 +20,11 @@ use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
  * TODO: Decrease count of dependencies to 13
@@ -61,6 +63,7 @@ class OrderController extends OrderController_parent
         $unzer = $this->getServiceFromContainer(Unzer::class);
         $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();
         $this->_aViewData['uzrcurrency'] = $this->getActCurrency();
+        $this->getSavedPayment();
         return parent::render();
     }
 
@@ -238,6 +241,22 @@ class OrderController extends OrderController_parent
     }
 
     /**
+     * @return int|mixed
+     */
+    public function getPaymentSaveSetting()
+    {
+        $bSavedPayment = 1;
+
+        // no guests allowed
+        $user = $this->getUser();
+        $passwordField = 'oxuser__oxpassword';
+        if (!$user || (!$user->$passwordField->value)) {
+            $bSavedPayment = 0;
+            return $bSavedPayment;
+        }
+        return $bSavedPayment;
+    }
+    /**
      * @return array
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
@@ -297,5 +316,49 @@ class OrderController extends OrderController_parent
             return 'executeoscunzer';
         }
         return parent::getExecuteFnc();
+    }
+
+    protected function getSavedPayment()
+    {
+        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
+        $unzerSDK = $UnzerSdk->getUnzerSDK();
+
+        $ids = $this->getTrancactionIds();
+        $paymentTypes = false;
+        if ($ids) {
+            foreach ($ids as $typeId) {
+                if (!empty($typeId['PAYMENTTYPEID'])) {
+                    try {
+                        $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
+                    } catch (UnzerApiException $e) {
+                        continue;
+                    }
+
+                    if (strpos($typeId['PAYMENTTYPEID'], 'crd')) {
+                        $paymentTypes['card'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    }
+                    if (strpos($typeId['PAYMENTTYPEID'], 'ppl')) {
+                        $paymentTypes['paypal'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    }
+                    if (strpos($typeId['PAYMENTTYPEID'], 'sdd')) {
+                        $paymentTypes['sepa'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    }
+                }
+            }
+        }
+
+        $this->_aViewData['unzerPaymentType'] = $paymentTypes;
+
+
+    }
+
+    protected function getTrancactionIds() {
+        if ($this->getUser()->getId() !== null) {
+            $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
+            $rowSelect = $oDB->getAll("SELECT PAYMENTTYPEID from oscunzertransaction
+                            where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL GROUP BY PAYMENTTYPEID ", [':oxuserid' => $this->getUser()->getId()]);
+            return $rowSelect;
+        }
+        return false;
     }
 }

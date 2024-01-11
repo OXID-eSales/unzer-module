@@ -1,0 +1,134 @@
+{% set template_title = "MY_ACCOUNT"|translate %}
+{% capture append = "oxidBlock_content" %}
+<div class="container-xxl py-5">
+    <div class="row">
+        <div class="page-header col pl-0 ml-3">
+            <h3>{{ translate({ ident: "OSCUNZER_SAVED_PAYMENTS" }) }}</h3>
+        </div>
+    </div>
+
+
+    {% if unzerPaymentType != false  %}
+    {% for type, setting in unzerPaymentType %}
+    {% if type != 'paypal' and type != 'sepa' %}
+        {% set counter = 0 %}
+
+        {% for paymenttypeid, paymentType in setting %}
+        <div class="card card-lg mb-3">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-3">
+                        <strong>{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</strong>
+                        <span>>{{ paymentType.number }}</span>
+                    </div>
+                    <div class="col-3">
+                        <strong>{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</strong>
+                        <span>
+                                    <span>{{ paymentType.expiryDate }}</span>
+                        </span>
+                    </div>
+                    <div class="col-3">
+                        <strong>{{ translate({ ident: "OSCUNZER_BRAND" }) }}</strong>
+                        <span>{{ type }}</span>
+                    </div>
+                    <div class="col-3">
+                        <strong>{{ translate({ ident: "OSCUNZER_REMOVE_PAYMENT" }) }}</strong>
+                        <form name="uzr" id="uzr_collect" action="{{ oViewConf.getSelfLink() }}" method="post">
+                            <input type="hidden" name="cl" value="unzer_saved_payments">
+                            <input type="hidden" name="fnc" value="deletePayment">
+                            <input type="hidden" name="paymenttypeid" value="{{ paymenttypeid }}">
+                            <button type="submit" class="btn btn-outline-primary stretched-link">{{ translate({ ident: "OSCUNZER_DELETE" }) }}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% if type == 'paypal' %}
+        {% set counter = 0 %}
+
+        {% for paymenttypeid, paymentType in setting %}
+        <div class="card card-lg mb-3">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-3">
+                        <strong>{{ translate({ ident: "EMAIL" }) }}</strong>
+                        <span id="accOrderDate_25">>{{ paymentType.email }}</span>
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <strong>{{ translate({ ident: "OSCUNZER_BRAND" }) }}</strong>
+                        <span>
+                                    <span>{{ type }}</span>
+                        </span>
+                    </div>
+                    <div class="col-3">
+                        <strong>{{ translate({ ident: "OSCUNZER_REMOVE_PAYMENT" }) }}</strong>
+                        <form name="uzr" id="uzr_collect" action="{{ oViewConf.getSelfLink() }}" method="post">
+                            <input type="hidden" name="cl" value="unzer_saved_payments">
+                            <input type="hidden" name="fnc" value="deletePayment">
+                            <input type="hidden" name="paymenttypeid" value="{{ paymenttypeid }}">
+                            <button type="submit" class="btn btn-outline-primary stretched-link">{{ translate({ ident: "OSCUNZER_DELETE" }) }}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% if type == 'sepa' %}
+        {% set counter = 0 %}
+
+        {% for paymenttypeid, paymentType in setting %}
+            <div class="card card-lg mb-3">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-3">
+                            <strong>{{ translate({ ident: "OSCUNZER_HOLDER" }) }}</strong>
+                            <span>>{{ paymentType.holder }}</span>
+                        </div>
+                        <div class="col-3"></div>
+                        <div class="col-3">
+                            <strong>{{ translate({ ident: "OSCUNZER_IBAN" }) }}</strong>
+                        <span>
+                            <span>{{ paymentType.iban }}</span>
+                        </span>
+                        </div>
+                        <div class="col-3">
+                            <strong>{{ translate({ ident: "OSCUNZER_REMOVE_PAYMENT" }) }}</strong>
+                            <form name="uzr" id="uzr_collect" action="{{ oViewConf.getSelfLink() }}" method="post">
+                                <input type="hidden" name="cl" value="unzer_saved_payments">
+                                <input type="hidden" name="fnc" value="deletePayment">
+                                <input type="hidden" name="paymenttypeid" value="{{ paymenttypeid }}">
+                                <button type="submit" class="btn btn-outline-primary stretched-link">{{ translate({ ident: "OSCUNZER_DELETE" }) }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <p>{{ translate({ ident: "OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS" }) }}</p>
+
+    {% endif %}
+</div>
+    {% endcapture %}
+<div class="container-xxl py-5">
+    <div class="row">
+        <h3 class="page-header col pl-0 ml-3">
+            {{ translate({ ident: "NEWSLETTER_SETTINGS" }) }}
+        </h3>
+    </div>
+
+</div>
+
+{{ insert_tracker({title: template_title}) }}
+{% include "layout/page.html.twig" %}
+
+
+
+
+

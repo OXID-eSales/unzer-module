@@ -53,6 +53,8 @@
         {% include "@osc-unzer/frontend/tpl/order/unzer_sepa.html.twig" %}
     {% elseif sPaymentID == "oscunzer_sepa - secured" %}
         {% include "@osc-unzer/frontend/tpl/order/unzer_sepa_secured.html.twig" %}
+    {% elseif sPaymentID == "oscunzer_paypal" %}
+        {% include "@osc-unzer/frontend/tpl/order/unzer_paypal.html.twig" %}
     {% elseif sPaymentID == "oscunzer_installment_paylater" %}
         {% include "@osc-unzer/frontend/tpl/order/unzer_installment_paylater.html.twig" %}
     {% endif %}

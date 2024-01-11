@@ -13,6 +13,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Service\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
@@ -102,6 +103,14 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     ): bool {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
+        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Paypal) {
+            $paymentData = $request->getRequestParameter('paymentData');
+            $aPaymentData = json_decode($paymentData,true);
+            if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
+                $paymentType->setId($aPaymentData['id']);
+
+            }
+        }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
 
@@ -132,6 +141,19 @@ abstract class UnzerPayment implements UnzerPaymentInterface
 
         if ($request->getRequestParameter('birthdate')) {
             $userModel->save();
+        }
+
+        $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+
+        if ($savePayment === "1" && $userModel->getId()) {
+            $transactionService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Transaction::class);
+            $payment = $this->getServiceFromContainer(Payment::class)->getSessionUnzerPayment();
+            try {
+                $transactionService->writeTransactionToDB(Registry::getSession()->getSessionChallengeToken(), $userModel->getId(), $payment);
+            } catch (Exception $e) {
+                Registry::getLogger()->info(
+                    'Could not save Transaction for PaymentID (savePayment): '.$e->getMessage());
+            }
         }
 
         return true;
