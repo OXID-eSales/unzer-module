@@ -19,6 +19,8 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -246,10 +248,10 @@ class Transaction
             'oxaction' => $oxaction,
             'traceid'  => $unzerPayment->getTraceId()
         ];
-        $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-        if ($savePayment === "1") {
-            $typeId = $unzerPayment->getPaymentType()->getId();
-            $params['paymenttypeid'] = $typeId;
+        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+        $paymentType = $unzerPayment->getPaymentType();
+        if ($savePayment === "1" && $paymentType instanceof BasePaymentType) {
+            $params['paymenttypeid'] = $paymentType->getId();
         }
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
@@ -271,15 +273,10 @@ class Transaction
 
     protected function getUnzerChargeData(Charge $unzerCharge): array
     {
-        $customerId = '';
         $payment = $unzerCharge->getPayment();
-        if (is_object($payment)) {
-            $customer = $payment->getCustomer();
-            if (is_object($customer)) {
-                $customerId = $customer->getId();
-            }
-        }
-        $typeId = $unzerCharge->getPayment()->getPaymentType()->getId();
+        $customerId = $payment?->getCustomer()?->getId();
+        $typeId = $payment?->getPaymentType()?->getId();
+
         return [
             'amount'            => $unzerCharge->getAmount(),
             'currency'          => $unzerCharge->getCurrency(),

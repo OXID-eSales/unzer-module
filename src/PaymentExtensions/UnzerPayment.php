@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Payment;
+use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
@@ -21,6 +22,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Interfaces\UnzerParentInterface;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Paypal as PayPalPaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
@@ -96,6 +98,8 @@ abstract class UnzerPayment implements UnzerPaymentInterface
      * @return bool
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @throws \JsonException
      */
     public function execute(
         User $userModel,
@@ -103,12 +107,12 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     ): bool {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
-        if ($paymentType instanceof \UnzerSDK\Resources\PaymentTypes\Paypal) {
+        if ($paymentType instanceof PayPalPaymentType) {
             $paymentData = $request->getRequestParameter('paymentData');
-            $aPaymentData = json_decode($paymentData,true);
+            $paymentData = is_string($paymentData) ? $paymentData: '';
+            $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
             if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
                 $paymentType->setId($aPaymentData['id']);
-
             }
         }
         /** @var string $companyType */
@@ -144,15 +148,21 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         }
 
         $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
 
         if ($savePayment === "1" && $userModel->getId()) {
-            $transactionService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Transaction::class);
+            $transactionService = $this->getServiceFromContainer(Transaction::class);
             $payment = $this->getServiceFromContainer(Payment::class)->getSessionUnzerPayment();
             try {
-                $transactionService->writeTransactionToDB(Registry::getSession()->getSessionChallengeToken(), $userModel->getId(), $payment);
+                $transactionService->writeTransactionToDB(
+                    Registry::getSession()->getSessionChallengeToken(),
+                    $userModel->getId(),
+                    $payment
+                );
             } catch (Exception $e) {
                 Registry::getLogger()->info(
-                    'Could not save Transaction for PaymentID (savePayment): '.$e->getMessage());
+                    'Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage()
+                );
             }
         }
 

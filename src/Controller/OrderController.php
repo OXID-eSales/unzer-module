@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
@@ -249,10 +250,9 @@ class OrderController extends OrderController_parent
 
         // no guests allowed
         $user = $this->getUser();
-        $passwordField = 'oxuser__oxpassword';
-        if (!$user || (!$user->$passwordField->value)) {
+        /** @var User $user */
+        if (!$user || (!$user->getFieldData('oxpassword'))) {
             $bSavedPayment = 0;
-            return $bSavedPayment;
         }
         return $bSavedPayment;
     }
@@ -318,7 +318,7 @@ class OrderController extends OrderController_parent
         return parent::getExecuteFnc();
     }
 
-    protected function getSavedPayment()
+    protected function getSavedPayment(): void
     {
         $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
         $unzerSDK = $UnzerSdk->getUnzerSDK();
@@ -348,17 +348,24 @@ class OrderController extends OrderController_parent
         }
 
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
-
-
     }
 
-    protected function getTrancactionIds() {
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    protected function getTrancactionIds(): array
+    {
+        $result = [];
         if ($this->getUser()->getId() !== null) {
             $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $rowSelect = $oDB->getAll("SELECT PAYMENTTYPEID from oscunzertransaction
-                            where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL GROUP BY PAYMENTTYPEID ", [':oxuserid' => $this->getUser()->getId()]);
-            return $rowSelect;
+            $result = $oDB->getAll(
+                "SELECT PAYMENTTYPEID from oscunzertransaction
+                     where OXUSERID = :oxuserid
+                       AND PAYMENTTYPEID IS NOT NULL
+                     GROUP BY PAYMENTTYPEID ",
+                [':oxuserid' => $this->getUser()->getId()]
+            );
         }
-        return false;
+        return $result;
     }
 }

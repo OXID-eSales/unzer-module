@@ -22,23 +22,27 @@ class TransactionList extends ListModel
     /**
      * @return void
      */
-    public function getTransactionList(string $orderId, $shortId = null)
+    public function getTransactionList(string $orderId, ?string $shortId = null): void
     {
         $oListObject = $this->getBaseObject();
         $sFieldList = $oListObject->getSelectFields();
 
         $shopId = Registry::getConfig()->getShopId();
-        if ($shortId === null) {
-            $params = [':shopid' => $shopId, ':orderid' => $orderId];
-            $query = "select $sFieldList from " . $oListObject->getViewName() . "
-            where oxshopid = :shopid and oxorderid = :orderid order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
 
-        } else {
-            $params = [':shopid' => $shopId, ':orderid' => $orderId, ':shortid' => $shortId];
-            $query = "select $sFieldList from " . $oListObject->getViewName() . "
-            where oxshopid = :shopid and oxorderid = :orderid
-            and shortid = :shortid order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
+        $params = [
+            ':shopid' => $shopId,
+            ':orderid' => $orderId
+        ];
+
+        if ($shortId) {
+            $params[':shortid'] = $shortId;
         }
+
+        $query = "select $sFieldList from " . $oListObject->getViewName() . "
+            where oxshopid = :shopid
+             and oxorderid = :orderid " .
+            ($shortId ? " and shortid = :shortid " : "") . "
+             order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
 
         $this->selectString($query, $params);
     }
