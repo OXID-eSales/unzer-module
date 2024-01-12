@@ -20,6 +20,7 @@ final class UnzerDefinitions
     public const GIROPAY_UNZER_PAYMENT_ID = 'oscunzer_giropay';
     public const IDEAL_UNZER_PAYMENT_ID = 'oscunzer_ideal';
     public const INSTALLMENT_UNZER_PAYMENT_ID = 'oscunzer_installment';
+    public const INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID = 'oscunzer_installment_paylater';
     public const INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice';
     public const OLD_INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice_old';
     public const PAYPAL_UNZER_PAYMENT_ID = 'oscunzer_paypal';
@@ -309,7 +310,34 @@ final class UnzerDefinitions
                 //self::CAN_REVERT_PARTIALLY,
             ],
         ],
-
+        self::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID => [
+            'descriptions' => [
+                'de' => [
+                    'desc' => 'Ratenkauf',
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Kauf auf Rechnung" style="float: left;margin-right: 10px;" />
+                        Bei dieser Methode zahlen Sie per Kauf auf Raten'
+                ],
+                'en' => [
+                    'desc' => 'Installment',
+                    'longdesc' => '',
+                    'longdesc_beta' => '<img src="https://a.storyblok.com/f/91629/x/e5b83d6129/unzer_invoice.svg"
+                        title="Invoice" style="float: left;margin-right: 10px;" />'
+                ]
+            ],
+            'active' => true,
+            'countries' => ['DE', 'AT', 'CH', 'NL'],
+            'currencies' => ['EUR', 'CHF'],
+            'constraints' => self::PAYMENT_CONSTRAINTS,
+            'abilities' => [
+                self::CAN_COLLECT_FULLY,
+                self::CAN_COLLECT_PARTIALLY,
+                self::CAN_REFUND_FULLY,
+                //self::CAN_REFUND_PARTIALLY,
+                //self::CAN_REVERT_PARTIALLY,
+            ],
+        ],
         //PayPal is one of the world’s most popular online payment systems.
         self::PAYPAL_UNZER_PAYMENT_ID => [
             'descriptions' => [

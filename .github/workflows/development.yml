@@ -24,7 +24,6 @@ on:
         default: '8.0'
         type: choice
         options:
-          - '8.0'
           - '8.1'
       mysql:
         description: 'MySQL version'
@@ -33,7 +32,6 @@ on:
         type: choice
         options:
           - '5.7.37'
-          - '8.0'
       template_engine:
         description: 'Template engine - smarty with flow theme, twig with twig theme'
         required: true

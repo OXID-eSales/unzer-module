@@ -106,7 +106,12 @@ class ModuleSettings
         $unzerPublicKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
         return $unzerPublicKey;
     }
-
+    public function getShopPublicKeyPaylater(): string
+    {
+        /** @var string $unzerPublicKey */
+        $unzerPublicKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
+        return $unzerPublicKey;
+    }
     /**
      * @return float
      */
@@ -144,7 +149,7 @@ class ModuleSettings
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
         if (
-            $paymentMethod === 'installment-secured' ||
+            $paymentMethod === 'installment-secured' || $paymentMethod === 'paylater-installment' ||
             $this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)
         ) {
             return self::PAYMENT_AUTHORIZE;
@@ -531,7 +536,15 @@ class ModuleSettings
         $unzerPubKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKeyB2CEUR');
         return $unzerPubKeyB2CEUR;
     }
-
+    /**
+     * @return string
+     */
+    private function getShopPublicKeyB2CInstallmentEUR(): string
+    {
+        /** @var string $unzerPubKeyB2CEUR */
+        $unzerPubKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPaylaterPublicKeyB2CEUR');
+        return $unzerPubKeyB2CEUR;
+    }
     /**
      * @return string
      */
@@ -542,6 +555,15 @@ class ModuleSettings
         return $unzerPrivKeyB2CEUR;
     }
 
+    /**
+     * @return string
+     */
+    private function getShopPrivateKeyB2CInstallmentEUR(): string
+    {
+        /** @var string $unzerPrivKeyB2CEUR */
+        $unzerPrivKeyB2CEUR = $this->getSettingValue($this->getSystemMode() . '-UnzerPaylaterPrivateKeyB2CEUR');
+        return $unzerPrivKeyB2CEUR;
+    }
     /**
      * @return string
      */
@@ -572,6 +594,25 @@ class ModuleSettings
         return $unzerPubKeyB2CCHF;
     }
 
+    /**
+     * @return string
+     */
+    private function getShopPublicKeyB2CInstallmentCHF(): string
+    {
+        /** @var string $unzerPubKeyB2CCHF */
+        $unzerPubKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPaylaterPublicKeyB2CCHF');
+        return $unzerPubKeyB2CCHF;
+    }
+
+    /**
+     * @return string
+     */
+    private function getShopPrivateKeyB2CInstallmentCHF(): string
+    {
+        /** @var string $unzerPrivKeyB2CCHF */
+        $unzerPrivKeyB2CCHF = $this->getSettingValue($this->getSystemMode() . '-UnzerPaylaterPrivateKeyB2CCHF');
+        return $unzerPrivKeyB2CCHF;
+    }
     /**
      * @return string
      */
@@ -631,6 +672,62 @@ class ModuleSettings
         return $result;
     }
 
+    /**
+     * @param string $customerType
+     * @return string
+     */
+    public function getShopPublicKeyInstallment(string $customerType = 'B2C'): string
+    {
+        $result = $this->getShopPublicKeyPaylater();
+
+        if ($this->isB2CInvoiceEligibility() && $customerType === 'B2C') {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPublicKeyB2CInstallmentCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPublicKeyB2CInstallmentEUR();
+            }
+        }
+        if ($this->isB2BInvoiceEligibility() && $customerType === 'B2B') {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPublicKeyB2BInvoiceCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPublicKeyB2BInvoiceEUR();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $customerType
+     * @return string
+     */
+    public function getShopPrivateKeyInstallment(string $customerType = 'B2C'): string
+    {
+        $result = $this->getShopPrivateKey();
+
+        if ($this->isB2CInvoiceEligibility() && $customerType === 'B2C') {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPrivateKeyB2CInstallmentCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPrivateKeyB2CInvoiceEUR();
+            }
+        }
+
+        if ($this->isB2BInvoiceEligibility() && $customerType === 'B2B') {
+            if ($this->isBasketCurrencyCHF()) {
+                $result = $this->getShopPrivateKeyB2BInvoiceCHF();
+            }
+            if ($this->isBasketCurrencyEUR()) {
+                $result = $this->getShopPrivateKeyB2BInvoiceEUR();
+            }
+        }
+
+        return $result;
+    }
     /**
      * @param string $customerType
      * @return string
@@ -699,7 +796,25 @@ class ModuleSettings
         }
         return $key;
     }
-
+    /**
+     * @param string $customerType
+     * @param string $currency
+     * @return string
+     */
+    public function getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(string $customerType, string $currency): string
+    {
+        $key = '';
+        if ($customerType == 'B2C' && $currency == 'EUR') {
+            $key = $this->getShopPrivateKeyB2CInstallmentEUR();
+        } elseif ($customerType == 'B2C' && $currency == 'CHF') {
+            $key = $this->getShopPrivateKeyB2CInstallmentCHF();
+        } elseif ($customerType == 'B2B' && $currency == 'EUR') {
+            $key = $this->getShopPrivateKeyB2BInvoiceEUR();
+        } elseif ($customerType == 'B2B' && $currency == 'CHF') {
+            $key = $this->getShopPrivateKeyB2BInvoiceCHF();
+        }
+        return $key;
+    }
     /**
      * @return bool
      */

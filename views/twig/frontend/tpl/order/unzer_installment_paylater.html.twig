@@ -1,0 +1,84 @@
+{% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
+{% set invadr = oView.getInvoiceAddress() %}
+{% set isCompany = false %}
+
+{% if (oxcmp_user.oxuser__oxcompany.value or (invadr and invadr.oxaddress__oxcompany.value)) %}
+    {% set isCompany = true %}
+    {% endif %}
+{% if isCompany %}
+    {% set customerType = "B2B" %}
+    {% else %}
+    {% set customerType = "B2C" %}
+    {% endif %}
+<form id="payment-form-installment" class="unzerUI form unzerUI-PaylaterInstallment__form" novalidate>
+    <br />
+    <div id="unzer-installment">
+        <!-- The Installment Secured field UI Element will be inserted here -->
+    </div>
+
+    <div class="field" id="error-holder" style="color: #9f3a38"> </div>
+    <button id="continue-button" class="unzerUI primary button fluid" type="submit" style="display: none" disabled>
+        {{ translate({ ident: "OSCUNZER_INSTALLMENT_CONTINUE" }) }}
+    </button>
+</form>
+{% set total = oxcmp_basket.getPrice() %}
+
+{% set totalgross = oxcmp_basket.getPrice() %}
+{% set uzrcurrency = currency.name %}
+{% if false %} <script>{% endif %}
+  {% capture assign = "unzerInstallmentJS" %}
+    function executeUnzerPayment(event){
+        event.stopPropagation();
+        $( "#payment-form-installment" ).submit();
+    }// Create an Unzer instance with your public key
+    let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
+
+    let InstallmentSecured = unzerInstance.PaylaterInstallment();
+    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+            event.preventDefault();
+            $( "#payment-form-installment" ).submit();
+        }
+    });
+
+
+    InstallmentSecured.create({
+        containerId: 'unzer-installment',
+        amount: {{ totalgross.getPrice() }},
+        currency: '{{ uzrcurrency }}',
+        country:'{{ oView.getUserCountryIso() }}',
+        threatMetrixId:'{{ unzerThreatMetrixSessionID }}'
+
+    });
+
+    // Handling payment form submission
+    $( "#payment-form-installment" ).submit(function( event ) {
+        event.preventDefault();
+        //  if($('.unzerUI-installment-secured__selected-rate').length){
+        InstallmentSecured.createResource()
+            .then(function(data) {
+                let hiddenInput = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentData')
+                    .val(JSON.stringify(data));
+                console.log(data);
+                $('#orderConfirmAgbBottom').append(hiddenInput);
+                let hiddenCustomerType = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'unzer_customer_type')
+                    .val('{{ customerType }}');
+                $('#orderConfirmAgbBottom').append(hiddenCustomerType);
+
+                $( '#orderConfirmAgbBottom' ).addClass("submitable");
+                $( "#orderConfirmAgbBottom" ).submit();
+            })
+            .catch(function(error) {
+                $('#error-holder').html(error.message);
+                $('html, body').animate({
+                    scrollTop: $("#orderPayment").offset().top - 150
+                }, 350);
+            });
+        //}
+    });
+    {% endcapture %}
+{{ script({ add: unzerInstallmentJS, dynamic: __oxid_include_dynamic }) }}

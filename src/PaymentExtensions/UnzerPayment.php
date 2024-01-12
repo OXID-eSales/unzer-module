@@ -10,11 +10,14 @@ namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
 
@@ -23,6 +26,8 @@ use UnzerSDK\Unzer;
  */
 abstract class UnzerPayment
 {
+    use ServiceContainer;
+
     /** @var Unzer */
     protected $unzerSDK;
 
@@ -118,19 +123,7 @@ abstract class UnzerPayment
             $customer = $this->unzerSDK->createCustomer($customer);
         }
 
-        $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
-        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
-
-        $transaction = $paymentType->{$paymentProcedure}(
-            $basketModel->getPrice()->getPrice(),
-            $basketModel->getBasketCurrency()->name,
-            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
-            $customer,
-            $this->unzerOrderId,
-            $this->unzerService->getShopMetadata($this->paymentMethod),
-            $uzrBasket
-        );
-
+        $transaction = $this->doTransactions($basketModel, $customer, $userModel, $paymentType);
         $this->unzerService->setSessionVars($transaction);
 
         if ($request->getRequestParameter('birthdate')) {
@@ -138,5 +131,44 @@ abstract class UnzerPayment
         }
 
         return true;
+    }
+
+    protected function doTransactions($basketModel, $customer, $userModel, $paymentType)
+    {
+        $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
+        /** @var $paymentType PaylaterInstallment */
+        $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
+        if ($paymentType instanceof PaylaterInstallment) {
+            $auth = oxNew(Authorization::class);
+            $auth->setAmount($basketModel->getPrice()->getPrice());
+            $currency = $basketModel->getBasketCurrency();
+            $auth->setCurrency($currency->name);
+            $auth->setReturnUrl($this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()));
+            $auth->setOrderId($this->unzerOrderId);
+
+            $uzrRiskData = $this->unzerService->getUnzerRiskData(
+                $customer,
+                $userModel
+            );
+            $auth->setRiskData($uzrRiskData);
+            try {
+                $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
+                $UnzerSdk = $loader->getUnzerSDK('B2C', $currency->name, true);
+                $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
+            } catch (UnzerApiException $e) {
+                throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
+            }
+        } else {
+            $transaction = $paymentType->{$paymentProcedure}(
+                $basketModel->getPrice()->getPrice(),
+                $basketModel->getBasketCurrency()->name,
+                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+                $customer,
+                $this->unzerOrderId,
+                $this->unzerService->getShopMetadata($this->paymentMethod),
+                $uzrBasket
+            );
+        }
+        return $transaction;
     }
 }
