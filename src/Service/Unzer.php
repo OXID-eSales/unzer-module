@@ -27,6 +27,7 @@ use UnzerSDK\Constants\CompanyTypes;
 use UnzerSDK\Constants\CustomerGroups;
 use UnzerSDK\Constants\Salutations;
 use UnzerSDK\Constants\ShippingTypes;
+use UnzerSDK\Interfaces\UnzerParentInterface;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Resources\Customer;
@@ -575,11 +576,9 @@ class Unzer
         throw new Exception('oscunzer_WRONGPAYMENTID');
     }
 
-    /**
-     * @param AbstractTransactionType $charge
-     */
-    public function setSessionVars(AbstractTransactionType $charge): void
+    public function setSessionVars(UnzerParentInterface $charge): void
     {
+        /** @var \UnzerSDK\Resources\TransactionTypes\AbstractTransactionType $charge */
         // You'll need to remember the shortId to show it on the success or failure page
         if ($charge->getShortId() !== null && $this->session->getVariable('ShortId') !== $charge->getShortId()) {
             $this->session->setVariable('ShortId', $charge->getShortId());

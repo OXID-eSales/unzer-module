@@ -96,7 +96,7 @@ class AdminOrderController extends AdminDetailsController
         return "@osc-unzer/admin/tpl/oscunzer_order";
     }
 
-    public function getUnzerSDK(string $customerType = '', string $currency = '', $type = false): Unzer
+    public function getUnzerSDK(string $customerType, string $currency, bool $type): Unzer
     {
         return $this->getServiceFromContainer(UnzerSDKLoader::class)
             ->getUnzerSDK($customerType, $currency, $type);
@@ -113,11 +113,11 @@ class AdminOrderController extends AdminDetailsController
     {
         try {
             $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
-            $paymentId =  $this->getEditObject()->getFieldData('oxpaymenttype');
-            $type = $paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID ? true : false;
-            // initialize proper SDK object
-            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency'],$type);
-            /** @var \UnzerSDK\Resources\Payment $unzerPayment */
+            $paymentId = $this->getEditObject()->getFieldData('oxpaymenttype');
+            $type = $paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID;
+
+            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency'], $type);
+
             $unzerPayment = $sdk->fetchPayment($sPaymentId);
             $fCancelled = 0.0;
             $fCharged = 0.0;
@@ -485,9 +485,9 @@ class AdminOrderController extends AdminDetailsController
     /**
      * Returns editable order object
      *
-     * @return Order|null
+     * @return Order
      */
-    public function getEditObject(): ?object
+    public function getEditObject(): object
     {
         $soxId = $this->getEditObjectId();
         if ($this->editObject === null && $soxId != '-1') {

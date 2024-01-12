@@ -19,6 +19,7 @@ use Exception;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class ModuleSettings
 {
@@ -444,10 +445,7 @@ class ModuleSettings
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
     }
 
-    /**
-     * @return mixed
-     */
-    private function getSettingValue(string $key)
+    private function getSettingValue(string $key): mixed
     {
         $result = '';
         try {
@@ -525,7 +523,7 @@ class ModuleSettings
             (
                 $this->isBasketCurrencyEUR() &&
                 !empty($this->getShopPublicKeyB2CInstallmentEUR()) &&
-                !empty($this->getShopPublicKeyB2CInstallmentEUR())
+                !empty(trim($this->getShopPublicKeyB2CInstallmentEUR()))
             );
     }
     public function isInstallmentEligibility(): bool
@@ -809,16 +807,18 @@ class ModuleSettings
      * @param string $currency
      * @return string
      */
-    public function getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency): string
-    {
+    public function getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(
+        string $customerType,
+        string $currency
+    ): string {
         $key = '';
-        if ($customerType == 'B2C' && $currency == 'EUR') {
+        if ($customerType === 'B2C' && $currency === 'EUR') {
             $key = $this->getShopPrivateKeyB2CInvoiceEUR();
-        } elseif ($customerType == 'B2C' && $currency == 'CHF') {
+        } elseif ($customerType === 'B2C' && $currency === 'CHF') {
             $key = $this->getShopPrivateKeyB2CInvoiceCHF();
-        } elseif ($customerType == 'B2B' && $currency == 'EUR') {
+        } elseif ($customerType === 'B2B' && $currency === 'EUR') {
             $key = $this->getShopPrivateKeyB2BInvoiceEUR();
-        } elseif ($customerType == 'B2B' && $currency == 'CHF') {
+        } elseif ($customerType === 'B2B' && $currency === 'CHF') {
             $key = $this->getShopPrivateKeyB2BInvoiceCHF();
         }
         return $key;
@@ -828,16 +828,18 @@ class ModuleSettings
      * @param string $currency
      * @return string
      */
-    public function getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(string $customerType, string $currency): string
-    {
+    public function getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
+        string $customerType,
+        string $currency
+    ): string {
         $key = '';
-        if ($customerType == 'B2C' && $currency == 'EUR') {
+        if ($customerType === 'B2C' && $currency === 'EUR') {
             $key = $this->getShopPrivateKeyB2CInstallmentEUR();
-        } elseif ($customerType == 'B2C' && $currency == 'CHF') {
+        } elseif ($customerType === 'B2C' && $currency === 'CHF') {
             $key = $this->getShopPrivateKeyB2CInstallmentCHF();
-        } elseif ($customerType == 'B2B' && $currency == 'EUR') {
+        } elseif ($customerType === 'B2B' && $currency === 'EUR') {
             $key = $this->getShopPrivateKeyB2BInvoiceEUR();
-        } elseif ($customerType == 'B2B' && $currency == 'CHF') {
+        } elseif ($customerType === 'B2B' && $currency === 'CHF') {
             $key = $this->getShopPrivateKeyB2BInvoiceCHF();
         }
         return $key;

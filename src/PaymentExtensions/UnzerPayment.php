@@ -5,17 +5,20 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
-use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Interfaces\UnzerParentInterface;
+use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -23,8 +26,9 @@ use UnzerSDK\Unzer;
 
 /**
  * @SuppressWarnings(PHPMD.NumberOfChildren)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-abstract class UnzerPayment
+abstract class UnzerPayment implements UnzerPaymentInterface
 {
     use ServiceContainer;
 
@@ -133,11 +137,23 @@ abstract class UnzerPayment
         return true;
     }
 
-    protected function doTransactions($basketModel, $customer, $userModel, $paymentType)
-    {
+    /**
+     * @param \OxidEsales\Eshop\Application\Model\Basket $basketModel
+     * @param \UnzerSDK\Resources\Customer $customer
+     * @param \OxidEsales\Eshop\Application\Model\User $userModel
+     * @param \UnzerSDK\Resources\PaymentTypes\BasePaymentType $paymentType
+     * @return \UnzerSDK\Interfaces\UnzerParentInterface
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     */
+    protected function doTransactions(
+        Basket $basketModel,
+        Customer $customer,
+        User $userModel,
+        BasePaymentType $paymentType
+    ): UnzerParentInterface {
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
-        /** @var $paymentType PaylaterInstallment */
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
+        /** @var $paymentType PaylaterInstallment */
         if ($paymentType instanceof PaylaterInstallment) {
             $auth = oxNew(Authorization::class);
             $auth->setAmount($basketModel->getPrice()->getPrice());
@@ -154,21 +170,27 @@ abstract class UnzerPayment
             try {
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
                 $UnzerSdk = $loader->getUnzerSDK('B2C', $currency->name, true);
-                $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer,   $this->unzerService->getShopMetadata($this->paymentMethod), $uzrBasket);
+                $transaction = $UnzerSdk->performAuthorization(
+                    $auth,
+                    $paymentType,
+                    $customer,
+                    $this->unzerService->getShopMetadata($this->paymentMethod),
+                    $uzrBasket
+                );
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }
-        } else {
-            $transaction = $paymentType->{$paymentProcedure}(
-                $basketModel->getPrice()->getPrice(),
-                $basketModel->getBasketCurrency()->name,
-                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
-                $customer,
-                $this->unzerOrderId,
-                $this->unzerService->getShopMetadata($this->paymentMethod),
-                $uzrBasket
-            );
+            return $transaction;
         }
-        return $transaction;
+
+        return $paymentType->{$paymentProcedure}(
+            $basketModel->getPrice()->getPrice(),
+            $basketModel->getBasketCurrency()->name,
+            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+            $customer,
+            $this->unzerOrderId,
+            $this->unzerService->getShopMetadata($this->paymentMethod),
+            $uzrBasket
+        );
     }
 }

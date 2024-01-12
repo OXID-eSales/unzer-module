@@ -49,8 +49,8 @@ class UnzerPaymentTest extends IntegrationTestCase
         $unzerServiceMock->expects($this->once())->method('setSessionVars')->with($chargeResult);
 
         $sdkMock = $this->createPartialMock(UnzerSDK::class, ['createCustomer', 'fetchCustomer']);
-        $sdkMock->method('createCustomer')->willReturn($customer = new Customer());
-        $sdkMock->method('fetchCustomer')->willReturn($customer = new Customer());
+        $sdkMock->method('createCustomer')->willReturn(new Customer());
+        $sdkMock->method('fetchCustomer')->willReturn(new Customer());
 
         $sut = $this->getMockForAbstractClass(UnzerPayment::class, [
             $sdkMock,

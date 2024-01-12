@@ -16,7 +16,9 @@ use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPaymentInterface;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
@@ -237,52 +239,64 @@ class Payment
     }
 
     /**
+     * @param \OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPaymentInterface|null $paymentExtension
+     * @param string $currency
      * @return \UnzerSDK\Resources\Payment|null
-     * @throws UnzerApiException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getSessionUnzerPayment($paymentExtension = null, $currency = null): ?\UnzerSDK\Resources\Payment
-    {
+    public function getSessionUnzerPayment(
+        UnzerPaymentInterface|null $paymentExtension = null,
+        string $currency = ''
+    ): ?\UnzerSDK\Resources\Payment {
         $paymentId = $this->session->getVariable('PaymentId');
-        if (is_string($paymentId)) {
-            /** @var string $sessionOrderId */
-            $sessionOrderId = $this->session->getVariable('sess_challenge');
-            /** @var Order $order */
-            $order = oxNew(Order::class);
-            $order->load($sessionOrderId);
-            $customerType = '';
-            /** @var string $currency */
-            if ($currency === null) {
-                $currency = $order->getFieldData('oxcurrency') ?? '';
-            }
-
-            if ($paymentExtension !== null && $currency !== null) {
-                $oRequest = oxNew(Request::class);
-                if ($paymentExtension instanceof \OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice) {
-                    if ($oRequest->getRequestParameter('unzer_customer_type') === 'B2C' ) {
-                        $customerType = 'B2C';
-                    } else {
-                        $customerType = 'B2B';
-                    }
-                }
-            }
-
-            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-                $customerType = 'B2C';
-                if (!empty($order->getFieldData('oxbillcompany')) || !empty($order->getFieldData('oxdelcompany'))) {
-                    $customerType = 'B2B';
-                }
-            }
-            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-                $customerType = 'B2C';
-                $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency, true);
-            } else {
-                $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
-            }
-
-            return $sdk->fetchPayment($paymentId);
+        if (!is_string($paymentId)) {
+            return null;
         }
 
-        return null;
+        /** @var string $sessionOrderId */
+        $sessionOrderId = $this->session->getVariable('sess_challenge');
+        /** @var Order $order */
+        $order = oxNew(Order::class);
+        $order->load($sessionOrderId);
+        $customerType = '';
+
+        if ($currency === '') {
+            /** @var string $currency */
+            $currency = $order->getFieldData('oxcurrency') ?? '';
+        }
+
+        if (
+            $currency !== ''
+            && $paymentExtension instanceof \OxidSolutionCatalysts\Unzer\PaymentExtensions\Invoice
+        ) {
+            $oRequest = oxNew(Request::class);
+            $customerType = 'B2B';
+            if ($oRequest->getRequestParameter('unzer_customer_type') === 'B2C') {
+                $customerType = 'B2C';
+            }
+        }
+
+        if ($order->getFieldData('oxpaymenttype') === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+            $customerType = 'B2C';
+            if (
+                !empty($order->getFieldData('oxbillcompany'))
+                || !empty($order->getFieldData('oxdelcompany'))
+            ) {
+                $customerType = 'B2B';
+            }
+        }
+
+        $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
+        if (
+            $order->getFieldData('oxpaymenttype')
+            === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID
+        ) {
+            $customerType = 'B2C';
+            $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency, true);
+        }
+
+        return $sdk->fetchPayment($paymentId);
     }
 
     /**
@@ -291,12 +305,18 @@ class Payment
      * @param string $chargeid
      * @param float $amount
      * @param string $reason
-     * @return UnzerApiException|bool
+     * @return \Exception|bool|\UnzerSDK\Exceptions\UnzerApiException
      *
+     * @throws \Exception
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, $reason)
-    {
+    public function doUnzerCancel(
+        Order $oOrder,
+        string $unzerid,
+        string $chargeid,
+        float $amount,
+        string $reason
+    ): Exception|bool|UnzerApiException {
         try {
             $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
 
@@ -326,10 +346,14 @@ class Payment
      * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
      * @param string $unzerid
      * @param float $amount
-     * @return UnzerApiException|bool
+     * @return \Exception|bool|\UnzerSDK\Exceptions\UnzerApiException
+     * @throws \Exception
      */
-    public function doUnzerCollect($oOrder, $unzerid, $amount)
-    {
+    public function doUnzerCollect(
+        ?UnzerOrder $oOrder,
+        string $unzerid,
+        float $amount
+    ): Exception|bool|UnzerApiException {
         if (!($oOrder instanceof Order)) {
             return false;
         }

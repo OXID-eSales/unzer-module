@@ -7,29 +7,19 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Doctrine\DBAL\Driver\Result;
-use OxidSolutionCatalysts\Unzer\Model\Order;
-use PDO;
-use Doctrine\DBAL\Query\QueryBuilder;
-use OxidEsales\Eshop\Application\Model\Basket;
-use OxidEsales\Eshop\Application\Model\Order as EshopModelOrder;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
-use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
-use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -93,7 +83,10 @@ class Transaction
                 array_merge($params, $this->getUnzerPaymentData($unzerPayment));
 
             // for PaylaterInvoice, store the customer type
-            if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice || $unzerPayment->getPaymentType() instanceof PaylaterInstallment) {
+            if (
+                $unzerPayment->getPaymentType() instanceof PaylaterInvoice ||
+                $unzerPayment->getPaymentType() instanceof PaylaterInstallment
+            ) {
                 $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
                 $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
                 $params['customertype'] = 'B2C';
@@ -114,6 +107,7 @@ class Transaction
 
             // Fallback: set ShortID as OXTRANSID
             $shortId = $params['shortid'] ?? '';
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder->setUnzerTransId($shortId);
 
             return true;
@@ -212,15 +206,14 @@ class Transaction
     /**
      * @param array $params
      * @return string
+     * @throws \JsonException
      */
     protected function prepareTransactionOxid(array $params): string
     {
-        unset($params['oxactiondate']);
-        unset($params['serialized_basket']);
-        unset($params['customertype']);
+        unset($params['oxactiondate'], $params['serialized_basket'], $params['customertype']);
 
         /** @var string $jsonEncode */
-        $jsonEncode = json_encode($params);
+        $jsonEncode = json_encode($params, JSON_THROW_ON_ERROR);
         return md5($jsonEncode);
     }
 
