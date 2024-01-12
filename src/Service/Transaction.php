@@ -27,6 +27,7 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
+use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -92,7 +93,7 @@ class Transaction
                 array_merge($params, $this->getUnzerPaymentData($unzerPayment));
 
             // for PaylaterInvoice, store the customer type
-            if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice) {
+            if ($unzerPayment->getPaymentType() instanceof PaylaterInvoice || $unzerPayment->getPaymentType() instanceof PaylaterInstallment) {
                 $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
                 $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
                 $params['customertype'] = 'B2C';

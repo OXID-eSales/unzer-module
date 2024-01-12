@@ -255,6 +255,9 @@ class Payment
                     $customerType = 'B2B';
                 }
             }
+            if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
+                $customerType = 'B2C';
+            }
 
             $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
             return $sdk->fetchPayment($paymentId);

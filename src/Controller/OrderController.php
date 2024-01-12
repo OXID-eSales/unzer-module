@@ -60,6 +60,7 @@ class OrderController extends OrderController_parent
         // generate always a new threat metrix session id
         $unzer = $this->getServiceFromContainer(Unzer::class);
         $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();
+        $this->_aViewData['uzrcurrency'] = $this->getActCurrency();
         return parent::render();
     }
 

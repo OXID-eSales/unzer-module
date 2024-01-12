@@ -88,6 +88,7 @@ $aModule = [
         '@osc-unzer/frontend/tpl/order/unzer_installment_confirm' =>       'views/smarty/frontend/tpl/order/unzer_installment_confirm.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_installment_confirm_flow' =>  'views/smarty/frontend/tpl/order/unzer_installment_confirm_flow.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_installment_confirm_wave' =>  'views/smarty/frontend/tpl/order/unzer_installment_confirm_wave.tpl',
+        '@osc-unzer/frontend/tpl/order/unzer_installment_paylater.tpl' =>  'views/smarty/frontend/tpl/order/order/unzer_installment_paylater.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_invoice' =>                   'views/smarty/frontend/tpl/order/unzer_invoice.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_applepay' =>                  'views/smarty/frontend/tpl/order/unzer_applepay.tpl',
         '@osc-unzer/frontend/tpl/order/unzer_sepa' =>                      'views/smarty/frontend/tpl/order/unzer_sepa.tpl',
@@ -366,6 +367,54 @@ $aModule = [
         [
             'group' => 'unzerinvoice',
             'name' => 'production-UnzerPrivateKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPublicKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2CCHF',
             'type' => 'str',
             'value' => ''
         ],
