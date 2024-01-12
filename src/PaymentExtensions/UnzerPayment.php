@@ -16,6 +16,7 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -133,11 +134,19 @@ abstract class UnzerPayment
         return true;
     }
 
-    protected function doTransactions($basketModel, $customer, $userModel, $paymentType)
+    /**
+     * @throws UnzerApiException
+     * @throws Exception
+     */
+    protected function doTransactions(
+        Basket $basketModel,
+        Customer $customer, User $userModel,
+        BasePaymentType $paymentType
+    ): Authorization
     {
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
-        /** @var $paymentType PaylaterInstallment */
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
+        /** @var $paymentType PaylaterInstallment */
         if ($paymentType instanceof PaylaterInstallment) {
             $auth = oxNew(Authorization::class);
             $auth->setAmount($basketModel->getPrice()->getPrice());
@@ -158,17 +167,17 @@ abstract class UnzerPayment
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }
-        } else {
-            $transaction = $paymentType->{$paymentProcedure}(
-                $basketModel->getPrice()->getPrice(),
-                $basketModel->getBasketCurrency()->name,
-                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
-                $customer,
-                $this->unzerOrderId,
-                $this->unzerService->getShopMetadata($this->paymentMethod),
-                $uzrBasket
-            );
+            return $transaction;
         }
-        return $transaction;
+
+        return $paymentType->{$paymentProcedure}(
+            $basketModel->getPrice()->getPrice(),
+            $basketModel->getBasketCurrency()->name,
+            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+            $customer,
+            $this->unzerOrderId,
+            $this->unzerService->getShopMetadata($this->paymentMethod),
+            $uzrBasket
+        );
     }
 }

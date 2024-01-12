@@ -50,10 +50,11 @@ class UnzerSDKLoader
      * @param string $customerType
      * @param string $currency
      * @return Unzer
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getUnzerSDK(string $customerType = '', string $currency = '', $type = false): Unzer
+    public function getUnzerSDK(string $customerType = '', string $currency = '', bool $type = false): Unzer
     {
-        if ($customerType != '' && $currency != '') {
+        if ($customerType !== '' && $currency !== '') {
             return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency, $type);
         }
         $key = $this->moduleSettings->getShopPrivateKey();
@@ -70,19 +71,25 @@ class UnzerSDKLoader
      * @param string $customerType
      * @param string $currency
      * @return Unzer
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function getUnzerSDKbyCustomerTypeAndCurrency(string $customerType, string $currency, $type = false): Unzer
+    public function getUnzerSDKbyCustomerTypeAndCurrency(string $customerType, string $currency, bool $type): Unzer
     {
         if ($customerType == '' || $currency == '') {
             return $this->getUnzerSDK();
         }
         if ($type === false) {
-            $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency($customerType, $currency);
-            $sdk = oxNew(Unzer::class, $key);
+            $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(
+                $customerType,
+                $currency
+            );
         } else {
-            $key = $this->moduleSettings->getShopPrivateKeyInstallmentByCustomerTypeAndCurrency($customerType, $currency);
-            $sdk = oxNew(Unzer::class, $key);
+            $key = $this->moduleSettings->getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
+                $customerType,
+                $currency
+            );
         }
+        $sdk = oxNew(Unzer::class, $key);
 
         if ($this->moduleSettings->isDebugMode()) {
             $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
