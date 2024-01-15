@@ -21,7 +21,7 @@ class AccountSavedPaymentController extends AccountController
      * @var string
      */
     // phpcs:ignore PSR2.Classes.PropertyDeclaration
-    protected $_sThisLoginTemplate = 'page/account/login.tpl';
+    protected $_sThisLoginTemplate = 'page/account/login';
 
     /**
      * @var string
@@ -33,7 +33,7 @@ class AccountSavedPaymentController extends AccountController
      * @var string
      */
     // phpcs:ignore PSR2.Classes.PropertyDeclaration
-    protected $_sThisAltLoginTemplate = 'page/privatesales/login.tpl';
+    protected $_sThisAltLoginTemplate = 'page/privatesales/login';
 
 
     public function render()
@@ -42,12 +42,11 @@ class AccountSavedPaymentController extends AccountController
         $this->redirectAfterLogin();
 
         $user = $this->getUser();
-        $passwordField = 'oxuser__oxpassword';
-        if ($user || ($user && $user->$passwordField->value)) {
-            $this->setPaymentListsToView();
-            return "@osc-unzer/frontend/tpl/account/account_saved_payments";
+        if (!$user) {
+            return $this->_sThisLoginTemplate;
         }
-        return  $this->_sThisLoginTemplate;
+        $this->setPaymentListsToView();
+        return $this->_sThisTemplate;
     }
 
     protected function setPaymentListsToView(): void

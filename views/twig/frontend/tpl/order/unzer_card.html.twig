@@ -24,7 +24,7 @@
                     <td>{{ type }}</td>
 
                     <td>
-                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
+                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" {% if loop.first %}checked{% endif %} style="-webkit-appearance: radio">
                     </td>
                 </tr>
             {% endfor %}
@@ -35,8 +35,9 @@
     </form>
     {% endif %}
     {% endfor %}
-    {% endif %}
 </div>
+    {% endif %}
+
 {% if unzerPaymentType != false  %}
 <br>
     <label>
@@ -92,6 +93,12 @@
         event.stopPropagation();
         document.querySelector( "#payment-form-card" ).requestSubmit();
     }
+    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+            event.preventDefault();
+            $( '#payment-form-card' ).submit();
+        }
+    });
     let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
     let Card = unzerInstance.Card();
     if ($('input[name="newccard"]').length === 0) {

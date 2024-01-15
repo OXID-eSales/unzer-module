@@ -21,7 +21,7 @@
                         <th scope="row">{{ paymentType.email }}</th>
                         <td>{{ type }}</td>
                         <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" {% if loop.first %}checked{% endif %} style="-webkit-appearance: radio">
                         </td>
                     </tr>
                     {% endfor %}
@@ -56,6 +56,12 @@
             event.stopPropagation();
             $( "#payment-saved-cards" ).submit();
         }
+        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+            if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+                event.preventDefault();
+                $( '#payment-saved-cards' ).submit();
+            }
+        });
         // Handling payment form submission
         $( "#payment-saved-cards" ).submit(function( event ) {
             event.preventDefault();

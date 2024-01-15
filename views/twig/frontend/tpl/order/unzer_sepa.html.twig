@@ -20,7 +20,7 @@
                         <th scope="row">{{ paymentType.holder }}</th>
                         <td>{{ paymentType.iban }}</td>
                         <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}"
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" {% if loop.first %}checked{% endif %} value="{{ paymenttypeid }}"
                                    style="-webkit-appearance: radio">
                         </td>
                     </tr>
@@ -104,6 +104,12 @@
             }
         });
     }
+    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
+        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+            event.preventDefault();
+            $( '#payment-form-sepa' ).submit();
+        }
+    });
     // Handling payment form submission
     $( "#payment-form-sepa" ).submit(function( event ) {
         event.preventDefault();
