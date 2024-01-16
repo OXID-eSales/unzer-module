@@ -639,4 +639,5 @@ $aLang = [
     'oscunzer_TRANSACTION_CHANGE' => 'Status %s für Payment %s wurde in die DB geschrieben',
     'oscunzer_TRANSACTION_NOTHINGTODO' => 'Kein Update erforderlich. Es gab keinen neuen Zahlungsstatus: ',
     'oscunzer_APPLEPAY_ERROR' => 'Zahlung mit Apple Pay konnte nicht ausgeführt werden.',
+    'oscunzer_ERROR_CHANGE_BASKET' => 'Leider hat sich der Warenkorb während des Checkouts noch einmal verändert. Bitte prüfen Sie den Warenkorb und wiederholen den Vorgang.'
 ];

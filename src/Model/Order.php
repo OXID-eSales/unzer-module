@@ -107,7 +107,9 @@ class Order extends Order_parent
                 $this->markUnzerOrderAsPaid();
             }
 
-            $this->initWriteTransactionToDB();
+            $this->initWriteTransactionToDB(
+                $paymentService->getSessionUnzerPayment()
+            );
         } else {
             // payment is canceled
             $this->delete();
@@ -187,6 +189,7 @@ class Order extends Order_parent
      * @param \UnzerSDK\Resources\Payment|null $unzerPayment
      * @return bool
      * @throws UnzerApiException
+     * @throws Exception
      */
     public function initWriteTransactionToDB($unzerPayment = null): bool
     {
@@ -195,8 +198,7 @@ class Order extends Order_parent
         if (
             strpos($oxpaymenttype, "oscunzer") !== false
         ) {
-            $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            return $transactionService->writeTransactionToDB(
+            return $this->getServiceFromContainer(TransactionService::class)->writeTransactionToDB(
                 $this->getId(),
                 $this->getOrderUser()->getId() ?: '',
                 $unzerPayment instanceof \UnzerSDK\Resources\Payment ?

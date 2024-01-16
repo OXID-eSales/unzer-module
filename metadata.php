@@ -9,7 +9,6 @@
  * Metadata version
  */
 
-use OxidSolutionCatalysts\Unzer\Model\DiscountList;
 use OxidSolutionCatalysts\Unzer\Controller\AccountSavedPaymentController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
@@ -23,7 +22,6 @@ use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
 use OxidSolutionCatalysts\Unzer\Core\Config;
 use OxidSolutionCatalysts\Unzer\Core\ShopControl;
 use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
-use OxidSolutionCatalysts\Unzer\Model\PaymentGateway;
 use OxidSolutionCatalysts\Unzer\Model\Article;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -54,7 +52,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.2.0-rc.1',
+    'version' => '1.2.0-rc.2',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -63,7 +61,6 @@ $aModule = [
         \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
         \OxidEsales\Eshop\Core\Config::class => Config::class,
         \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
-        \OxidEsales\Eshop\Application\Model\DiscountList::class => DiscountList::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
         \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
         \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
