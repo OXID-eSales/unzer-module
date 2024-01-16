@@ -200,8 +200,6 @@
                                                         {% set payment = oView.getPayment() %}
                                                         {% if payment.getId() is same as('oscunzer_applepay') %}
                                                             {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
-                                                        {% else %}
-
                                                         {% endif %}
                                                     {% endblock %}
                                                 </form>
