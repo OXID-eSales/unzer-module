@@ -201,9 +201,7 @@
                                                         {% if payment.getId() is same as('oscunzer_applepay') %}
                                                             {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
                                                         {% else %}
-                                                            <button type="submit" class="btn btn-lg btn-primary w-100">
-                                                                {{ translate({ ident: "SUBMIT_ORDER" }) }}
-                                                            </button>
+
                                                         {% endif %}
                                                     {% endblock %}
                                                 </form>
