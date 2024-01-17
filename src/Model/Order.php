@@ -107,7 +107,9 @@ class Order extends Order_parent
                 $this->markUnzerOrderAsPaid();
             }
 
-            $this->initWriteTransactionToDB();
+            $this->initWriteTransactionToDB(
+                $paymentService->getSessionUnzerPayment()
+            );
         } else {
             // payment is canceled
             $this->delete();
@@ -116,16 +118,15 @@ class Order extends Order_parent
         return $iRet;
     }
 
-    public function getUnzerOrderNr(): int
+    public function getUnzerOrderNr(): string
     {
-        $value = $this->getFieldData('oxunzerordernr');
-        return is_numeric($value) ? (int)$value : 0;
+        return $this->getFieldData('oxunzerordernr');
     }
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function setUnzerOrderNr(int $unzerOrderId): int
+    public function setUnzerOrderNr(string $unzerOrderId): string
     {
         /** @var ContainerInterface $container */
         $container = ContainerFactory::getInstance()
@@ -187,6 +188,7 @@ class Order extends Order_parent
      * @param \UnzerSDK\Resources\Payment|null $unzerPayment
      * @return bool
      * @throws UnzerApiException
+     * @throws Exception
      */
     public function initWriteTransactionToDB($unzerPayment = null): bool
     {
@@ -195,8 +197,7 @@ class Order extends Order_parent
         if (
             strpos($oxpaymenttype, "oscunzer") !== false
         ) {
-            $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            return $transactionService->writeTransactionToDB(
+            return $this->getServiceFromContainer(TransactionService::class)->writeTransactionToDB(
                 $this->getId(),
                 $this->getOrderUser()->getId() ?: '',
                 $unzerPayment instanceof \UnzerSDK\Resources\Payment ?

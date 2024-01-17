@@ -9,10 +9,8 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
@@ -20,13 +18,12 @@ use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Payment as UnzerPayment;
 use UnzerSDK\Resources\AbstractUnzerResource;
-use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
-use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 /**
@@ -42,33 +39,23 @@ class Payment
     private const STATUS_NOT_FINISHED = "NOT_FINISHED";
     private const STATUS_ERROR = "ERROR";
 
-    /** @var Session */
-    protected $session;
+    protected Session $session;
 
-    /** @var PaymentExtensionLoader */
-    protected $paymentExtLoader;
+    protected PaymentExtensionLoader $paymentExtLoader;
 
-    /** @var Translator */
-    protected $translator;
+    protected Translator $translator;
 
-    /** @var Unzer */
-    protected $unzerService;
+    protected Unzer $unzerService;
 
-    /** @var UnzerSDKLoader */
-    protected $unzerSDKLoader;
+    protected UnzerSDKLoader $unzerSDKLoader;
 
-    /**
-     * @var string
-     */
-    protected $redirectUrl;
+    protected ?UnzerPayment $sessionUnzerPayment = null;
 
-    /**
-     * @var string
-     */
-    protected $pdfLink;
+    protected ?string $redirectUrl = null;
 
-    /** @var TransactionService */
-    protected $transactionService;
+    protected ?string $pdfLink = null;
+
+    protected TransactionService $transactionService;
 
     /**
      * @param Session $session
@@ -108,7 +95,6 @@ class Payment
             $basket = $this->session->getBasket();
             $currency = $basket->getBasketCurrency()->name;
 
-            /** @var AbstractUnzerPayment $paymentExtension */
             $paymentExtension = $this->paymentExtLoader->getPaymentExtensionByCustomerTypeAndCurrency(
                 $paymentModel,
                 $customerType,
@@ -168,13 +154,13 @@ class Payment
     public function getUnzerPaymentStatus(): string
     {
         $result = self::STATUS_ERROR;
+        /** @var UnzerPayment $sessionUnzerPayment */
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
+
         if (is_null($sessionUnzerPayment)) {
             return $result;
         }
 
-        /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
-        $sessionUnzerPayment = $this->getSessionUnzerPayment();
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {
@@ -210,14 +196,14 @@ class Payment
      * @return int
      * @throws UnzerApiException
      */
-    public function getUnzerOrderId(): int
+    public function getUnzerOrderId(): string
     {
         $result = 0;
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
         if ($sessionUnzerPayment) {
             $transaction = $sessionUnzerPayment->getInitialTransaction();
             if ($transaction) {
-                $result = (int)$transaction->getOrderId();
+                $result = $transaction->getOrderId();
             }
         }
         return $result;
@@ -235,13 +221,17 @@ class Payment
 
     /**
      * @param null $paymentExtension
-     * @param null $currency
-     * @return \UnzerSDK\Resources\Payment|null
+     * @return UnzerPayment|null
      * @throws UnzerApiException
      */
-    public function getSessionUnzerPayment($paymentExtension = null, $currency = null): ?\UnzerSDK\Resources\Payment
+    public function getSessionUnzerPayment($paymentExtension = null): ?UnzerPayment
     {
         $result = null;
+
+        if ($this->sessionUnzerPayment instanceof UnzerPayment) {
+            return $this->sessionUnzerPayment;
+        }
+
         $paymentId = $this->session->getVariable('PaymentId');
         if (is_string($paymentId)) {
             /** @var string $sessionOrderId */
@@ -267,6 +257,7 @@ class Payment
                     'Payment not found with key: ' . $paymentId
                 );
             }
+            $this->sessionUnzerPayment = $result;
         }
 
         return $result;
@@ -452,7 +443,7 @@ class Payment
     }
 
     /**
-     * @param \UnzerSDK\Resources\Payment $unzerPayment
+     * @param UnzerPayment $unzerPayment
      * @return BasePaymentType|AbstractUnzerResource The updated PaymentType object.
      */
     public function setInstallmentDueDate($unzerPayment)
