@@ -51,9 +51,9 @@ class Payment
 
     protected ?UnzerPayment $sessionUnzerPayment = null;
 
-    protected string $redirectUrl;
+    protected string $redirectUrl = '';
 
-    protected string $pdfLink;
+    protected string $pdfLink = '';
 
     protected TransactionService $transactionService;
 
