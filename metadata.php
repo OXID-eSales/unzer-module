@@ -106,16 +106,9 @@ $aModule = [
     'blocks' => [
         //frontend
         [
-            'theme' => 'flow',
             'template' => 'page/checkout/order.tpl',
             'block' => 'shippingAndPayment',
-            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment_flow.tpl'
-        ],
-        [
-            'theme' => 'wave',
-            'template' => 'page/checkout/order.tpl',
-            'block' => 'shippingAndPayment',
-            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment_wave.tpl'
+            'file' => 'views/frontend/blocks/page/checkout/shippingAndPayment.tpl'
         ],
         [
             'template' => 'page/checkout/order.tpl',
