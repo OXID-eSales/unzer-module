@@ -80,6 +80,8 @@
             let SepaDirectDebit = unzerInstance.SepaDirectDebit();
         }
         event.stopPropagation();
+        var zahlungsButton = $(event.currentTarget);
+        zahlungsButton.prop('disabled', true);
         $( "#payment-form-sepa" ).submit();
     }
     let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
@@ -112,6 +114,7 @@
     });
     // Handling payment form submission
     $( "#payment-form-sepa" ).submit(function( event ) {
+        var zahlungsButton = $('.btn-highlight');
         event.preventDefault();
         let hiddenInput1 = $(document.createElement('input'))
             .attr('type', 'hidden')
@@ -155,6 +158,7 @@
             $('html, body').animate({
             scrollTop: $("#orderPayment").offset().top - 150
             }, 350);
+            zahlungsButton.prop('disabled', false);
         })
     });
 function removeCardElements() {

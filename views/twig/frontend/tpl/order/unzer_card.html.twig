@@ -91,7 +91,9 @@
             let Card = unzerInstance.Card();
         }
         event.stopPropagation();
-        document.querySelector( "#payment-form-card" ).requestSubmit();
+        var zahlungsButton = $(event.currentTarget);
+        zahlungsButton.prop('disabled', true);
+        $( "#payment-form-card" ).submit();
     }
     $( '#orderConfirmAgbBottom' ).submit(function( event ) {
         if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
@@ -128,6 +130,7 @@
         });
     }
     $( "#payment-form-card" ).on('submit', function( event ) {
+        var zahlungsButton = $('.btn-highlight');
         event.preventDefault();
         var checkedInput = $('input[name=paymenttypeid]:checked');
         if (checkedInput.length > 0) {
@@ -142,9 +145,9 @@
                 .attr('name', 'paymentData')
                 .val(paymentDataString);
             $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).submit();
-        }
-        Card.createResource()
-            .then(function(result) {
+        } else {
+            Card.createResource()
+                .then(function(result) {
                     //new payment
                     let hiddenInput = $(document.createElement('input'))
                         .attr('type', 'hidden')
@@ -155,22 +158,23 @@
                         .attr('name', 'oscunzersavepayment')
                         .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
                     $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).append(hiddenInput2).submit();
-            })
-            .catch(function(error) {
-                console.log('error'+ error.message)
+                })
+                .catch(function(error) {
+                    console.log('error'+ error.message)
 
-                $('html, body').animate({
-                    scrollTop: $("#orderPayment").offset().top - 150
-                }, 350);
+                    $('html, body').animate({
+                        scrollTop: $("#orderPayment").offset().top - 150
+                    }, 350);
 
-                errorField = $("#card-element-id-number");
-                errorField.find('div').first().addClass('error');
-                errorEl = errorField.find('div.error.message');
-                errorEl.css('display', 'inline-block');
-                errorEl.text(error.message);
-
-                $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
-            })
+                    errorField = $("#card-element-id-number");
+                    errorField.find('div').first().addClass('error');
+                    errorEl = errorField.find('div.error.message');
+                    errorEl.css('display', 'inline-block');
+                    errorEl.text(error.message);
+                    zahlungsButton.prop('disabled', false);
+                    $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+                })
+        }
     });
 function addPaymentElements(Card) {
     // Clear the contents of the Card-Element containers

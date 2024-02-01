@@ -38,7 +38,7 @@
                 <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
                     <input id="oscunzersavepayment" type="checkbox" name="oscunzersavepayment" value="0" style="-webkit-appearance: checkbox">
                     <label for="oscunzersavepayment">
-                        {{ translate({ ident: "OSCUNZER_SAVE_PAYMENT" }) }}
+                        {{ translate({ ident: "OSCUNZER_SAVE_PAYPAL" }) }}
                     </label>
                 </div>
             </div>
@@ -54,6 +54,8 @@
         function executeUnzerPayment(event){
 
             event.stopPropagation();
+            var zahlungsButton = $(event.currentTarget);
+            zahlungsButton.prop('disabled', true);
             $( "#payment-saved-cards" ).submit();
         }
         $( '#orderConfirmAgbBottom' ).submit(function( event ) {
@@ -84,6 +86,7 @@
                 .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
 
             $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).append(hiddenInput1).submit();
+           // zahlungsButton.prop('disabled', false);
         });
 {% endcapture %}
     {% if false %}
