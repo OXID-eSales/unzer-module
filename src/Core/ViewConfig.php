@@ -161,26 +161,26 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * Template variable getter. Check if is a Flow Theme Compatible Theme
+     * Template variable getter. Check if active theme is a Flow Theme Compatible Theme
      *
      * @return boolean
      */
-    public function isFlowCompatibleTheme()
+    public function isFlowCompatibleTheme(): bool
     {
-        if ($this->isFlowCompatibleTheme) {
+        if (is_null($this->isFlowCompatibleTheme)) {
             $this->isFlowCompatibleTheme = $this->isCompatibleTheme('flow');
         }
         return $this->isFlowCompatibleTheme;
     }
 
     /**
-     * Template variable getter. Check if is a Wave Theme Compatible Theme
+     * Template variable getter. Check if active theme is a Wave Theme Compatible Theme
      *
      * @return boolean
      */
-    public function isWaveCompatibleTheme()
+    public function isWaveCompatibleTheme(): bool
     {
-        if ($this->isWaveCompatibleTheme) {
+        if (is_null($this->isWaveCompatibleTheme)) {
             $this->isWaveCompatibleTheme = $this->isCompatibleTheme('wave');
         }
         return $this->isWaveCompatibleTheme;
