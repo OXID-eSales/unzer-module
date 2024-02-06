@@ -169,13 +169,13 @@ abstract class BaseCest
     /**
      * @return void
      */
-    protected function _checkSuccessfulPayment()
+    protected function _checkSuccessfulPayment(int $longWait = 0)
     {
         $this->I->wait(10);
         $this->I->waitForDocumentReadyState();
         $this->I->wait(10);
         $this->I->waitForPageLoad();
-        $this->I->wait(10);
+        $this->I->wait(10 + $longWait);
         $this->I->waitForText(Translator::translate('THANK_YOU'));
     }
 
