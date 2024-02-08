@@ -64,16 +64,20 @@ class PaymentExtensionLoader
      */
     private $unzerService;
 
+    private DebugHandler $logger;
+
     /**
      * @param UnzerSDKLoader $unzerSDKLoader
      * @param Unzer $unzerService
      */
     public function __construct(
         UnzerSDKLoader $unzerSDKLoader,
-        Unzer $unzerService
+        Unzer $unzerService,
+        DebugHandler $logger
     ) {
         $this->unzerSdkLoader = $unzerSDKLoader;
         $this->unzerService = $unzerService;
+        $this->logger = $logger;
     }
 
     /**
@@ -85,7 +89,8 @@ class PaymentExtensionLoader
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $this->unzerSdkLoader->getUnzerSDK(),
-            $this->unzerService
+            $this->unzerService,
+            $this->logger
         );
     }
 
