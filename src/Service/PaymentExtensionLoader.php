@@ -118,7 +118,8 @@ class PaymentExtensionLoader
             return oxNew(
                 self::UNZERCLASSNAMEMAPPING[$payment->getId()],
                 $this->unzerSdkLoader->getUnzerSDK($customerType, $currency, true),
-                $this->unzerService
+                $this->unzerService,
+                $this->logger
             );
         }
         return oxNew(
