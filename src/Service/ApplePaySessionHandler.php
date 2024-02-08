@@ -15,14 +15,16 @@ class ApplePaySessionHandler
     private ApplepaySession $session;
     private ApplepayAdapter $adapter;
     private ModuleSettings $moduleSettings;
+    private DebugHandler $logger;
 
     /**
      * @param ModuleSettings $moduleSettings
      */
-    public function __construct(ModuleSettings $moduleSettings)
+    public function __construct(ModuleSettings $moduleSettings, DebugHandler $logger)
     {
         $this->moduleSettings = $moduleSettings;
         $this->initialize();
+        $this->logger = $logger;
     }
 
     /**
@@ -78,10 +80,7 @@ class ApplePaySessionHandler
             );
             return $jsonDecoded;
         } catch (\Throwable $e) {
-            /** @var LoggerInterface $logger */
-            /** @phpstan-ignore-next-line */
-            $logger = $this->getServiceFromContainer('OxidSolutionCatalysts\Unzer\Logger');
-            $logger->error($e->getMessage());
+            $this->logger->log($e->getMessage());
             return null;
         }
     }

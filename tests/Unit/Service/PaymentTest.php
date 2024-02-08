@@ -211,7 +211,8 @@ class PaymentTest extends IntegrationTestCase
         $extensionLoader = $this->getMockBuilder(PaymentExtensionLoader::class)
             ->setConstructorArgs([
                 $this->getUnzerSDKLoaderMock(),
-                $this->getUnzerServiceMock()
+                $this->getUnzerServiceMock(),
+                $this->getLoggerMock()
             ])->onlyMethods(['getPaymentExtension', 'getPaymentExtensionByCustomerTypeAndCurrency'])
             ->getMock();
 
@@ -309,5 +310,12 @@ class PaymentTest extends IntegrationTestCase
     protected function getException()
     {
         return new \Exception("clientMessage");
+    }
+
+    private function getLoggerMock()
+    {
+        return new \OxidSolutionCatalysts\Unzer\Service\DebugHandler(
+            $this->createMock(\Monolog\Logger::class)
+        );
     }
 }

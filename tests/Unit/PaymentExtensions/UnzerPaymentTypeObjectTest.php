@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Exception;
 
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Unzer;
 
@@ -25,7 +26,10 @@ class UnzerPaymentTypeObjectTest extends IntegrationTestCase
 
         $sut = new $extensionClass(
             $sdkMock,
-            $this->getMockBuilder(UnzerService::class)->disableOriginalConstructor()->getMock()
+            $this->getMockBuilder(UnzerService::class)->disableOriginalConstructor()->getMock(),
+            new DebugHandler(
+                $this->createMock(\Monolog\Logger::class)
+            )
         );
 
         $result = $sut->getUnzerPaymentTypeObject();
@@ -93,7 +97,10 @@ class UnzerPaymentTypeObjectTest extends IntegrationTestCase
             $sdkMock,
             $this->createConfiguredMock(UnzerService::class, [
                 'getUnzerPaymentIdFromRequest' => 'someId'
-            ])
+            ]),
+            new DebugHandler(
+                $this->createMock(\Monolog\Logger::class)
+            )
         );
 
         $result = $sut->getUnzerPaymentTypeObject();

@@ -15,15 +15,16 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Service\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
-use UnzerSDK\Interfaces\UnzerParentInterface;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\Paypal as PayPalPaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
 
@@ -56,12 +57,15 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     /** @var array */
     protected $allowedCurrencies = [];
 
+    private DebugHandler $logger;
+
     /**
      * @throws Exception
      */
     public function __construct(
         Unzer $unzerSDK,
-        UnzerService $unzerService
+        UnzerService $unzerService,
+        DebugHandler $logger
     ) {
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
@@ -69,6 +73,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $this->unzerOrderId = (string)$this->unzerService->generateUnzerOrderId();
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
+        $this->logger = $logger;
     }
 
     /**
@@ -97,9 +102,10 @@ abstract class UnzerPayment implements UnzerPaymentInterface
      * @param Basket $basketModel
      * @return bool
      *
-     * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @throws \JsonException
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws JsonException
+     * @throws UnzerApiException
      */
     public function execute(
         User $userModel,
@@ -159,9 +165,8 @@ abstract class UnzerPayment implements UnzerPaymentInterface
                     $payment
                 );
             } catch (Exception $e) {
-                Registry::getLogger()->info(
-                    'Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage()
-                );
+                $this->logger
+                    ->log('Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage());
             }
         }
 
@@ -169,14 +174,14 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     }
 
     /**
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     protected function doTransactions(
         Basket $basketModel,
         Customer $customer,
         User $userModel,
         BasePaymentType $paymentType
-    ): UnzerParentInterface {
+    ): AbstractTransactionType {
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
         /** @var $paymentType PaylaterInstallment */
