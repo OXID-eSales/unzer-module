@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Home;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
@@ -32,7 +33,7 @@ final class ShopCest extends BaseCest
         $homePage = new Home($I);
         $I->amOnPage($homePage->URL);
 
-        $I->waitForText("Home");
-        $I->waitForText("Week's Special");
+        $I->waitForText(Translator::translate('OUR_BRANDS'));
+        $I->waitForText(Translator::translate('NEWSLETTER'));
     }
 }
