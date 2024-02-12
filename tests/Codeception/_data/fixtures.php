@@ -10,11 +10,11 @@ declare(strict_types=1);
 return [
     // This product is available in ce|pe|ee demodata
     'product' => [
-        'id' => 'dc5ffdf380e15674b56dd562a7cb6aec',
-        'title' => 'Kuyichi leather belt JEVER',
-        'bruttoprice_single' => '29.90',
-        'nettoprice_single' => '25.13',
-        'shipping_cost' => '3.90',
+        'id' => '15d7c73d18d8a2aa7494cb4b29b65c6d',
+        'title' => 'Amber',
+        'bruttoprice_single' => '79.00',
+        'nettoprice_single' => '66.39',
+        'shipping_cost' => '10.00',
         'currency' => '€'
     ],
 

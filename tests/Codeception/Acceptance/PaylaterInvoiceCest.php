@@ -11,6 +11,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Locator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
+use UnzerSDK\Constants\CompanyTypes;
 
 /**
  * @group unzer_module
@@ -28,15 +29,16 @@ final class PaylaterInvoiceCest extends BaseCest
     protected function fillB2Cdata(AcceptanceTester $I)
     {
         $consentCheckbox = Locator::firstElement('.unzerUI .checkbox');
+        $I->scrollTo($consentCheckbox);
         $I->wait(2);
         $I->click($consentCheckbox);
         // use birthdate 10.10.1990
         $I->wait(2);
         $I->fillField('#birthdate_day', 10);
-        $monthPicker = Locator::find('button', ['data-id' => 'birthdate_month']);
+        $monthPicker = '#birthdate_month';
         $I->click($monthPicker);
         $I->wait(2);
-        $I->click(['css' => "#consumer_common li[data-original-index='10']"]);
+        $I->click(['css' => "#consumer_common option[value='10']"]);
         $I->wait(2);
         $I->fillField('#birthdate_year', 1990);
     }
@@ -46,11 +48,13 @@ final class PaylaterInvoiceCest extends BaseCest
         // same as B2C
         $this->fillB2Cdata($I);
         // B2B specific
-        $companyTypeSelect = Locator::find('button', ['data-id' => 'unzer_company_form']);
+        $companyTypeSelect = '#unzer_company_form';
         $I->wait(2);
         $I->click($companyTypeSelect);
         $I->wait(2);
-        $I->click(['css' => "#consumer_b2b li[data-original-index='1']"]);
+        $I->click(['css' => "#consumer_b2b option[value='" . CompanyTypes::ASSOCIATION . "']"]);
+        $I->click($companyTypeSelect);
+        $I->wait(2);
     }
 
     /**

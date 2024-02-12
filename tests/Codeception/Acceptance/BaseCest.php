@@ -49,6 +49,12 @@ abstract class BaseCest
             ['OXID' => $product['id']]
         );
 
+        $I->updateInDatabase(
+            'oxdelivery',
+            ['oxsort' => 15],
+            ['oxtitle' => 'Standard']
+        );
+
         // activate some countries and assign country to the payment.
         // Also make sure, that delivery set and delivery costs are properly assigned
         $aCountryId2paymentId = [
@@ -123,7 +129,7 @@ abstract class BaseCest
      */
     protected function _initializeTest()
     {
-        $miniBasketMenuElement = '//div[@class="btn-group minibasket-menu"]/button';
+        $miniBasketMenuElement = '//button[@class="btn btn-minibasket"]';
         $this->I->openShop();
 
         $basketItem = Fixtures::get('product');
@@ -154,12 +160,12 @@ abstract class BaseCest
         $this->I->click(Translator::translate('DISPLAY_BASKET'));
         $this->I->waitForPageLoad();
 
-        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
-        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForText(Translator::translate('CHECKOUT'));
+        $this->I->click(Translator::translate('CHECKOUT'));
         $this->I->waitForPageLoad();
 
-        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
-        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForText(Translator::translate('NEXT'));
+        $this->I->click(Translator::translate('NEXT'));
         $this->I->waitForPageLoad();
     }
 
@@ -168,7 +174,7 @@ abstract class BaseCest
      */
     protected function _initializeSecuredTest()
     {
-        $miniBasketMenuElement = '//div[@class="btn-group minibasket-menu"]/button';
+        $miniBasketMenuElement = '//button[@class="btn btn-minibasket"]';
         $this->I->openShop();
 
         $basketItem = Fixtures::get('product');
@@ -199,12 +205,12 @@ abstract class BaseCest
         $this->I->click(Translator::translate('DISPLAY_BASKET'));
         $this->I->waitForPageLoad();
 
-        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
-        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForText(Translator::translate('CHECKOUT'));
+        $this->I->click(Translator::translate('CHECKOUT'));
         $this->I->waitForPageLoad();
 
-        $this->I->waitForText(Translator::translate('CONTINUE_TO_NEXT_STEP'));
-        $this->I->click(Translator::translate('CONTINUE_TO_NEXT_STEP'));
+        $this->I->waitForText(Translator::translate('NEXT'));
+        $this->I->click(Translator::translate('NEXT'));
         $this->I->waitForPageLoad();
     }
 
@@ -214,11 +220,11 @@ abstract class BaseCest
      */
     protected function _loginUser(string $type)
     {
-        $accountMenuButton = "//div[contains(@class,'service-menu')]/button";
-        $openAccountMenuButton = "//div[contains(@class,'service-menu')]/ul";
+        $accountMenuButton = "//button[contains(@aria-label,'Usercenter')]";
+        $openAccountMenuButton = "//form[@class='px-3 py-2']";
         $userLoginName = '#loginEmail';
         $userLoginPassword = '#loginPasword';
-        $userLoginButton = '//div[@id="loginBox"]/button';
+        $userLoginButton = '//button[@class="btn btn-primary"]';
 
         $clientData = Fixtures::get($type);
 
@@ -229,7 +235,7 @@ abstract class BaseCest
         $this->I->click($accountMenuButton);
         $this->I->waitForElementClickable($openAccountMenuButton);
 
-        $this->I->waitForText(Translator::translate('MY_ACCOUNT'));
+        //$this->I->waitForText(Translator::translate('MY_ACCOUNT'));
         $this->I->waitForElementVisible($userLoginName);
         $this->I->fillField($userLoginName, $clientData['username']);
         $this->I->fillField($userLoginPassword, $clientData['password']);
@@ -243,15 +249,15 @@ abstract class BaseCest
      */
     protected function _choosePayment(string $label)
     {
-        $nextStepButton = '#paymentNextStepBottom';
-        $breadCrumb = '#breadcrumb';
+        $nextStepButton = '//button[@class="btn btn-highlight btn-lg w-100"]';
 
+        $this->I->scrollTo($label);
+        $this->I->wait(3);
         $this->I->waitForElement($label);
         $this->I->click($label);
 
         $this->I->click($nextStepButton);
         $this->I->waitForPageLoad();
-        $this->I->waitForElement($breadCrumb);
     }
 
     /**
@@ -269,8 +275,13 @@ abstract class BaseCest
      */
     protected function _submitOrder()
     {
-        $this->I->waitForText(Translator::translate('SUBMIT_ORDER'));
-        $this->I->click(Translator::translate('SUBMIT_ORDER'));
+        $submiButton = '#orderConfirmAgbBottom';
+
+
+        $this->I->waitForElement($submiButton);
+        $this->I->scrollTo($submiButton);
+        $this->I->wait(5);
+        $this->I->click($submiButton);
         $this->I->waitForPageLoad();
     }
 

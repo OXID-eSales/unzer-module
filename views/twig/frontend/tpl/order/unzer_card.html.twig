@@ -31,15 +31,15 @@
 {% capture assign = "unzerCardJS" %}
     function executeUnzerPayment(event){
         event.stopPropagation();
-        $( "#payment-form-card" ).submit();
+        document.querySelector( "#payment-form-card" ).requestSubmit();
     }
 
-    /*$( '#orderConfirmAgbBottom' ).submit(function( event ) {
-        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
-            $( "#payment-form-card" ).submit();
+    document.querySelector( '#orderConfirmAgbBottom' ).addEventListener('submit', function( event ) {
+        if(!document.querySelector( '#orderConfirmAgbBottom' ).classList.contains("submitable")){
+            event.preventDefault();
+            document.querySelector( "#payment-form-card" ).requestSubmit();
         }
-        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
-    });*/
+    });
 
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
@@ -59,28 +59,29 @@
         onlyIframe: false
     });
 
-    $( "#payment-form-card" ).on('submit', function( event ) {
+    document.querySelector( "#payment-form-card" ).addEventListener('submit', function( event ) {
         event.preventDefault();
         Card.createResource()
             .then(function(result) {
-                let hiddenInput = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'paymentData')
-                    .val(JSON.stringify(result));
-                $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).submit();
+                let hiddenInput = document.createElement('input');
+                hiddenInput.setAttribute('type', 'hidden');
+                hiddenInput.setAttribute('name', 'paymentData');
+                hiddenInput.value = JSON.stringify(result);
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenInput);
+
+                document.querySelector('#orderConfirmAgbBottom' ).classList.add("submitable");
+                document.querySelector("#orderConfirmAgbBottom" ).submit();
             })
             .catch(function(error) {
-                $('html, body').animate({
-                    scrollTop: $("#orderPayment").offset().top - 150
+                document.querySelector('html, body').animate({
+                    scrollTop: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY  - 150
                 }, 350);
 
-                errorField = $("#card-element-id-number");
-                errorField.find('div').first().addClass('error');
-                errorEl = errorField.find('div.error.message');
-                errorEl.css('display', 'inline-block');
-                errorEl.text(error.message);
-
-                $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+                errorField = document.querySelector("#card-element-id-number");
+                errorField.querySelectorAll("div").item(0).classList.add('error');
+                errorEl = errorField.querySelector("div.error.message");
+                errorEl.setAttribute("style", "display: inline-block");
+                errorEl.innerHTML = error.message;
             })
     });
 

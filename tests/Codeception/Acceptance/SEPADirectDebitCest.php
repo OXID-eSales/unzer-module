@@ -37,12 +37,15 @@ final class SEPADirectDebitCest extends BaseCest
         $this->_choosePayment($this->sepaPaymentLabel);
 
         $payment = Fixtures::get('sepa_payment');
+        $I->scrollTo($this->IBANInput);
+        $I->wait(3);
         $I->fillField($this->IBANInput, $payment['IBAN']);
         $I->click("#oscunzersepaagreement");
         $I->wait(1);
 
         $this->_submitOrder();
 
+        $I->wait(10);
         $this->_checkSuccessfulPayment();
     }
 }

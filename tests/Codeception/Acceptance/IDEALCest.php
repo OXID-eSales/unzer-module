@@ -67,6 +67,8 @@ final class IDEALCest extends BaseCest
         $idealPaymentData = Fixtures::get('ideal_payment');
         $price = str_replace(',', '.', $this->_getPrice());
 
+        $I->scrollTo($this->paymentMethodForm);
+        $I->wait(3);
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
         $I->click("//div[@data-value='" . $idealPaymentData["option"] . "']");

@@ -19,7 +19,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 final class EPSCest extends BaseCest
 {
     private $epsLabel = "//label[@for='payment_oscunzer_eps']";
-    private $paymentMethodForm = "//form[@id='payment-form']";
+    private $paymentMethodForm = "#payment-form";
     private $usernameInput = "//input[@id='username']";
     private $passwordInput = "//input[@id='passwort']";
     private $submitInput = "//input[@type='submit']";
@@ -28,6 +28,9 @@ final class EPSCest extends BaseCest
     private $tanSpan = "//span[@id='tan']";
     private $tanInput = "//input[@id='usrtan']";
     private $backlinkDiv = "//div[@class='button']";
+    private $submitButton = '#selectionSubmit';
+    private $listboxUl = '#listbox-container';
+    private $banknameInput = '#bankname';
 
     protected function _getOXID(): array
     {
@@ -71,6 +74,8 @@ final class EPSCest extends BaseCest
         $epsPaymentData = Fixtures::get('eps_payment');
 
         $I->waitForDocumentReadyState();
+        $I->scrollTo($this->paymentMethodForm);
+        $I->wait(3);
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
         $I->waitForDocumentReadyState();

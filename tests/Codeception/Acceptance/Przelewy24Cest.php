@@ -99,7 +99,6 @@ final class Przelewy24Cest extends BaseCest
 
         // third page : expect end
         $I->waitForDocumentReadyState();
-        $I->waitForJS("return !!window.jQuery", 60);
 
         $this->_checkSuccessfulPayment();
     }

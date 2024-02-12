@@ -5,16 +5,8 @@
     <div class="field" id="error-holder" style="color: #9f3a38"></div>
 </form>
 
+<script>
 {% capture assign = "unzerEPSJS" %}
-
-    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
-            event.preventDefault();
-            $( '#payment-form' ).submit();
-        }
-        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
-    });
-
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
 
@@ -24,27 +16,35 @@
         containerId: 'unzer-eps'
     });
 
+    document.querySelector( '#orderConfirmAgbBottom' ).addEventListener('submit', function( event ) {
+        if(!document.querySelector( '#orderConfirmAgbBottom' ).classList.contains("submitable")){
+            event.preventDefault();
+            document.querySelector( "#payment-form" ).requestSubmit();
+        }
+    });
+
     // Handling payment form submission
-    $( "#payment-form" ).submit(function( event ) {
+    document.querySelector( "#payment-form" ).addEventListener('submit', function( event ) {
         event.preventDefault();
         // Creating a EPS resource
         EPS.createResource()
-        .then(function(result) {
-            let hiddenInput = $(document.createElement('input'))
-            .attr('type', 'hidden')
-            .attr('name', 'paymentData')
-            .val(JSON.stringify(result));
-            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+            .then(function(result) {
+                let hiddenInput = document.createElement('input');
+                hiddenInput.setAttribute('type', 'hidden');
+                hiddenInput.setAttribute('name', 'paymentData');
+                hiddenInput.value = JSON.stringify(result);
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenInput);
 
-            $( '#orderConfirmAgbBottom' ).addClass("submitable");
-            $( "#orderConfirmAgbBottom" ).submit();
-        })
-        .catch(function(error) {
-            $('#error-holder').html(error.message)
-            $('html, body').animate({
-            scrollTop: $("#orderPayment").offset().top - 150
-            }, 350);
-        })
+                document.querySelector( '#orderConfirmAgbBottom' ).classList.add("submitable");
+                document.querySelector( "#orderConfirmAgbBottom" ).submit();
+            })
+            .catch(function(error) {
+                document.querySelector('#error-holder').innerHTML = error.message;
+                document.querySelector('html, body').animate({
+                    scrollTop: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY - 150
+                }, 350);
+            })
     });
 {% endcapture %}
+</script>
 {{ script({ add: unzerEPSJS, dynamic: __oxid_include_dynamic }) }}

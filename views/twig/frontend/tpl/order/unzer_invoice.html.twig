@@ -14,19 +14,19 @@
 {% if isset( invadr.oxuser__oxbirthdate.month ) %}
     {% set iBirthdayMonth = invadr.oxuser__oxbirthdate.month %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]/","")|regex_replace("/[-]([0-9]{1,) 2})$/","") %}
+    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|split("-")[1] %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.day ) %}
     {% set iBirthdayDay = invadr.oxuser__oxbirthdate.day %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]([0-9]{1, 2})[-]/","") %}
+    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|split("-")[2] %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.year ) %}
     {% set iBirthdayYear = invadr.oxuser__oxbirthdate.year %}
 {% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
-    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/[-]([0-9]{1,) 2})[-]([0-9]{1, 2})$/","") %}
+    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|split("-")[0] %}
 {% endif %}
 {% if (oxcmp_user.oxuser__oxcompany.value or (invadr and invadr.oxaddress__oxcompany.value)) %}
     {% set isCompany = true %}
@@ -60,7 +60,7 @@
                 </div>
             </div>
         {% else %}
-            <input id="unzer_select_consumer" type="hidden" value="{% if isB2B %} {{ B2B }} {% else %} {{ B2C }} {% endif %}" />
+            <input id="unzer_select_consumer" type="hidden" value="{% if isB2B %} {{ 'B2B' }} {% else %} {{ 'B2C' }} {% endif %}" />
         {% endif %}
 
         <div id="paylater-invoice">
@@ -102,46 +102,49 @@
             <div class="col-12 col-lg-9">
                 <select id="unzer_company_form" class="form-control selectpicker" required>
                     <option value="" label="-">-</option>
-                    {% for companyTypes in oView.getUnzerCompanyTypes() %}
-                        <option value="{{ companyTypes }}" label="{{ companyTypes }}">{{ companyTypes }}</option>
+                    {% for key, companyTypes in oView.getUnzerCompanyTypes() %}
+                        <option value="{{ key }}" label="{{ companyTypes }}">{{ companyTypes }}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
         {% endif %}
     </form>
+    <script>
     {% capture assign = "unzerInvoiceJS" %}
+    {% if false %}
     let showB2B = function() {
-        $('#consumer_b2c').collapse('hide');
-        $('#consumer_b2b').collapse('show');
+        document.getElementById('consumer_b2c').style.visibility = "hidden";
+        document.getElementById('consumer_b2b').style.visibility = "visible";
     };
     let showB2C = function showB2C() {
-        $('#consumer_b2c').collapse('show');
-        $('#consumer_b2b').collapse('hide');
+        document.getElementById('consumer_b2c').style.visibility = "visible";
+        document.getElementById('consumer_b2b').style.visibility = "hidden";
     };
     {% if isBoth %}
-        $('#unzer_select_consumer').change(function() {
-            opt = $(this).val();
-            if (opt=="B2B") {
-                $('#consumer_b2c').collapse('hide');
-                $('#consumer_b2b').collapse('show');
+        document.querySelector('#unzer_select_consumer').addEventListener('change', function() {
+            opt = this.value;
+            if (opt === "B2B") {
+                document.getElementById('consumer_b2c').style.visibility = "hidden";
+                document.getElementById('consumer_b2b').style.visibility = "visible";
             }
-            else if (opt == "B2C") {
-                $('#consumer_b2c').collapse('show');
-                $('#consumer_b2b').collapse('hide');
+            else if (opt === "B2C") {
+                document.getElementById('consumer_b2c').style.visibility = "visible";
+                document.getElementById('consumer_b2b').style.visibility = "hidden";
             }
             else {
-                $('#consumer_b2c').collapse('hide');
-                $('#consumer_b2b').collapse('hide');
+                document.getElementById('consumer_b2c').style.visibility = "hidden";
+                document.getElementById('consumer_b2b').style.visibility = "hidden";
             }
         });
     {% endif %}
+    {% endif %}
 
     {% if isCompany %}
-        showB2B();
+        //showB2B();
         let unzerInstance = new unzer('{{ oViewConf.getUnzerB2BPubKey() }}', {locale: "{{ unzerLocale }}"});
     {% else %}
-        showB2C();
+        //showB2C();
         let unzerInstance = new unzer('{{ oViewConf.getUnzerB2CPubKey() }}', {locale: "{{ unzerLocale }}"});
     {% endif %}
     let paylaterInvoice = unzerInstance.PaylaterInvoice();
@@ -152,7 +155,7 @@
     })
 
     // Handle payment form submission.
-    $( "#payment-form" ).submit(function( event ) {
+    document.querySelector( "#payment-form" ).addEventListener('submit', function( event ) {
         event.preventDefault();
         paylaterInvoice.createResource()
         .then(function(result) {
@@ -161,44 +164,46 @@
             let selectConsumer = '{{ customerType }}';
             if(
                 (
-                    !$( '.oxDate' ).hasClass("text-danger") && selectConsumer == 'B2C'
+                    !document.querySelector( '.oxDate' ).classList.contains("text-danger") && selectConsumer === 'B2C'
                 )
             {% if isCompany %}
                 || (
-                    !$( '.unzerCompanyForm' ).hasClass("text-danger") && selectConsumer == 'B2B'
+                    !document.querySelector( '.unzerCompanyForm' ).classList.contains("text-danger") && selectConsumer === 'B2B'
                 )
             {% endif %}
             ) {
             {% if isCompany %}
-                let hiddenInputCompanyForm = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'unzer_company_form')
-                    .val($('#unzer_company_form').val());
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputCompanyForm);
+                let hiddenInputCompanyForm = document.createElement('input');
+                hiddenInputCompanyForm.setAttribute('type', 'hidden');
+                hiddenInputCompanyForm.setAttribute('name', 'unzer_company_form');
+                hiddenInputCompanyForm.value = document.getElementById('unzer_company_form').value;
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenInputCompanyForm);
             {% endif %}
-                let hiddenInputBirthdate = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'birthdate')
-                    .val($('#birthdate_year').val()+'-'+$('#birthdate_month').val()+'-'+$('#birthdate_day').val());
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputBirthdate);
+                let hiddenInputBirthdate = document.createElement('input');
+                hiddenInputBirthdate.setAttribute('type', 'hidden');
+                hiddenInputBirthdate.setAttribute('name', 'birthdate');
+                hiddenInputBirthdate.value = document.querySelector('#birthdate_year').value + '-' +
+                                             document.querySelector('#birthdate_month').value + '-' +
+                                             document.querySelector('#birthdate_day').value;
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenInputBirthdate);
 
-                let hiddenCustomerType = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'unzer_customer_type')
-                    .val('{{ customerType }}');
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenCustomerType);
+                let hiddenCustomerType = document.createElement('input');
+                hiddenCustomerType.setAttribute('type', 'hidden');
+                hiddenCustomerType.setAttribute('name', 'unzer_customer_type');
+                hiddenCustomerType.value = '{{ customerType }}';
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenCustomerType);
 
-                let hiddenTypeId = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'unzer_type_id')
-                    .val(typeId);
-                $('#orderConfirmAgbBottom').find(".hidden").append(hiddenTypeId);
+                let hiddenTypeId = document.createElement('input');
+                hiddenTypeId.setAttribute('type', 'hidden');
+                hiddenTypeId.setAttribute('name', 'unzer_type_id');
+                hiddenTypeId.value = typeId;
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenTypeId);
 
-                $('#orderConfirmAgbBottom' ).addClass("submitable");
-                $("#orderConfirmAgbBottom" ).submit();
+                document.querySelector('#orderConfirmAgbBottom' ).classList.add("submitable");
+                document.querySelector("#orderConfirmAgbBottom" ).submit();
             } else {
-                $('html, body').animate({
-                    scrollTop: $("#orderPayment").offset().top - 150
+                document.querySelector('html, body').animate({
+                    scrollTop: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY - 150
                 }, 350);
             }
         })
@@ -208,14 +213,52 @@
 
     });
 
-    $('#orderConfirmAgbBottom').submit(function( event ) {
-        if(!$('#orderConfirmAgbBottom').hasClass("submitable")){
+    document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function( event ) {
+        if(!document.querySelector('#orderConfirmAgbBottom').classList.contains("submitable")){
             event.preventDefault();
-            $("#payment-form").submit();
+            document.querySelector("#payment-form").requestSubmit();
         }
-        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
+    });
+
+    {% if isCompany %}
+        document.querySelector( '#unzer_company_form' ).addEventListener('change', function(event) {
+            event.preventDefault();
+            if (document.querySelector('#unzer_company_form').value === "") {
+                document.querySelector( '.unzerCompanyForm' ).classList.add("text-danger");
+            } else {
+                document.querySelector( '.unzerCompanyForm' ).classList.remove("text-danger");
+            }
+        });
+    {% endif %}
+
+    document.querySelector( '#birthdate_year' ).addEventListener('change', function(event) {
+        event.preventDefault();
+        if (document.querySelector('#birthdate_year').value === "") {
+            document.querySelector( '.oxDate' ).classList.add("text-danger");
+        } else {
+            document.querySelector( '.oxDate' ).classList.remove("text-danger");
+        }
+    });
+
+    document.querySelector( '#birthdate_month' ).addEventListener('change', function(event) {
+        event.preventDefault();
+        if (document.querySelector('#birthdate_month').value === "") {
+            document.querySelector( '.oxDate' ).classList.add("text-danger");
+        } else {
+            document.querySelector( '.oxDate' ).classList.remove("text-danger");
+        }
+    });
+
+    document.querySelector( '#birthdate_day' ).addEventListener('change', function(event) {
+        event.preventDefault();
+        if (document.querySelector('#birthdate_day').value === "") {
+            document.querySelector( '.oxDate' ).classList.add("text-danger");
+        } else {
+            document.querySelector( '.oxDate' ).classList.remove("text-danger");
+        }
     });
 
     {% endcapture %}
+    </script>
     {{ script({ add: unzerInvoiceJS, dynamic: __oxid_include_dynamic }) }}
 {% endblock %}

@@ -19,15 +19,15 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 final class GiropayCest extends BaseCest
 {
     private $giropayPaymentLabel = "//label[@for='payment_oscunzer_giropay']";
-    private $banknameInput = "//input[@id='tags']";
+    private $banknameInput = "//input[@name='bic']";
     private $banknameA = "//ul[@class='ui-menu ui-widget ui-widget-content ui-autocomplete ui-front']";
-    private $continueButton = "//input[@name='continueBtn']";
-    private $accountLabel = "//input[@name='account/addition[@name=benutzerkennung]']";
-    private $PINLabel = "//input[@name='ticket/pin']";
+    private $continueButton = "//button[@class='btn btn-primary']";
+    private $accountLabel = "//input[@name='userLogin']";
+    private $PINLabel = "//input[@name='userPIN']";
     private $payNowButton = "//input[@value='Jetzt bezahlen']";
     private $chooseTANLabel = "//input[@id='TV5']";
     private $nextStepButton = "//input[@name='weiterButton' and @type='submit']";
-    private $TANLabel = "//input[@name='ticket/tan']";
+    private $TANLabel = "//input[@name='tan']";
     private $yesButton = "//button[@id='yes']";
 
     protected function _getOXID(): array
@@ -48,43 +48,27 @@ final class GiropayCest extends BaseCest
 
         $giropayPaymentData = Fixtures::get('giropay_payment');
 
-        // first page : put in bankname
         $I->waitForElement($this->banknameInput);
         $I->fillField($this->banknameInput, $giropayPaymentData['BIC']);
-        $I->waitForElement($this->banknameA);
-        $I->wait(5);
-        $I->canSeeAndClick($this->banknameA);
+        $I->waitForElement($this->continueButton);
         $I->click($this->continueButton);
 
-        // accept using of cache
-        $I->waitForElement($this->yesButton);
-        $I->click($this->yesButton);
-
-        // second page : login
         $I->waitForElement($this->accountLabel);
         $I->fillField($this->accountLabel, $giropayPaymentData['USER']);
         $I->fillField($this->PINLabel, $giropayPaymentData['USER_PIN']);
-        $I->click($this->payNowButton);
+        $I->waitForElement($this->continueButton);
+        $I->click($this->continueButton);
 
-        // third page : choose TAN options
-        $I->waitForText($this->_getPrice());
-        $I->waitForElement($this->chooseTANLabel);
-        $I->click($this->chooseTANLabel);
-        $I->click($this->nextStepButton);
-
-        // fourth page : login TAN
         $I->waitForElement($this->TANLabel);
         $I->fillField($this->TANLabel, $giropayPaymentData['USER_TAN']);
-        $I->pressKey($this->TANLabel, "\n");
 
-        // fifth page : check information
-        $I->waitForElement($this->nextStepButton);
-        $I->click($this->nextStepButton);
-
-        // sixth page : confirm payment
-        $I->waitForElement($this->TANLabel);
-        $I->fillField($this->TANLabel, $giropayPaymentData['USER_TAN']);
-        $I->click($this->payNowButton);
+        $I->waitForElement($this->continueButton);
+        $I->click($this->continueButton);
+        $I->waitForText(str_replace(',', '.', $this->_getPrice()));
+        $I->waitForElementClickable($this->continueButton);
+        $I->wait(5);
+        $I->click($this->continueButton);
+        $I->wait(5);
 
         $this->_checkSuccessfulPayment();
     }

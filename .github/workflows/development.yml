@@ -349,7 +349,7 @@ jobs:
             source/source/log/oxideshop.log
             data/php/logs/error_log.txt
 
-  codeception_twig:
+  codeception_tests:
     strategy:
       fail-fast: false
       matrix:
@@ -383,35 +383,28 @@ jobs:
           make up
           sleep 2
 
-      - name: Configure codeception runner for twig case
-        run: |
-          perl -pi\
-            -e 's#theme_id: .*#theme_id: twig#g;'\
-            -e 's#admin_smarty#admin_twig#g;'\
-            -e 's#\/flow\/translations#\/twig#g;'\
-            source/vendor/${{ env.PACKAGE_NAME }}/tests/Codeception/acceptance.suite.yml
-
       - name: Install twig template engine and twig theme
         run: |
           docker-compose exec -T php composer require oxid-esales/twig-component:dev-b-7.0.x --no-update
           docker-compose exec -T php composer require oxid-esales/twig-admin-theme:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer require oxid-esales/twig-theme:dev-b-7.0.x --no-update
+          docker-compose exec -T php composer require oxid-esales/apex-theme:dev-b-7.0.x --no-update
           docker-compose exec -T php composer update --no-interaction
 
       - name: Install demodata
         run: |
-          docker-compose exec -T php bin/oe-console oe:setup:demodata
+          docker-compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-b-7.0.x --no-update
+          docker-compose exec -T php composer update --no-interaction
 
       - name: Activate theme
         run: |
-          docker-compose exec -T php bin/oe-console oe:theme:activate twig
+          docker-compose exec -T php bin/oe-console oe:theme:activate apex
 
       - name: Run tests
         run: |
           docker-compose exec -T \
             -e SELENIUM_SERVER_HOST=selenium \
             -e BROWSER_NAME=chrome \
-            -e THEME_ID=twig \
+            -e THEME_ID=apex \
             -e MODULE_IDS=0 \
             php vendor/bin/codecept run acceptance \
                 -c /var/www/vendor/${{ env.PACKAGE_NAME }}/tests/codeception.yml \
@@ -437,88 +430,6 @@ jobs:
         if: always()
         run: |
           docker-compose down
-          sleep 2
-
-  codeception_smarty:
-    strategy:
-      fail-fast: false
-      matrix:
-        group:
-          [
-            'PaymentAvailableTest',
-            'FirstGroup',
-            'SecondGroup',
-            'ThirdGroup',
-          ]
-    needs: [ install_shop_with_module ]
-    if: ${{ inputs.template_engine == 'both' || inputs.template_engine == 'smarty' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Load current installation from cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ./*
-          key: installation-${{ join(inputs.*, '-') }}-${{ github.run_number }}-${{ github.run_attempt }}
-          restore-keys: |
-            installation-${{ join(inputs.*, '-') }}-${{ github.run_number }}-${{ github.run_attempt }}
-      - name: Reconfigure codeception for smarty themes
-        run: |
-          perl -pi \
-          -e 's#admin_twig#admin_smarty#g;' \
-          source/test-module/tests/Codeception/acceptance.suite.yml
-          perl -pi \
-          -e 's#views/twig#views/flow/translations#g;' \
-          source/test-module/tests/Codeception/acceptance.suite.yml
-          perl -pi \
-          -e 's#theme_id:\s?twig#theme_id: flow#g;' \
-          source/test-module/tests/Codeception/acceptance.suite.yml
-      - name: Start containers
-        run: |
-          make up
-          sleep 2
-
-      - name: Install smarty template engine and flow theme
-        run: |
-          docker-compose exec -T php composer require oxid-esales/smarty-component:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer require oxid-esales/smarty-admin-theme:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer require oxid-esales/flow-theme:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer update --no-interaction
-
-      - name: Install demodata
-        run: |
-          docker-compose exec -T php bin/oe-console oe:setup:demodata
-
-      - name: Run tests
-        run: |
-          docker-compose exec -T \
-            -e SELENIUM_SERVER_HOST=selenium \
-            -e BROWSER_NAME=chrome \
-            -e THEME_ID=flow \
-            -e MODULE_IDS=0 \
-            php vendor/bin/codecept run acceptance \
-                -c /var/www/vendor/${{ env.PACKAGE_NAME }}/tests/codeception.yml \
-                --bootstrap tests/bootstrap.php \
-                -g ${{ matrix.group }}
-
-      - name: Upload log artifact
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: ModuleCodeceptionTestsLog-${{ inputs.php }}-${{ inputs.mysql }}-${{ inputs.template_engine }}
-          path: |
-            docker-compose.yml
-            source/composer.json
-            source/composer.lock
-            source/source/config.inc.php
-            source/source/log/oxideshop.log
-            data/php/logs/error_log.txt
-            source/tests/Codeception/_output
-            source/vendor/${{ env.PACKAGE_NAME }}/tests/Codeception/_output/
-      - name: Stop containers
-        if: always()
-        run: |
-          make down
           sleep 2
 
   prepare_coverage_results:
