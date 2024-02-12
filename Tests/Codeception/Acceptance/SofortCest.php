@@ -23,7 +23,7 @@ final class SofortCest extends BaseCest
     private $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
     private $bankSearchInput = "//input[@id='BankCodeSearch']";
     private $banksearchresultDiv = "//div[@id='BankSearcherResults']";
-    private $bankLabel = "//input[@id='account-88888888']";
+    private $bankLabel = "//label[@for='account-88888888']";
     private $accountNumberLabel = "//input[@id='BackendFormLOGINNAMEUSERID']";
     private $PINNumberLabel = "//input[@id='BackendFormUSERPIN']";
     private $continueButton = "//button[@class='button-right primary has-indicator']";
@@ -60,8 +60,8 @@ final class SofortCest extends BaseCest
         $I->waitForElement($this->bankSearchInput);
         $I->fillField($this->bankSearchInput, "Demo Bank");
         $I->wait(1);
-        $I->waitForElement($this->bankLabel);
-        $I->clickWithLeftButton($this->bankLabel);
+        $I->waitForElementClickable($this->bankLabel);
+        $I->click($this->bankLabel);
 
         // second page : put in account data
         $I->waitForElement($this->accountNumberLabel);
