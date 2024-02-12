@@ -140,6 +140,7 @@ class UnzerSDKLoader
             }
             if ($paymentType === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
                 $customerType = 'B2C';
+                return  $this->getUnzerSDK($customerType, $currency, true);
             }
         }
         return $this->getUnzerSDK($customerType, $currency);

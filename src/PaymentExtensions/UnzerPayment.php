@@ -163,7 +163,7 @@ abstract class UnzerPayment
             try {
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
                 $UnzerSdk = $loader->getUnzerSDK('B2C', $currency->name, true);
-                $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
+                $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer,   $this->unzerService->getShopMetadata($this->paymentMethod), $uzrBasket);
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }
