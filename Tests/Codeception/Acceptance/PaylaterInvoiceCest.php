@@ -64,6 +64,7 @@ final class PaylaterInvoiceCest extends BaseCest
         $this->_initializeSecuredTest();
         $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
         $this->fillB2Cdata($I);
+        $I->scrollTo('#orderConfirmAgbBottom');
         $orderPage->submitOrder();
 
         $this->_checkSuccessfulPayment();

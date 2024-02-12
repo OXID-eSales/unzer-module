@@ -285,7 +285,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: CodeceptionTestsLog-${{ matrix.php }}
+          name: CodeceptionTestsLog-${{ matrix.php }}-${{ matrix.group }}
           path: |
             source/vendor/${{ env.PACKAGE_NAME }}/Tests/Codeception/_output/
             source/source/log/oxideshop.log

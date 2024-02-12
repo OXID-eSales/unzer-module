@@ -180,7 +180,7 @@ class Payment
                 $result = self::STATUS_NOT_FINISHED;
                 /** @var string $redirectUrl */
                 $redirectUrl = $transaction->getRedirectUrl();
-                $this->redirectUrl = $redirectUrl;
+                $this->redirectUrl = is_null($redirectUrl) ? "" : $redirectUrl;
             } elseif ($transaction->isError()) {
                 throw new Exception($this->translator->translateCode(
                     $transaction->getMessage()->getCode(),

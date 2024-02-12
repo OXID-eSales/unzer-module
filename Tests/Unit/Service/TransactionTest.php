@@ -30,7 +30,8 @@ class TransactionTest extends TestCase
             'oxuserid' => 'userId',
             'oxshopid' => 5,
             'oxactiondate' => '2021-12-10 16:44:54',
-            'customertype' => ''
+            'customertype' => '',
+            'metadata' => '""'
         ]);
 
         $sut->writeTransactionToDB("orderId", "userId", null);
