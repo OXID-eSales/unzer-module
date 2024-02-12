@@ -41,7 +41,7 @@ class UnzerPaymentTest extends TestCase
         $unzerServiceMock->method('prepareOrderRedirectUrl')->willReturn('someRedirectUrl');
         $unzerServiceMock->method('getUnzerCustomer')->with($userModel)->willReturn($customer = new Customer());
         $unzerServiceMock->method('getShopMetadata')->willReturn($metadata = new Metadata());
-        $unzerServiceMock->method('generateUnzerOrderId')->willReturn('unzerOrderId');
+        $unzerServiceMock->method('generateUnzerOrderId')->willReturn(1234567890);
         $unzerServiceMock->method('getUnzerBasket')->willReturn($unzerBasket);
 
         $chargeResult = $this->createPartialMock(Charge::class, []);
@@ -65,7 +65,7 @@ class UnzerPaymentTest extends TestCase
                 'EUR',
                 'someRedirectUrl',
                 $customer,
-                'unzerOrderId',
+                1234567890,
                 $metadata,
                 $unzerBasket
             )
