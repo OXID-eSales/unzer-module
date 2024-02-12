@@ -425,6 +425,12 @@ class ModuleSettings
         if ('' !== $this->getShopPrivateKeyB2BInvoiceCHF()) {
             $privateKeys['b2bchf'] = $this->getShopPrivateKeyB2BInvoiceCHF();
         }
+        if ('' !== $this->getShopPrivateKeyB2CInstallmentEUR()) {
+            $privateKeys['b2ceurinstallment'] = $this->getShopPrivateKeyB2CInstallmentEUR();
+        }
+        if ('' !== $this->getShopPrivateKeyB2CInstallmentCHF()) {
+            $privateKeys['b2cchfinstallment'] = $this->getShopPrivateKeyB2CInstallmentCHF();
+        }
         return $privateKeys;
     }
 
@@ -507,6 +513,27 @@ class ModuleSettings
             $this->isBasketCurrencyEUR() &&
             !empty($this->getShopPublicKeyB2CInvoiceEUR()) &&
             !empty($this->getShopPrivateKeyB2CInvoiceEUR())
+        );
+    }
+    public function isB2CInstallmentEligibility(): bool
+    {
+        return (
+                $this->isBasketCurrencyCHF() &&
+                !empty($this->getShopPublicKeyB2CInstallmentCHF()) &&
+                !empty($this->getShopPrivateKeyB2CInstallmentCHF())
+            ) ||
+            (
+                $this->isBasketCurrencyEUR() &&
+                !empty($this->getShopPublicKeyB2CInstallmentEUR()) &&
+                !empty($this->getShopPublicKeyB2CInstallmentEUR())
+            );
+    }
+    public function isInstallmentEligibility(): bool
+    {
+        return (
+        ($this->isB2CInstallmentEligibility() &&
+            $this->hasWebhookConfiguration('b2ceurinstallment') &&
+            $this->hasWebhookConfiguration('b2cchfinstallment'))
         );
     }
 
@@ -680,7 +707,7 @@ class ModuleSettings
     {
         $result = $this->getShopPublicKeyPaylater();
 
-        if ($this->isB2CInvoiceEligibility() && $customerType === 'B2C') {
+        if ($this->isB2CInstallmentEligibility() && $customerType === 'B2C') {
             if ($this->isBasketCurrencyCHF()) {
                 $result = $this->getShopPublicKeyB2CInstallmentCHF();
             }

@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
@@ -95,10 +96,10 @@ class AdminOrderController extends AdminDetailsController
         return "@osc-unzer/admin/tpl/oscunzer_order";
     }
 
-    public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
+    public function getUnzerSDK(string $customerType = '', string $currency = '', $type = false): Unzer
     {
         return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK($customerType, $currency);
+            ->getUnzerSDK($customerType, $currency, $type);
     }
 
     /**
@@ -112,8 +113,10 @@ class AdminOrderController extends AdminDetailsController
     {
         try {
             $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
+            $paymentId =  $this->getEditObject()->getFieldData('oxpaymenttype');
+            $type = $paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID ? true : false;
             // initialize proper SDK object
-            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency']);
+            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency'],$type);
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
             $unzerPayment = $sdk->fetchPayment($sPaymentId);
             $fCancelled = 0.0;

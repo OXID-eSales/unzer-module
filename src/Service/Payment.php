@@ -9,7 +9,6 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -21,12 +20,10 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerP
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\AbstractUnzerResource;
-use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
-use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
 
 /**
@@ -100,7 +97,6 @@ class Payment
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
-        $paymentExtension = null;
         try {
             /** @var string $customerType */
             $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
@@ -253,7 +249,6 @@ class Payment
             /** @var Order $order */
             $order = oxNew(Order::class);
             $order->load($sessionOrderId);
-
             $customerType = '';
             /** @var string $currency */
             if ($currency === null) {
@@ -279,9 +274,11 @@ class Payment
             }
             if ($order->getFieldData('oxpaymenttype') == UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
                 $customerType = 'B2C';
+                $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency, true);
+            } else {
+                $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
             }
 
-            $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
             return $sdk->fetchPayment($paymentId);
         }
 
