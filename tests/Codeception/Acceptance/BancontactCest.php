@@ -130,6 +130,7 @@ final class BancontactCest extends BaseCest
         $I->wantToTest('Test Bancontact Maestro payment works');
         $this->_prepareBancontactTest($I);
         $this->_submitBancontactPayment('maestro_payment');
+        $I->wait(3);
         $this->_checkBancontactPayment();
     }
 }

@@ -59,21 +59,32 @@ class TransactionTest extends IntegrationTestCase
             ])
         ]);
 
-        $model->expects($this->at(0))->method('assign')->with([
-            'oxorderid' => 'orderId',
-            'shortid' => 'unzerShortId',
-            'traceid' => null,
-            'oxshopid' => 5,
-            'oxuserid' => 'userId',
-            'oxactiondate' => '2021-12-10 16:44:54',
-            'amount' => 10.20,
-            'currency' => 'specialCurrency',
-            'typeid' => 'unzerPaymentId',
-            'oxaction' => 'statename',
-            'metadata' => 'metadataJson',
-            'customerid' => 'unzerCustomerId',
-            'customertype' => ''
-        ]);
+        $assignCallCount = 0;
+
+        $model->method('assign')->willReturnCallback(function ($params) use (&$assignCallCount) {
+            $assignCallCount++;
+            $firstCallParams = [
+                'oxorderid' => 'orderId',
+                'shortid' => 'unzerShortId',
+                'traceid' => null,
+                'oxshopid' => 5,
+                'oxuserid' => 'userId',
+                'oxactiondate' => '2021-12-10 16:44:54',
+                'amount' => 10.20,
+                'currency' => 'specialCurrency',
+                'typeid' => 'unzerPaymentId',
+                'oxaction' => 'statename',
+                'metadata' => 'metadataJson',
+                'customerid' => 'unzerCustomerId',
+                'customertype' => ''
+            ];
+
+            if ($assignCallCount === 1) {
+                return $params === $firstCallParams;
+            } else {
+                return false;
+            }
+        });
 
         $this->assertTrue($sut->writeTransactionToDB("orderId", "userId", $payment));
         $this->assertFalse($sut->writeTransactionToDB("orderId", "userId", $payment));

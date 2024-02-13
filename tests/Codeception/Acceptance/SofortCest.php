@@ -58,8 +58,8 @@ final class SofortCest extends BaseCest
         $I->waitForText($this->_getPrice() . ' ' . $this->_getCurrency());
         $I->selectOption($this->landSelect, 'DE');
         $I->waitForElement($this->bankSearchInput);
+        $I->wait(3);
         $I->fillField($this->bankSearchInput, "Demo Bank");
-        $I->wait(1);
         $I->waitForElement($this->bankLabel);
         $I->clickWithLeftButton($this->bankLabel);
 
