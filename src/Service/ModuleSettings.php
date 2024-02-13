@@ -532,7 +532,7 @@ class ModuleSettings
     {
         return (
         ($this->isB2CInstallmentEligibility() &&
-            $this->hasWebhookConfiguration('b2ceurinstallment') &&
+            $this->hasWebhookConfiguration('b2ceurinstallment') ||
             $this->hasWebhookConfiguration('b2cchfinstallment'))
         );
     }
