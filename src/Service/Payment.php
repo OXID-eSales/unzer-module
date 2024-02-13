@@ -21,6 +21,7 @@ use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerP
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPaymentInterface;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Payment as UnzerPayment;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
@@ -41,33 +42,23 @@ class Payment
     private const STATUS_NOT_FINISHED = "NOT_FINISHED";
     private const STATUS_ERROR = "ERROR";
 
-    /** @var Session */
-    protected $session;
+    protected Session $session;
 
-    /** @var PaymentExtensionLoader */
-    protected $paymentExtLoader;
+    protected PaymentExtensionLoader $paymentExtLoader;
 
-    /** @var Translator */
-    protected $translator;
+    protected Translator $translator;
 
-    /** @var Unzer */
-    protected $unzerService;
+    protected Unzer $unzerService;
 
-    /** @var UnzerSDKLoader */
-    protected $unzerSDKLoader;
+    protected UnzerSDKLoader $unzerSDKLoader;
 
-    /**
-     * @var string
-     */
-    protected $redirectUrl;
+    protected ?UnzerPayment $sessionUnzerPayment = null;
 
-    /**
-     * @var string
-     */
-    protected $pdfLink;
+    protected string $redirectUrl = '';
 
-    /** @var TransactionService */
-    protected $transactionService;
+    protected string $pdfLink = '';
+
+    protected TransactionService $transactionService;
 
     /**
      * @param Session $session
@@ -99,6 +90,7 @@ class Payment
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
+        $paymentExtension = null;
         try {
             /** @var string $customerType */
             $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
@@ -173,7 +165,7 @@ class Payment
     public function getUnzerPaymentStatus(): string
     {
         $result = self::STATUS_ERROR;
-
+        /** @var UnzerPayment $sessionUnzerPayment */
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
         if (is_null($sessionUnzerPayment)) {
             return $result;
@@ -199,7 +191,7 @@ class Payment
                 $result = self::STATUS_NOT_FINISHED;
                 /** @var string $redirectUrl */
                 $redirectUrl = $transaction->getRedirectUrl();
-                $this->redirectUrl = $redirectUrl;
+                $this->redirectUrl = is_null($redirectUrl) ? "" : $redirectUrl;
             } elseif ($transaction->isError()) {
                 throw new Exception($this->translator->translateCode(
                     $transaction->getMessage()->getCode(),

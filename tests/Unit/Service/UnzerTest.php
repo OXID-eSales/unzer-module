@@ -15,10 +15,16 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\Eshop\Core\Price;
+use OxidEsales\EshopCommunity\Core\DatabaseProvider;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Context;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use OxidSolutionCatalysts\Unzer\Service\Payment;
+use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
+use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 
 class UnzerTest extends IntegrationTestCase
 {
@@ -95,23 +101,121 @@ class UnzerTest extends IntegrationTestCase
         ];
     }
 
-    private function getSut(array $settings = []): Unzer
+    public function testIfImmediatePostAuthCollectTrue(): void
     {
-        $translatorMock = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
+        $moduleSettings = $this->createPartialMock(ModuleSettings::class, ['getPaymentProcedureSetting']);
+        $moduleSettings->method('getPaymentProcedureSetting')
+            ->willReturn(ModuleSettings::PAYMENT_CHARGE);
+        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
+        $paymentService = $this->getPaymentServiceMock($sut);
+
+        $this->assertTrue($sut->ifImmediatePostAuthCollect($paymentService));
+    }
+
+    public function testIfImmediatePostAuthCollectFalse(): void
+    {
+        $moduleSettings = $this->createPartialMock(ModuleSettings::class, ['getPaymentProcedureSetting']);
+        $moduleSettings->method('getPaymentProcedureSetting')
+            ->willReturn(ModuleSettings::PAYMENT_AUTHORIZE);
+        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
+        $paymentService = $this->getPaymentServiceMock($sut);
+
+        $paymentService->method('getUnzerOrderId')
+            ->willReturn(666);
+
+        $sql = "INSERT INTO oxorder SET OXID=9999, OXPAYMENTTYPE='oscunzer_paypal', OXUNZERORDERNR=666";
+        DatabaseProvider::getDb()->execute($sql);
+
+        $this->assertFalse($sut->ifImmediatePostAuthCollect($paymentService));
+    }
+
+    private function getPaymentServiceMock($sut)
+    {
+        return $this->getMockBuilder(Payment::class)
+            ->setConstructorArgs(
+                [
+                    $this->createMock(Session::class),
+                    $this->createMock(PaymentExtensionLoader::class),
+                    $this->createMock(Translator::class),
+                    $sut,
+                    $this->createMock(UnzerSDKLoader::class),
+                    $this->createMock(Transaction::class),
+                    $this->createMock(TransactionService::class)
+                ]
+            )
             ->getMock();
-        $translatorMock->expects($this->any())
-            ->method('translate')
-            ->willReturn('Shipping costs');
-        return new Unzer(
-            $this->createPartialMock(Session::class, []),
-            $translatorMock,
-            $this->createPartialMock(Context::class, []),
-            $settings[ModuleSettings::class] ?:
-                $this->createPartialMock(ModuleSettings::class, []),
-            $settings[Request::class] ?:
-                $this->createPartialMock(Request::class, []),
+    }
+
+
+    public function testGetPaymentProcedureAuthorizeForListedPayment(): void
+    {
+        $paymentType = 'paypal';
+
+        $moduleSettings = $this->createPartialMock(
+            ModuleSettings::class,
+            ['getPaymentProcedureSetting']
         );
+
+        $moduleSettings->method('getPaymentProcedureSetting')
+            ->willReturn(ModuleSettings::PAYMENT_AUTHORIZE);
+
+        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
+
+        $paymentProcedure = $sut->getPaymentProcedure($paymentType);
+        $this->assertEquals(ModuleSettings::PAYMENT_AUTHORIZE, $paymentProcedure);
+    }
+
+    public function testGetPaymentProcedureChargeForListedPayment(): void
+    {
+        $paymentType = 'paypal';
+
+        $moduleSettings = $this->createPartialMock(
+            ModuleSettings::class,
+            ['getPaymentProcedureSetting']
+        );
+
+        $moduleSettings->method('getPaymentProcedureSetting')
+            ->willReturn(ModuleSettings::PAYMENT_CHARGE);
+
+        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
+
+        $paymentProcedure = $sut->getPaymentProcedure($paymentType);
+        $this->assertEquals(ModuleSettings::PAYMENT_CHARGE, $paymentProcedure);
+    }
+
+    public function testGetPaymentProcedureChargeForNonlistedPayment(): void
+    {
+        $paymentType = 'unlisted_payment';
+
+        $moduleSettings = $this->createPartialMock(
+            ModuleSettings::class,
+            ['getPaymentProcedureSetting']
+        );
+
+        $moduleSettings->method('getPaymentProcedureSetting')
+            ->willReturn(ModuleSettings::PAYMENT_AUTHORIZE);
+
+        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
+
+        $paymentProcedure = $sut->getPaymentProcedure($paymentType);
+        $this->assertEquals(ModuleSettings::PAYMENT_CHARGE, $paymentProcedure);
+    }
+
+    public function testGetPaymentProcedureChargeForUnlistedPayment(): void
+    {
+        $paymentType = 'dummy_payment';
+
+        $moduleSettings = $this->createPartialMock(
+            ModuleSettings::class,
+            ['getPaymentProcedureSetting']
+        );
+        $moduleSettings->method('getPaymentProcedureSetting')
+            ->willReturn(ModuleSettings::PAYMENT_CHARGE);
+
+        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
+
+        $paymentProcedure = $sut->getPaymentProcedure($paymentType);
+        $this->assertEquals(ModuleSettings::PAYMENT_CHARGE, $paymentProcedure);
     }
 
     public function testGetBasicUnzerBasket(): void
@@ -228,5 +332,24 @@ class UnzerTest extends IntegrationTestCase
         $this->expectExceptionMessage('oscunzer_WRONGPAYMENTID');
 
         $sut->getUnzerPaymentIdFromRequest();
+    }
+
+    private function getSut(array $settings = []): Unzer
+    {
+        $translatorMock = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translatorMock->expects($this->any())
+            ->method('translate')
+            ->willReturn('Shipping costs');
+        return new Unzer(
+            $this->createPartialMock(Session::class, []),
+            $translatorMock,
+            $this->createPartialMock(Context::class, []),
+            $settings[ModuleSettings::class] ?:
+                $this->createPartialMock(ModuleSettings::class, []),
+            $settings[Request::class] ?:
+                $this->createPartialMock(Request::class, []),
+        );
     }
 }

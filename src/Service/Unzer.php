@@ -19,6 +19,8 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
@@ -89,12 +91,6 @@ class Unzer
     }
 
     /**
-     * @param User $oUser
-     * @param Order|null $oOrder
-     * @param string $companyType
-     * @return Customer
-     * @throws UnzerException
-     *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -122,7 +118,7 @@ class Unzer
 
         /** @var string $birthdate */
         $birthdate = $oUser->getFieldData('oxbirthdate');
-        $customer->setBirthDate($birthdate != "0000-00-00" ? $birthdate : '');
+        $customer->setBirthDate($birthdate !== "0000-00-00" ? $birthdate : '');
 
         /** @var string $oxcompany */
         $oxcompany = $oUser->getFieldData('oxcompany');
@@ -248,11 +244,6 @@ class Unzer
         return $customer;
     }
 
-    /**
-     * @param Customer $unzerCustomer
-     * @param Customer $oxidCustomer
-     * @return bool
-     */
     public function updateUnzerCustomer(Customer $unzerCustomer, Customer $oxidCustomer): bool
     {
         $hasChanged = false;
@@ -339,11 +330,6 @@ class Unzer
         return $hasChanged;
     }
 
-    /**
-     * @param string $unzerOrderId
-     * @param BasketModel $basketModel
-     * @return Basket
-     */
     public function getUnzerBasket(string $unzerOrderId, BasketModel $basketModel): Basket
     {
         // v2 (BUT we need to keep the v1 methods for some reason...)
@@ -434,9 +420,6 @@ class Unzer
         return $basket;
     }
 
-    /**
-     * @throws Exception
-     */
     public function getUnzerRiskData(Customer $unzerCustomer, User $oUser): RiskData
     {
         $bPasswordIsEmpty = ($oUser->getFieldData('oxpassword') === '');
@@ -475,10 +458,6 @@ class Unzer
         return $riskData;
     }
 
-    /**
-     * @param Charge $charge
-     * @return string
-     */
     public function getBankDataFromCharge(Charge $charge): string
     {
         $bankData = sprintf(
@@ -510,10 +489,6 @@ class Unzer
         return $bankData;
     }
 
-    /**
-     * @param string $paymentMethod
-     * @return string
-     */
     public function getPaymentProcedure(string $paymentMethod): string
     {
         if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured', 'applepay', 'paylater-installment'])) {
@@ -524,8 +499,6 @@ class Unzer
     }
 
     /**
-     * @param bool $addPending
-     * @return string
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function prepareOrderRedirectUrl(bool $addPending = false): string
@@ -539,9 +512,6 @@ class Unzer
         return $redirectUrl;
     }
 
-    /**
-     * @return string
-     */
     public function preparePdfConfirmRedirectUrl(): string
     {
         $redirectUrl = $this->prepareRedirectUrl('unzer_installment');
@@ -549,10 +519,6 @@ class Unzer
         return $redirectUrl;
     }
 
-    /**
-     * @param string $destination
-     * @return string
-     */
     public function prepareRedirectUrl(string $destination = ''): string
     {
         return Registry::getConfig()->getSslShopUrl() . 'index.php?cl=' . str_replace('?', '&', $destination);
@@ -608,8 +574,6 @@ class Unzer
     }
 
     /**
-     * @param string $paymentMethod
-     * @return Metadata
      * @throws \Exception
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
@@ -628,8 +592,6 @@ class Unzer
     }
 
     /**
-     * @return int
-     * @throws Exception
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function generateUnzerOrderId(): int
@@ -652,9 +614,6 @@ class Unzer
         Registry::getSession()->deleteVariable('UnzerOrderId');
     }
 
-    /**
-     * @return string
-     */
     public function generateUnzerThreatMetrixIdInSession(): string
     {
         $tmSessionID = Registry::getUtilsObject()->generateUID();
@@ -662,9 +621,6 @@ class Unzer
         return $tmSessionID;
     }
 
-    /**
-     * @return string
-     */
     public function getUnzerThreatMetrixIdFromSession(): string
     {
         /** @var string $tmSessionID */
@@ -673,7 +629,6 @@ class Unzer
     }
 
     /**
-     * @return void
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function setIsAjaxPayment(bool $isAjaxPayment = false): void
@@ -681,11 +636,46 @@ class Unzer
         $this->session->setVariable('UzrAjaxRedirect', $isAjaxPayment);
     }
 
-    /**
-     * @return bool
-     */
     public function isAjaxPayment(): bool
     {
         return (bool)$this->session->getVariable('UzrAjaxRedirect');
+    }
+
+    public function ifImmediatePostAuthCollect(Payment $paymentService): bool
+    {
+        $paymentMethod = $this->getPaymentMethodFromOrder($paymentService->getUnzerOrderId());
+        $paymentProcedure = $this->getPaymentProcedure(str_replace('oscunzer_', '', $paymentMethod));
+        return $paymentProcedure === ModuleSettings::PAYMENT_CHARGE;
+    }
+
+    private function getPaymentMethodFromOrder(int $oxUnzerOrderNr): string
+    {
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = ContainerFactory::getInstance()
+            ->getContainer()->get(QueryBuilderFactoryInterface::class);
+
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->select('OXPAYMENTTYPE')
+            ->from('oxorder')
+            ->where("OXUNZERORDERNR = :oxunzerordernr");
+
+        $parameters = [
+            ':oxunzerordernr' => $oxUnzerOrderNr,
+        ];
+
+        $result = $query->setParameters($parameters)->execute();
+
+        if ($result instanceof \Doctrine\DBAL\Driver\ResultStatement) {
+            /** @var string $value */
+            $value = $result->fetchColumn();
+            if (empty($value)) {
+                $value = '';
+            };
+            return $value;
+        }
+
+        return '';
     }
 }

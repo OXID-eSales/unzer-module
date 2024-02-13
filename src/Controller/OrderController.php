@@ -31,6 +31,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class OrderController extends OrderController_parent
 {
@@ -64,7 +65,9 @@ class OrderController extends OrderController_parent
         $unzer = $this->getServiceFromContainer(Unzer::class);
         $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();
         $this->_aViewData['uzrcurrency'] = $this->getActCurrency();
+
         $this->getSavedPayment();
+
         return parent::render();
     }
 
@@ -97,6 +100,7 @@ class OrderController extends OrderController_parent
     /**
      * @throws Redirect
      * @throws DatabaseErrorException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -120,13 +124,21 @@ class OrderController extends OrderController_parent
             $oUser->onOrderExecute($oBasket, $iSuccess);
 
             $nextStep = $this->getNextStep($iSuccess);
-
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
             if ('thankyou' === $nextStep) {
-                // commit transaction and proceeding to next view
                 $oDB->commitTransaction();
+
+                $paymentService = $this->getServiceFromContainer(PaymentService::class);
+                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                    $paymentService->doUnzerCollect(
+                        $oOrder,
+                        $oUser->getId(),
+                        $oBasket->getDiscountedProductsBruttoPrice()
+                    );
+                }
+
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
             }
 
