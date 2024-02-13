@@ -13,7 +13,7 @@
         {% if sepaError == 1 %}
             {% include "message/error.html.twig" with {statusMessage: "ERROR_UNZER_SEPA_CONFIRMATION_MISSING"|translate} %}
         {% endif %}
-        {% include "@osc-unzer/frontend/tpl/message/js-errors.html.twig" %}v
+        {% include "@osc-unzer/frontend/tpl/message/js-errors.html.twig" %}
     {%  endblock %}
 
     <div class="container-md py-5">
