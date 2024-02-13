@@ -77,13 +77,6 @@ class Unzer
     /** @var Request */
     protected $request;
 
-    /**
-     * @param Session $session
-     * @param Translator $translator
-     * @param Context $context
-     * @param ModuleSettings $moduleSettings
-     * @param Request $request
-     */
     public function __construct(
         Session $session,
         Translator $translator,
