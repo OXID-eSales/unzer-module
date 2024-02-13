@@ -39,23 +39,32 @@ class Payment
     private const STATUS_NOT_FINISHED = "NOT_FINISHED";
     private const STATUS_ERROR = "ERROR";
 
-    protected Session $session;
+    /** @var \OxidEsales\Eshop\Core\Session $session */
+    protected $session;
 
-    protected PaymentExtensionLoader $paymentExtLoader;
+    /** @var \OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader $paymentExtLoader */
+    protected $paymentExtLoader;
 
-    protected Translator $translator;
+    /** @var \OxidSolutionCatalysts\Unzer\Service\Translator $translator */
+    protected $translator;
 
-    protected Unzer $unzerService;
+    /** @var \OxidSolutionCatalysts\Unzer\Service\Unzer $unzerService */
+    protected $unzerService;
 
-    protected UnzerSDKLoader $unzerSDKLoader;
+    /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
+    protected $unzerSDKLoader;
 
-    protected ?UnzerPayment $sessionUnzerPayment = null;
+    /** @var \UnzerSDK\Resources\Payment|null $sessionUnzerPayment */
+    protected $sessionUnzerPayment = null;
 
-    protected string $redirectUrl = '';
+    /** @var string $redirectUrl */
+    protected $redirectUrl = '';
 
-    protected string $pdfLink = '';
+    /** @var string|null $pdfLink */
+    protected $pdfLink = '';
 
-    protected TransactionService $transactionService;
+    /** @var \OxidSolutionCatalysts\Unzer\Service\Transaction $transactionService */
+    protected $transactionService;
 
     /**
      * @param Session $session
@@ -167,15 +176,14 @@ class Payment
             $result = self::STATUS_OK;
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
+                $this->pdfLink = '';
                 if ($transaction instanceof Authorization) {
-                    /** @var string $pdfLink */
                     $pdfLink = $transaction->getPDFLink();
-                    $this->pdfLink = $pdfLink;
+                    if ($pdfLink) {
+                        $this->pdfLink = $pdfLink;
+                    }
+                    $result = self::STATUS_OK;
                 }
-                if ($this->isPdfSession()) {
-                    $this->pdfLink = '';
-                }
-                $result = self::STATUS_OK;
             } elseif ($transaction->isPending()) {
                 $result = self::STATUS_NOT_FINISHED;
                 /** @var string $redirectUrl */
@@ -271,6 +279,7 @@ class Payment
      * @param string $reason
      * @return UnzerApiException|bool
      *
+     * @throws \Exception
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, $reason)
@@ -305,6 +314,7 @@ class Payment
      * @param string $unzerid
      * @param float $amount
      * @return UnzerApiException|bool
+     * @throws \Exception
      */
     public function doUnzerCollect($oOrder, $unzerid, $amount)
     {
@@ -349,6 +359,7 @@ class Payment
      * @param string $unzerid
      * @param float $amount
      * @return UnzerApiException|bool
+     * @throws \Exception
      */
     public function doUnzerAuthorizationCancel($oOrder, $unzerid, $amount)
     {
@@ -378,9 +389,12 @@ class Payment
 
     /**
      * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
-     * @param string $sPaymentId
+     * @param string|null $sPaymentId
      * @return UnzerApiException|bool
      *
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function sendShipmentNotification($oOrder, $sPaymentId = null)
@@ -445,6 +459,7 @@ class Payment
     /**
      * @param UnzerPayment $unzerPayment
      * @return BasePaymentType|AbstractUnzerResource The updated PaymentType object.
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
     public function setInstallmentDueDate($unzerPayment)
     {

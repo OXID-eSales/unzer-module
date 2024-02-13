@@ -40,16 +40,23 @@ class ModuleSettings
         'visa' => '1'
     ];
 
-    private ModuleSettingBridgeInterface $moduleSettingBridge;
+    /** @var ModuleSettingBridgeInterface $moduleSettingBridge */
+    private $moduleSettingBridge;
 
-    private ModuleConfigurationDaoBridgeInterface $moduleInfoBridge;
+    /** @var ModuleConfigurationDaoBridgeInterface  */
+    private $moduleInfoBridge;
 
-    private Session $session;
+    /** @var Session $session */
+    private $session;
 
-    private Config $config;
+    /** @var Config $config */
+    private $config;
 
     /**
      * @param ModuleSettingBridgeInterface $moduleSettingBridge
+     * @param ModuleConfigurationDaoBridgeInterface $moduleInfoBridge
+     * @param \OxidEsales\Eshop\Core\Session $session
+     * @param \OxidEsales\Eshop\Core\Config $config
      */
     public function __construct(
         ModuleSettingBridgeInterface $moduleSettingBridge,
