@@ -281,5 +281,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
 
         parent::saveConfVars();
+        if ($request->getRequestEscapedParameter('oxid') === 'osc-unzer') {
+            $this->moduleSettings->saveWebhookConfiguration([]);
+            $this->registerWebhooks();
+        }
     }
 }
