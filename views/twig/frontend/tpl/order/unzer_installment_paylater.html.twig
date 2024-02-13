@@ -1,19 +1,67 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
 {% set invadr = oView.getInvoiceAddress() %}
 {% set isCompany = false %}
+{% if invadr.oxuser__oxbirthdate.month is defined %}
+    {% set iBirthdayMonth = invadr.oxuser__oxbirthdate.month %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
+    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|split('-')[1] %}
+{% else %}
+    {% set iBirthdayMonth = 0 %}
+{% endif %}
+
+{% if invadr.oxuser__oxbirthdate.day is defined %}
+    {% set iBirthdayDay = invadr.oxuser__oxbirthdate.day %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
+    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|split('-')[2] %}
+{% else %}
+    {% set iBirthdayDay = 0 %}
+{% endif %}
+
+{% if invadr.oxuser__oxbirthdate.year is defined %}
+    {% set iBirthdayYear = invadr.oxuser__oxbirthdate.year %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
+    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|split('-')[0] %}
+{% else %}
+    {% set iBirthdayYear = 0 %}
+{% endif %}
 
 {% if (oxcmp_user.oxuser__oxcompany.value or (invadr and invadr.oxaddress__oxcompany.value)) %}
     {% set isCompany = true %}
-    {% endif %}
+{% endif %}
+
 {% if isCompany %}
     {% set customerType = "B2B" %}
-    {% else %}
+{% else %}
     {% set customerType = "B2C" %}
-    {% endif %}
-<form id="payment-form-installment" class="unzerUI form unzerUI-PaylaterInstallment__form" novalidate>
+{% endif %}
+<form id="payment-form-installment" class="unzerUI-PaylaterInstallment__form" novalidate>
     <br />
     <div id="unzer-installment">
         <!-- The Installment Secured field UI Element will be inserted here -->
+    </div>
+    <div id="oxDateForInstallment" class="row {% if not iBirthdayMonth or not iBirthdayDay or not iBirthdayYear %}text-danger{% endif %}">
+        <div class="col-12">
+            <label for="oxDay">{{ translate({ ident: "BIRTHDATE" }) }}</label>
+        </div>
+        <div class="input-group">
+            <input id="birthdate_day" class="form-control" type="text" maxlength="2" value="{% if iBirthdayDay > 0 %}{{ iBirthdayDay }}{% endif %}"
+                   placeholder="{{ translate({ ident: "DAY" }) }}" required>
+            <select id="birthdate_month" class="form-control" required>
+                <option value="" label="-">-</option>
+                {% for month in 1..12 %}
+                    <option value="{{ month }}" {% if month == iBirthdayMonth %}selected{% endif %}>
+                        {{ translate({ ident: "MONTH_NAME_"|cat(month) }) }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input id="birthdate_year" class="form-control" type="text" maxlength="4" value="{% if iBirthdayYear %}{{ iBirthdayYear }}{% endif %}"
+                   placeholder="{{ translate({ ident: "YEAR" }) }}" required>
+        </div>
+        <div class="col-12">
+            <div class="help-block">
+                <p class="text-danger {% if iBirthdayMonth and iBirthdayDay and iBirthdayYear %}d-none{% endif %}">{{ translate({ ident: "DD_FORM_VALIDATION_REQUIRED" }) }}</p>
+            </div>
+        </div>
     </div>
 
     <div class="field" id="error-holder" style="color: #9f3a38"> </div>
