@@ -135,7 +135,7 @@
                         <tbody>
                         <tr>
                             <td>[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE"}]</td>
-                            [{if $canRevertPartially}]
+                            [{if $canRevertPartially || $oOrder->oxorder__oxpaymenttype->value == 'oscunzer_invoice'}]
                             <td><input type="text" id ="amount_authorize" name="amount"
                                        value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
                             [{else}]

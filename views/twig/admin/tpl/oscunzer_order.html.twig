@@ -135,7 +135,7 @@
                         <tbody>
                         <tr>
                             <td>{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE" }) }}</td>
-                            {% if canRevertPartially %}
+                            {% if canRevertPartially or oOrder.oxorder__oxpaymenttype.value == "oscunzer_invoice" %}
                                 <td><input type="text" id ="amount_authorize" name="amount"
                                            value="{{ AuthAmountRemaining|number_format(2, '.', ' ') }}"> {{ AuthCur }}</td>
                             {% else %}
