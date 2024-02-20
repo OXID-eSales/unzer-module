@@ -70,7 +70,7 @@
             <!-- Errors will be inserted here -->
         </div>
 
-        <div id="consumer_common" class="form-group row oxDate {% if not iBirthdayMonth or not iBirthdayDay or not iBirthdayYear %}text-danger{% endif %}">
+        <div id="consumer_common" class="form-group row oxDate {% if not iBirthdayMonth or not iBirthdayDay or not iBirthdayYear %}text-muted{% endif %}">
             <label class="col-12 col-lg-3 req" for="oxDay">{{ translate({ ident: "BIRTHDATE" }) }}</label>
             <div class="col-3 col-lg-3">
                 <input id="birthdate_day" class="oxDay form-control" type="text" maxlength="2" value="{% if iBirthdayDay > 0 %}{{ iBirthdayDay }}{% endif %}"
@@ -92,7 +92,7 @@
             </div>
             <div class="offset-lg-3 col-lg-9 col-12">
                 <div class="help-block">
-                    <p class="text-danger {% if iBirthdayMonth and iBirthdayDay and iBirthdayYear %}d-none hidden{% endif %}">{{ translate({ ident: "DD_FORM_VALIDATION_REQUIRED" }) }}</p>
+                    <p class="text-muted {% if iBirthdayMonth and iBirthdayDay and iBirthdayYear %}d-none hidden{% endif %}">{{ translate({ ident: "OSCUNZER_COMPANY_FORM_birthday" }) }}</p>
                 </div>
             </div>
         </div>
