@@ -175,7 +175,7 @@ abstract class BaseCest
         $this->I->waitForDocumentReadyState();
         $this->I->wait(10);
         $this->I->waitForPageLoad();
-        $this->I->wait(10+$longWait);
+        $this->I->wait(10 + $longWait);
         $this->I->waitForText(Translator::translate('THANK_YOU'));
     }
 
