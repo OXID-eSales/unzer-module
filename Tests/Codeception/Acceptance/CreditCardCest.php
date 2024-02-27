@@ -53,6 +53,7 @@ final class CreditCardCest extends BaseCest
         $this->_getAcceptance()->waitForPageLoad();
         $this->_getAcceptance()->waitForElement($this->cardNumberIframe);
         $this->_getAcceptance()->switchToIFrame($this->cardNumberIframe);
+        $this->_getAcceptance()->wait(5);
         $this->_getAcceptance()->fillField($this->cardNumberInput, $fixtures['cardnumber']);
         $this->_getAcceptance()->switchToNextTab(1);
         $this->_getAcceptance()->switchToIFrame($this->expireDateIframe);
