@@ -51,10 +51,23 @@ class UnzerPaymentTest extends TestCase
         $sdkMock->method('createCustomer')->willReturn($customer = new Customer());
         $sdkMock->method('fetchCustomer')->willReturn($customer = new Customer());
 
-        $sut = $this->getMockForAbstractClass(UnzerPayment::class, [
-            $sdkMock,
-            $unzerServiceMock
-        ], '', true, true, true, ['getUnzerPaymentTypeObject']);
+        $sut = $this->getMockForAbstractClass(
+            UnzerPayment::class,
+            [
+                $sdkMock,
+                $unzerServiceMock,
+                new \OxidSolutionCatalysts\Unzer\Service\DebugHandler(
+                    $this->createMock(\Monolog\Logger::class)
+                )
+            ],
+            '',
+            true,
+            true,
+            true,
+            [
+                'getUnzerPaymentTypeObject'
+            ]
+        );
         $sut->method('getUnzerPaymentTypeObject')->willReturn(
             $paymentTypeMock = $this->createPartialMock(InvoiceAlias::class, ['charge'])
         );

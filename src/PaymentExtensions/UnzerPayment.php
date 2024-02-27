@@ -11,11 +11,13 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use Psr\Log\LoggerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
@@ -56,12 +58,15 @@ abstract class UnzerPayment
     /** @var array */
     protected $allowedCurrencies = [];
 
+    private DebugHandler $logger;
+
     /**
      * @throws Exception
      */
     public function __construct(
         Unzer $unzerSDK,
-        UnzerService $unzerService
+        UnzerService $unzerService,
+        DebugHandler $logger
     ) {
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
@@ -69,6 +74,7 @@ abstract class UnzerPayment
         $this->unzerOrderId = (string)$this->unzerService->generateUnzerOrderId();
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
+        $this->logger = $logger;
     }
 
     /**
@@ -164,9 +170,8 @@ abstract class UnzerPayment
                     $payment
                 );
             } catch (Exception $e) {
-                Registry::getLogger()->info(
-                    'Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage()
-                );
+                $this->logger
+                    ->log('Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage());
             }
         }
         return true;
@@ -200,7 +205,7 @@ abstract class UnzerPayment
             try {
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
                 $UnzerSdk = $loader->getUnzerSDK('B2C', $currency->name, true);
-                 $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
+                $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }
