@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - increase line spacing for the error messages
 - Save Payment Data for registered Users
 - fix inconsistent data for Paylater payment methods
+- use Module-Logger also in UnzerPayment
 
 ## [1.1.3] - 2023-11-14
 
