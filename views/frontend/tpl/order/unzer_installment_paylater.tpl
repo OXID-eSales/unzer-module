@@ -137,4 +137,3 @@
         });
 [{/capture}]
 [{oxscript add=$unzerInstallmentJS}]
-[{debug}]
