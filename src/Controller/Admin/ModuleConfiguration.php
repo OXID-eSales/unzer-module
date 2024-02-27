@@ -100,9 +100,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @throws GuzzleException
-     * @throws \JsonException
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ElseExpression)

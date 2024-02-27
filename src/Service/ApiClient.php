@@ -3,21 +3,21 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
+use UnzerSDK\Services\ValueService;
 
 /**
  * We only use this for requests the unzer sdk currently does not cover
  */
 class ApiClient
 {
-    /**
-     * @var Client
-     */
     private Client $client;
 
-    /**
-     * @var ModuleSettings
-     */
+    private DebugHandler $logger;
+
     private ModuleSettings $moduleSettings;
 
     /**
@@ -29,10 +29,15 @@ class ApiClient
 
     /**
      * @param ModuleSettings $moduleSettings
+     * @param DebugHandler $logger
      */
-    public function __construct(ModuleSettings $moduleSettings)
+    public function __construct(
+        ModuleSettings $moduleSettings,
+        DebugHandler $logger
+    )
     {
         $this->client = new Client();
+        $this->logger = $logger;
         $this->moduleSettings = $moduleSettings;
 
         $this->headers = [
@@ -44,7 +49,7 @@ class ApiClient
     /**
      * @param string $certificateId
      * @return ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException|JsonException
      */
     public function requestApplePayPaymentCert(string $certificateId): ResponseInterface
     {
@@ -54,7 +59,7 @@ class ApiClient
     /**
      * @param string $keyId
      * @return ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function requestApplePayPaymentKey(string $keyId): ResponseInterface
     {
@@ -64,8 +69,8 @@ class ApiClient
     /**
      * @param string $key
      * @return ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
+     * @throws GuzzleException
+     * @throws JsonException
      */
     public function uploadApplePayPaymentKey(string $key): ResponseInterface
     {
@@ -80,8 +85,8 @@ class ApiClient
      * @param string $certificate
      * @param string $privateKeyId (getting from upload of ApplePayPaymentKey)
      * @return ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
+     * @throws GuzzleException
+     * @throws JsonException
      */
     public function uploadApplePayPaymentCertificate(string $certificate, string $privateKeyId): ResponseInterface
     {
@@ -96,8 +101,8 @@ class ApiClient
     /**
      * @param string $certificateId
      * @return ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
+     * @throws GuzzleException
+     * @throws JsonException
      */
     public function activateApplePayPaymentCertificate(string $certificateId): ResponseInterface
     {
@@ -105,8 +110,7 @@ class ApiClient
     }
 
     /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function request(
         string $url,
@@ -114,13 +118,35 @@ class ApiClient
         array $body = [],
         array $headers = []
     ): ResponseInterface {
+        $response = null;
         $options = [];
         $options['headers'] = array_merge($this->headers, $headers);
+        $payload = '';
         if ($body) {
             $options['headers']['Content-Type'] = 'application/json';
-            $options['body'] = json_encode($body, JSON_THROW_ON_ERROR);
+            $payload = json_encode($body, JSON_THROW_ON_ERROR);
+            $options['body'] = $payload;
         }
 
-        return $this->client->request($method, $this->baseUrl . $url, $options);
+        try {
+            $response = $this->client->request($method, $this->baseUrl . $url, $options);
+        } catch (GuzzleException $e) {
+            if ($this->moduleSettings->isDebugMode()) {
+                // mask auth string
+                $authHeader = explode(' ', $options['headers']['Authorization']);
+                $authHeader[1] = ValueService::maskValue($authHeader[1]);
+                $options['headers']['Authorization'] = implode(' ', $authHeader);
+
+                // log request
+                $this->logger->log($method . ': ' . $url);
+                $this->logger->log('Headers: ' . json_encode($options['headers'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
+                if ($payload) {
+                    $this->logger->log('Request: ' . $payload);
+                }
+                $this->logger->log('ErrorMessage: ' . $e->getMessage());
+            }
+        }
+
+        return $response;
     }
 }
