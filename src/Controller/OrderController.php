@@ -129,7 +129,7 @@ class OrderController extends OrderController_parent
 
             $unzerService = $this->getServiceFromContainer(Unzer::class);
 
-            if ('thankyou' === $nextStep) {
+            if (stripos($nextStep, 'thankyou') !== false) {
                 // commit transaction and proceeding to next view
                 $oDB->commitTransaction();
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
