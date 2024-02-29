@@ -115,12 +115,11 @@ class ApiClient
     private function request(
         string $url,
         string $method = 'GET',
-        array $body = [],
-        array $headers = []
+        array $body = []
     ): ResponseInterface {
         $response = null;
         $options = [];
-        $options['headers'] = array_merge($this->headers, $headers);
+        $options['headers'] = $this->headers;
         $payload = '';
         if ($body) {
             $options['headers']['Content-Type'] = 'application/json';
