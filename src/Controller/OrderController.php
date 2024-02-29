@@ -26,6 +26,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use Psr\Log\LoggerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
@@ -111,6 +112,11 @@ class OrderController extends OrderController_parent
         // get basket contents
         $oUser = $this->getUser();
         $oBasket = $this->getSession()->getBasket();
+
+        /** @var LoggerInterface $logger */
+        /** @phpstan-ignore-next-line */
+        $logger = $this->getServiceFromContainer('OxidSolutionCatalysts\Unzer\Logger');
+
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
@@ -121,6 +127,7 @@ class OrderController extends OrderController_parent
 
             //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
             $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+            $logger->info('unzerExecuteAfterRedirect iSuccess:' . $iSuccess);
 
             // performing special actions after user finishes order (assignment to special user groups)
             $oUser->onOrderExecute($oBasket, $iSuccess);
