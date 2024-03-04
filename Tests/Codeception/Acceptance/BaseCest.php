@@ -159,8 +159,7 @@ abstract class BaseCest
      */
     protected function _choosePayment(string $label): Page
     {
-        $this->I->waitForElement($label);
-        $this->I->wait(3);
+        $this->I->waitForElement($label, 5);
         $this->I->click($label);
 
         return $this->paymentSelection->goToNextStep();

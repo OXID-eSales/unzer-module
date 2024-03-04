@@ -45,6 +45,7 @@ return [
     // Payment data for SEPA
     'sepa_payment' => [
         "IBAN" => "DE89370400440532013000",
+        "IBANHolder" => "Musterman Max"
     ],
 
     // Payment data for Credit card using Mastercard
