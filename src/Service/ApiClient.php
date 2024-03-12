@@ -4,6 +4,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
@@ -34,8 +35,7 @@ class ApiClient
     public function __construct(
         ModuleSettings $moduleSettings,
         DebugHandler $logger
-    )
-    {
+    ) {
         $this->client = new Client();
         $this->logger = $logger;
         $this->moduleSettings = $moduleSettings;
@@ -110,14 +110,18 @@ class ApiClient
     }
 
     /**
-     * @throws JsonException
+     * @param string $url
+     * @param string $method
+     * @param array $body
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \JsonException
      */
     private function request(
         string $url,
         string $method = 'GET',
         array $body = []
     ): ResponseInterface {
-        $response = null;
+        $response = new Response(0);
         $options = [];
         $options['headers'] = $this->headers;
         $payload = '';
@@ -138,7 +142,10 @@ class ApiClient
 
                 // log request
                 $this->logger->log($method . ': ' . $url);
-                $this->logger->log('Headers: ' . json_encode($options['headers'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
+                $this->logger->log(
+                    'Headers: '
+                    . json_encode($options['headers'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES)
+                );
                 if ($payload) {
                     $this->logger->log('Request: ' . $payload);
                 }
