@@ -135,16 +135,6 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * checks if jQuery should be imported
-     *
-     * @return bool
-     */
-    public function useModuleJQueryInFrontend(): bool
-    {
-        return $this->moduleSettings->useModuleJQueryInFrontend();
-    }
-
-    /**
      * Template variable getter. Check if is a Flow Theme Compatible Theme
      *
      * @return boolean

@@ -1,11 +1,9 @@
 {% block unzer_jquery %}
     {# we use original script tag instead of oxscript because of the additional params #}
-    {% if attribute(oViewConf, 'useModuleJQueryInFrontend') is defined and oViewConf.useModuleJQueryInFrontend() %}
-        <script
+    <script
             src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
             crossorigin="anonymous"></script>
-    {% endif %}
 {% endblock %}
 {% block unzer_js %}
     {{ script({ include: "https://static.unzer.com/v1/unzer.js", dynamic: __oxid_include_dynamic }) }}

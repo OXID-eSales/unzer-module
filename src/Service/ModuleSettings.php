@@ -128,16 +128,6 @@ class ModuleSettings
     }
 
     /**
-     * @return bool
-     */
-    public function useModuleJQueryInFrontend(): bool
-    {
-        /** @var bool $unzerJQuery */
-        $unzerJQuery = $this->getSettingValue('UnzerjQuery');
-        return $unzerJQuery;
-    }
-
-    /**
      * @param string $paymentMethod
      * @return string
      */

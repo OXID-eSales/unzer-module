@@ -369,12 +369,6 @@ $aModule = [
             'type' => 'str',
             'value' => ''
         ],
-        [
-            'group' => 'unzerother',
-            'name' => 'UnzerjQuery',
-            'type' => 'bool',
-            'value' => '0',
-        ],
         // this options are invisible because of missing group
         [
             'group' => '',
