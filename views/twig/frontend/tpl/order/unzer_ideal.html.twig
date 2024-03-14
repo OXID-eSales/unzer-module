@@ -5,9 +5,8 @@
     <div class="field" id="error-holder" style="color: #9f3a38"> </div>
 </form>
 
-<script>
 {% capture assign = "unzerIDealJS" %}
-
+    {% if false %}<script>{% endif %}
     document.querySelector( '#orderConfirmAgbBottom' ).addEventListener('submit', function( event ) {
         if(!document.querySelector( '#orderConfirmAgbBottom' ).classList.contains("submitable")){
             event.preventDefault();
@@ -44,6 +43,6 @@
             }, 350);
         });
     });
+    {% if false %}</script>{% endif %}
 {% endcapture %}
-</script>
 {{ script({ add: unzerIDealJS, dynamic: __oxid_include_dynamic }) }}

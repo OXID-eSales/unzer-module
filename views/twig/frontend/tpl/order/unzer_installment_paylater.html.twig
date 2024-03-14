@@ -25,60 +25,70 @@
 
 {% set totalgross = oxcmp_basket.getPrice() %}
 {% set uzrcurrency = currency.name %}
-{% if false %} <script>{% endif %}
-  {% capture assign = "unzerInstallmentJS" %}
-    function executeUnzerPayment(event){
+
+{% capture assign = "unzerInstallmentJS" %}
+{% if false %}<script>{% endif %}
+    function executeUnzerPayment(event) {
         event.stopPropagation();
-        $( "#payment-form-installment" ).submit();
-    }// Create an Unzer instance with your public key
+        document.querySelector("#payment-form-installment").submit();
+    }
+
+    // Create an Unzer instance with your public key
     let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
 
     let InstallmentSecured = unzerInstance.PaylaterInstallment();
-    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+
+    document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function(event) {
+        if (!this.classList.contains("submitable")) {
             event.preventDefault();
-            $( "#payment-form-installment" ).submit();
+            document.querySelector("#payment-form-installment").submit();
         }
     });
-
 
     InstallmentSecured.create({
         containerId: 'unzer-installment',
         amount: {{ totalgross.getPrice() }},
         currency: '{{ uzrcurrency }}',
-        country:'{{ oView.getUserCountryIso() }}',
-        threatMetrixId:'{{ unzerThreatMetrixSessionID }}'
-
+        country: '{{ oView.getUserCountryIso() }}',
+        threatMetrixId: '{{ unzerThreatMetrixSessionID }}'
     });
 
     // Handling payment form submission
-    $( "#payment-form-installment" ).submit(function( event ) {
+    document.querySelector("#payment-form-installment").addEventListener('submit', function(event) {
         event.preventDefault();
-        //  if($('.unzerUI-installment-secured__selected-rate').length){
         InstallmentSecured.createResource()
             .then(function(data) {
-                let hiddenInput = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'paymentData')
-                    .val(JSON.stringify(data));
+                let hiddenInput = document.createElement('input');
+                hiddenInput.setAttribute('type', 'hidden');
+                hiddenInput.setAttribute('name', 'paymentData');
+                hiddenInput.value = JSON.stringify(data);
                 console.log(data);
-                $('#orderConfirmAgbBottom').append(hiddenInput);
-                let hiddenCustomerType = $(document.createElement('input'))
-                    .attr('type', 'hidden')
-                    .attr('name', 'unzer_customer_type')
-                    .val('{{ customerType }}');
-                $('#orderConfirmAgbBottom').append(hiddenCustomerType);
+                document.querySelector('#orderConfirmAgbBottom').appendChild(hiddenInput);
 
-                $( '#orderConfirmAgbBottom' ).addClass("submitable");
-                $( "#orderConfirmAgbBottom" ).submit();
+                let hiddenCustomerType = document.createElement('input');
+                hiddenCustomerType.setAttribute('type', 'hidden');
+                hiddenCustomerType.setAttribute('name', 'unzer_customer_type');
+                hiddenCustomerType.value = '{{ customerType }}';
+                document.querySelector('#orderConfirmAgbBottom').appendChild(hiddenCustomerType);
+
+                let hiddenInputBirthdate = document.createElement('input');
+                hiddenInputBirthdate.setAttribute('type', 'hidden');
+                hiddenInputBirthdate.setAttribute('name', 'birthdate');
+                hiddenInputBirthdate.value = document.querySelector('#birthdate_year').value + '-' + document.querySelector('#birthdate_month').value + '-' + document.querySelector('#birthdate_day').value;
+                document.querySelector('#orderConfirmAgbBottom').appendChild(hiddenInputBirthdate);
+
+                document.querySelector('#orderConfirmAgbBottom').classList.add("submitable");
+                document.querySelector("#orderConfirmAgbBottom").submit();
             })
             .catch(function(error) {
-                $('#error-holder').html(error.message);
-                $('html, body').animate({
-                    scrollTop: $("#orderPayment").offset().top - 150
-                }, 350);
+                document.querySelector('#error-holder').innerHTML = error.message;
+                window.scrollTo({
+                    top: document.querySelector("#orderPayment").offsetTop - 150,
+                    behavior: 'smooth'
+                });
             });
-        //}
     });
-    {% endcapture %}
+{% if false %}</script>{% endif %}
+{% endcapture %}
+
 {{ script({ add: unzerInstallmentJS, dynamic: __oxid_include_dynamic }) }}

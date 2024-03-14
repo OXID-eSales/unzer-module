@@ -25,9 +25,7 @@
     }
 </style>
 
-{% if false %}
-<script>
-{% endif %}
+{% if false %}<script>{% endif %}
 {% capture assign = "unzerCardJS" %}
     function executeUnzerPayment(event){
         event.stopPropagation();
@@ -86,7 +84,5 @@
     });
 
 {% endcapture %}
-{% if false %}
-</script>
-{% endif %}
+{% if false %}</script>{% endif %}
 {{ script({ add: unzerCardJS, dynamic: __oxid_include_dynamic }) }}

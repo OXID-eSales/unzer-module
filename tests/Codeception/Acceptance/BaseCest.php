@@ -275,13 +275,12 @@ abstract class BaseCest
      */
     protected function _submitOrder()
     {
-        $submiButton = '#orderConfirmAgbBottom';
+        $submitButton = '#submitOrder';
 
-
-        $this->I->waitForElement($submiButton);
-        $this->I->scrollTo($submiButton);
+        $this->I->waitForElement($submitButton);
+        $this->I->scrollTo($submitButton);
         $this->I->wait(5);
-        $this->I->click($submiButton);
+        $this->I->click($submitButton);
         $this->I->waitForPageLoad();
     }
 

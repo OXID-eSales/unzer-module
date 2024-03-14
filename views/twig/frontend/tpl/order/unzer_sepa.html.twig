@@ -21,8 +21,8 @@
 
 </form>
 
-<script>
 {% capture assign = "unzerSepaDirectJS" %}
+{% if false %}<script>{% endif %}
     document.querySelector( '#orderConfirmAgbBottom' ).addEventListener('submit', function( event ) {
         if(!document.querySelector( '#orderConfirmAgbBottom' ).classList.contains("submitable")){
             event.preventDefault();
@@ -68,7 +68,6 @@
                 }, 350);
             });
     });
-
-    {% endcapture %}
-</script>
+{% if false %}</script>{% endif %}
+{% endcapture %}
 {{ script({ add: unzerSepaDirectJS, dynamic: __oxid_include_dynamic }) }}

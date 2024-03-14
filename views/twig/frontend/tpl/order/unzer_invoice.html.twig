@@ -110,155 +110,153 @@
         </div>
         {% endif %}
     </form>
-    <script>
+
     {% capture assign = "unzerInvoiceJS" %}
-    {% if false %}
-    let showB2B = function() {
-        document.getElementById('consumer_b2c').style.visibility = "hidden";
-        document.getElementById('consumer_b2b').style.visibility = "visible";
-    };
-    let showB2C = function showB2C() {
-        document.getElementById('consumer_b2c').style.visibility = "visible";
-        document.getElementById('consumer_b2b').style.visibility = "hidden";
-    };
-    {% if isBoth %}
-        document.querySelector('#unzer_select_consumer').addEventListener('change', function() {
-            opt = this.value;
-            if (opt === "B2B") {
-                document.getElementById('consumer_b2c').style.visibility = "hidden";
-                document.getElementById('consumer_b2b').style.visibility = "visible";
-            }
-            else if (opt === "B2C") {
-                document.getElementById('consumer_b2c').style.visibility = "visible";
-                document.getElementById('consumer_b2b').style.visibility = "hidden";
-            }
-            else {
-                document.getElementById('consumer_b2c').style.visibility = "hidden";
-                document.getElementById('consumer_b2b').style.visibility = "hidden";
-            }
-        });
-    {% endif %}
-    {% endif %}
+    {% if false %}<script>{% endif %}
+        let showB2B = function() {
+            document.getElementById('consumer_b2c').style.visibility = "hidden";
+            document.getElementById('consumer_b2b').style.visibility = "visible";
+        };
+        let showB2C = function showB2C() {
+            document.getElementById('consumer_b2c').style.visibility = "visible";
+            document.getElementById('consumer_b2b').style.visibility = "hidden";
+        };
+        {% if isBoth %}
+            document.querySelector('#unzer_select_consumer').addEventListener('change', function() {
+                opt = this.value;
+                if (opt === "B2B") {
+                    document.getElementById('consumer_b2c').style.visibility = "hidden";
+                    document.getElementById('consumer_b2b').style.visibility = "visible";
+                }
+                else if (opt === "B2C") {
+                    document.getElementById('consumer_b2c').style.visibility = "visible";
+                    document.getElementById('consumer_b2b').style.visibility = "hidden";
+                }
+                else {
+                    document.getElementById('consumer_b2c').style.visibility = "hidden";
+                    document.getElementById('consumer_b2b').style.visibility = "hidden";
+                }
+            });
+        {% endif %}
 
-    {% if isCompany %}
-        //showB2B();
-        let unzerInstance = new unzer('{{ oViewConf.getUnzerB2BPubKey() }}', {locale: "{{ unzerLocale }}"});
-    {% else %}
-        //showB2C();
-        let unzerInstance = new unzer('{{ oViewConf.getUnzerB2CPubKey() }}', {locale: "{{ unzerLocale }}"});
-    {% endif %}
-    let paylaterInvoice = unzerInstance.PaylaterInvoice();
-    paylaterInvoice.create({
-        containerId: 'paylater-invoice',
-        customerType: '{{ customerType }}', // B2C or B2B
-        errorHolderId: 'error-holder',
-    })
-
-    // Handle payment form submission.
-    document.querySelector( "#payment-form" ).addEventListener('submit', function( event ) {
-        event.preventDefault();
-        paylaterInvoice.createResource()
-        .then(function(result) {
-            let typeId = result.id;
-            // submit the payment type ID to your server-side integration
-            let selectConsumer = '{{ customerType }}';
-            if(
-                (
-                    !document.querySelector( '.oxDate' ).classList.contains("text-danger") && selectConsumer === 'B2C'
-                )
-            {% if isCompany %}
-                || (
-                    !document.querySelector( '.unzerCompanyForm' ).classList.contains("text-danger") && selectConsumer === 'B2B'
-                )
-            {% endif %}
-            ) {
-            {% if isCompany %}
-                let hiddenInputCompanyForm = document.createElement('input');
-                hiddenInputCompanyForm.setAttribute('type', 'hidden');
-                hiddenInputCompanyForm.setAttribute('name', 'unzer_company_form');
-                hiddenInputCompanyForm.value = document.getElementById('unzer_company_form').value;
-                document.querySelector('#orderConfirmAgbBottom').append(hiddenInputCompanyForm);
-            {% endif %}
-                let hiddenInputBirthdate = document.createElement('input');
-                hiddenInputBirthdate.setAttribute('type', 'hidden');
-                hiddenInputBirthdate.setAttribute('name', 'birthdate');
-                hiddenInputBirthdate.value = document.querySelector('#birthdate_year').value + '-' +
-                                             document.querySelector('#birthdate_month').value + '-' +
-                                             document.querySelector('#birthdate_day').value;
-                document.querySelector('#orderConfirmAgbBottom').append(hiddenInputBirthdate);
-
-                let hiddenCustomerType = document.createElement('input');
-                hiddenCustomerType.setAttribute('type', 'hidden');
-                hiddenCustomerType.setAttribute('name', 'unzer_customer_type');
-                hiddenCustomerType.value = '{{ customerType }}';
-                document.querySelector('#orderConfirmAgbBottom').append(hiddenCustomerType);
-
-                let hiddenTypeId = document.createElement('input');
-                hiddenTypeId.setAttribute('type', 'hidden');
-                hiddenTypeId.setAttribute('name', 'unzer_type_id');
-                hiddenTypeId.value = typeId;
-                document.querySelector('#orderConfirmAgbBottom').append(hiddenTypeId);
-
-                document.querySelector('#orderConfirmAgbBottom' ).classList.add("submitable");
-                document.querySelector("#orderConfirmAgbBottom" ).submit();
-            } else {
-                document.querySelector('html, body').animate({
-                    scrollTop: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY - 150
-                }, 350);
-            }
-        })
-        .catch(function(error) {
-            document.getElementById('error-holder').innerText = error.customerMessage || error.message || 'Error'
+        {% if isCompany %}
+            //showB2B();
+            let unzerInstance = new unzer('{{ oViewConf.getUnzerB2BPubKey() }}', {locale: "{{ unzerLocale }}"});
+        {% else %}
+            //showB2C();
+            let unzerInstance = new unzer('{{ oViewConf.getUnzerB2CPubKey() }}', {locale: "{{ unzerLocale }}"});
+        {% endif %}
+        let paylaterInvoice = unzerInstance.PaylaterInvoice();
+        paylaterInvoice.create({
+            containerId: 'paylater-invoice',
+            customerType: '{{ customerType }}', // B2C or B2B
+            errorHolderId: 'error-holder',
         })
 
-    });
-
-    document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function( event ) {
-        if(!document.querySelector('#orderConfirmAgbBottom').classList.contains("submitable")){
+        // Handle payment form submission.
+        document.querySelector( "#payment-form" ).addEventListener('submit', function( event ) {
             event.preventDefault();
-            document.querySelector("#payment-form").requestSubmit();
-        }
-    });
+            paylaterInvoice.createResource()
+            .then(function(result) {
+                let typeId = result.id;
+                // submit the payment type ID to your server-side integration
+                let selectConsumer = '{{ customerType }}';
+                if(
+                    (
+                        !document.querySelector( '.oxDate' ).classList.contains("text-danger") && selectConsumer === 'B2C'
+                    )
+                {% if isCompany %}
+                    || (
+                        !document.querySelector( '.unzerCompanyForm' ).classList.contains("text-danger") && selectConsumer === 'B2B'
+                    )
+                {% endif %}
+                ) {
+                {% if isCompany %}
+                    let hiddenInputCompanyForm = document.createElement('input');
+                    hiddenInputCompanyForm.setAttribute('type', 'hidden');
+                    hiddenInputCompanyForm.setAttribute('name', 'unzer_company_form');
+                    hiddenInputCompanyForm.value = document.getElementById('unzer_company_form').value;
+                    document.querySelector('#orderConfirmAgbBottom').append(hiddenInputCompanyForm);
+                {% endif %}
+                    let hiddenInputBirthdate = document.createElement('input');
+                    hiddenInputBirthdate.setAttribute('type', 'hidden');
+                    hiddenInputBirthdate.setAttribute('name', 'birthdate');
+                    hiddenInputBirthdate.value = document.querySelector('#birthdate_year').value + '-' +
+                                                 document.querySelector('#birthdate_month').value + '-' +
+                                                 document.querySelector('#birthdate_day').value;
+                    document.querySelector('#orderConfirmAgbBottom').append(hiddenInputBirthdate);
 
-    {% if isCompany %}
-        document.querySelector( '#unzer_company_form' ).addEventListener('change', function(event) {
-            event.preventDefault();
-            if (document.querySelector('#unzer_company_form').value === "") {
-                document.querySelector( '.unzerCompanyForm' ).classList.add("text-danger");
-            } else {
-                document.querySelector( '.unzerCompanyForm' ).classList.remove("text-danger");
+                    let hiddenCustomerType = document.createElement('input');
+                    hiddenCustomerType.setAttribute('type', 'hidden');
+                    hiddenCustomerType.setAttribute('name', 'unzer_customer_type');
+                    hiddenCustomerType.value = '{{ customerType }}';
+                    document.querySelector('#orderConfirmAgbBottom').append(hiddenCustomerType);
+
+                    let hiddenTypeId = document.createElement('input');
+                    hiddenTypeId.setAttribute('type', 'hidden');
+                    hiddenTypeId.setAttribute('name', 'unzer_type_id');
+                    hiddenTypeId.value = typeId;
+                    document.querySelector('#orderConfirmAgbBottom').append(hiddenTypeId);
+
+                    document.querySelector('#orderConfirmAgbBottom' ).classList.add("submitable");
+                    document.querySelector("#orderConfirmAgbBottom" ).submit();
+                } else {
+                    document.querySelector('html, body').animate({
+                        scrollTop: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY - 150
+                    }, 350);
+                }
+            })
+            .catch(function(error) {
+                document.getElementById('error-holder').innerText = error.customerMessage || error.message || 'Error'
+            })
+
+        });
+
+        document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function( event ) {
+            if(!document.querySelector('#orderConfirmAgbBottom').classList.contains("submitable")){
+                event.preventDefault();
+                document.querySelector("#payment-form").requestSubmit();
             }
         });
-    {% endif %}
 
-    document.querySelector( '#birthdate_year' ).addEventListener('change', function(event) {
-        event.preventDefault();
-        if (document.querySelector('#birthdate_year').value === "") {
-            document.querySelector( '.oxDate' ).classList.add("text-danger");
-        } else {
-            document.querySelector( '.oxDate' ).classList.remove("text-danger");
-        }
-    });
+        {% if isCompany %}
+            document.querySelector( '#unzer_company_form' ).addEventListener('change', function(event) {
+                event.preventDefault();
+                if (document.querySelector('#unzer_company_form').value === "") {
+                    document.querySelector( '.unzerCompanyForm' ).classList.add("text-danger");
+                } else {
+                    document.querySelector( '.unzerCompanyForm' ).classList.remove("text-danger");
+                }
+            });
+        {% endif %}
 
-    document.querySelector( '#birthdate_month' ).addEventListener('change', function(event) {
-        event.preventDefault();
-        if (document.querySelector('#birthdate_month').value === "") {
-            document.querySelector( '.oxDate' ).classList.add("text-danger");
-        } else {
-            document.querySelector( '.oxDate' ).classList.remove("text-danger");
-        }
-    });
+        document.querySelector( '#birthdate_year' ).addEventListener('change', function(event) {
+            event.preventDefault();
+            if (document.querySelector('#birthdate_year').value === "") {
+                document.querySelector( '.oxDate' ).classList.add("text-danger");
+            } else {
+                document.querySelector( '.oxDate' ).classList.remove("text-danger");
+            }
+        });
 
-    document.querySelector( '#birthdate_day' ).addEventListener('change', function(event) {
-        event.preventDefault();
-        if (document.querySelector('#birthdate_day').value === "") {
-            document.querySelector( '.oxDate' ).classList.add("text-danger");
-        } else {
-            document.querySelector( '.oxDate' ).classList.remove("text-danger");
-        }
-    });
+        document.querySelector( '#birthdate_month' ).addEventListener('change', function(event) {
+            event.preventDefault();
+            if (document.querySelector('#birthdate_month').value === "") {
+                document.querySelector( '.oxDate' ).classList.add("text-danger");
+            } else {
+                document.querySelector( '.oxDate' ).classList.remove("text-danger");
+            }
+        });
 
+        document.querySelector( '#birthdate_day' ).addEventListener('change', function(event) {
+            event.preventDefault();
+            if (document.querySelector('#birthdate_day').value === "") {
+                document.querySelector( '.oxDate' ).classList.add("text-danger");
+            } else {
+                document.querySelector( '.oxDate' ).classList.remove("text-danger");
+            }
+        });
+    {% if false %}</script>{% endif %}
     {% endcapture %}
-    </script>
     {{ script({ add: unzerInvoiceJS, dynamic: __oxid_include_dynamic }) }}
 {% endblock %}

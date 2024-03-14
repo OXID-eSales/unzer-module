@@ -66,23 +66,27 @@
 {% set totalgross = oxcmp_basket.getBruttoSum() %}
 {% set uzrcurrency = 'EUR' %}
 {% set installrate = oViewConf.getUnzerInstallmentRate() %}
-
+{% if false %}<script>{% endif %}
 {% capture assign = "unzerInstallmentJS" %}
 
     // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
+    let unzerInstance = new unzer('[{$unzerpub}]', { locale: "[{$unzerLocale}]" });
 
     let InstallmentSecured = unzerInstance.InstallmentSecured();
 
-    function toggleDateVisbility() {
-        if ($('#installment-secured-account-owner').length < 1) $('#oxDateForInstallment').hide();
-        $('#installment-secured-account-owner').each(function() {
-            if ($(this).is(':visible')){
-                $('#oxDateForInstallment').show();
-            }
-        });
+    function toggleDateVisibility() {
+        let accountOwner = document.getElementById('installment-secured-account-owner');
+        let oxDateForInstallment = document.getElementById('oxDateForInstallment');
+
+        if (!accountOwner) {
+            oxDateForInstallment.style.display = 'none';
+        }
+
+        if (getComputedStyle(accountOwner).display !== 'none') {
+            oxDateForInstallment.style.display = 'block';
+        }
     }
-    window.setInterval(toggleDateVisbility, 100);
+    window.setInterval(toggleDateVisibility, 100);
 
     InstallmentSecured.create({
         containerId: 'unzer-installment',
@@ -91,47 +95,50 @@
         effectiveInterest: [{$installrate}]
     });
 
-    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+    document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function(event) {
+        if (!this.classList.contains("submitable")) {
             event.preventDefault();
-            $( '#payment-form-installment' ).submit();
+            document.querySelector('#payment-form-installment').submit();
         }
-        $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
+        document.querySelector('#orderConfirmAgbBottom .submitButton').disabled = true;
     });
 
     // Handling payment form submission
-    $( "#payment-form-installment" ).submit(function( event ) {
+    document.querySelector("#payment-form-installment").addEventListener('submit', function(event) {
         event.preventDefault();
-        if($('.unzerUI-installment-secured__selected-rate').length){
+        if (document.querySelectorAll('.unzerUI-installment-secured__selected-rate').length) {
             InstallmentSecured.createResource()
                 .then(function(data) {
-                    let hiddenInput = $(document.createElement('input'))
-                            .attr('type', 'hidden')
-                            .attr('name', 'paymentData')
-                            .val(JSON.stringify(data));
+                    let hiddenInput = document.createElement('input');
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'paymentData');
+                    hiddenInput.value = JSON.stringify(data);
 
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+                    document.querySelector('#orderConfirmAgbBottom .hidden').appendChild(hiddenInput);
 
-                    let hiddenInputBirthdate = $(document.createElement('input'))
-                            .attr('type', 'hidden')
-                            .attr('name', 'birthdate')
-                            .val($('#birthdate_year').val()+'-'+$('#birthdate_month').val()+'-'+$('#birthdate_day').val());
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInputBirthdate);
+                    let hiddenInputBirthdate = document.createElement('input');
+                    hiddenInputBirthdate.setAttribute('type', 'hidden');
+                    hiddenInputBirthdate.setAttribute('name', 'birthdate');
+                    hiddenInputBirthdate.value = document.querySelector('#birthdate_year').value + '-' + document.querySelector('#birthdate_month').value + '-' + document.querySelector('#birthdate_day').value;
+                    document.querySelector('#orderConfirmAgbBottom .hidden').appendChild(hiddenInputBirthdate);
 
-                    $( '#orderConfirmAgbBottom' ).addClass("submitable");
-                    $( "#orderConfirmAgbBottom" ).submit();
+                    document.querySelector('#orderConfirmAgbBottom').classList.add("submitable");
+                    document.querySelector("#orderConfirmAgbBottom").submit();
                 })
                 .catch(function(error) {
-                    $('#error-holder').html(error.message);
-                    $('html, body').animate({
-                        scrollTop: $("#orderPayment").offset().top - 150
-                }, 350);
+                    document.querySelector('#error-holder').innerText = error.message;
+                    window.scrollTo({
+                        top: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY - 150,
+                        behavior: 'smooth'
+                    });
+                });
+        } else {
+            window.scrollTo({
+                top: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY - 150,
+                behavior: 'smooth'
             });
-        }else{
-            $('html, body').animate({
-                scrollTop: $("#orderPayment").offset().top - 150
-            }, 350);
         }
     });
 {% endcapture %}
+{% if false %}</script>{% endif %}
 {{ script({ add: unzerInstallmentJS, dynamic: __oxid_include_dynamic }) }}

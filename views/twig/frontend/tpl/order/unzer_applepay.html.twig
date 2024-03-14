@@ -1,5 +1,5 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
-
+{% if false %}<script>{% endif %}
     {% capture assign = "unzerApplePayJS" %}
         const $errorHolder = $('#error-holder');
 
@@ -303,4 +303,6 @@
             session.abort();
         }
     {% endcapture %}
+{% if false %}</script>{% endif %}
+
 {{ script({ add: unzerApplePayJS, dynamic: __oxid_include_dynamic }) }}
