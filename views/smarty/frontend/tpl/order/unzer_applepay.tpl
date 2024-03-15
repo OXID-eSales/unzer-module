@@ -73,7 +73,7 @@
                     }).fail(function (error) {
                         handleError({message: error.statusText});
                         abortPaymentSession(session);
-                        window.location.href = '[{$oViewConf->getSelfLink()}]cl=payment&payerror=2'
+                        window.location.href = '[{$oViewConf->getSelfLink()}]&cl=payment&payerror=2'
                     });
                 })
                 .catch(function (error) {
