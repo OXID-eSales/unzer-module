@@ -69,11 +69,11 @@
 
                     $.post('[{$oViewConf->getSelfActionLink()}]', $form.serialize()).done(function (data) {
                         session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
-                        window.location.href = data.redirectUrl;
+                        window.location.href = '[{$oViewConf->getSelfLink()}]&cl=thankyou';
                     }).fail(function (error) {
                         handleError({message: error.statusText});
                         abortPaymentSession(session);
-                        window.location.href = '[{$oViewConf->getSelfLink()}]cl=payment&payerror=2'
+                        window.location.href = '[{$oViewConf->getSelfLink()}]&cl=payment&payerror=2'
                     });
                 })
                 .catch(function (error) {

@@ -7,11 +7,11 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
-use Throwable;
 use UnzerSDK\Services\ValueService;
 
 /**
  * We only use this for requests the unzer sdk currently does not cover
+ * @SuppressWarnings(PHPMD.StaticAccess)
  */
 class ApiClient
 {
@@ -47,32 +47,26 @@ class ApiClient
     }
 
     /**
-     * @param string $certificateId
-     * @return ResponseInterface
      * @throws GuzzleException|JsonException
      */
-    public function requestApplePayPaymentCert(string $certificateId): ResponseInterface
+    public function requestApplePayPaymentCert(string $certificateId): ?ResponseInterface
     {
         return $this->request('keypair/applepay/certificates/' . $certificateId);
     }
 
     /**
-     * @param string $keyId
-     * @return ResponseInterface
      * @throws GuzzleException
      */
-    public function requestApplePayPaymentKey(string $keyId): ResponseInterface
+    public function requestApplePayPaymentKey(string $keyId): ?ResponseInterface
     {
         return $this->request('keypair/applepay/privatekeys/' . $keyId);
     }
 
     /**
-     * @param string $key
-     * @return ResponseInterface
      * @throws GuzzleException
      * @throws JsonException
      */
-    public function uploadApplePayPaymentKey(string $key): ResponseInterface
+    public function uploadApplePayPaymentKey(string $key): ?ResponseInterface
     {
         return $this->request('keypair/applepay/privatekeys', 'POST', [
             'format' => 'PEM',
@@ -82,13 +76,11 @@ class ApiClient
     }
 
     /**
-     * @param string $certificate
      * @param string $privateKeyId (getting from upload of ApplePayPaymentKey)
-     * @return ResponseInterface
      * @throws GuzzleException
      * @throws JsonException
      */
-    public function uploadApplePayPaymentCertificate(string $certificate, string $privateKeyId): ResponseInterface
+    public function uploadApplePayPaymentCertificate(string $certificate, string $privateKeyId): ?ResponseInterface
     {
         return $this->request('keypair/applepay/certificates', 'POST', [
             'format' => 'PEM',
@@ -99,12 +91,10 @@ class ApiClient
     }
 
     /**
-     * @param string $certificateId
-     * @return ResponseInterface
      * @throws GuzzleException
      * @throws JsonException
      */
-    public function activateApplePayPaymentCertificate(string $certificateId): ResponseInterface
+    public function activateApplePayPaymentCertificate(string $certificateId): ?ResponseInterface
     {
         return $this->request('keypair/applepay/certificates/' . $certificateId . '/activate', 'POST');
     }
@@ -120,8 +110,8 @@ class ApiClient
         string $url,
         string $method = 'GET',
         array $body = []
-    ): ResponseInterface {
-        $response = new Response(0);
+    ): ?ResponseInterface {
+        $response = null;
         $options = [];
         $options['headers'] = $this->headers;
         $payload = '';
@@ -143,8 +133,7 @@ class ApiClient
                 // log request
                 $this->logger->log($method . ': ' . $url);
                 $this->logger->log(
-                    'Headers: '
-                    . json_encode($options['headers'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES)
+                    'Headers: ' . json_encode($options['headers'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES)
                 );
                 if ($payload) {
                     $this->logger->log('Request: ' . $payload);

@@ -33,6 +33,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OrderController extends OrderController_parent
 {
@@ -141,7 +142,14 @@ class OrderController extends OrderController_parent
                     );
                 }
 
-                throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
+                if ($oBasket->getPaymentId() !== CoreUnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
+                    throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
+                }
+                // this action was called from js if payment was settled correctly with unzer apple pay,
+                // and the order needs to be updated as successfully paid, we send here just a
+                // 200 response, the next step is that the js calls the thank you page
+                // modules/osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl:77
+                return;
             }
 
             $oDB->rollbackTransaction();
@@ -384,7 +392,7 @@ class OrderController extends OrderController_parent
     protected function getTrancactionIds(): array
     {
         $result = [];
-        if ($this->getUser()->getId() !== null) {
+        if ($this->getUser() && $this->getUser()->getId() !== null) {
             $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
             $result = $oDB->getAll(
                 "SELECT PAYMENTTYPEID from oscunzertransaction
