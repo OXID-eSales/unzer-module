@@ -33,6 +33,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OrderController extends OrderController_parent
 {

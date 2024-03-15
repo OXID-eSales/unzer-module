@@ -120,7 +120,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         if (is_null($errorMessage)) {
             try {
                 $response = $apiClient->uploadApplePayPaymentKey($key);
-                if ($response->getStatusCode() !== 201) {
+                if (!$response || $response->getStatusCode() !== 201) {
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_KEY';
                 } else {
                     /** @var array{'id': string} $responseBody */
@@ -136,7 +136,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         if ($applePayKeyId && is_null($errorMessage)) {
             try {
                 $response = $apiClient->uploadApplePayPaymentCertificate($cert, $applePayKeyId);
-                if ($response->getStatusCode() !== 201) {
+                if (!$response || $response->getStatusCode() !== 201) {
                     $errorMessage = 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT';
                 } else {
                     /** @var array{'id': string} $responseBody */
@@ -152,7 +152,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         if ($applePayKeyId && $applePayCertId && is_null($errorMessage)) {
             try {
                 $response = $apiClient->activateApplePayPaymentCertificate($applePayCertId);
-                if ($response->getStatusCode() !== 200) {
+                if (!$response || $response->getStatusCode() !== 200) {
                     $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
                 } else {
                     $this->moduleSettings->saveApplePayPaymentKeyId($applePayKeyId);
@@ -184,19 +184,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $keyId = $this->moduleSettings->getApplePayPaymentKeyId();
         if ($this->moduleSettings->getApplePayMerchantCertKey() && $keyId) {
             try {
-                $keyExists = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentKey($keyId)
-                    ->getStatusCode()
-                    === 200;
+                $response = $this->getServiceFromContainer(ApiClient::class)
+                    ->requestApplePayPaymentKey($keyId);
+                if (!$response) {
+                    $this->addErrorTransmittingKey();
+                    return false;
+                }
+
+                return $response->getStatusCode() === 200;
             } catch (GuzzleException $guzzleException) {
-                Registry::getUtilsView()->addErrorToDisplay(
-                    oxNew(
-                        UnzerException::class,
-                        $this->translator->translate(
-                            'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY'
-                        )
-                    )
-                );
+                $this->addErrorTransmittingKey();
             }
         }
         return $keyExists;
@@ -211,19 +208,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $certId = $this->moduleSettings->getApplePayPaymentCertificateId();
         if ($this->moduleSettings->getApplePayMerchantCert() && $certId) {
             try {
-                $certExists = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentCert($certId)
-                    ->getStatusCode()
-                    === 200;
+                $response = $this->getServiceFromContainer(ApiClient::class)
+                    ->requestApplePayPaymentCert($certId);
+                if (!$response) {
+                    $this->addErrorTransmittingCertificate();
+                    return false;
+                }
+
+                return $response->getStatusCode() === 200;
             } catch (GuzzleException $guzzleException) {
-                Registry::getUtilsView()->addErrorToDisplay(
-                    oxNew(
-                        UnzerException::class,
-                        $this->translator->translate(
-                            'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT'
-                        )
-                    )
-                );
+                $this->addErrorTransmittingCertificate();
             }
         }
         return $certExists;
@@ -277,5 +271,29 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $this->moduleSettings->saveWebhookConfiguration([]);
             $this->registerWebhooks();
         }
+    }
+
+    private function addErrorTransmittingCertificate(): void
+    {
+        Registry::getUtilsView()->addErrorToDisplay(
+            oxNew(
+                UnzerException::class,
+                $this->translator->translate(
+                    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_CERT'
+                )
+            )
+        );
+    }
+
+    private function addErrorTransmittingKey(): void
+    {
+        Registry::getUtilsView()->addErrorToDisplay(
+            oxNew(
+                UnzerException::class,
+                $this->translator->translate(
+                    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_GET_KEY'
+                )
+            )
+        );
     }
 }

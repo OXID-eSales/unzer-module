@@ -1,22 +1,21 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace OxidEsales\EshopCommunity\modules\osc\unzer\src\Model;
 
 class UnzerPaymentDataErrorProcessing
 {
-    public ?string $uniqueId = null;
-    public ?string $shortId = null;
+    /** @var string|null */
+    public $uniqueId = null;
+    /** @var string|null */
+    public $shortId = null;
 
     /**
      * @param array $arrayPaymentData
      * @return self
      */
-    public static function fromArray($arrayPaymentData)
+    public function __construct($arrayPaymentData)
     {
-        $unzerPaymentData = new self();
-        $unzerPaymentData->uniqueId = $arrayPaymentData['uniqueId'] ?? null;
-        $unzerPaymentData->shortId = $arrayPaymentData['shortId'] ?? null;
-
-        return $unzerPaymentData;
+        $this->uniqueId = $arrayPaymentData['uniqueId'] ?? null;
+        $this->shortId = $arrayPaymentData['shortId'] ?? null;
     }
 }

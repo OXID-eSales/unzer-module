@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
@@ -12,23 +12,21 @@ class UnzerPaymentDataError
     public $customerMessage = null;
     /** @var UnzerPaymentDataErrorStatus|null */
     public $status = null;
+    /** @var UnzerPaymentDataErrorProcessing|null */
+    public $processing = null;
 
     /**
      * @param array $arrayPaymentData
-     * @return self
      */
-    public static function fromArray($arrayPaymentData)
+    public function __construct($arrayPaymentData)
     {
-        $unzerPaymentData = new self();
-        $unzerPaymentData->code = $arrayPaymentData['code'] ?? null;
-        $unzerPaymentData->customerMessage = $arrayPaymentData['customerMessage'] ?? null;
-        $unzerPaymentData->status = UnzerPaymentDataErrorStatus::fromArray(
+        $this->code = $arrayPaymentData['code'] ?? null;
+        $this->customerMessage = $arrayPaymentData['customerMessage'] ?? null;
+        $this->status = new UnzerPaymentDataErrorStatus(
             $arrayPaymentData['status'] ?? []
         );
-        $unzerPaymentData->status = UnzerPaymentDataErrorProcessing::fromArray(
+        $this->processing = new UnzerPaymentDataErrorProcessing(
             $arrayPaymentData['processing'] ?? []
         );
-        
-        return $unzerPaymentData;
     }
 }

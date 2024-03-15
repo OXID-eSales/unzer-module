@@ -15,6 +15,7 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
+use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
@@ -240,14 +241,23 @@ abstract class UnzerPayment
             $this->logger
                 ->log(
                     sprintf(
-                        'Could not process Transaction for paymentId %s, traceId: %s, timestamp: %s, customerMessage: %s',
+                        'Could not process Transaction for paymentId %s,'
+                        . 'traceId: %s, timestamp: %s, customerMessage: %s',
                         $unzerPaymentData->id,
                         $unzerPaymentData->traceId,
                         $unzerPaymentData->timestamp,
                         $unzerPaymentData->getFirstErrorMessage()
                     )
                 );
-            throw new Exception($unzerPaymentData->getFirstErrorMessage());
+            throw new Exception(
+                $unzerPaymentData->getFirstErrorMessage() ?? $this->getDefaultExceptionMessage()
+            );
         }
+    }
+
+    private function getDefaultExceptionMessage(): string
+    {
+        $translator = $this->getServiceFromContainer(Translator::class);
+        return $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT');
     }
 }

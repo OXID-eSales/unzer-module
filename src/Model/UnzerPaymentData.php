@@ -1,20 +1,29 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 class UnzerPaymentData
 {
-    public ?string $id = null;
-    public ?bool $isSuccess = null;
-    public ?bool $isPending = null;
-    public ?bool $isResumed = null;
-    public ?bool $isError = null;
-    public ?string $url = null;
-    public ?string $timestamp = null;
-    public ?string $traceId = null;
-    public ?string $paymentId = null;
+    /** @var string|null */
+    public $id = null;
+    /** @var bool|null */
+    public $isSuccess = null;
+    /** @var bool|null */
+    public $isPending = null;
+    /** @var bool|null */
+    public $isResumed = null;
+    /** @var bool|null */
+    public $isError = null;
+    /** @var string|null */
+    public $url = null;
+    /** @var string|null */
+    public $timestamp = null;
+    /** @var string|null */
+    public $traceId = null;
+    /** @var string|null */
+    public $paymentId = null;
     /** @var UnzerPaymentDataError[] */
-    public array $errors = [];
+    public $errors = [];
 
     /**
      * @return string|null
@@ -24,29 +33,29 @@ class UnzerPaymentData
         return $this->errors[0]->customerMessage ?? null;
     }
 
-    public static function fromArray($arrayPaymentData): self
+    /**
+     * @param array $arrayPaymentData
+     */
+    public function __construct($arrayPaymentData)
     {
-        $unzerPaymentData = new self();
-        $unzerPaymentData->id = $arrayPaymentData['id'] ?? null;
-        $unzerPaymentData->isSuccess = $arrayPaymentData['isSuccess'] ?? null;
-        $unzerPaymentData->isPending = $arrayPaymentData['isPending'] ?? null;
-        $unzerPaymentData->isResumed = $arrayPaymentData['isResumed'] ?? null;
-        $unzerPaymentData->isError = $arrayPaymentData['isError'] ?? null;
-        $unzerPaymentData->url = $arrayPaymentData['url'] ?? null;
-        $unzerPaymentData->timestamp = $arrayPaymentData['timestamp'] ?? null;
-        $unzerPaymentData->traceId = $arrayPaymentData['traceId'] ?? null;
-        $unzerPaymentData->paymentId = $arrayPaymentData['paymentId'] ?? null;
-        $unzerPaymentData->errors = self::getErrors($arrayPaymentData['errors'] ?? []);
-
-        return $unzerPaymentData;
+        $this->id = $arrayPaymentData['id'] ?? null;
+        $this->isSuccess = $arrayPaymentData['isSuccess'] ?? null;
+        $this->isPending = $arrayPaymentData['isPending'] ?? null;
+        $this->isResumed = $arrayPaymentData['isResumed'] ?? null;
+        $this->isError = $arrayPaymentData['isError'] ?? null;
+        $this->url = $arrayPaymentData['url'] ?? null;
+        $this->timestamp = $arrayPaymentData['timestamp'] ?? null;
+        $this->traceId = $arrayPaymentData['traceId'] ?? null;
+        $this->paymentId = $arrayPaymentData['paymentId'] ?? null;
+        $this->errors = $this->getErrors($arrayPaymentData['errors'] ?? []);
     }
 
-    private static function getErrors(array $arrayErrors): array
+    private function getErrors(array $arrayErrors): array
     {
         $errors = [];
         if (count($arrayErrors) > 0) {
             foreach ($arrayErrors as $arrayError) {
-                $errors[] = UnzerPaymentDataError::fromArray($arrayError);
+                $errors[] = new UnzerPaymentDataError($arrayError);
             }
         }
 

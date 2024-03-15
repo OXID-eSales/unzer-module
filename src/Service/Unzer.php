@@ -584,7 +584,7 @@ class Unzer
     {
         $paymentData = $this->getPaymentDataArrayFromRequest();
 
-        return UnzerPaymentData::fromArray($paymentData);
+        return new UnzerPaymentData($paymentData);
     }
 
     /**
@@ -680,6 +680,6 @@ class Unzer
         /** @var string $jsonPaymentData */
         $jsonPaymentData = $this->request->getRequestParameter('paymentData');
 
-        return $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
+        return $jsonPaymentData ? (array) json_decode($jsonPaymentData, true) : [];
     }
 }
