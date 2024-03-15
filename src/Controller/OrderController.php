@@ -40,6 +40,7 @@ use UnzerSDK\Resources\PaymentTypes\Paypal;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OrderController extends OrderController_parent
 {

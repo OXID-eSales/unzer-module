@@ -15,7 +15,7 @@ class UnzerPaymentDataErrorStatus
     public bool|null $processing = null;
     public bool|null $pending = null;
 
-    public function __construct(array $arrayPaymentData)
+    public function __construct($arrayPaymentData)
     {
         $this->successful = $arrayPaymentData['successful'] ?? null;
         $this->processing = $arrayPaymentData['processing'] ?? null;
