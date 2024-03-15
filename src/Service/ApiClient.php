@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use JsonException;
 use Psr\Http\Message\ResponseInterface;
-use Throwable;
 use UnzerSDK\Services\ValueService;
 
 /**

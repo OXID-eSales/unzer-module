@@ -7,14 +7,15 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use DateTime;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\Model\ListModel;
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
@@ -24,25 +25,25 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
+use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentData;
+use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
 use UnzerSDK\Constants\CompanyTypes;
 use UnzerSDK\Constants\CustomerGroups;
 use UnzerSDK\Constants\Salutations;
 use UnzerSDK\Constants\ShippingTypes;
 use UnzerSDK\Resources\Basket;
-use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
+use UnzerSDK\Resources\EmbeddedResources\Address as UnzerSDKAddress;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\EmbeddedResources\CompanyInfo;
 use UnzerSDK\Resources\EmbeddedResources\RiskData;
-use UnzerSDK\Resources\EmbeddedResources\Address as UnzerSDKAddress;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\PaymentTypes\Prepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
-use DateTime;
 
 /**
  * TODO: Fix all the suppressed warnings
@@ -522,10 +523,7 @@ class Unzer
      */
     public function getUnzerPaymentIdFromRequest(): string
     {
-        /** @var string $jsonPaymentData */
-        $jsonPaymentData = $this->request->getRequestParameter('paymentData');
-        /** @var array $paymentData */
-        $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
+        $paymentData = $this->getPaymentDataArrayFromRequest();
 
         if (array_key_exists('id', $paymentData)) {
             return $paymentData['id'];
@@ -541,7 +539,7 @@ class Unzer
             $this->session->setVariable('ShortId', $charge->getShortId());
         }
 
-        $this->session->setVariable('PaymentId', $charge->getPaymentId());
+        $this->session->setVariable('paymentid', $charge->getPaymentId());
 
         if ($charge instanceof Authorization) {
             $this->session->setVariable('UzrPdfLink', $charge->getPDFLink());
@@ -580,6 +578,13 @@ class Unzer
         $metadata->addMetadata('pluginVersion', $this->moduleSettings->getModuleVersion());
 
         return $metadata;
+    }
+
+    public function getUnzerPaymentDataFromRequest(): UnzerPaymentData
+    {
+        $paymentData = $this->getPaymentDataArrayFromRequest();
+
+        return UnzerPaymentData::fromArray($paymentData);
     }
 
     /**
@@ -668,5 +673,13 @@ class Unzer
         }
 
         return '';
+    }
+
+    private function getPaymentDataArrayFromRequest(): array
+    {
+        /** @var string $jsonPaymentData */
+        $jsonPaymentData = $this->request->getRequestParameter('paymentData');
+
+        return $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
     }
 }

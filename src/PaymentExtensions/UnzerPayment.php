@@ -11,13 +11,13 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use Psr\Log\LoggerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
@@ -112,6 +112,7 @@ abstract class UnzerPayment
         User $userModel,
         Basket $basketModel
     ): bool {
+        $this->throwExceptionIfPaymentDataError();
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
         if ($paymentType instanceof Paypal) {
@@ -221,5 +222,32 @@ abstract class UnzerPayment
             );
         }
         return $transaction;
+    }
+
+    /**
+     * proves if there are errors coming from unzer like: credit card has been expired, to send this error to the
+     * customer and log it
+     *
+     * @return void
+     */
+    private function throwExceptionIfPaymentDataError()
+    {
+        /** @var UnzerService $unzerService */
+        $unzerService = ContainerFactory::getInstance()->getContainer()->get(UnzerService::class);
+        $unzerPaymentData = $unzerService->getUnzerPaymentDataFromRequest();
+
+        if ($unzerPaymentData->isSuccess === false && $unzerPaymentData->isError === true) {
+            $this->logger
+                ->log(
+                    sprintf(
+                        'Could not process Transaction for paymentId %s, traceId: %s, timestamp: %s, customerMessage: %s',
+                        $unzerPaymentData->id,
+                        $unzerPaymentData->traceId,
+                        $unzerPaymentData->timestamp,
+                        $unzerPaymentData->getFirstErrorMessage()
+                    )
+                );
+            throw new Exception($unzerPaymentData->getFirstErrorMessage());
+        }
     }
 }

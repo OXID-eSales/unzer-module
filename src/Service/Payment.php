@@ -240,7 +240,7 @@ class Payment
             return $this->sessionUnzerPayment;
         }
 
-        $paymentId = $this->session->getVariable('PaymentId');
+        $paymentId = $this->session->getVariable('paymentid');
         if (is_string($paymentId)) {
             /** @var string $sessionOrderId */
             $sessionOrderId = $this->session->getVariable('sess_challenge');
