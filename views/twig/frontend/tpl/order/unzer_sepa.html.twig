@@ -3,43 +3,43 @@
 {% if unzerPaymentType != false  %}
     <div class="savedpayment">
         {% for type, setting in unzerPaymentType %}
-        {% if type == 'sepa' %}
-        <form id="payment-saved-cards" class="unzerUI form" novalidate>
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">{{ translate({ ident: "OSCUNZER_HOLDER" }) }}</th>
-                    <th scope="col">{{ translate({ ident: "OSCUNZER_IBAN" }) }}</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-
-                {% for paymenttypeid, paymentType in setting %}
+            {% if type == 'sepa' %}
+            <form id="payment-saved-cards" class="unzerUI form" novalidate>
+                <table class="table">
+                    <thead>
                     <tr>
-                        <th scope="row">{{ paymentType.holder }}</th>
-                        <td>{{ paymentType.iban }}</td>
-                        <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" {% if loop.first %}checked{% endif %} value="{{ paymenttypeid }}"
-                                   style="-webkit-appearance: radio">
-                        </td>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_HOLDER" }) }}</th>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_IBAN" }) }}</th>
+                        <th scope="col"></th>
                     </tr>
-                    {% endfor %}
+                    </thead>
+                    <tbody>
 
-
-                </tbody>
-            </table>
-        </form>
-        {% endif %}
+                    {% for paymenttypeid, paymentType in setting %}
+                        <tr>
+                            <th scope="row">{{ paymentType.holder }}</th>
+                            <td>{{ paymentType.iban }}</td>
+                            <td>
+                                <input type="radio" class="paymenttypeid" name="paymenttypeid" {% if loop.first %}checked{% endif %} value="{{ paymenttypeid }}"
+                                       style="-webkit-appearance: radio">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+            {% endif %}
         {% endfor %}
     </div>
-    {% endif %}
-{% if unzerPaymentType != false  %}
-<br>
-    <label class="newiban">
-        <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue IBAN
-    </label>
 {% endif %}
+
+{% if unzerPaymentType != false  %}
+    <br>
+        <label class="newiban">
+            <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue IBAN
+        </label>
+{% endif %}
+
 <div id="newsepa" style="display:none;">
 
     <form id="payment-form-sepa">
@@ -72,107 +72,115 @@
     </div>
 </div>
 {% capture assign = "unzerSepaDirectJS" %}
-{% if false %}
-<script>
-{% endif %}
-    function executeUnzerPayment(event){
-        if (!SepaDirectDebit) {
-            let SepaDirectDebit = unzerInstance.SepaDirectDebit();
-        }
+{% if false %}<script>{% endif %}
+    function executeUnzerPayment(event) {
         event.stopPropagation();
-        var zahlungsButton = $(event.currentTarget);
-        zahlungsButton.prop('disabled', true);
-        $( "#payment-form-sepa" ).submit();
+        let zahlungsButton = event.currentTarget;
+        zahlungsButton.disabled = true;
+        document.getElementById('orderConfirmAgbBottom').submit();
     }
-    let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
+
+    let unzerInstance = new unzer('{{ unzerpub }}', { locale: "{{ unzerLocale }}" });
     let SepaDirectDebit = unzerInstance.SepaDirectDebit();
-    if ($('input[name="paymenttypeid"]').length === 0) {
-        $('#orderConfirmAgbBottom').addClass('new-card-selected');
-        $('#newsepa').show();
-        $('.newiban').hide();
+
+    if (document.querySelectorAll('input[name="paymenttypeid"]').length === 0) {
+        document.getElementById('orderConfirmAgbBottom').classList.add('new-card-selected');
+        document.getElementById('newsepa').style.display = 'block';
+        document.querySelectorAll('.newiban').forEach(el => el.style.display = 'none');
         SepaDirectDebit.create('sepa-direct-debit', {
             containerId: 'sepa-IBAN'
         });
     } else {
-        $('input[name="newccard"]').on('change', function() {
-            if ($(this).prop('checked')) {
-                $('#newsepa').show();
-                $('.savedpayment').hide();
-                addElements(SepaDirectDebit);
-            } else {
-                $('#newsepa').hide();
-                $('.savedpayment').show();
-                removeCardElements();
-            }
+        document.querySelectorAll('input[name="newccard"]').forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('newsepa').style.display = 'block';
+                    document.querySelectorAll('.savedpayment').forEach(el => el.style.display = 'none');
+                    addElements(SepaDirectDebit);
+                } else {
+                    document.getElementById('newsepa').style.display = 'none';
+                    document.querySelectorAll('.savedpayment').forEach(el => el.style.display = 'block');
+                    removeCardElements();
+                }
+            });
         });
     }
-    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+
+    document.getElementById('orderConfirmAgbBottom').addEventListener('submit', function(event) {
+        if (!this.classList.contains('submitable')) {
             event.preventDefault();
-            $( '#payment-form-sepa' ).submit();
+            document.querySelector('#payment-form-sepa').requestSubmit();
         }
     });
-    // Handling payment form submission
-    $( "#payment-form-sepa" ).submit(function( event ) {
-        var zahlungsButton = $('.btn-highlight');
-        event.preventDefault();
-        let hiddenInput1 = $(document.createElement('input'))
-            .attr('type', 'hidden')
-            .attr('name', 'sepaConfirmation')
-            .val($('#oscunzersepaagreement').is(':checked') ? '1' : '0');
 
-        var checkedInput = $('input[name=paymenttypeid]:checked');
-        if (checkedInput.length > 0) {
-            // saved Payment
-            let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
+    document.getElementById('payment-form-sepa').addEventListener('submit', function(event) {
+        let zahlungsButton = document.getElementById('submitOrder');
+        event.preventDefault();
+        let sepaConfirmationValue = document.getElementById('oscunzersepaagreement').checked ? '1' : '0';
+        let hiddenInput1 = document.createElement('input');
+        hiddenInput1.type = 'hidden';
+        hiddenInput1.name = 'sepaConfirmation';
+        hiddenInput1.value = sepaConfirmationValue;
+
+        let checkedInput = document.querySelector('input[name=paymenttypeid]:checked');
+        if (checkedInput) {
+            let selectedPaymentTypeId = checkedInput.value;
             let paymentData = {
                 id: selectedPaymentTypeId
             };
             let paymentDataString = JSON.stringify(paymentData);
-            let hiddenInput = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'paymentData')
-                .val(paymentDataString);
-            $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).append(hiddenInput1).submit();
+            let hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'paymentData';
+            hiddenInput.value = paymentDataString;
+            document.querySelector('#orderConfirmAgbBottom')
+                .classList
+                .add("submitable")
+                .appendChild(hiddenInput)
+                .appendChild(hiddenInput1)
+                .submit();
         }
+
         // Creating a SEPA resource
         SepaDirectDebit.createResource()
-        .then(function(result) {
-            let hiddenInput = $(document.createElement('input'))
-            .attr('type', 'hidden')
-            .attr('name', 'paymentData')
-            .val(JSON.stringify(result));
-            $('#orderConfirmAgbBottom').append(hiddenInput);
+            .then(function(result) {
+                let hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'paymentData';
+                hiddenInput.value = JSON.stringify(result);
+                document.getElementById('orderConfirmAgbBottom').appendChild(hiddenInput);
 
-            let hiddenInput2 = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'oscunzersavepayment')
-                .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
-            $('#orderConfirmAgbBottom').append(hiddenInput).append(hiddenInput1).append(hiddenInput2);
+                let hiddenInput2 = document.createElement('input');
+                hiddenInput2.type = 'hidden';
+                hiddenInput2.name = 'oscunzersavepayment';
+                hiddenInput2.value = document.getElementById('oscunzersavepayment').checked ? '1' : '0';
+                document.getElementById('orderConfirmAgbBottom').appendChild(hiddenInput).appendChild(hiddenInput1).appendChild(hiddenInput2);
 
-            $( '#orderConfirmAgbBottom' ).addClass("submitable");
-            $( "#orderConfirmAgbBottom" ).submit();
-        })
-        .catch(function(error) {
-            $('#error-holder').html(error.message);
-            $('html, body').animate({
-            scrollTop: $("#orderPayment").offset().top - 150
-            }, 350);
-            zahlungsButton.prop('disabled', false);
-        })
+                document.getElementById('orderConfirmAgbBottom').classList.add("submitable");
+                document.getElementById("orderConfirmAgbBottom").submit();
+            })
+            .catch(function(error) {
+                document.getElementById('error-holder').innerHTML = error.message;
+                window.scrollTo({
+                    top: document.getElementById("orderPayment").offsetTop - 150,
+                    behavior: 'smooth'
+                });
+                zahlungsButton.disabled = false;
+            });
     });
-function removeCardElements() {
-    // Clear the contents of the Card-Element containers
-    $('#sepa-IBAN').empty();
-}
-function addElements(SepaDirectDebit) {
-    // Clear the contents of the Card-Element containers
-    SepaDirectDebit.create('sepa-direct-debit', {
-        containerId: 'sepa-IBAN'
-    });
-}
+
+    function removeCardElements() {
+        // Clear the contents of the Card-Element containers
+        document.getElementById('sepa-IBAN').innerHTML = '';
+    }
+
+    function addElements(SepaDirectDebit) {
+        // Clear the contents of the Card-Element containers and create new ones
+        SepaDirectDebit.create('sepa-direct-debit', {
+            containerId: 'sepa-IBAN'
+        });
+    }
+
+{% if false %}</script>{% endif %}
 {% endcapture %}
-{% if false %}
-</script>
-{% endif %}
 {{ script({ add: unzerSepaDirectJS, dynamic: __oxid_include_dynamic }) }}

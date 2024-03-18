@@ -86,119 +86,129 @@
 
 {% if false %}<script>{% endif %}
 {% capture assign = "unzerCardJS" %}
-    function executeUnzerPayment(event){
-        if (!Card) {
-            let Card = unzerInstance.Card();
-        }
+    function executeUnzerPayment(event) {
         event.stopPropagation();
-        var zahlungsButton = $(event.currentTarget);
-        zahlungsButton.prop('disabled', true);
-        $( "#payment-form-card" ).submit();
+        let zahlungsButton = event.currentTarget;
+        zahlungsButton.disabled = true;
+        document.getElementById('orderConfirmAgbBottom').submit();
     }
-    $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-        if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+
+    document.getElementById("orderConfirmAgbBottom").addEventListener("submit", function(event) {
+        if (!this.classList.contains("submitable")) {
             event.preventDefault();
-            $( '#payment-form-card' ).submit();
+            document.getElementById("payment-form-card").requestSubmit();
         }
     });
-    let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
+
+    let unzerInstance = new unzer('{{ unzerpub }}', { locale: "{{ unzerLocale }}" });
     let Card = unzerInstance.Card();
-    if ($('input[name="newccard"]').length === 0) {
 
-        $('#orderConfirmAgbBottom').addClass('new-card-selected');
-        $('#newcc').show();
+    if (document.querySelectorAll('input[name="newccard"]').length === 0) {
+        document.getElementById('orderConfirmAgbBottom').classList.add('new-card-selected');
+        document.getElementById('newcc').style.display = 'block';
         addPaymentElements(Card);
-    } else     {
-        $('input[name="newccard"]').on('change', function() {
+    } else {
+        document.querySelectorAll('input[name="newccard"]').forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.checked) {
+                    document.querySelector('.savedpayment').style.display = 'none';
+                    document.querySelectorAll('input[name="paymenttypeid"]').forEach(input => {
+                        input.checked = false;
+                    });
 
-            if ($(this).prop('checked')) {
-                $('.savedpayment').fadeOut();
-                $('input[name="paymenttypeid"]').prop('checked', false);
-
-                $('#newcc').fadeIn();
-                // Create a Card instance and render the input fields
-                addPaymentElements(Card);
-            } else {
-                $('.savedpayment').fadeIn();
-                // Neue Kreditkarte ausblenden
-                $('#newcc').fadeOut();
-                removeCardElements();
-                if (Card && Card.destroy) {
-                    Card.destroy();
+                    document.getElementById('newcc').style.display = 'block';
+                    addPaymentElements(Card);
+                } else {
+                    document.querySelector('.savedpayment').style.display = 'block';
+                    document.getElementById('newcc').style.display = 'none';
+                    removeCardElements();
+                    if (Card && Card.destroy) {
+                        Card.destroy();
+                    }
                 }
-            }
+            });
         });
     }
-    $( "#payment-form-card" ).on('submit', function( event ) {
-        var zahlungsButton = $('.btn-highlight');
+
+    document.getElementById('payment-form-card').addEventListener('submit', function(event) {
+        let zahlungsButton = document.querySelector('#submitOrder');
         event.preventDefault();
-        var checkedInput = $('input[name=paymenttypeid]:checked');
-        if (checkedInput.length > 0) {
-            // saved Payment
-            let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
+        let checkedInput = document.querySelector('input[name=paymenttypeid]:checked');
+        if (checkedInput) {
+            let selectedPaymentTypeId = checkedInput.value;
             let paymentData = {
                 id: selectedPaymentTypeId
             };
             let paymentDataString = JSON.stringify(paymentData);
-            let hiddenInput = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'paymentData')
-                .val(paymentDataString);
-            $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).submit();
+            let hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'paymentData';
+            hiddenInput.value = paymentDataString;
+            let form = document.getElementById('orderConfirmAgbBottom');
+            form.addClass("submitable")
+            form.appendChild(hiddenInput)
+            form.submit();
         } else {
             Card.createResource()
                 .then(function(result) {
-                    //new payment
-                    let hiddenInput = $(document.createElement('input'))
-                        .attr('type', 'hidden')
-                        .attr('name', 'paymentData')
-                        .val(JSON.stringify(result));
-                    let hiddenInput2 = $(document.createElement('input'))
-                        .attr('type', 'hidden')
-                        .attr('name', 'oscunzersavepayment')
-                        .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
-                    $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).append(hiddenInput2).submit();
+                    let hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'paymentData';
+                    hiddenInput.value = JSON.stringify(result);
+                    let hiddenInput2 = document.createElement('input');
+                    hiddenInput2.type = 'hidden';
+                    hiddenInput2.name = 'oscunzersavepayment';
+                    hiddenInput2.value = document.getElementById('oscunzersavepayment').checked ? '1' : '0';
+
+                    let form = document.getElementById('orderConfirmAgbBottom');
+                    form.classList.add("submitable")
+                    form.appendChild(hiddenInput)
+                    form.appendChild(hiddenInput2)
+                    form.submit();
                 })
                 .catch(function(error) {
-                    console.log('error'+ error.message)
+                    console.error('error' + error.message);
 
-                    $('html, body').animate({
-                        scrollTop: $("#orderPayment").offset().top - 150
-                    }, 350);
+                    window.scrollTo({
+                        top: document.getElementById("orderPayment").offsetTop - 150,
+                        behavior: 'smooth'
+                    });
 
-                    errorField = $("#card-element-id-number");
-                    errorField.find('div').first().addClass('error');
-                    errorEl = errorField.find('div.error.message');
-                    errorEl.css('display', 'inline-block');
-                    errorEl.text(error.message);
-                    zahlungsButton.prop('disabled', false);
-                    $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+                    let errorField = document.getElementById("card-element-id-number");
+                    let errorDiv = errorField.querySelector('div');
+                    errorDiv.classList.add('error');
+                    let errorEl = errorField.querySelector('div.error.message');
+                    errorEl.style.display = 'inline-block';
+                    errorEl.textContent = error.message;
+                    zahlungsButton.disabled = false;
+                    document.getElementById('submitOrder').disabled = false;
                 })
         }
     });
-function addPaymentElements(Card) {
-    // Clear the contents of the Card-Element containers
-    Card.create('number', {
-        containerId: 'card-element-id-number',
-        onlyIframe: false
-    });
-    Card.create('expiry', {
-        containerId: 'card-element-id-expiry',
-        onlyIframe: false
-    });
-    Card.create('cvc', {
-        containerId: 'card-element-id-cvc',
-        onlyIframe: false
-    });
 
-}
+    function addPaymentElements(Card) {
+        // Clear the contents of the Card-Element containers
+        Card.create('number', {
+            containerId: 'card-element-id-number',
+            onlyIframe: false
+        });
+        Card.create('expiry', {
+            containerId: 'card-element-id-expiry',
+            onlyIframe: false
+        });
+        Card.create('cvc', {
+            containerId: 'card-element-id-cvc',
+            onlyIframe: false
+        });
+    }
+
     function removeCardElements() {
         // Clear the contents of the Card-Element containers
-        $('#card-element-id-number').empty();
-        $('#card-element-id-expiry').empty();
-        $('#card-element-id-cvc').empty();
-
+        document.getElementById('card-element-id-number').innerHTML = '';
+        document.getElementById('card-element-id-expiry').innerHTML = '';
+        document.getElementById('card-element-id-cvc').innerHTML = '';
     }
+
 {% endcapture %}
 {% if false %}</script>{% endif %}
 {{ script({ add: unzerCardJS, dynamic: __oxid_include_dynamic }) }}
