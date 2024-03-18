@@ -109,7 +109,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $paymentType = $this->getUnzerPaymentTypeObject();
         if ($paymentType instanceof PayPalPaymentType) {
             $paymentData = $request->getRequestParameter('paymentData');
-            $paymentData = is_string($paymentData) ? $paymentData: '';
+            $paymentData = is_string($paymentData) ? $paymentData : '';
             $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
             if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
                 $paymentType->setId($aPaymentData['id']);
@@ -147,7 +147,6 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $userModel->save();
         }
 
-        $savePayment =  Registry::getRequest()->getRequestParameter('oscunzersavepayment');
         $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
 
         if ($savePayment === "1" && $userModel->getId()) {
@@ -170,11 +169,6 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     }
 
     /**
-     * @param \OxidEsales\Eshop\Application\Model\Basket $basketModel
-     * @param \UnzerSDK\Resources\Customer $customer
-     * @param \OxidEsales\Eshop\Application\Model\User $userModel
-     * @param \UnzerSDK\Resources\PaymentTypes\BasePaymentType $paymentType
-     * @return \UnzerSDK\Interfaces\UnzerParentInterface
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
     protected function doTransactions(

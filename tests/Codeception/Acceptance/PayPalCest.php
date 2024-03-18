@@ -15,16 +15,17 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 /**
  * @group unzer_module
  * @group SecondGroup
+ * @group PayPal
  */
 final class PayPalCest extends BaseCest
 {
-    private $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
-    private $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
-    private $loginInput = "#email";
-    private $passwordInput = "#password";
-    private $loginButton = "#btnLogin";
-    private $submitButton = "#payment-submit-btn";
-    private $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
+    private string $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
+    private string $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
+    private string $loginInput = "#email";
+    private string $passwordInput = "#password";
+    private string $loginButton = "#btnLogin";
+    private string $submitButton = "#payment-submit-btn";
+    private string $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
 
     protected function _getOXID(): array
     {
@@ -32,27 +33,29 @@ final class PayPalCest extends BaseCest
     }
 
     /**
-     * @param AcceptanceTester $I
      * @group PaypalPaymentTest
      */
-    public function checkPaymentWorks(AcceptanceTester $I)
+    public function checkPaymentWorks(AcceptanceTester $I): void
     {
         $I->wantToTest('Test PayPal payment works');
         $this->_initializeTest();
         $this->_choosePayment($this->paypalPaymentLabel);
+        $I->makeScreenshot('order_filled');
         $this->_submitOrder();
 
         $paypalPaymentData = Fixtures::get('paypal_payment');
 
+        $I->makeScreenshot('order_submited');
         // accept cookies
         $I->waitForDocumentReadyState();
-        $I->wait(5);
+        $I->wait(3);
         if ($this->_checkElementExists($this->acceptAllCookiesButton, $I)) {
             $I->click($this->acceptAllCookiesButton);
         }
 
         // login page
         $I->waitForDocumentReadyState();
+        $I->makeScreenshot('waiting_for_the_form');
         $I->waitForElement($this->loginInput);
         $I->fillField($this->loginInput, $paypalPaymentData['username']);
         $I->fillField($this->passwordInput, $paypalPaymentData['password']);

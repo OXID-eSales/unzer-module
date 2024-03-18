@@ -18,17 +18,17 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class SofortCest extends BaseCest
 {
-    private $sofortPaymentLabel = "//label[@for='payment_oscunzer_sofort']";
-    private $landSelect = "//select[@id='MultipaysSessionSenderCountryId']";
-    private $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
-    private $bankSearchInput = "//input[@id='BankCodeSearch']";
-    private $banksearchresultDiv = "//div[@id='BankSearcherResults']";
-    private $bankLabel = "//label[@for='account-88888888']";
-    private $accountNumberLabel = "//input[@id='BackendFormLOGINNAMEUSERID']";
-    private $PINNumberLabel = "//input[@id='BackendFormUSERPIN']";
-    private $continueButton = "//button[@class='button-right primary has-indicator']";
-    private $kontoOptionInput = "//input[@id='account-1']";
-    private $TANInput = "//input[@id='BackendFormTan']";
+    private string $sofortPaymentLabel = "//label[@for='payment_oscunzer_sofort']";
+    private string $landSelect = "//select[@id='MultipaysSessionSenderCountryId']";
+    private string $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
+    private string $bankSearchInput = "//input[@id='BankCodeSearch']";
+    private string $banksearchresultDiv = "//div[@id='BankSearcherResults']";
+    private string $bankLabel = "//label[@for='account-88888888']";
+    private string $accountNumberLabel = "//input[@id='BackendFormLOGINNAMEUSERID']";
+    private string $PINNumberLabel = "//input[@id='BackendFormUSERPIN']";
+    private string $continueButton = "//button[@class='button-right primary has-indicator']";
+    private string $kontoOptionInput = "//input[@id='account-1']";
+    private string $TANInput = "//input[@id='BackendFormTan']";
 
     protected function _getOXID(): array
     {
@@ -36,10 +36,9 @@ final class SofortCest extends BaseCest
     }
 
     /**
-     * @param AcceptanceTester $I
      * @group SofortPaymentTest
      */
-    public function checkPaymentWorks(AcceptanceTester $I)
+    public function checkPaymentWorks(AcceptanceTester $I): void
     {
         $I->wantToTest('Test Sofort payment works');
         $this->_initializeTest();
@@ -57,7 +56,7 @@ final class SofortCest extends BaseCest
         $I->waitForPageLoad();
         $I->waitForText($this->_getPrice() . ' ' . $this->_getCurrency());
         $I->selectOption($this->landSelect, 'DE');
-        $I->waitForElement($this->bankSearchInput);
+        $I->waitForElement($this->bankSearchInput, 3);
         $I->fillField($this->bankSearchInput, "Demo Bank");
         $I->wait(1);
         $I->waitForElement($this->bankLabel);

@@ -73,7 +73,7 @@ class AdminOrderController extends AdminDetailsController
         $oOrder = $this->getEditObject();
         $transactionList = oxNew(TransactionList::class);
         $oxTransId = $oOrder->getFieldData('OXTRANSID');
-        $oxTransId = is_string($oxTransId) ? $oxTransId: null;
+        $oxTransId = is_string($oxTransId) ? $oxTransId : null;
         $transactionList->getTransactionList(
             $this->getEditObjectId(),
             $oxTransId

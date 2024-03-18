@@ -223,14 +223,7 @@ class Order extends Order_parent
         return $number;
     }
 
-    /**
-     * @inerhitDoc
-     *
-     * @param string $sOxId Ordering ID (default null)
-     *
-     * @return bool
-     */
-    public function delete($sOxId = null)
+    public function delete($sOxId = ''): bool
     {
         $sOxId = $sOxId ?? $this->getId();
 

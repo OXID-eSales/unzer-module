@@ -245,7 +245,7 @@
 {% endcapture %}
 
 
-{% capture assign = "unzerInvoiceJS" %}
+{% capture assign = "unzerPaymentJS" %}
 {% if false %}<script>{% endif %}
     function executeUnzerPayment(event) {
         event.stopPropagation();
@@ -254,7 +254,7 @@
 {% if false %}</script>{% endif %}
 {% endcapture %}
 
-{{ script({ add: unzerInvoiceJS, dynamic: __oxid_include_dynamic }) }}
+{{ script({ add: unzerPaymentJS, dynamic: __oxid_include_dynamic }) }}
 
 {% set template_title = "REVIEW_YOUR_ORDER"|translate %}
 {% include "layout/page.html.twig" with {title: template_title, location: template_title, active_step: 3} %}

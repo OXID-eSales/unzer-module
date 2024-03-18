@@ -33,7 +33,7 @@ class AccountSavedPaymentController extends AccountController
      * @var string
      */
     // phpcs:ignore PSR2.Classes.PropertyDeclaration
-    protected $_sThisAltLoginTemplate = 'page/privatesales/login';
+    protected $sThisAltTemplate = 'page/privatesales/login';
 
 
     public function render()
