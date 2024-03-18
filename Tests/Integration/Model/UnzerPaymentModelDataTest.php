@@ -31,11 +31,29 @@ class UnzerPaymentModelDataTest extends UnitTestCase
         $this->assertEquals($decodedPaymentDataArray['traceId'], $paymentData->traceId);
         $this->assertEquals($decodedPaymentDataArray['paymentId'], $paymentData->paymentId);
         $this->assertEquals($decodedPaymentDataArray['errors'][0]['code'], $paymentData->errors[0]->code);
-        $this->assertEquals($decodedPaymentDataArray['errors'][0]['customerMessage'], $paymentData->errors[0]->customerMessage);
-        $this->assertEquals($decodedPaymentDataArray['errors'][0]['status']['successful'], $paymentData->errors[0]->status->successful);
-        $this->assertEquals($decodedPaymentDataArray['errors'][0]['status']['processing'], $paymentData->errors[0]->status->processing);
-        $this->assertEquals($decodedPaymentDataArray['errors'][0]['status']['pending'], $paymentData->errors[0]->status->pending);
-        $this->assertEquals($decodedPaymentDataArray['errors'][0]['processing']['uniqueId'], $paymentData->errors[0]->processing->uniqueId);
-        $this->assertEquals($decodedPaymentDataArray['errors'][0]['processing']['shortId'], $paymentData->errors[0]->processing->shortId);
+        $this->assertEquals(
+            $decodedPaymentDataArray['errors'][0]['customerMessage'],
+            $paymentData->errors[0]->customerMessage
+        );
+        $this->assertEquals(
+            $decodedPaymentDataArray['errors'][0]['status']['successful'],
+            $paymentData->errors[0]->status->successful
+        );
+        $this->assertEquals(
+            $decodedPaymentDataArray['errors'][0]['status']['processing'],
+            $paymentData->errors[0]->status->processing
+        );
+        $this->assertEquals(
+            $decodedPaymentDataArray['errors'][0]['status']['pending'],
+            $paymentData->errors[0]->status->pending
+        );
+        $this->assertEquals(
+            $decodedPaymentDataArray['errors'][0]['processing']['uniqueId'],
+            $paymentData->errors[0]->processing->uniqueId
+        );
+        $this->assertEquals(
+            $decodedPaymentDataArray['errors'][0]['processing']['shortId'],
+            $paymentData->errors[0]->processing->shortId
+        );
     }
 }
