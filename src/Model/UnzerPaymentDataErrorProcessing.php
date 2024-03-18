@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidEsales\EshopCommunity\modules\osc\unzer\src\Model;
+namespace OxidSolutionCatalysts\Unzer\Model;
 
 class UnzerPaymentDataErrorProcessing
 {
@@ -11,7 +11,6 @@ class UnzerPaymentDataErrorProcessing
 
     /**
      * @param array $arrayPaymentData
-     * @return self
      */
     public function __construct($arrayPaymentData)
     {

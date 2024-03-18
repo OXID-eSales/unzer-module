@@ -2,7 +2,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use OxidEsales\EshopCommunity\modules\osc\unzer\src\Model\UnzerPaymentDataErrorProcessing;
+use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentDataErrorProcessing;
 
 class UnzerPaymentDataError
 {
