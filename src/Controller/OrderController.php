@@ -142,7 +142,10 @@ class OrderController extends OrderController_parent
                     );
                 }
 
-                // this action was called from js if payment was settled correctly with unzer,
+                if ($oBasket->getPaymentId() !== CoreUnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
+                    throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
+                }
+                // this action was called from js if payment was settled correctly with unzer apple pay,
                 // and the order needs to be updated as successfully paid, we send here just a
                 // 200 response, the next step is that the js calls the thank you page
                 // modules/osc/unzer/views/frontend/tpl/order/unzer_applepay.tpl:77
