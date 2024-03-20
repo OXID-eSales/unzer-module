@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
@@ -342,7 +343,12 @@ class Unzer
 
         $priceForPayment = $basketModel->getPriceForPayment();
         $discountAmount = $basketModel->getTotalDiscount()->getPrice();
-        $voucherAmount = $basketModel->getVoucherDiscount()->getPrice();
+
+        if (!is_null($basketModel->getVoucherDiscount())) {
+            $voucherAmount = $basketModel->getVoucherDiscount()->getPrice();
+        } else {
+            $voucherAmount = new Price(0.0);
+        }
 
         $shopBasketContents = $basketModel->getContents();
 

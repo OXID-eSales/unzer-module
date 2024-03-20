@@ -1,4 +1,4 @@
-[{include file="modules/osc/unzer/unzer_assets.tpl"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
 [{if $unzerPaymentType}]
 <div class="savedpayment">
     [{foreach from=$unzerPaymentType item="setting" key="type"}]
@@ -221,5 +221,5 @@
     [{/capture}]
         [{if false}]
 </script>
-    [{/if}]
+[{/if}]
 [{oxscript add=$unzerCardJS}]

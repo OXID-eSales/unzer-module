@@ -1,4 +1,4 @@
-[{include file="modules/osc/unzer/unzer_assets.tpl"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
 [{if $unzerPaymentType != false }]
     <div class="savedpayment">
         [{foreach from=$unzerPaymentType item="setting" key="type"}]
@@ -79,10 +79,8 @@
 
     </form>
 </div>
-[{if false}]
-<script>
-    [{/if}]
-        [{capture assign="unzerSepaDirectJS"}]
+[{if false}]<script>[{/if}]
+[{capture assign="unzerSepaDirectJS"}]
     $('input[name="newccard"]').on('change', function() {
         if ($(this).prop('checked')) {
             console.log('checked new card');
@@ -228,5 +226,5 @@
         // Clear the contents of the Card-Element containers
         $('#sepa-IBAN').empty();
     }
-    [{/capture}]
-        [{oxscript add=$unzerSepaDirectJS}]
+[{/capture}]
+[{oxscript add=$unzerSepaDirectJS}]

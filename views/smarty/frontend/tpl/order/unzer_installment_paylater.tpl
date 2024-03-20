@@ -1,15 +1,18 @@
-[{include file="modules/osc/unzer/unzer_assets.tpl"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
+
 [{assign var="invadr" value=$oView->getInvoiceAddress()}]
 [{assign var="isCompany" value=false}]
 
 [{if ($oxcmp_user->oxuser__oxcompany->value || ($invadr && $invadr->oxaddress__oxcompany->value))}]
     [{assign var="isCompany" value=true}]
-    [{/if}]
+[{/if}]
+
 [{if $isCompany}]
     [{assign var="customerType" value="B2B"}]
-    [{else}]
+[{else}]
     [{assign var="customerType" value="B2C"}]
-    [{/if}]
+[{/if}]
+
 <form id="payment-form-installment" class="unzerUI form unzerUI-PaylaterInstallment__form" novalidate>
     <br />
     <div id="unzer-installment">
@@ -21,12 +24,13 @@
         [{oxmultilang ident="OSCUNZER_INSTALLMENT_CONTINUE"}]
     </button>
 </form>
+
 [{assign var="total" value=$oxcmp_basket->getPrice()}]
 
 [{assign var=totalgross value=$oxcmp_basket->getPrice()}]
 [{assign var=uzrcurrency value=$currency->name}]
-[{if false}] <script>[{/if}]
-        [{capture assign="unzerInstallmentJS"}]
+
+[{capture assign="unzerInstallmentJS"}]
 
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
@@ -79,5 +83,5 @@
             });
         //}
     });
-    [{/capture}]
-        [{oxscript add=$unzerInstallmentJS}]
+[{/capture}]
+[{oxscript add=$unzerInstallmentJS}]
