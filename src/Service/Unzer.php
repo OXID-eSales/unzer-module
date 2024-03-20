@@ -24,6 +24,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
+use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentData;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
 use UnzerSDK\Constants\CompanyTypes;
 use UnzerSDK\Constants\CustomerGroups;
@@ -530,10 +531,7 @@ class Unzer
      */
     public function getUnzerPaymentIdFromRequest(): string
     {
-        /** @var string $jsonPaymentData */
-        $jsonPaymentData = $this->request->getRequestParameter('paymentData');
-        /** @var array $paymentData */
-        $paymentData = $jsonPaymentData ? json_decode($jsonPaymentData, true) : [];
+        $paymentData = $this->getPaymentDataArrayFromRequest();
 
         if (array_key_exists('id', $paymentData)) {
             return $paymentData['id'];
@@ -589,6 +587,13 @@ class Unzer
         $metadata->addMetadata('pluginVersion', $this->moduleSettings->getModuleVersion());
 
         return $metadata;
+    }
+
+    public function getUnzerPaymentDataFromRequest(): UnzerPaymentData
+    {
+        $paymentData = $this->getPaymentDataArrayFromRequest();
+
+        return new UnzerPaymentData($paymentData);
     }
 
     /**
@@ -677,5 +682,12 @@ class Unzer
         }
 
         return '';
+    }
+
+    private function getPaymentDataArrayFromRequest(): array
+    {
+        /** @var string $jsonPaymentData */
+        $jsonPaymentData = $this->request->getRequestParameter('paymentData');
+        return $jsonPaymentData ? (array) json_decode($jsonPaymentData, true) : [];
     }
 }

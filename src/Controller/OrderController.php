@@ -368,7 +368,7 @@ class OrderController extends OrderController_parent
     protected function getTrancactionIds(): array
     {
         $result = [];
-        if ($this->getUser()->getId() !== null) {
+        if ($this->getUser() && $this->getUser()->getId() !== null) {
             $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
             $result = $oDB->getAll(
                 "SELECT PAYMENTTYPEID from oscunzertransaction

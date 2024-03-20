@@ -13,6 +13,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
@@ -102,10 +103,11 @@ abstract class UnzerPayment implements UnzerPaymentInterface
      * @param Basket $basketModel
      * @return bool
      *
+     * @throws \JsonException
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.StaticAccess)
-     * @throws JsonException
-     * @throws UnzerApiException
      */
     public function execute(
         User $userModel,
@@ -182,6 +184,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         User $userModel,
         BasePaymentType $paymentType
     ): AbstractTransactionType {
+        $this->throwExceptionIfPaymentDataError();
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
         /** @var $paymentType PaylaterInstallment */
@@ -223,5 +226,39 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $this->unzerService->getShopMetadata($this->paymentMethod),
             $uzrBasket
         );
+    }
+
+    /**
+     * proves if there are errors coming from unzer like: credit card has been expired, to send this error to the
+     * customer and log it
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Exception
+     */
+    private function throwExceptionIfPaymentDataError(): void
+    {
+        /** @var UnzerService $unzerService */
+        $unzerService = ContainerFactory::getInstance()->getContainer()->get(UnzerService::class);
+        $unzerPaymentData = $unzerService->getUnzerPaymentDataFromRequest();
+
+        if ($unzerPaymentData->isSuccess === false && $unzerPaymentData->isError === true) {
+            $this->logger
+                ->log(
+                    sprintf(
+                        'Could not process Transaction for '
+                            . 'paymentId %s, traceId: %s, timestamp: %s, customerMessage: %s',
+                        $unzerPaymentData->id,
+                        $unzerPaymentData->traceId,
+                        $unzerPaymentData->timestamp,
+                        $unzerPaymentData->getFirstErrorMessage()
+                    )
+                );
+            $exceptionMessage = $unzerPaymentData->getFirstErrorMessage();
+            if ($exceptionMessage === null) {
+                $exceptionMessage = '';
+            }
+            throw new Exception($exceptionMessage);
+        }
     }
 }

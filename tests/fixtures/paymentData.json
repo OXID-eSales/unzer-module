@@ -1,0 +1,26 @@
+{
+  "id": "s-err-de4834dac5754258aa556ce1682",
+  "isSuccess": false,
+  "isPending": false,
+  "isResumed": false,
+  "isError": true,
+  "url": "https://sbx-api.heidelpay.com/v1/types/applepay",
+  "timestamp": "2024-03-14 08:30:35",
+  "traceId": "f02c0ee75cdf4173d91e61533380edab",
+  "paymentId": "CC.RG",
+  "errors": [
+    {
+      "code": "COR.100.100.303",
+      "customerMessage": "Ihre Karte ist abgelaufen. Verwenden Sie bitte eine andere Karte.",
+      "status": {
+        "successful": false,
+        "processing": false,
+        "pending": false
+      },
+      "processing": {
+        "uniqueId": "31HA07BC81136C4361102E616706A7A7",
+        "shortId": "5743.3143.4539"
+      }
+    }
+  ]
+}
