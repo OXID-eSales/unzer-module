@@ -69,7 +69,7 @@
             <!-- Errors will be inserted here -->
         </div>
 
-        <div id="consumer_common" class="form-group row oxDate [{if !$iBirthdayMonth || !$iBirthdayDay || !$iBirthdayYear}]text-danger[{/if}]">
+        <div id="consumer_common" class="form-group row oxDate [{if !$iBirthdayMonth || !$iBirthdayDay || !$iBirthdayYear}]text-muted[{/if}]">
             <label class="col-12 col-lg-3 req" for="oxDay">[{oxmultilang ident="BIRTHDATE"}]</label>
             <div class="col-3 col-lg-3">
                 <input id="birthdate_day" class="oxDay form-control" type="text" maxlength="2" value="[{if $iBirthdayDay > 0}][{$iBirthdayDay}][{/if}]"
@@ -91,7 +91,7 @@
             </div>
             <div class="offset-lg-3 col-lg-9 col-12">
                 <div class="help-block">
-                    <p class="text-danger [{if $iBirthdayMonth && $iBirthdayDay && $iBirthdayYear}]d-none hidden[{/if}]">[{oxmultilang ident="DD_FORM_VALIDATION_REQUIRED"}]</p>
+                    <p class="text-muted [{if $iBirthdayMonth && $iBirthdayDay && $iBirthdayYear}]d-none hidden[{/if}]">[{oxmultilang ident="OSCUNZER_COMPANY_FORM_birthday"}]</p>
                 </div>
             </div>
         </div>

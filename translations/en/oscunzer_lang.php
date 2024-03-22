@@ -32,6 +32,7 @@ $aLang = [
     'OSCUNZER_COMPANY_FORM_sole' => 'Sole',
     'OSCUNZER_COMPANY_FORM_company' => 'Company',
     'OSCUNZER_COMPANY_FORM_other' => 'Other',
+    'OSCUNZER_COMPANY_FORM_birthday' => 'Please enter your date of birth',
 
     'OSCUNZER_MISSING_INTAGIBLE_CONFIRMATION_MESSAGE' => 'Please confirm the hint regarding the access to digital goods.',
     'OSCUNZER_MISSING_SERVICEAGREEMENT_CONFIRMATION_MESSAGE' => 'Please confirm the service products agreement.',
