@@ -105,6 +105,12 @@ class Order extends Order_parent
 
             if ($unzerPaymentStatus === 'OK') {
                 $this->markUnzerOrderAsPaid();
+                $tmpOrder = oxNew(TmpOrder::class);
+                $tmpData = $tmpOrder->getTmpOrderByUnzerId($this->getUnzerOrderNr());
+                if ($tmpOrder->load($tmpData['OXID'])) {
+                    $tmpOrder->assign(['STATUS' =>'FINISHED']);
+                    $tmpOrder->save();
+                }
             }
 
             $this->initWriteTransactionToDB(
@@ -117,7 +123,71 @@ class Order extends Order_parent
 
         return $iRet;
     }
+    public function createTmpOrder(
+        Basket $oBasket,
+        User $oUser
+    ) {
+        $orderId = Registry::getSession()->getVariable('sess_challenge');
+        $orderId = is_string($orderId) ? $orderId : '';
+        $iRet = self::ORDER_STATE_PAYMENTERROR;
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        if (!$orderId) {
+            return $iRet;
+        }
+        if ($this->_checkOrderExist($orderId)) {
+            // we might use this later, this means that somebody clicked like mad on order button
+            return self::ORDER_STATE_ORDEREXISTS;
+        }
+        $this->setId($orderId);
 
+
+
+            // copies user info
+            $this->_setUser($oUser);
+
+            // copies basket info
+            $this->_loadFromBasket($oBasket);
+
+            $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
+            $this->_oPayment = $oUserPayment;
+
+            // set folder information, order is new
+            $this->_setFolder();
+
+            // setUnzerOrderId
+            $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
+
+
+            $blRet = $this->_executePayment($oBasket, $oUserPayment);
+            if ($blRet !== true) {
+                return $blRet;
+            }
+
+            // deleting remark info only when order is finished
+
+            //#4005: Order creation time is not updated when order processing is complete
+            $this->_updateOrderDate();
+
+            // store orderid
+            $oBasket->setOrderId($orderId);
+
+            // updating wish lists
+            $this->_updateWishlist($oBasket->getContents(), $oUser);
+
+            // updating users notice list
+            $this->_updateNoticeList($oBasket->getContents(), $oUser);
+
+            // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
+            $this->_markVouchers($oBasket, $oUser);
+
+            $this->_setOrderStatus('NOT_FINISHED');
+            $tmpOrder = oxNew(TmpOrder::class);
+            $tmpOrder->prepareOrderForJson($this);
+            $tmpOrder->save();
+            Registry::getSession()->setVariable('settedOrder', $this->getId());
+
+        return $iRet;
+    }
     public function getUnzerOrderNr(): int
     {
         $value = $this->getFieldData('oxunzerordernr');

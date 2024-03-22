@@ -11,10 +11,13 @@ use Exception;
 use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -22,6 +25,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Payment;
 
 class DispatcherController extends FrontendController
 {
@@ -65,7 +69,6 @@ class DispatcherController extends FrontendController
         $transaction = $this->getServiceFromContainer(Transaction::class);
         $aPath = explode("/", $url['path']);
         $typeid = end($aPath);
-
         /** @var Request $request */
         $request = Registry::getRequest();
         /** @var string $context */
@@ -85,15 +88,14 @@ class DispatcherController extends FrontendController
         ) {
             Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
         }
-
-        if (!$transaction->isValidTransactionTypeId($typeid)) {
-            Registry::getUtils()->showMessageAndExit("Invalid type id");
-        }
-
         $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDKbyKey($unzerKey);
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
-
         $paymentId = $resource->getId();
+
+        if (!$transaction->isValidTransactionTypeId($typeid) ) {
+         //   Registry::getUtils()->showMessageAndExit("Invalid type id");
+        }
+
         if (is_string($paymentId)) {
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
             $order = oxNew(Order::class);
@@ -129,9 +131,80 @@ class DispatcherController extends FrontendController
                 } else {
                     $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
                 }
+            } else {
+                /** @var TmpOrder $tmpOrder */
+                $tmpOrder = oxNew(TmpOrder::class);
+                sleep(10);
+                $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerPayment->getBasket()->getOrderId());
+                if (
+                    $unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
+                    $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
+                    $unzerPayment->getState() === PaymentState::STATE_PENDING
+                ) {
+                    if ($tmpOrder->load($tmpData['OXID'])) {
+                        $tmpOrderTime = $tmpOrder->getFieldData('TIMESTAMP');
+                        $tmpOrderTimeUnix = strtotime($tmpOrderTime);
+                        $nowTimeUnix = time();
+                        $difference = $nowTimeUnix - $tmpOrderTimeUnix;
+                       // if ($difference >= 60) {
+                            $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData);
+                            Registry::getUtils()->setHeader('HTTP/1.1 200 OK');
+                      //  } else {
+                     //       Registry::getUtils()->setHeader('HTTP/1.1 204 No Content');
+                     //   }
+                    }
+                }
             }
         }
 
         Registry::getUtils()->showMessageAndExit($result);
+    }
+
+    /**
+     * @param $unzerPayment Payment
+     * @return void
+     * @throws Exception
+     */
+    protected function cleanUpOrder($unzerPayment, $tmpOrder,  $tmpData) {
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']));
+            $this->setOrderStatus($aOrderData['order'], $unzerPayment);
+            $tmpOrder->assign(['STATUS' => 'FINISHED']);
+            $tmpOrder->save();
+            /** @TODO here we could send an email to the user (depending on the state) */
+            Registry::getUtils()->setHeader('HTTP/1.1 200 OK');
+            Registry::getUtils()->showMessageAndExit('200');
+        }
+    }
+
+    /**
+     * @param $oOrder Order
+     * @param $unzerPayment Payment
+     * @return void
+     * @throws Exception
+     */
+    protected function setOrderStatus($oOrder, $unzerPayment)
+    {
+        $orderStatus = $oOrder->oxorder__oxtransstatus->rawValue;
+        if ($orderStatus === 'NOT_FINISHED') {
+            $oOrder->oxorder__oxtransstatus = new Field('OK', Field::T_RAW);
+            $oOrder->oxorder__oxfolder      = new Field('ORDERFOLDER_NEW', Field::T_RAW);
+            $oOrder->oxorder__oxpaid        = new Field(date('Y-m-d H:i:s'));
+            switch ($unzerPayment->getState()) {
+                case PaymentState::STATE_COMPLETED:
+                    $oOrder->markUnzerOrderAsPaid();
+                    break;
+                case PaymentState::STATE_CANCELED:
+                    $oOrder->cancelOrder();
+                    break;
+            }
+            $oOrder->initWriteTransactionToDB($unzerPayment);
+            if (!$oOrder->getFieldData('oxordernr')) {
+                $sCounterIdent = 'oxOrder';
+                $iCnt = oxNew(Counter::class)->getNext($sCounterIdent);
+                $oOrder->oxorder__oxordernr = new Field($iCnt);
+            }
+            $oOrder->save();
+        }
     }
 }
