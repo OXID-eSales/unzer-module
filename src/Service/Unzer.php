@@ -20,12 +20,12 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\ShopVersion;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
 use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentData;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
 use UnzerSDK\Constants\CompanyTypes;
@@ -54,6 +54,8 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
  */
 class Unzer
 {
+    use ServiceContainer;
+
     /** @var \OxidEsales\Eshop\Core\Session $session */
     protected $session;
 
@@ -647,8 +649,7 @@ class Unzer
     private function getPaymentMethodFromOrder(int $oxUnzerOrderNr): string
     {
         /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = ContainerFactory::getInstance()
-            ->getContainer()->get(QueryBuilderFactoryInterface::class);
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
 
         $queryBuilder = $queryBuilderFactory->create();
 

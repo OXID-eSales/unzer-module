@@ -12,13 +12,11 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use Psr\Container\ContainerInterface;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
@@ -199,12 +197,8 @@ class Order extends Order_parent
      */
     public function setUnzerOrderNr(int $unzerOrderId): int
     {
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()
-            ->getContainer();
-
         /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
 
         $queryBuilder = $queryBuilderFactory->create();
 

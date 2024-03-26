@@ -1,35 +1,24 @@
 <?php
+
 /**
- * This file is part of a maexware solutions module.
- *
- * This maexware solutions module is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This maexware solutions module is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with maexware wirecard module. If not, see <http://www.gnu.org/licenses/>.
- *
- * @link https://www.maexware-solutions.de
- * @author Danny Zimmer <danny.zimmer@maexware-solutions.de>
- * @copyright (C) maexware solutions GmbH 2020
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
  */
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Core\Model\BaseModel;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class TmpOrder extends BaseModel
 {
+    use ServiceContainer;
 
     /**
      * Class constructor, initiates parent constructor.
@@ -72,13 +61,13 @@ class TmpOrder extends BaseModel
     /**
      * @param $unzerOrderNr
      * @return false|mixed
-     * @throws \Doctrine\DBAL\Exception
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function getTmpOrderByUnzerId($unzerOrderNr) {
-        $container = ContainerFactory::getInstance()->getContainer();
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+    public function getTmpOrderByUnzerId($unzerOrderNr)
+    {
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $queryBuilderFactory->create();
         $queryBuilder

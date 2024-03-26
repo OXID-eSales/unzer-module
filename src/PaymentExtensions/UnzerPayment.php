@@ -11,7 +11,6 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -234,7 +233,7 @@ abstract class UnzerPayment
     private function throwExceptionIfPaymentDataError()
     {
         /** @var UnzerService $unzerService */
-        $unzerService = ContainerFactory::getInstance()->getContainer()->get(UnzerService::class);
+        $unzerService = $this->getServiceFromContainer(UnzerService::class);
         $unzerPaymentData = $unzerService->getUnzerPaymentDataFromRequest();
 
         if ($unzerPaymentData->isSuccess === false && $unzerPaymentData->isError === true) {
