@@ -109,7 +109,6 @@ class PaymentController extends PaymentController_parent
                 $order->delete($orderId);
                 $session->deleteVariable('sess_challenge');
             }
-
         }
     }
 
@@ -127,7 +126,8 @@ class PaymentController extends PaymentController_parent
                     $unzerPayment = $unzerSDK->fetchPayment($paymentId);
                     $unzerOrderId = $unzerPayment->getOrderId();
                     $sessionUnzerOrderId = $session->getVariable('UnzerOrderId');
-                    if ((int) $unzerOrderId === $sessionUnzerOrderId &&
+                    if (
+                        (int) $unzerOrderId === $sessionUnzerOrderId &&
                         ($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
                             $unzerPayment->getState() === PaymentState::STATE_PENDING)
                     ) {
@@ -136,7 +136,7 @@ class PaymentController extends PaymentController_parent
                     }
                 } catch (UnzerApiException $e) {
                     Registry::getLogger()->warning(
-                        'Payment not found with key: ' . $paymentId .' and message: '.$e->getMessage()
+                        'Payment not found with key: ' . $paymentId . ' and message: ' . $e->getMessage()
                     );
                 }
             }

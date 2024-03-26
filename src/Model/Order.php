@@ -117,7 +117,7 @@ class Order extends Order_parent
         $tmpOrder = oxNew(TmpOrder::class);
         $tmpData = $tmpOrder->getTmpOrderByUnzerId($this->getUnzerOrderNr());
         if ($tmpOrder->load($tmpData['OXID'])) {
-            $tmpOrder->assign(['STATUS' =>'FINISHED']);
+            $tmpOrder->assign(['STATUS' => 'FINISHED']);
             $tmpOrder->save();
         }
 
@@ -159,9 +159,9 @@ class Order extends Order_parent
 
 
             $blRet = $this->_executePayment($oBasket, $oUserPayment);
-            if ($blRet !== true) {
-                return $blRet;
-            }
+        if ($blRet !== true) {
+            return $blRet;
+        }
 
             // deleting remark info only when order is finished
 

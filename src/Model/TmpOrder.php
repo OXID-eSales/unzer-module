@@ -7,7 +7,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Core\Model\BaseModel;
@@ -35,7 +34,6 @@ class TmpOrder extends BaseModel
     public function save()
     {
         return parent::save();
-
     }
 
     public function prepareOrderForJson($oOrder)
@@ -86,6 +84,4 @@ class TmpOrder extends BaseModel
         }
         return false;
     }
-
-
 }

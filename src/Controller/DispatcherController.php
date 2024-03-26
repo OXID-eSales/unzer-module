@@ -92,7 +92,7 @@ class DispatcherController extends FrontendController
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
         $paymentId = $resource->getId();
 
-        if (!$transaction->isValidTransactionTypeId($typeid) ) {
+        if (!$transaction->isValidTransactionTypeId($typeid)) {
          //   Registry::getUtils()->showMessageAndExit("Invalid type id");
         }
 
@@ -165,7 +165,8 @@ class DispatcherController extends FrontendController
      * @return void
      * @throws Exception
      */
-    protected function cleanUpOrder($unzerPayment, $tmpOrder,  $tmpData) {
+    protected function cleanUpOrder($unzerPayment, $tmpOrder, $tmpData)
+    {
         if ($tmpOrder->load($tmpData['OXID'])) {
             $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']));
             $this->setOrderStatus($aOrderData['order'], $unzerPayment);
