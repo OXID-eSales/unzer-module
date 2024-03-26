@@ -140,8 +140,6 @@ class Order extends Order_parent
         }
         $this->setId($orderId);
 
-
-
             // copies user info
             $this->_setUser($oUser);
 
@@ -157,12 +155,10 @@ class Order extends Order_parent
             // setUnzerOrderId
             $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
 
-
             $blRet = $this->_executePayment($oBasket, $oUserPayment);
         if ($blRet !== true) {
             return $blRet;
         }
-
             // deleting remark info only when order is finished
 
             //#4005: Order creation time is not updated when order processing is complete
