@@ -19,17 +19,14 @@ final class Version20240321104606 extends AbstractMigration
 
     public function up(Schema $schema) : void
     {
-        if($schema->hasTable('oscunzertmporder')) {
+        if(!$schema->hasTable('oscunzertmporder')) {
             $this->createTmpOrderTable();
         }
     }
-
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
-
     }
-
     protected function createTmpOrderTable() {
         $this->addSql("CREATE TABLE `oscunzertmporder` (
                               `OXID` char(32) NOT NULL,
