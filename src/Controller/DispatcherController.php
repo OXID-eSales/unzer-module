@@ -142,16 +142,7 @@ class DispatcherController extends FrontendController
                     $unzerPayment->getState() === PaymentState::STATE_PENDING
                 ) {
                     if ($tmpOrder->load($tmpData['OXID'])) {
-                        $tmpOrderTime = $tmpOrder->getFieldData('TIMESTAMP');
-                        $tmpOrderTimeUnix = strtotime($tmpOrderTime);
-                        $nowTimeUnix = time();
-                        $difference = $nowTimeUnix - $tmpOrderTimeUnix;
-                       // if ($difference >= 60) {
-                            $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData);
-                            Registry::getUtils()->setHeader('HTTP/1.1 200 OK');
-                      //  } else {
-                     //       Registry::getUtils()->setHeader('HTTP/1.1 204 No Content');
-                     //   }
+                        $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData);
                     }
                 }
             }
