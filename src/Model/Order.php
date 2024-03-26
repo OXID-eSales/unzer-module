@@ -103,12 +103,6 @@ class Order extends Order_parent
 
             if ($unzerPaymentStatus === 'OK') {
                 $this->markUnzerOrderAsPaid();
-                $tmpOrder = oxNew(TmpOrder::class);
-                $tmpData = $tmpOrder->getTmpOrderByUnzerId($this->getUnzerOrderNr());
-                if ($tmpOrder->load($tmpData['OXID'])) {
-                    $tmpOrder->assign(['STATUS' =>'FINISHED']);
-                    $tmpOrder->save();
-                }
             }
 
             $this->initWriteTransactionToDB(
@@ -117,6 +111,14 @@ class Order extends Order_parent
         } else {
             // payment is canceled
             $this->delete();
+        }
+
+        // cleanUp Tmp Order
+        $tmpOrder = oxNew(TmpOrder::class);
+        $tmpData = $tmpOrder->getTmpOrderByUnzerId($this->getUnzerOrderNr());
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $tmpOrder->assign(['STATUS' =>'FINISHED']);
+            $tmpOrder->save();
         }
 
         return $iRet;
