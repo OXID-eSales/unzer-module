@@ -344,10 +344,9 @@ class Unzer
         $priceForPayment = $basketModel->getPriceForPayment();
         $discountAmount = $basketModel->getTotalDiscount()->getPrice();
 
+        $voucherAmount = 0.0;
         if (!is_null($basketModel->getVoucherDiscount())) {
             $voucherAmount = $basketModel->getVoucherDiscount()->getPrice();
-        } else {
-            $voucherAmount = new Price(0.0);
         }
 
         $shopBasketContents = $basketModel->getContents();

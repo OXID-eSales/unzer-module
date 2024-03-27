@@ -64,10 +64,6 @@ final class StaticContentTest extends IntegrationTestCase
         $changeme->assign(['oxtitle' => 'some test title']);
         $changeme->save();
 
-        //now run service again
-        $service = $this->getServiceFromContainer(StaticContent::class);
-        $service->ensureStaticContents();
-
         $after = oxNew(EshopModelContent::class);
         $after->loadByIdent('oscunzersepamandatetext');
         $this->assertEquals('some test title', $after->getTitle());

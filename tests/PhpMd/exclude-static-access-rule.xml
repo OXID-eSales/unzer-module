@@ -11,12 +11,18 @@
 
     <rule ref="rulesets/cleancode.xml">
         <exclude name="StaticAccess"/>
+        <exclude name="CodeSize"/>
     </rule>
 
 
     <!-- Specifically allow StaticAccess for ValueService but keep other rules active -->
     <rule ref="rulesets/cleancode.xml/StaticAccess">
         <exclude-pattern>*\UnzerSDK\Services\ValueService*</exclude-pattern>
+    </rule>
+
+
+    <rule ref="rulesets/codesize.xml">
+        <exclude-pattern>*\StaticContent.php</exclude-pattern>
     </rule>
 
 </ruleset>

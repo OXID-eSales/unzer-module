@@ -65,9 +65,28 @@
     <div class="sepaagreement" id="sepaagree_unzer">
         <input id="oscunzersepaagreement" type="checkbox" name="oscunzersepaagreement" value="0">
         <label for="oscunzersepaagreement">
-            {% ifcontent ident "oscunzersepamandateconfirmation" set oCont %}
-                {{ oCont.oxcontents__oxcontent.value }}
-            {% endifcontent %}
+                {% ifcontent ident "oscunzersepamandateconfirmation" set oCont %}
+                    {% if oCont %}
+                        {{ oCont.oxcontents__oxcontent.value|raw }}
+                    {% endif %}
+                {% endifcontent %}
+                {% capture assign="sepaMadateJs" %}
+                    {% ifcontent ident "oscunzersepamandatetext" set oCont2 %}
+                        {% set param="plain=1" %}
+                        {% set url = oCont2.getLink() ~ "?plain=1" %}
+                        {%  if false %}<script>{% endif %}
+                        function openAndModifyPopup() {
+                            debugger
+                            window.open(
+                                "{{ url }}",
+                                "sepa_popup",
+                                "resizable=yes,status=no,scrollbars=yes,menubar=no,width=620,height=400"
+                            );
+                        }
+                        {%  if false %}</script>{% endif %}
+                    {% endifcontent %}
+                {% endcapture %}
+                {{ script({ add:sepaMadateJs, dynamic: __oxid_include_dynamic }) }}
         </label>
     </div>
 </div>
