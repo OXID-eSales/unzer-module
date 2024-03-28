@@ -132,17 +132,20 @@ class DispatcherController extends FrontendController
                     $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
                 }
             } else {
-                /** @var TmpOrder $tmpOrder */
                 $tmpOrder = oxNew(TmpOrder::class);
-                sleep(10);
                 $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerPayment->getBasket()->getOrderId());
-                if (
-                    $unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
-                    $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
-                    $unzerPayment->getState() === PaymentState::STATE_PENDING
-                ) {
-                    if ($tmpOrder->load($tmpData['OXID'])) {
-                        $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData);
+                if ($tmpOrder->load($tmpData['OXID'])) {
+                    if ($this->hasExceededTimeLimit($tmpOrder)) {
+                        if (
+                            $unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
+                            $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
+                            $unzerPayment->getState() === PaymentState::STATE_PENDING
+                            )
+                        {
+                            $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData);
+                         } else {
+                            $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData, true);
+                        }
                     }
                 }
             }
@@ -156,14 +159,13 @@ class DispatcherController extends FrontendController
      * @return void
      * @throws Exception
      */
-    protected function cleanUpOrder($unzerPayment, $tmpOrder, $tmpData)
+    protected function cleanUpOrder($unzerPayment, $tmpOrder, $tmpData, $error = false)
     {
         if ($tmpOrder->load($tmpData['OXID'])) {
             $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']));
-            $this->setOrderStatus($aOrderData['order'], $unzerPayment);
+            $this->setOrderStatus($aOrderData['order'], $unzerPayment, $error);
             $tmpOrder->assign(['STATUS' => 'FINISHED']);
             $tmpOrder->save();
-            /** @TODO here we could send an email to the user (depending on the state) */
             Registry::getUtils()->setHeader('HTTP/1.1 200 OK');
             Registry::getUtils()->showMessageAndExit('200');
         }
@@ -175,7 +177,7 @@ class DispatcherController extends FrontendController
      * @return void
      * @throws Exception
      */
-    protected function setOrderStatus($oOrder, $unzerPayment)
+    protected function setOrderStatus($oOrder, $unzerPayment, $error = false)
     {
         $orderStatus = $oOrder->oxorder__oxtransstatus->rawValue;
         if ($orderStatus === 'NOT_FINISHED') {
@@ -190,6 +192,10 @@ class DispatcherController extends FrontendController
                     $oOrder->cancelOrder();
                     break;
             }
+            if ($error === true) {
+                $oOrder->oxorder__oxtransstatus = new Field('ERROR', Field::T_RAW);
+                $oOrder->oxorder__oxfolder      = new Field('ORDERFOLDER_PROBLEMS', Field::T_RAW);
+            }
             $oOrder->initWriteTransactionToDB($unzerPayment);
             if (!$oOrder->getFieldData('oxordernr')) {
                 $sCounterIdent = 'oxOrder';
@@ -198,5 +204,23 @@ class DispatcherController extends FrontendController
             }
             $oOrder->save();
         }
+    }
+
+    /**
+     * @param $tmpOrder TmpOrder
+     * @return bool
+     */
+    protected function hasExceededTimeLimit($tmpOrder): bool
+    {
+        $UnzerWebhookTimeDifference = Registry::getConfig()->getConfigParam('UnzerWebhookTimeDifference',5);
+        $TimeDifferenceSeconds = $UnzerWebhookTimeDifference * 60;
+        $tmpOrderTime = $tmpOrder->getFieldData('TIMESTAMP');
+        $tmpOrderTimeUnix = strtotime($tmpOrderTime);
+        $nowTimeUnix = time();
+        $difference = $nowTimeUnix - $tmpOrderTimeUnix;
+        if ($difference >= $TimeDifferenceSeconds) {
+            return true;
+        }
+        return false;
     }
 }

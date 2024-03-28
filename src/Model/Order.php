@@ -52,66 +52,61 @@ class Order extends Order_parent
         $unzerService = $this->getServiceFromContainer(Unzer::class);
         $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
 
-        if ($unzerPaymentStatus !== "ERROR") {
-            // copies user info
-            $this->_setUser($oUser);
+        // copies user info
+        $this->_setUser($oUser);
 
-            // copies basket info
-            $this->_loadFromBasket($oBasket);
+        // copies basket info
+        $this->_loadFromBasket($oBasket);
 
-            $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
+        $oUserPayment = $this->_setPayment($oBasket->getPaymentId());
 
-            // set folder information, order is new
-            $this->_setFolder();
+        // set folder information, order is new
+        $this->_setFolder();
 
-            //saving all order data to DB
-            $this->save();
+        //saving all order data to DB
+        $this->save();
 
-            if (!$this->getFieldData('oxordernr')) {
-                $this->_setNumber();
-            }
-
-            // setUnzerOrderId
-            $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
-            $unzerService->resetUnzerOrderId();
-
-            // deleting remark info only when order is finished
-            Registry::getSession()->deleteVariable('ordrem');
-
-            //#4005: Order creation time is not updated when order processing is complete
-            $this->_updateOrderDate();
-
-            // store orderid
-            $oBasket->setOrderId($orderId);
-
-            // updating wish lists
-            $this->_updateWishlist($oBasket->getContents(), $oUser);
-
-            // updating users notice list
-            $this->_updateNoticeList($oBasket->getContents(), $oUser);
-
-            // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
-            $this->_markVouchers($oBasket, $oUser);
-
-            // send order by email to shop owner and current user
-            // don't let order fail due to stock check while sending out the order mail
-            Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
-            $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
-            Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
-
-            $this->_setOrderStatus($unzerPaymentStatus);
-
-            if ($unzerPaymentStatus === 'OK') {
-                $this->markUnzerOrderAsPaid();
-            }
-
-            $this->initWriteTransactionToDB(
-                $paymentService->getSessionUnzerPayment()
-            );
-        } else {
-            // payment is canceled
-            $this->delete();
+        if (!$this->getFieldData('oxordernr')) {
+            $this->_setNumber();
         }
+
+        // setUnzerOrderId
+        $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
+        $unzerService->resetUnzerOrderId();
+
+        // deleting remark info only when order is finished
+        Registry::getSession()->deleteVariable('ordrem');
+
+        //#4005: Order creation time is not updated when order processing is complete
+        $this->_updateOrderDate();
+
+        // store orderid
+        $oBasket->setOrderId($orderId);
+
+        // updating wish lists
+        $this->_updateWishlist($oBasket->getContents(), $oUser);
+
+        // updating users notice list
+        $this->_updateNoticeList($oBasket->getContents(), $oUser);
+
+        // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
+        $this->_markVouchers($oBasket, $oUser);
+
+        // send order by email to shop owner and current user
+        // don't let order fail due to stock check while sending out the order mail
+        Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
+        $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
+        Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
+
+        $this->_setOrderStatus($unzerPaymentStatus);
+
+        if ($unzerPaymentStatus === 'OK') {
+            $this->markUnzerOrderAsPaid();
+        }
+
+        $this->initWriteTransactionToDB(
+            $paymentService->getSessionUnzerPayment()
+        );
 
         // cleanUp Tmp Order
         $tmpOrder = oxNew(TmpOrder::class);
