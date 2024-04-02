@@ -10,23 +10,23 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use Psr\Container\ContainerInterface;
-use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Core\Registry as EshopRegistry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Exception\InvalidThemeNameException;
+use OxidEsales\Twig\TwigEngineConfigurationInterface;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidEsales\Eshop\Application\Model\Content as EshopModelContent;
 use OxidEsales\Eshop\Application\Model\Payment as EshopModelPayment;
 use OxidEsales\Eshop\Core\Model\BaseModel as EshopBaseModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 
-//NOTE: later we will do this on module installation, for now on first activation
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ */
 class StaticContent
 {
-    /** @var QueryBuilderFactoryInterface */
-    private $queryBuilderFactory;
+    private QueryBuilderFactoryInterface $queryBuilderFactory;
 
     public function __construct(
         QueryBuilderFactoryInterface $queryBuilderFactory
@@ -35,8 +35,8 @@ class StaticContent
     }
 
     /**
-     * @return void
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws \Exception
      */
     public function ensureUnzerPaymentMethods(): void
     {
@@ -53,7 +53,49 @@ class StaticContent
         }
     }
 
-    protected function checkAndDeactivatePaymentMethod(array $paymentDefinition, EshopModelPayment $paymentMethod): void
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function ensureStaticContents(): void
+    {
+        $feEngine = $this->getFrontendEngine();
+        foreach (UnzerDefinitions::getUnzerStaticContents() as $content) {
+            $loadId = $content['oxloadid'];
+            if (!$this->needToAddContent($loadId)) {
+                continue;
+            }
+
+            foreach ($this->getLanguageIds() as $langId => $langAbbr) {
+                $contentModel = $this->getContentModel($loadId, $langId);
+                $contentModel->assign(
+                    [
+                        'oxloadid'  => $loadId,
+                        'oxactive'  => $content['oxactive'],
+                        'oxtitle'   => $this->getContentBlockTitle($content, $langAbbr),
+                        'oxcontent' => $this->getContentBlockContent($content, $langAbbr, $feEngine)
+                    ]
+                );
+                $contentModel->save();
+            }
+        }
+    }
+
+    /**
+     * @throws \Exception
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function createRdfa(): void
+    {
+        foreach (UnzerDefinitions::getUnzerRdfaDefinitions() as $oxId => $rdfaDefinitions) {
+            $this->assignPaymentToRdfa(
+                $oxId,
+                $rdfaDefinitions['oxpaymentid'],
+                $rdfaDefinitions['oxrdfaid']
+            );
+        }
+    }
+
+    private function checkAndDeactivatePaymentMethod(array $paymentDefinition, EshopModelPayment $paymentMethod): void
     {
         // TODO fixme Access to an undefined property OxidEsales\Eshop\Application\Model\Payment::$oxpayments__oxactive.
         /** @phpstan-ignore-next-line */
@@ -64,7 +106,7 @@ class StaticContent
         }
     }
 
-    protected function getAssignToCountries(array $paymentCountries): array
+    private function getAssignToCountries(array $paymentCountries): array
     {
         $activeCountries = array_flip($this->getActiveCountries());
         $assignToCountries = [];
@@ -77,7 +119,7 @@ class StaticContent
         return $assignToCountries;
     }
 
-    protected function getAssignedCountriesFromPayment(string $paymentId): array
+    private function getAssignedCountriesFromPayment(string $paymentId): array
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $statement = $queryBuilder
@@ -98,17 +140,7 @@ class StaticContent
         return $assignedCountries;
     }
 
-    /**
-     * Update the list of countries for which a payment should be available. Might become neccessary, if countries
-     * become active/inactive (otherwise, it would happen only when the payment method is created, which happes
-     * only once at all)
-     *
-     * @param string $paymentId
-     * @param array $countries
-     * @return void
-     * @throws \Exception
-     */
-    protected function updatePaymentToCountries(string $paymentId, array $countries): void
+    private function updatePaymentToCountries(string $paymentId, array $countries): void
     {
         $assignToCountries = $this->getAssignToCountries($countries);
         $assignedCountries = $this->getAssignedCountriesFromPayment($paymentId);
@@ -121,7 +153,7 @@ class StaticContent
         }
     }
 
-    protected function assignPaymentToActiveDeliverySets(string $paymentId): void
+    private function assignPaymentToActiveDeliverySets(string $paymentId): void
     {
         $deliverySetIds = $this->getActiveDeliverySetIds();
         foreach ($deliverySetIds as $deliverySetId) {
@@ -129,7 +161,7 @@ class StaticContent
         }
     }
 
-    protected function assignPaymentToCountries(string $paymentId, array $countries): void
+    private function assignPaymentToCountries(string $paymentId, array $countries): void
     {
         $assignToCountries = $this->getAssignToCountries($countries);
 
@@ -138,13 +170,7 @@ class StaticContent
         }
     }
 
-    /**
-     * @param string $paymentId
-     * @param string $countryId
-     * @return void
-     * @throws \Exception
-     */
-    protected function assignPaymentToCountry(string $paymentId, string $countryId): void
+    private function assignPaymentToCountry(string $paymentId, string $countryId): void
     {
         $object2Paymentent = oxNew(EshopBaseModel::class);
         $object2Paymentent->init('oxobject2payment');
@@ -158,7 +184,7 @@ class StaticContent
         $object2Paymentent->save();
     }
 
-    protected function removePaymentFromCountry(string $paymentId, string $countryId): void
+    private function removePaymentFromCountry(string $paymentId, string $countryId): void
     {
         $queryBuilder = $this->queryBuilderFactory->create();
 
@@ -174,13 +200,7 @@ class StaticContent
         $statement->execute();
     }
 
-    /**
-     * @param string $paymentId
-     * @param string $deliverySetId
-     * @return void
-     * @throws \Exception
-     */
-    protected function assignPaymentToDelivery(string $paymentId, string $deliverySetId): void
+    private function assignPaymentToDelivery(string $paymentId, string $deliverySetId): void
     {
         $object2Paymentent = oxNew(EshopBaseModel::class);
         $object2Paymentent->init('oxobject2payment');
@@ -194,13 +214,7 @@ class StaticContent
         $object2Paymentent->save();
     }
 
-    /**
-     * @param string $paymentId
-     * @param array $definitions
-     * @return void
-     * @throws \Exception
-     */
-    protected function createPaymentMethod(string $paymentId, array $definitions): void
+    private function createPaymentMethod(string $paymentId, array $definitions): void
     {
         /** @var EshopModelPayment $paymentModel */
         $paymentModel = oxNew(EshopModelPayment::class);
@@ -239,60 +253,7 @@ class StaticContent
         }
     }
 
-    /**
-     * @return void
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function ensureStaticContents(): void
-    {
-        foreach (UnzerDefinitions::getUnzerStaticContents() as $content) {
-            $loadId = $content['oxloadid'];
-            if (!$this->needToAddContent($loadId)) {
-                continue;
-            }
-
-            foreach ($this->getLanguageIds() as $langId => $langAbbr) {
-                $contentModel = $this->getContentModel($loadId, $langId);
-                $contentModel->assign(
-                    [
-                        'oxloadid'  => $loadId,
-                        'oxactive'  => $content['oxactive'],
-                        'oxtitle'   => isset($content['oxtitle_' . $langAbbr]) ?
-                            $content['oxtitle_' . $langAbbr] :
-                            '',
-                        'oxcontent' => isset($content['oxcontent_' . $langAbbr]) ?
-                            $content['oxcontent_' . $langAbbr] :
-                            '',
-                    ]
-                );
-                $contentModel->save();
-            }
-        }
-    }
-
-    /**
-     * @return void
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    public function createRdfa(): void
-    {
-        foreach (UnzerDefinitions::getUnzerRdfaDefinitions() as $oxId => $rdfaDefinitions) {
-            $this->assignPaymentToRdfa(
-                $oxId,
-                $rdfaDefinitions['oxpaymentid'],
-                $rdfaDefinitions['oxrdfaid']
-            );
-        }
-    }
-
-    /**
-     * @param string $oxId
-     * @param string $paymentId
-     * @param string $rdfaId
-     * @return void
-     * @throws \Exception
-     */
-    protected function assignPaymentToRdfa(string $oxId, string $paymentId, string $rdfaId): void
+    private function assignPaymentToRdfa(string $oxId, string $paymentId, string $rdfaId): void
     {
         $object2Paymentent = oxNew(EshopBaseModel::class);
         $object2Paymentent->init('oxobject2payment');
@@ -307,25 +268,16 @@ class StaticContent
         $object2Paymentent->save();
     }
 
-    /**
-     * @param string $ident
-     * @return bool
-     */
-    protected function needToAddContent(string $ident): bool
+    private function needToAddContent(string $ident): bool
     {
         $content = oxNew(EshopModelContent::class);
         if ($content->loadByIdent($ident)) {
-            return false;
+            return true;
         }
         return true;
     }
 
-    /**
-     * @param string $ident
-     * @param int $languageId
-     * @return EshopModelContent
-     */
-    protected function getContentModel(string $ident, int $languageId): EshopModelContent
+    private function getContentModel(string $ident, int $languageId): EshopModelContent
     {
         $content = oxNew(EshopModelContent::class);
         if ($content->loadByIdent($ident)) {
@@ -335,12 +287,7 @@ class StaticContent
         return $content;
     }
 
-    /**
-     * @return array
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    protected function getActiveDeliverySetIds(): array
+    private function getActiveDeliverySetIds(): array
     {
         /** @var array $result */
         $result = null;
@@ -364,20 +311,12 @@ class StaticContent
         return $result;
     }
 
-    /**
-     * get the language-IDs
-     */
-    protected function getLanguageIds(): array
+    private function getLanguageIds(): array
     {
         return EshopRegistry::getLang()->getLanguageIds();
     }
 
-    /**
-     * @return array
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    protected function getActiveCountries(): array
+    private function getActiveCountries(): array
     {
         $result = [];
 
@@ -398,5 +337,34 @@ class StaticContent
         }
 
         return $result;
+    }
+
+    private function getContentBlockTitle(array $content, string $langAbbr): string
+    {
+        return $content['oxtitle_' . $langAbbr] ?? '';
+    }
+
+    private function getContentBlockContent(array $content, string $langAbbr, string $feEngine): string
+    {
+        if (isset($content['oxcontent_' . $langAbbr][$feEngine])) {
+            return $content['oxcontent_' . $langAbbr][$feEngine];
+        }
+
+        return $content['oxcontent_' . $langAbbr] ?? '';
+    }
+
+    private function getFrontendEngine(): string
+    {
+        $container = ContainerFactory::getInstance()->getContainer();
+
+        if ($container->has('OxidEsales\Twig\TwigEngineConfigurationInterface')) {
+            return 'twig';
+        }
+
+        if ($container->has('OxidEsales\Smarty\SmartyEngineInterface')) {
+            return 'smarty';
+        }
+
+        return 'twig';
     }
 }
