@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use Psr\Container\ContainerInterface;
 use PDO;
@@ -55,11 +56,8 @@ class StaticContent
 
     protected function checkAndDeactivatePaymentMethod(array $paymentDefinition, EshopModelPayment $paymentMethod): void
     {
-        // TODO fixme Access to an undefined property OxidEsales\Eshop\Application\Model\Payment::$oxpayments__oxactive.
-        /** @phpstan-ignore-next-line */
-        if (!$paymentDefinition['active'] && $paymentMethod->oxpayments__oxactive->value == 1) {
-            /** @phpstan-ignore-next-line */
-            $paymentMethod->oxpayments__oxactive->value = 0;
+        if (!$paymentDefinition['active'] && (string) $paymentMethod->getFieldData('oxactive') === '1') {
+            $paymentMethod->oxpayments__oxactive = new Field('0', Field::T_RAW);
             $paymentMethod->save();
         }
     }

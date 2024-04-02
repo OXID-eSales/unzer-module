@@ -179,7 +179,7 @@ class DispatcherController extends FrontendController
      */
     protected function setOrderStatus($oOrder, $unzerPayment, $error = false)
     {
-        $orderStatus = $oOrder->oxorder__oxtransstatus->rawValue;
+        $orderStatus = $oOrder->getRawFieldData('oxtransstatus');
         if ($orderStatus === 'NOT_FINISHED') {
             $oOrder->oxorder__oxtransstatus = new Field('OK', Field::T_RAW);
             $oOrder->oxorder__oxfolder      = new Field('ORDERFOLDER_NEW', Field::T_RAW);
