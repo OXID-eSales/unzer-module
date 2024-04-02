@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.2.0-rc1] - 2024-03-22
+## [2.2.0] - 2024-??-??
+
+### NEW
+- provide content for smarty and twig
+
 
 ## [2.1.4] - 2023-11-23
 
