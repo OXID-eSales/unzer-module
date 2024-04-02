@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.2.0] - 2024-??-??
+## [1.2.0-rc2] - 2024-03-22
+
+
+## [1.2.0-rc1] - 2023-12-21
 
 ### NEW
 - new Paymentmethod Unzer installment (Paylater)
