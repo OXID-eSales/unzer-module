@@ -155,14 +155,16 @@ class DispatcherController extends FrontendController
     }
 
     /**
-     * @param $unzerPayment Payment
+     * @param Payment $unzerPayment
+     * @param TmpOrder $tmpOrder
+     * @param array $tmpData
      * @return void
      * @throws Exception
      */
-    protected function cleanUpOrder($unzerPayment, $tmpOrder, $tmpData, $error = false)
+    protected function cleanUpOrder(Payment $unzerPayment, TmpOrder $tmpOrder, array $tmpData, $error = false): void
     {
         if ($tmpOrder->load($tmpData['OXID'])) {
-            $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']));
+            $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']), ['allowed_classes' => [Order::class]]);
             $this->setOrderStatus($aOrderData['order'], $unzerPayment, $error);
             $tmpOrder->assign(['STATUS' => 'FINISHED']);
             $tmpOrder->save();
@@ -177,7 +179,7 @@ class DispatcherController extends FrontendController
      * @return void
      * @throws Exception
      */
-    protected function setOrderStatus($oOrder, $unzerPayment, $error = false)
+    protected function setOrderStatus(Order $oOrder, Payment $unzerPayment, bool $error = false): void
     {
         $orderStatus = $oOrder->getRawFieldData('oxtransstatus');
         if ($orderStatus === 'NOT_FINISHED') {
@@ -210,7 +212,7 @@ class DispatcherController extends FrontendController
      * @param $tmpOrder TmpOrder
      * @return bool
      */
-    protected function hasExceededTimeLimit($tmpOrder): bool
+    protected function hasExceededTimeLimit(TmpOrder $tmpOrder): bool
     {
         $UnzerWebhookTimeDifference = Registry::getConfig()->getConfigParam('UnzerWebhookTimeDifference',5);
         $TimeDifferenceSeconds = $UnzerWebhookTimeDifference * 60;
