@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
@@ -105,7 +106,7 @@ class OrderController extends OrderController_parent
     /**
      * @throws Redirect
      * @throws DatabaseErrorException
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws Exception
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
