@@ -142,6 +142,7 @@ class DispatcherController extends FrontendController
                             $unzerPayment->getState() === PaymentState::STATE_PENDING
                             )
                         {
+                            $this->addMissingOrder($tmpOrder, $tmpData);
                             $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData);
                          } else {
                             $this->cleanUpOrder($unzerPayment, $tmpOrder, $tmpData, true);
@@ -171,6 +172,19 @@ class DispatcherController extends FrontendController
             Registry::getUtils()->setHeader('HTTP/1.1 200 OK');
             Registry::getUtils()->showMessageAndExit('200');
         }
+    }
+
+    /**
+     * @param Payment $unzerPayment
+     * @param TmpOrder $tmpOrder
+     * @param array $tmpData
+     * @return void
+     * @throws Exception
+     */
+    protected function addMissingOrder(TmpOrder $tmpOrder, array $tmpData, $error = false): void
+    {
+        // save missing order
+        $order = oxNew(Order::class);
     }
 
     /**
