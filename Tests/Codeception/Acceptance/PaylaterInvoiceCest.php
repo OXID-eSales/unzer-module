@@ -67,7 +67,7 @@ final class PaylaterInvoiceCest extends BaseCest
         $I->scrollTo('#orderConfirmAgbBottom');
         $orderPage->submitOrder();
 
-        $this->_checkSuccessfulPayment(40);
+        $this->_checkSuccessfulPayment(45);
     }
 
     /**
