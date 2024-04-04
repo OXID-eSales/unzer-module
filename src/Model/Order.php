@@ -22,6 +22,7 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Payment;
 
 /**
  * TODO: Decrease count of dependencies to 13
@@ -326,6 +327,38 @@ class Order extends Order_parent
             $this->getFieldData('OXINVOICENR') :
             $this->getFieldData('OXORDERNR');
         return $number;
+    }
+
+    /**
+     * @param $unzerPayment Payment
+     * @return void
+     * @throws Exception
+     */
+    public function finalizeTmpOrder(Payment $unzerPayment, bool $error = false): void
+    {
+        // set order in any case as Paid
+        $this->markUnzerOrderAsPaid();
+
+        if ($error === true) {
+            $this->_setOrderStatus('ERROR');
+        }
+        else {
+            switch ($unzerPayment->getState()) {
+                case PaymentState::STATE_PENDING:
+                    $this->_setOrderStatus('NOT_FINISHED');
+                    break;
+                case PaymentState::STATE_CANCELED:
+                    $this->cancelOrder();
+                    break;
+            }
+        }
+
+        if (!$this->getFieldData('oxordernr')) {
+            $this->_setNumber();
+        }
+
+        $this->initWriteTransactionToDB($unzerPayment);
+        $this->save();
     }
 
     /**
