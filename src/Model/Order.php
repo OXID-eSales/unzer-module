@@ -333,6 +333,8 @@ class Order extends Order_parent
      * @param $unzerPayment Payment
      * @return void
      * @throws Exception
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function finalizeTmpOrder(Payment $unzerPayment, bool $error = false): void
     {
