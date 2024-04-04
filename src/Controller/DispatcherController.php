@@ -162,8 +162,12 @@ class DispatcherController extends FrontendController
      * @throws Exception
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    protected function handleTmpOrder(Payment $unzerPayment, TmpOrder $tmpOrder, array $tmpData, bool $error = false): void
-    {
+    protected function handleTmpOrder(
+        Payment $unzerPayment,
+        TmpOrder $tmpOrder,
+        array $tmpData,
+        bool $error = false
+    ): void {
         $translator = $this->getServiceFromContainer(Translator::class);
         $result = $translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
         if ($tmpOrder->load($tmpData['OXID'])) {

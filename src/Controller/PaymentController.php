@@ -103,7 +103,9 @@ class PaymentController extends PaymentController_parent
             $payment->load($actualPaymentId) &&
             $payment->isUnzerPayment()
         ) {
-            $orderId = is_string($session->getVariable('sess_challenge')) ? $session->getVariable('sess_challenge') : '';
+            $orderId = is_string($session->getVariable('sess_challenge')) ?
+                $session->getVariable('sess_challenge') :
+                '';
             if ($orderId) {
                 $order = oxNew(Order::class);
                 $order->delete($orderId);
