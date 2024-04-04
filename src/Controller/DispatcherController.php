@@ -175,7 +175,7 @@ class DispatcherController extends FrontendController
      */
     protected function hasExceededTimeLimit(TmpOrder $tmpOrder): bool
     {
-        $UnzerWebhookTimeDifference = (int) Registry::getConfig()->getConfigParam('UnzerWebhookTimeDifference',5);
+        $UnzerWebhookTimeDifference = (int) Registry::getConfig()->getConfigParam('UnzerWebhookTimeDifference', 5);
         $TimeDifferenceSeconds = $UnzerWebhookTimeDifference * 60;
         $tmpOrderTime = $tmpOrder->getFieldData('TIMESTAMP');
         $tmpOrderTimeUnix = strtotime($tmpOrderTime);
