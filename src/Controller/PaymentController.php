@@ -103,8 +103,8 @@ class PaymentController extends PaymentController_parent
             $payment->load($actualPaymentId) &&
             $payment->isUnzerPayment()
         ) {
-            /** @var string $orderId */
-            if ($orderId = $session->getVariable('sess_challenge')) {
+            $orderId = is_string($session->getVariable('sess_challenge')) ? $session->getVariable('sess_challenge') : '';
+            if ($orderId) {
                 $order = oxNew(Order::class);
                 $order->delete($orderId);
                 $session->deleteVariable('sess_challenge');
@@ -116,12 +116,14 @@ class PaymentController extends PaymentController_parent
      * @param $session Session
      * @return void
      */
-    protected function checkForDuplicateOrderAttempt($session)
+    protected function checkForDuplicateOrderAttempt(Session $session)
     {
         $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
         $unzerSDK = $unzerSDK->getUnzerSDK();
-        if ($session->getVariable('settedOrder')) {
-            if ($paymentId = $session->getVariable('paymentid')) {
+        $oxOrderIdOfTmpOrder = $session->getVariable('oxOrderIdOfTmpOrder');
+        $paymentId = is_string($session->getVariable('paymentid')) ? $session->getVariable('paymentid') : '';
+        if ($oxOrderIdOfTmpOrder) {
+            if ($paymentId) {
                 try {
                     $unzerPayment = $unzerSDK->fetchPayment($paymentId);
                     $unzerOrderId = $unzerPayment->getOrderId();
@@ -141,7 +143,7 @@ class PaymentController extends PaymentController_parent
                 }
             }
             $session->deleteVariable('sess_challenge');
-            $session->deleteVariable('settedOrder');
+            $session->deleteVariable('oxOrderIdOfTmpOrder');
         }
     }
 }

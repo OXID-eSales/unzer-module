@@ -56,8 +56,8 @@ class StaticContent
 
     protected function checkAndDeactivatePaymentMethod(array $paymentDefinition, EshopModelPayment $paymentMethod): void
     {
-        if (!$paymentDefinition['active'] && (string) $paymentMethod->getFieldData('oxactive') === '1') {
-            $paymentMethod->oxpayments__oxactive = new Field('0', Field::T_RAW);
+        if (!$paymentDefinition['active'] && $paymentMethod->getFieldData('oxactive')) {
+            $paymentMethod->assign(['oxpayments__oxactive' => '0']);
             $paymentMethod->save();
         }
     }

@@ -638,5 +638,7 @@ $aLang = [
     'oscunzer_TRANSACTION_CHANGE' => 'State %s was written to database for payment %s',
     'oscunzer_TRANSACTION_NOTHINGTODO' => 'No update needed. There was no new state for payment: ',
     'oscunzer_APPLEPAY_ERROR' => 'Failed to complete payment with Apple Pay.',
-    'oscunzer_ERROR_CHANGE_BASKET' => 'Unfortunately the shopping cart changed again during checkout. Please check the shopping cart and repeat the process.'
+    'oscunzer_ERROR_CHANGE_BASKET' => 'Unfortunately the shopping cart changed again during checkout. Please check the shopping cart and repeat the process.',
+    'oscunzer_ERROR_HANDLE_TMP_ORDER' => 'The temporary order was not handled successfully.',
+    'oscunzer_SUCCESS_HANDLE_TMP_ORDER' => 'The temporary order was handled successfully.',
 ];

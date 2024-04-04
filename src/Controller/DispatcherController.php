@@ -133,14 +133,17 @@ class DispatcherController extends FrontendController
                 }
             } else {
                 $tmpOrder = oxNew(TmpOrder::class);
-                $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerPayment->getBasket()->getOrderId());
-                if ($tmpOrder->load($tmpData['OXID'])) {
-                    if ($this->hasExceededTimeLimit($tmpOrder)) {
-                        $bError = !($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
-                            $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
-                            $unzerPayment->getState() === PaymentState::STATE_PENDING);
-                        $this->handleTmpOrder($unzerPayment, $tmpOrder, $tmpData, $bError);
-                    }
+                $iOrderId = $unzerPayment->getBasket() ? (int) $unzerPayment->getBasket()->getOrderId() : 0;
+                $tmpData = $tmpOrder->getTmpOrderByUnzerId($iOrderId);
+                if (
+                    isset($tmpData['OXID']) &&
+                    $tmpOrder->load($tmpData['OXID']) &&
+                    $this->hasExceededTimeLimit($tmpOrder)
+                ) {
+                    $bError = !($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
+                        $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
+                        $unzerPayment->getState() === PaymentState::STATE_PENDING);
+                    $this->handleTmpOrder($unzerPayment, $tmpOrder, $tmpData, $bError);
                 }
             }
         }
@@ -152,21 +155,26 @@ class DispatcherController extends FrontendController
      * @param Payment $unzerPayment
      * @param TmpOrder $tmpOrder
      * @param array $tmpData
+     * @param bool $error
      * @return void
      * @throws Exception
      */
-    protected function handleTmpOrder(Payment $unzerPayment, TmpOrder $tmpOrder, array $tmpData, $error = false): void
+    protected function handleTmpOrder(Payment $unzerPayment, TmpOrder $tmpOrder, array $tmpData, bool $error = false): void
     {
+        $translator = $this->getServiceFromContainer(Translator::class);
+        $result = $translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
         if ($tmpOrder->load($tmpData['OXID'])) {
             $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']), ['allowed_classes' => [Order::class]]);
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
-            $oOrder = $aOrderData['order'];
-            $oOrder->finalizeTmpOrder($unzerPayment, $error);
-            $tmpOrder->assign(['STATUS' => 'FINISHED']);
-            $tmpOrder->save();
-            Registry::getUtils()->setHeader('HTTP/1.1 200 OK');
-            Registry::getUtils()->showMessageAndExit('200');
+            $oOrder = is_array($aOrderData) && isset($aOrderData['order']) ? $aOrderData['order'] : null;
+            if ($oOrder) {
+                $oOrder->finalizeTmpOrder($unzerPayment, $error);
+                $tmpOrder->assign(['STATUS' => 'FINISHED']);
+                $tmpOrder->save();
+                $result = $translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
+            }
         }
+        Registry::getUtils()->showMessageAndExit($result);
     }
 
     /**
@@ -175,9 +183,9 @@ class DispatcherController extends FrontendController
      */
     protected function hasExceededTimeLimit(TmpOrder $tmpOrder): bool
     {
-        $UnzerWebhookTimeDifference = (int) Registry::getConfig()->getConfigParam('UnzerWebhookTimeDifference', 5);
+        $UnzerWebhookTimeDifference = Registry::getConfig()->getConfigParam('UnzerWebhookTimeDifference', 5);
         $TimeDifferenceSeconds = $UnzerWebhookTimeDifference * 60;
-        $tmpOrderTime = $tmpOrder->getFieldData('TIMESTAMP');
+        $tmpOrderTime = is_string($tmpOrder->getFieldData('TIMESTAMP')) ? $tmpOrder->getFieldData('TIMESTAMP') : '';
         $tmpOrderTimeUnix = strtotime($tmpOrderTime);
         $nowTimeUnix = time();
         $difference = $nowTimeUnix - $tmpOrderTimeUnix;

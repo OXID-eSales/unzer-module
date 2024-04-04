@@ -120,6 +120,13 @@ class Order extends Order_parent
 
         return $iRet;
     }
+
+    /**
+     * @param Basket $oBasket
+     * @param User $oUser
+     * @return int|bool
+     * @throws Exception
+     */
     public function createTmpOrder(
         Basket $oBasket,
         User $oUser
@@ -177,7 +184,7 @@ class Order extends Order_parent
             $tmpOrder = oxNew(TmpOrder::class);
             $tmpOrder->prepareOrderForJson($this);
             $tmpOrder->save();
-            Registry::getSession()->setVariable('settedOrder', $this->getId());
+            Registry::getSession()->setVariable('oxOrderIdOfTmpOrder', $this->getId());
 
         return $iRet;
     }
