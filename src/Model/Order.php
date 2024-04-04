@@ -341,8 +341,7 @@ class Order extends Order_parent
 
         if ($error === true) {
             $this->_setOrderStatus('ERROR');
-        }
-        else {
+        } else {
             switch ($unzerPayment->getState()) {
                 case PaymentState::STATE_PENDING:
                     $this->_setOrderStatus('NOT_FINISHED');
