@@ -11,10 +11,8 @@ use Exception;
 use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
@@ -27,6 +25,10 @@ use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment;
 
+/**
+ *  TODO: Decrease count of dependencies to 13
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class DispatcherController extends FrontendController
 {
     use ServiceContainer;
@@ -158,6 +160,7 @@ class DispatcherController extends FrontendController
      * @param bool $error
      * @return void
      * @throws Exception
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function handleTmpOrder(Payment $unzerPayment, TmpOrder $tmpOrder, array $tmpData, bool $error = false): void
     {
@@ -183,13 +186,13 @@ class DispatcherController extends FrontendController
      */
     protected function hasExceededTimeLimit(TmpOrder $tmpOrder): bool
     {
-        $UnzerWebhookTimeDifference = Registry::getConfig()->getConfigParam('UnzerWebhookTimeDifference', 5);
-        $TimeDifferenceSeconds = $UnzerWebhookTimeDifference * 60;
+        $defTimeDiffMin = Registry::getConfig()->getConfigParam('defTimeDiffMin', 5);
+        $timeDiffSec = $defTimeDiffMin * 60;
         $tmpOrderTime = is_string($tmpOrder->getFieldData('TIMESTAMP')) ? $tmpOrder->getFieldData('TIMESTAMP') : '';
         $tmpOrderTimeUnix = strtotime($tmpOrderTime);
         $nowTimeUnix = time();
         $difference = $nowTimeUnix - $tmpOrderTimeUnix;
 
-        return $difference >= $TimeDifferenceSeconds;
+        return $difference >= $timeDiffSec;
     }
 }

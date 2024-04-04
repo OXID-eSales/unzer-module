@@ -31,7 +31,6 @@ class TmpOrder extends BaseModel
         $this->init('oscunzertmporder');
     }
 
-
     public function save()
     {
         return parent::save();
@@ -41,8 +40,10 @@ class TmpOrder extends BaseModel
     {
         $oConfig = Registry::getConfig();
         $oOrderArticles = $oOrder->getOrderArticles();
-        $completeOrder['order'] = $oOrder;
-        $completeOrder['orderArticles'] = $oOrderArticles->getArray();
+        $completeOrder = [
+            'order' => $oOrder,
+            'orderArticles' => $oOrderArticles->getArray()
+        ];
         $serializedOrder = serialize($completeOrder);
         $base64Order = base64_encode($serializedOrder);
         /** @var Order $oOrder */
