@@ -8,14 +8,15 @@
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Service\UserRepository;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions as UnzerDefinitionsService;
-use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
+use UnzerSDK\Constants\PaymentState;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 class PaymentController extends PaymentController_parent
 {
@@ -91,6 +92,8 @@ class PaymentController extends PaymentController_parent
      */
     protected function checkForUnzerPaymentErrors(): void
     {
+        $session = Registry::getSession();
+        $this->checkForDuplicateOrderAttempt($session);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $payment */
         $payment = oxNew(Payment::class);
         $actualPaymentId = $this->getCheckedPaymentId();
@@ -100,12 +103,49 @@ class PaymentController extends PaymentController_parent
             $payment->load($actualPaymentId) &&
             $payment->isUnzerPayment()
         ) {
-            $session = Registry::getSession();
-            /** @var string $orderId */
-            $orderId = $session->getVariable('sess_challenge');
-            $order = oxNew(Order::class);
-            $order->delete($orderId);
+            $orderId = is_string($session->getVariable('sess_challenge')) ?
+                $session->getVariable('sess_challenge') :
+                '';
+            if ($orderId) {
+                $order = oxNew(Order::class);
+                $order->delete($orderId);
+                $session->deleteVariable('sess_challenge');
+            }
+        }
+    }
+
+    /**
+     * @param $session Session
+     * @return void
+     */
+    protected function checkForDuplicateOrderAttempt(Session $session)
+    {
+        $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
+        $unzerSDK = $unzerSDK->getUnzerSDK();
+        $oxOrderIdOfTmpOrder = $session->getVariable('oxOrderIdOfTmpOrder');
+        $paymentId = is_string($session->getVariable('paymentid')) ? $session->getVariable('paymentid') : '';
+        if ($oxOrderIdOfTmpOrder) {
+            if ($paymentId) {
+                try {
+                    $unzerPayment = $unzerSDK->fetchPayment($paymentId);
+                    $unzerOrderId = $unzerPayment->getOrderId();
+                    $sessionUnzerOrderId = $session->getVariable('UnzerOrderId');
+                    if (
+                        (int) $unzerOrderId === $sessionUnzerOrderId &&
+                        ($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
+                            $unzerPayment->getState() === PaymentState::STATE_PENDING)
+                    ) {
+                        $session->deleteVariable('paymentid');
+                        $session->deleteVariable('UnzerOrderId');
+                    }
+                } catch (UnzerApiException $e) {
+                    Registry::getLogger()->warning(
+                        'Payment not found with key: ' . $paymentId . ' and message: ' . $e->getMessage()
+                    );
+                }
+            }
             $session->deleteVariable('sess_challenge');
+            $session->deleteVariable('oxOrderIdOfTmpOrder');
         }
     }
 }

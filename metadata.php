@@ -52,7 +52,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.2.0-rc.3',
+    'version' => '1.2.0-rc.4',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -423,6 +423,12 @@ $aModule = [
             'name' => 'UnzerjQuery',
             'type' => 'bool',
             'value' => '0',
+        ],
+        [
+            'group' => 'unzerother',
+            'name' => 'UnzerWebhookTimeDifference',
+            'type' => 'str',
+            'value' => '5',
         ],
         // this options are invisible because of missing group
         [

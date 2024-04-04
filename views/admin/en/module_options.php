@@ -45,6 +45,7 @@ $aLang = [
     'SHOP_MODULE_UnzerOption_oscunzer_installment_rate' => 'Installment rate',
     'HELP_SHOP_MODULE_UnzerOption_oscunzer_installment_rate' => 'Installmentrate per 100 in %, i.e.: "4.5"',
     'SHOP_MODULE_UnzerjQuery' => 'Include jQuery via the module',
+    'SHOP_MODULE_UnzerWebhookTimeDifference' => 'Time limit in minutes for creating paid orders via webhook',
     'HELP_SHOP_MODULE_UnzerSystemMode' => 'Here you can switch between Sandbox (demo mode) and Production mode',
     'SHOP_MODULE_UnzerDebug' => 'Enable debug mode',
     'HELP_SHOP_MODULE_UnzerDebug' => 'In active debug mode, log files are written to the /log/unzer directory.',

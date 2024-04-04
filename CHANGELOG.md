@@ -8,8 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### NEW
 - new Paymentmethod Unzer installment (Paylater)
-- refactor basket-change-check before payment
-- fix Typed property must not be accessed before initialization in Payment-Service
+- If customers - for whatever reason - interrupt the order in the checkout, the order is still saved using a temporary order and Unzer's webhook
 
 ### FIXED
 - [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)
