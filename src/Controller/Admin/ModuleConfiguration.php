@@ -176,27 +176,24 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * @throws GuzzleException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */
     public function getApplePayPaymentProcessingKeyExists(): bool
     {
-        $keyExists = false;
         $keyId = $this->moduleSettings->getApplePayPaymentKeyId();
         if ($this->moduleSettings->getApplePayMerchantCertKey() && $keyId) {
-            try {
-                $response = $this->getServiceFromContainer(ApiClient::class)
-                    ->requestApplePayPaymentKey($keyId);
-                if (!$response) {
-                    $this->addErrorTransmittingKey();
-                    return false;
-                }
+            $response = $this->getServiceFromContainer(ApiClient::class)
+                ->requestApplePayPaymentKey($keyId);
 
-                return $response->getStatusCode() === 200;
-            } catch (GuzzleException $guzzleException) {
+            if (!$response) {
                 $this->addErrorTransmittingKey();
+                return false;
             }
+
+            return $response->getStatusCode() === 200;
         }
-        return $keyExists;
+        return false;
     }
 
     /**
