@@ -13,6 +13,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Service\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
@@ -109,19 +110,12 @@ abstract class UnzerPayment implements UnzerPaymentInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function execute(
-        User $userModel,
-        Basket $basketModel
-    ): bool {
+    public function execute(User $userModel, Basket $basketModel): bool
+    {
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
         if ($paymentType instanceof PayPalPaymentType) {
-            $paymentData = $request->getRequestParameter('paymentData');
-            $paymentData = is_string($paymentData) ? $paymentData : '';
-            $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
-            if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
-                $paymentType->setId($aPaymentData['id']);
-            }
+            $this->setPaypalPaymentDataId($request, $paymentType);
         }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
@@ -226,6 +220,21 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $this->unzerService->getShopMetadata($this->paymentMethod),
             $uzrBasket
         );
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    private function setPaypalPaymentDataId(Request $request, PayPalPaymentType $paymentType): void
+    {
+        $paymentDataRaw = $request->getRequestParameter('paymentData');
+        $paymentData = is_string($paymentDataRaw) ? $paymentDataRaw : '';
+        if (!empty($paymentData) && is_string($paymentDataRaw)) {
+            $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
+            if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
+                $paymentType->setId($aPaymentData['id']);
+            }
+        }
     }
 
     /**

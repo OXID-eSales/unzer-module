@@ -129,42 +129,42 @@ jobs:
 
       - name: Install module
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             php composer config repositories.${{ env.PACKAGE_NAME }} \
             --json '{"type":"path", "url":"./test-module", "options": {"symlink": true}}'
-          docker-compose exec -T \
+          docker compose exec -T \
             php composer require ${{ env.PACKAGE_NAME }}:* --no-interaction --no-update
 
       - name: Install demodata
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             php composer config repositories.oxid-esales/oxideshop-demodata-ce \
             --json '{"type":"git", "url":"https://github.com/OXID-eSales/oxideshop_demodata_ce"}'
-          docker-compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-master --no-update
+          docker compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-master --no-update
 
       - name: Install dependencies and reset shop
         run: |
-          docker-compose exec -T php composer update --no-interaction
-          docker-compose exec -T php bin/oe-console oe:database:reset \
+          docker compose exec -T php composer update --no-interaction
+          docker compose exec -T php bin/oe-console oe:database:reset \
             --db-host=mysql --db-port=3306 --db-name=example --db-user=root --db-password=root --force
-          docker-compose exec -T php bin/oe-console oe:module:activate osc-unzer
+          docker compose exec -T php bin/oe-console oe:module:activate osc-unzer
 
       - name: Put module settings
         continue-on-error: true
         run: |
           mkdir -p source/var/configuration/environment/shops/1/modules
           echo "${{ secrets.MODULE_SETTINGS_OXID7 }}" > source/var/configuration/environment/shops/1/modules/osc-unzer.yaml
-          docker-compose exec -T php php bin/oe-console oe:module:activate osc-unzer
+          docker compose exec -T php php bin/oe-console oe:module:activate osc-unzer
 
       - name: Show docker log
         if: always()
         run: |
-          docker-compose logs
+          docker compose logs
 
       - name: Stop containers
         if: always()
         run: |
-          docker-compose down
+          docker compose down
           sleep 2
 
       - name: Upload configuration artifacts
@@ -200,14 +200,14 @@ jobs:
 
       - name: Install module dependencies
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             --workdir=/var/www/test-module \
             php composer install
 
       - name: Run phpcs
         if: always()
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             --workdir=/var/www/test-module \
             php composer phpcs
 
@@ -215,14 +215,14 @@ jobs:
         id: phpstan
         if: always()
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             --workdir=/var/www/test-module \
             php composer phpstan
 
       - name: Run phpstan scan and generate report for further processing
         if: always()
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             --workdir=/var/www/test-module \
             php composer phpstan-report
 
@@ -231,14 +231,14 @@ jobs:
         if: always()
         working-directory: source/test-module
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             --workdir=/var/www/test-module \
             php composer phpmd
 
       - name: Run phpstan scan and generate report for further processing
         if: always()
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             --workdir=/var/www/test-module \
             php composer phpmd-report
 
@@ -277,7 +277,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             -e XDEBUG_MODE=coverage \
             php php vendor/bin/phpunit \
               -c /var/www/vendor/${{ env.PACKAGE_NAME }}/tests/phpunit.xml \
@@ -299,7 +299,7 @@ jobs:
       - name: Stop containers
         if: always()
         run: |
-          docker-compose down
+          docker compose down
           sleep 2
 
   unit_tests:
@@ -322,7 +322,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             -e XDEBUG_MODE=coverage \
             php php vendor/bin/phpunit \
               -c /var/www/vendor/${{ env.PACKAGE_NAME }}/tests/phpunit.xml \
@@ -334,7 +334,7 @@ jobs:
       - name: Stop containers
         if: always()
         run: |
-          docker-compose down
+          docker compose down
           sleep 2
 
       - name: Upload log artifact
@@ -383,23 +383,23 @@ jobs:
 
       - name: Install twig template engine and twig theme
         run: |
-          docker-compose exec -T php composer require oxid-esales/twig-component:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer require oxid-esales/twig-admin-theme:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer require oxid-esales/apex-theme:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer update --no-interaction
+          docker compose exec -T php composer require oxid-esales/twig-component:dev-b-7.0.x --no-update
+          docker compose exec -T php composer require oxid-esales/twig-admin-theme:dev-b-7.0.x --no-update
+          docker compose exec -T php composer require oxid-esales/apex-theme:dev-b-7.0.x --no-update
+          docker compose exec -T php composer update --no-interaction
 
       - name: Install demodata
         run: |
-          docker-compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-b-7.0.x --no-update
-          docker-compose exec -T php composer update --no-interaction
+          docker compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-b-7.0.x --no-update
+          docker compose exec -T php composer update --no-interaction
 
       - name: Activate theme
         run: |
-          docker-compose exec -T php bin/oe-console oe:theme:activate apex
+          docker compose exec -T php bin/oe-console oe:theme:activate apex
 
       - name: Run tests
         run: |
-          docker-compose exec -T \
+          docker compose exec -T \
             -e SELENIUM_SERVER_HOST=selenium \
             -e BROWSER_NAME=chrome \
             -e THEME_ID=apex \
@@ -427,7 +427,7 @@ jobs:
       - name: Stop containers
         if: always()
         run: |
-          docker-compose down
+          docker compose down
           sleep 2
 
   prepare_coverage_results:
@@ -466,7 +466,7 @@ jobs:
           ls -alh source/coverage/source
           wget https://phar.phpunit.de/phpcov-8.2.1.phar
           mv phpcov-8.2.1.phar source/phpcov.phar
-          docker-compose exec -T php php phpcov.phar merge --clover coverage.xml ./coverage/source
+          docker compose exec -T php php phpcov.phar merge --clover coverage.xml ./coverage/source
           sed -i 's+/var/www/test-module/+./+' source/coverage.xml
 
       - name: Upload log artifact

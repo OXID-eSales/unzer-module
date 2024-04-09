@@ -22,7 +22,7 @@ use OxidEsales\Eshop\Core\Model\BaseModel as EshopBaseModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 
 /**
- * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD)
  */
 class StaticContent
 {
@@ -316,11 +316,14 @@ class StaticContent
         return EshopRegistry::getLang()->getLanguageIds();
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
     private function getActiveCountries(): array
     {
         $result = [];
 
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->queryBuilderFactory->create();
         $resultDb = $queryBuilder
             ->select('oxid, oxisoalpha2')
