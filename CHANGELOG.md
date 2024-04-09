@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - provide content for smarty and twig
 
+### FIXED
+- fix: PayPal sporadically fails on GHA CC Tests
 
 ## [2.1.4] - 2023-11-23
 
