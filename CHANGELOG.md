@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Save Payment Data for registered Users
 - fix inconsistent data for Paylater payment methods
 - use Module-Logger also in UnzerPayment
+- Avoid checking AppleCert if ApplePay is off
 
 ## [1.1.3] - 2023-11-14
 
