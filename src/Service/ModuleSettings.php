@@ -408,7 +408,9 @@ class ModuleSettings
      */
     public function getWebhookConfiguration(): array
     {
-        return $this->getSettingValue('webhookConfiguration');
+        /** @var array $webhookConfig */
+        $webhookConfig = $this->getSettingValue('webhookConfiguration');
+        return $webhookConfig;
     }
 
     /**

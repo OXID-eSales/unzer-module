@@ -214,7 +214,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 }
 
                 return $response->getStatusCode() === 200;
-            } catch (GuzzleException|JsonException $guzzleException) {
+            } catch (GuzzleException | JsonException $guzzleException) {
                 $this->addErrorTransmittingCertificate();
             }
         }
