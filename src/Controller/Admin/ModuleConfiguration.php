@@ -3,6 +3,7 @@
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
 use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
@@ -49,9 +50,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function render()
     {
-        parent::render();
+        $result = parent::render();
 
-        if ($this->_sModuleId == Module::MODULE_ID) {
+        if ($this->_sModuleId === Module::MODULE_ID) {
             try {
                 $this->_aViewData["webhookConfiguration"] = $this->moduleSettings->getWebhookConfiguration();
                 $this->_aViewData['applePayMC'] = $this->moduleSettings->getApplePayMerchantCapabilities();
@@ -68,7 +69,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 );
             }
         }
-        return 'module_config.tpl';
+        return $result;
     }
 
     public function registerWebhooks(): void
@@ -198,10 +199,10 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
     /**
      * @throws GuzzleException
+     * @throws FileException
      */
     public function getApplePayPaymentProcessingCertExists(): bool
     {
-        $certExists = false;
         $certId = $this->moduleSettings->getApplePayPaymentCertificateId();
         if ($this->moduleSettings->getApplePayMerchantCert() && $certId) {
             try {
@@ -213,11 +214,11 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 }
 
                 return $response->getStatusCode() === 200;
-            } catch (GuzzleException $guzzleException) {
+            } catch (GuzzleException|JsonException $guzzleException) {
                 $this->addErrorTransmittingCertificate();
             }
         }
-        return $certExists;
+        return false;
     }
 
     /**
@@ -228,18 +229,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     public function saveConfVars()
     {
         $request = Registry::getRequest();
-        if (
-            $request->getRequestEscapedParameter('oxid') &&
-            $request->getRequestEscapedParameter('oxid') === 'osc-unzer'
-        ) {
-            // the systemMode is very important, so we set it first ...
+
+        $moduleId = $request->getRequestEscapedParameter('oxid');
+        if ($moduleId === Module::MODULE_ID) {
             /** @var array $confselects */
             $confselects = $request->getRequestEscapedParameter('confselects');
             /** @var string $systemMode */
             $systemMode = $confselects['UnzerSystemMode'];
             $this->moduleSettings->setSystemMode($systemMode);
-
-            $this->resetContentCache();
+            // get translated systemmode
+            $systemMode = $this->moduleSettings->getSystemMode();
 
             $applePayMC = $request->getRequestEscapedParameter('applePayMC');
             if (is_array($applePayMC)) {
@@ -249,25 +248,24 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             if (is_array($applePayNetworks)) {
                 $this->moduleSettings->saveApplePayNetworks($applePayNetworks);
             }
-            $certConfigKey = $this->moduleSettings->getSystemMode() . '-' . 'applePayMerchantCert';
+            $certConfigKey = $systemMode . '-' . 'applePayMerchantCert';
             $applePayMerchantCert = $request->getRequestEscapedParameter($certConfigKey);
             file_put_contents(
                 $this->moduleSettings->getApplePayMerchantCertFilePath(),
                 $applePayMerchantCert
             );
-            $keyConfigKey = $this->moduleSettings->getSystemMode() . '-' . 'applePayMerchantCertKey';
+
+            $keyConfigKey = $systemMode . '-' . 'applePayMerchantCertKey';
             $applePayMerchCertKey = $request->getRequestEscapedParameter($keyConfigKey);
             file_put_contents(
                 $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
                 $applePayMerchCertKey
             );
-        }
 
-        parent::saveConfVars();
-        if ($request->getRequestEscapedParameter('oxid') === 'osc-unzer') {
             $this->moduleSettings->saveWebhookConfiguration([]);
             $this->registerWebhooks();
         }
+        parent::saveConfVars();
     }
 
     private function addErrorTransmittingCertificate(): void
