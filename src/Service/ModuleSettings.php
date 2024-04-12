@@ -9,12 +9,10 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Session;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
 use OxidEsales\Facts\Facts;
-use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Module;
 use Exception;
 
@@ -402,7 +400,7 @@ class ModuleSettings
      */
     public function saveWebhookConfiguration(array $webhookConfig): void
     {
-        $this->moduleSettingBridge->save('webhookConfiguration', $webhookConfig, Module::MODULE_ID);
+        $this->saveSetting('webhookConfiguration', $webhookConfig);
     }
 
     /**
@@ -410,7 +408,7 @@ class ModuleSettings
      */
     public function getWebhookConfiguration(): array
     {
-        return $this->moduleSettingBridge->get('webhookConfiguration', Module::MODULE_ID);
+        return $this->getSettingValue('webhookConfiguration');
     }
 
     /**
@@ -459,13 +457,7 @@ class ModuleSettings
      */
     private function getSettingValue(string $key)
     {
-        $result = '';
-        try {
-            $result = $this->moduleSettingBridge->get($key, Module::MODULE_ID);
-        } catch (ModuleConfigurationNotFoundException $exception) {
-            //todo: improve
-        }
-        return $result;
+        return $this->moduleSettingBridge->get($key, Module::MODULE_ID);
     }
 
     /**
