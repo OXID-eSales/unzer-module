@@ -27,7 +27,7 @@ final class PISCest extends BaseCest
     private $usertanInput = "//input[@id='XS2A-TAN']";
     private $finishButton = "//a[@class='ui blue button back-btn']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_pis'];
     }
@@ -42,18 +42,18 @@ final class PISCest extends BaseCest
      * @param AcceptanceTester $I
      * @group PisPaymentTest
      */
-    public function _checkPaymentWorks(AcceptanceTester $I)
+    public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test PIS payment works');
 
-        $this->_initializeTest();
-        $this->_choosePayment($this->pisLabel);
-        $this->_submitOrder();
+        $this->initializeTest();
+        $this->choosePayment($this->pisLabel);
+        $this->submitOrder();
 
         $pisPaymentData = Fixtures::get('pis_payment');
 
         // first page : choose bank
-        $I->waitForText($this->_getPrice());
+        $I->waitForText($this->getPrice());
         $I->waitForElement($this->countrySelect);
         $I->selectOption($this->countrySelect, "DE");
         $I->waitForElement($this->banknameInput);
@@ -79,6 +79,6 @@ final class PISCest extends BaseCest
         $I->waitForElement($this->finishButton);
         $I->click($this->finishButton);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

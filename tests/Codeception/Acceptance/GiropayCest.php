@@ -30,7 +30,7 @@ final class GiropayCest extends BaseCest
     private $TANLabel = "//input[@name='tan']";
     private $yesButton = "//button[@id='yes']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_giropay'];
     }
@@ -42,9 +42,9 @@ final class GiropayCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Giropay payment works');
-        $this->_initializeTest();
-        $this->_choosePayment($this->giropayPaymentLabel);
-        $this->_submitOrder();
+        $this->initializeTest();
+        $this->choosePayment($this->giropayPaymentLabel);
+        $this->submitOrder();
 
         $giropayPaymentData = Fixtures::get('giropay_payment');
 
@@ -64,12 +64,12 @@ final class GiropayCest extends BaseCest
 
         $I->waitForElement($this->continueButton);
         $I->click($this->continueButton);
-        $I->waitForText(str_replace(',', '.', $this->_getPrice()));
+        $I->waitForText(str_replace(',', '.', $this->getPrice()));
         $I->waitForElementClickable($this->continueButton);
         $I->wait(5);
         $I->click($this->continueButton);
         $I->wait(5);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

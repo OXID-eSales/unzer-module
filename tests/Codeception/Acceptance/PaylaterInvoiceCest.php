@@ -21,7 +21,7 @@ final class PaylaterInvoiceCest extends BaseCest
 {
     private $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_invoice'];
     }
@@ -64,12 +64,12 @@ final class PaylaterInvoiceCest extends BaseCest
     public function checkPaymentB2CEURWorks(AcceptanceTester $I)
     {
         $I->wantToTest('PaylaterInvoice B2C EUR payment works');
-        $this->_initializeSecuredTest();
-        $this->_choosePayment($this->invoicePaymentLabel);
+        $this->initializeSecuredTest();
+        $this->choosePayment($this->invoicePaymentLabel);
         $this->fillB2Cdata($I);
-        $this->_submitOrder();
+        $this->submitOrder();
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment(30);
     }
 
     /**
@@ -85,11 +85,11 @@ final class PaylaterInvoiceCest extends BaseCest
             ['oxcompany' => 'ACME'],
             ['oxid' => 'unzersecureuser']
         );
-        $this->_initializeSecuredTest();
-        $this->_choosePayment($this->invoicePaymentLabel);
+        $this->initializeSecuredTest();
+        $this->choosePayment($this->invoicePaymentLabel);
         $this->fillB2Bdata($I);
-        $this->_submitOrder();
+        $this->submitOrder();
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment(30);
     }
 }

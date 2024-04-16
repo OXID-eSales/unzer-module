@@ -20,7 +20,7 @@ final class PrepaymentCest extends BaseCest
 {
     private $prePaymentLabel = "//label[@for='payment_oscunzer_prepayment']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_prepayment'];
     }
@@ -32,19 +32,19 @@ final class PrepaymentCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Prepayment payment works');
-        $this->_initializeTest();
-        $this->_choosePayment($this->prePaymentLabel);
-        $this->_submitOrder();
+        $this->initializeTest();
+        $this->choosePayment($this->prePaymentLabel);
+        $this->submitOrder();
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
 
         // This text doesn't appear on Thankye page for some reason, only in the email
         // possible ToDo: check the thank you page
         /*
         $I->waitForText(rtrim(strip_tags(sprintf(
             Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->_getPrice(),
-            $this->_getCurrency()
+            $this->getPrice(),
+            $this->getCurrency()
         ))));
         */
     }

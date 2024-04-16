@@ -21,7 +21,7 @@ final class SEPADirectDebitCest extends BaseCest
     private $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa']";
     private $IBANInput = "//input[contains(@id, 'unzer-iban-input')]";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_sepa'];
     }
@@ -33,8 +33,8 @@ final class SEPADirectDebitCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
-        $this->_initializeTest();
-        $this->_choosePayment($this->sepaPaymentLabel);
+        $this->initializeTest();
+        $this->choosePayment($this->sepaPaymentLabel);
 
         $payment = Fixtures::get('sepa_payment');
         $I->scrollTo($this->IBANInput);
@@ -43,9 +43,9 @@ final class SEPADirectDebitCest extends BaseCest
         $I->click("#oscunzersepaagreement");
         $I->wait(1);
 
-        $this->_submitOrder();
+        $this->submitOrder();
 
         $I->wait(10);
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

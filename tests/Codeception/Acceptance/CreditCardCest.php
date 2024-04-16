@@ -27,7 +27,7 @@ final class CreditCardCest extends BaseCest
     private $CVCInput = "//input[@id='card-ccv']";
     private $toCompleteAuthentication = "Click here to complete authentication.";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_card'];
     }
@@ -36,44 +36,44 @@ final class CreditCardCest extends BaseCest
      * @param AcceptanceTester $I
      * @return void
      */
-    private function _prepareCreditCardTest(AcceptanceTester $I)
+    private function prepareCreditCardTest(AcceptanceTester $I)
     {
-        $this->_initializeTest();
+        $this->initializeTest();
     }
 
     /**
      * @param string $name Fixtures name
      * @return void
      */
-    private function _submitCreditCardPayment(string $name)
+    private function submitCreditCardPayment(string $name)
     {
-        $this->_choosePayment($this->cardPaymentLabel);
+        $this->choosePayment($this->cardPaymentLabel);
 
         $fixtures = Fixtures::get($name);
-        $this->_getAcceptance()->waitForPageLoad();
-        $this->_getAcceptance()->waitForElement($this->cardNumberIframe);
-        $this->_getAcceptance()->switchToIFrame($this->cardNumberIframe);
-        $this->_getAcceptance()->fillField($this->cardNumberInput, $fixtures['cardnumber']);
-        $this->_getAcceptance()->switchToNextTab(1);
-        $this->_getAcceptance()->switchToIFrame($this->expireDateIframe);
-        $this->_getAcceptance()->fillField($this->expireDateInput, '12/' . date('y'));
-        $this->_getAcceptance()->switchToNextTab(1);
-        $this->_getAcceptance()->switchToIFrame($this->CVCIframe);
-        $this->_getAcceptance()->fillField($this->CVCInput, $fixtures['CVC']);
-        $this->_getAcceptance()->switchToFrame(null);
+        $this->getAcceptance()->waitForPageLoad();
+        $this->getAcceptance()->waitForElement($this->cardNumberIframe);
+        $this->getAcceptance()->switchToIFrame($this->cardNumberIframe);
+        $this->getAcceptance()->fillField($this->cardNumberInput, $fixtures['cardnumber']);
+        $this->getAcceptance()->switchToNextTab(1);
+        $this->getAcceptance()->switchToIFrame($this->expireDateIframe);
+        $this->getAcceptance()->fillField($this->expireDateInput, '12/' . date('y'));
+        $this->getAcceptance()->switchToNextTab(1);
+        $this->getAcceptance()->switchToIFrame($this->CVCIframe);
+        $this->getAcceptance()->fillField($this->CVCInput, $fixtures['CVC']);
+        $this->getAcceptance()->switchToFrame(null);
 
-        $this->_submitOrder();
+        $this->submitOrder();
     }
 
     /**
      * @return void
      */
-    private function _checkCreditCardPayment()
+    private function checkCreditCardPayment()
     {
-        $this->_getAcceptance()->waitForText($this->toCompleteAuthentication, 60);
-        $this->_getAcceptance()->click($this->toCompleteAuthentication);
+        $this->getAcceptance()->waitForText($this->toCompleteAuthentication, 60);
+        $this->getAcceptance()->click($this->toCompleteAuthentication);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 
     /**
@@ -81,10 +81,10 @@ final class CreditCardCest extends BaseCest
      * @param $flag int is oxarticles->OXSTOCKFLAG
      * @return void
      */
-    private function _updateArticleStockAndFlag($stock, $flag)
+    private function updateArticleStockAndFlag($stock, $flag)
     {
         $article = Fixtures::get('product');
-        $this->_getAcceptance()->updateInDatabase(
+        $this->getAcceptance()->updateInDatabase(
             'oxarticles',
             ['OXSTOCK' => $stock, 'OXSTOCKFLAG' => $flag],
             ['OXID' => $article['id']]
@@ -99,11 +99,11 @@ final class CreditCardCest extends BaseCest
     public function checkPaymentUsingMastercardWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Credit Card payment using Mastercard works');
-        $this->_updateArticleStockAndFlag(15, 1);
-        $this->_prepareCreditCardTest($I);
+        $this->updateArticleStockAndFlag(15, 1);
+        $this->prepareCreditCardTest($I);
 
-        $this->_submitCreditCardPayment('mastercard_payment');
-        $this->_checkCreditCardPayment();
+        $this->submitCreditCardPayment('mastercard_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**
@@ -114,11 +114,11 @@ final class CreditCardCest extends BaseCest
     public function checkPaymentUsingMastercardWithLastStockItemWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Credit Card payment using Mastercard with last stock item works');
-        $this->_updateArticleStockAndFlag(1, 3);
-        $this->_prepareCreditCardTest($I);
+        $this->updateArticleStockAndFlag(1, 3);
+        $this->prepareCreditCardTest($I);
 
-        $this->_submitCreditCardPayment('mastercard_payment');
-        $this->_checkCreditCardPayment();
+        $this->submitCreditCardPayment('mastercard_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**
@@ -128,11 +128,11 @@ final class CreditCardCest extends BaseCest
     public function checkPaymentUsingVisaWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Credit Card payment using Visa works');
-        $this->_updateArticleStockAndFlag(15, 1);
-        $this->_prepareCreditCardTest($I);
+        $this->updateArticleStockAndFlag(15, 1);
+        $this->prepareCreditCardTest($I);
 
-        $this->_submitCreditCardPayment('visa_payment');
-        $this->_checkCreditCardPayment();
+        $this->submitCreditCardPayment('visa_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**
@@ -143,11 +143,11 @@ final class CreditCardCest extends BaseCest
     public function checkPaymentUsingVisaWithLastStockItemWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Credit Card payment using Visa with last stock item works');
-        $this->_updateArticleStockAndFlag(1, 3);
-        $this->_prepareCreditCardTest($I);
+        $this->updateArticleStockAndFlag(1, 3);
+        $this->prepareCreditCardTest($I);
 
-        $this->_submitCreditCardPayment('visa_payment');
-        $this->_checkCreditCardPayment();
+        $this->submitCreditCardPayment('visa_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**

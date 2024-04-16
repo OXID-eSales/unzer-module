@@ -135,7 +135,7 @@ final class PaymentsAvailableCest extends BaseCest
         }
     }
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return [
             'oscunzer_alipay',
@@ -160,7 +160,7 @@ final class PaymentsAvailableCest extends BaseCest
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {
         $I->wantToTest('Test payment methods are available');
-        $this->_initializeTest();
+        $this->initializeTest();
 
         foreach ($this->paymentMethodsByCountry as $country => $paymentMethods) {
             $this->switchCountry($I, $country);

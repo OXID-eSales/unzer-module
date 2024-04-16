@@ -7,8 +7,7 @@ use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentData;
 
 class UnzerPaymentModelDataTest extends IntegrationTestCase
 {
-    /** @var string */
-    private $paymentDataJson;
+    private string $paymentDataJson;
 
     public function setUp(): void
     {
