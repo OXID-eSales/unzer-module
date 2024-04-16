@@ -104,15 +104,16 @@ class Payment
             $basket = $this->session->getBasket();
             $currency = $basket->getBasketCurrency()->name;
 
-            $oOrder = oxNew(Order::class);
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
-            $oOrder->createTmpOrder($basket, $user);
-
             $paymentExtension = $this->paymentExtLoader->getPaymentExtensionByCustomerTypeAndCurrency(
                 $paymentModel,
                 $customerType,
                 $currency
             );
+
+            $oOrder = oxNew(Order::class);
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            $oOrder->createTmpOrder($basket, $user, $paymentExtension->getUnzerOrderId());
+
             $paymentExtension->execute(
                 $user,
                 $basket

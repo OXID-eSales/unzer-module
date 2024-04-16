@@ -178,6 +178,11 @@ abstract class UnzerPayment
         return true;
     }
 
+    public function getUnzerOrderId(): int
+    {
+        return $this->unzerOrderId;
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
