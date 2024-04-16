@@ -220,10 +220,10 @@ abstract class BaseCest
 
         $this->I->amOnPage('/index.php');
         $this->I->waitForPageLoad();
-        $this->I->waitForElementVisible($accountMenuButton, 3);
-        $this->I->waitForElementClickable($accountMenuButton, 3);
+        $this->I->waitForElementVisible($accountMenuButton);
+        $this->I->waitForElementClickable($accountMenuButton);
         $this->I->scrollTo($accountMenuButton);
-        $this->I->wait(3);
+        $this->I->wait(10);
 
         try {
             $this->I->click($accountMenuButton);
