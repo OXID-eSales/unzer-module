@@ -176,7 +176,7 @@ class DispatcherController extends FrontendController
             $oOrder = is_array($aOrderData) && isset($aOrderData['order']) ? $aOrderData['order'] : null;
             if ($oOrder) {
                 $oOrder->finalizeTmpOrder($unzerPayment, $error);
-                $tmpOrder->assign(['STATUS' => 'FINISHED']);
+                $tmpOrder->assign(['status' => 'FINISHED']);
                 $tmpOrder->save();
                 $result = $translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
             }
@@ -192,7 +192,7 @@ class DispatcherController extends FrontendController
     {
         $defTimeDiffMin = Registry::getConfig()->getConfigParam('defTimeDiffMin', 5);
         $timeDiffSec = $defTimeDiffMin * 60;
-        $tmpOrderTime = is_string($tmpOrder->getFieldData('TIMESTAMP')) ? $tmpOrder->getFieldData('TIMESTAMP') : '';
+        $tmpOrderTime = is_string($tmpOrder->getFieldData('timestamp')) ? $tmpOrder->getFieldData('timestamp') : '';
         $tmpOrderTimeUnix = strtotime($tmpOrderTime);
         $nowTimeUnix = time();
         $difference = $nowTimeUnix - $tmpOrderTimeUnix;
