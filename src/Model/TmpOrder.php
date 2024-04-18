@@ -96,7 +96,7 @@ class TmpOrder extends BaseModel
         /** @var Result $blocksData */
         $blocksData = $queryBuilder->execute();
         $result = is_a($blocksData, Result::class) ? $blocksData->fetchAssociative() : false;
-        return isset($result['oxid']) && is_string($result['oxid']) ? $result['oxid']:  '';
+        return isset($result['oxid']) && is_string($result['oxid']) ? $result['oxid'] : '';
     }
 
     /**
