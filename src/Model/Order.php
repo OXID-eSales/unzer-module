@@ -73,7 +73,8 @@ class Order extends Order_parent
         }
 
         // setUnzerOrderId
-        $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
+        $unzerOrderId = $paymentService->getUnzerOrderId();
+        $this->setUnzerOrderNr($unzerOrderId);
         $unzerService->resetUnzerOrderId();
 
         // deleting remark info only when order is finished
@@ -112,7 +113,7 @@ class Order extends Order_parent
 
         // cleanUp Tmp Order
         $tmpOrder = oxNew(TmpOrder::class);
-        $tmpData = $tmpOrder->getTmpOrderByUnzerId($this->getUnzerOrderNr());
+        $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerOrderId);
         if ($tmpOrder->load($tmpData['OXID'])) {
             $tmpOrder->assign(['status' => 'FINISHED']);
             $tmpOrder->save();
