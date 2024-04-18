@@ -39,6 +39,7 @@ class DispatcherController extends FrontendController
      * @throws DatabaseErrorException
      * @throws UnzerApiException
      * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -135,8 +136,8 @@ class DispatcherController extends FrontendController
                 }
             } else {
                 $tmpOrder = oxNew(TmpOrder::class);
-                $iOrderId = $unzerPayment->getBasket() ? (int) $unzerPayment->getBasket()->getOrderId() : 0;
-                $tmpData = $tmpOrder->getTmpOrderByUnzerId($iOrderId);
+                $orderId = $unzerPayment->getBasket() ? $unzerPayment->getBasket()->getOrderId() : '';
+                $tmpData = $tmpOrder->getTmpOrderByUnzerId($orderId);
                 if (
                     isset($tmpData['OXID']) &&
                     $tmpOrder->load($tmpData['OXID']) &&
@@ -176,7 +177,7 @@ class DispatcherController extends FrontendController
             $oOrder = is_array($aOrderData) && isset($aOrderData['order']) ? $aOrderData['order'] : null;
             if ($oOrder) {
                 $oOrder->finalizeTmpOrder($unzerPayment, $error);
-                $tmpOrder->assign(['STATUS' => 'FINISHED']);
+                $tmpOrder->assign(['status' => 'FINISHED']);
                 $tmpOrder->save();
                 $result = $translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
             }
@@ -192,7 +193,7 @@ class DispatcherController extends FrontendController
     {
         $defTimeDiffMin = Registry::getConfig()->getConfigParam('defTimeDiffMin', 5);
         $timeDiffSec = $defTimeDiffMin * 60;
-        $tmpOrderTime = is_string($tmpOrder->getFieldData('TIMESTAMP')) ? $tmpOrder->getFieldData('TIMESTAMP') : '';
+        $tmpOrderTime = is_string($tmpOrder->getFieldData('timestamp')) ? $tmpOrder->getFieldData('timestamp') : '';
         $tmpOrderTimeUnix = strtotime($tmpOrderTime);
         $nowTimeUnix = time();
         $difference = $nowTimeUnix - $tmpOrderTimeUnix;
