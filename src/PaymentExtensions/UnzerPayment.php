@@ -44,7 +44,7 @@ abstract class UnzerPayment
     protected $unzerService;
 
     /** @var string */
-    protected $unzerOrderId;
+    protected $unzerOrderId = '';
 
     /** @var string */
     protected $paymentMethod = '';
