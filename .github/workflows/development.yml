@@ -354,9 +354,6 @@ jobs:
         group:
           [
             'PaymentAvailableTest',
-            'FirstGroup',
-            'SecondGroup',
-            'ThirdGroup',
           ]
     needs: [ install_shop_with_module ]
     runs-on: ubuntu-latest
