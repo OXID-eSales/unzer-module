@@ -131,7 +131,7 @@ class Order extends Order_parent
     public function createTmpOrder(
         Basket $oBasket,
         User $oUser,
-        int $unzerOrderId
+        string $unzerOrderId
     ) {
         $orderId = Registry::getSession()->getVariable('sess_challenge');
         $orderId = is_string($orderId) ? $orderId : '';
@@ -199,7 +199,7 @@ class Order extends Order_parent
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function setUnzerOrderNr(int $unzerOrderId): int
+    public function setUnzerOrderNr(string $unzerOrderId): string
     {
         /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);

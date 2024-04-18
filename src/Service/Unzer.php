@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use DateTime;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
@@ -32,6 +33,7 @@ use UnzerSDK\Constants\CompanyTypes;
 use UnzerSDK\Constants\CustomerGroups;
 use UnzerSDK\Constants\Salutations;
 use UnzerSDK\Constants\ShippingTypes;
+use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\CustomerFactory;
@@ -591,17 +593,18 @@ class Unzer
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws Exception
      */
-    public function generateUnzerOrderId(): int
+    public function generateUnzerOrderId(): string
     {
         $config = Registry::getConfig();
         $session = Registry::getSession();
         $unzerOrderId = $session->getVariable('UnzerOrderId');
-        $unzerOrderId = is_numeric($unzerOrderId) ? (int)$unzerOrderId : 0;
+        $unzerOrderId = is_string($unzerOrderId) ? $unzerOrderId : '';
         if (!$unzerOrderId) {
             $separateNumbering = $config->getConfigParam('blSeparateNumbering');
             $counterIdent = $separateNumbering ? 'oxUnzerOrder_' . $config->getShopId() : 'oxUnzerOrder';
-            $unzerOrderId = oxNew(Counter::class)->getNext($counterIdent);
+            $unzerOrderId = (string) oxNew(Counter::class)->getNext($counterIdent);
             $session->setVariable('UnzerOrderId', $unzerOrderId);
         }
         return $unzerOrderId;
@@ -639,6 +642,9 @@ class Unzer
         return (bool)$this->session->getVariable('UzrAjaxRedirect');
     }
 
+    /**
+     * @throws UnzerApiException
+     */
     public function ifImmediatePostAuthCollect(Payment $paymentService): bool
     {
         $paymentMethod = $this->getPaymentMethodFromOrder($paymentService->getUnzerOrderId());
@@ -646,7 +652,7 @@ class Unzer
         return $paymentProcedure === ModuleSettings::PAYMENT_CHARGE;
     }
 
-    private function getPaymentMethodFromOrder(int $oxUnzerOrderNr): string
+    private function getPaymentMethodFromOrder(string $oxUnzerOrderNr): string
     {
         /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
@@ -664,12 +670,12 @@ class Unzer
 
         $result = $query->setParameters($parameters)->execute();
 
-        if ($result instanceof \Doctrine\DBAL\Driver\ResultStatement) {
+        if ($result instanceof ResultStatement) {
             /** @var string $value */
             $value = $result->fetchColumn();
             if (empty($value)) {
                 $value = '';
-            };
+            }
             return $value;
         }
 

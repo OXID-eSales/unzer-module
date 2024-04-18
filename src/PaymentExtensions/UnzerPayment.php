@@ -71,7 +71,7 @@ abstract class UnzerPayment
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
-        $this->unzerOrderId = (string)$this->unzerService->generateUnzerOrderId();
+        $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
         $this->logger = $logger;
@@ -178,7 +178,7 @@ abstract class UnzerPayment
         return true;
     }
 
-    public function getUnzerOrderId(): int
+    public function getUnzerOrderId(): string
     {
         return $this->unzerOrderId;
     }

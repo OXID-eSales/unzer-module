@@ -39,6 +39,7 @@ class DispatcherController extends FrontendController
      * @throws DatabaseErrorException
      * @throws UnzerApiException
      * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      *
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -135,8 +136,8 @@ class DispatcherController extends FrontendController
                 }
             } else {
                 $tmpOrder = oxNew(TmpOrder::class);
-                $iOrderId = $unzerPayment->getBasket() ? (int) $unzerPayment->getBasket()->getOrderId() : 0;
-                $tmpData = $tmpOrder->getTmpOrderByUnzerId($iOrderId);
+                $orderId = $unzerPayment->getBasket() ? $unzerPayment->getBasket()->getOrderId() : '';
+                $tmpData = $tmpOrder->getTmpOrderByUnzerId($orderId);
                 if (
                     isset($tmpData['OXID']) &&
                     $tmpOrder->load($tmpData['OXID']) &&

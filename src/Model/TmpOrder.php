@@ -52,6 +52,7 @@ class TmpOrder extends BaseModel
         $serializedOrder = serialize($completeOrder);
         $base64Order = base64_encode($serializedOrder);
 
+        /** @var Order $oOrder */
         $oxId = $this->getOxIdFromTmpOrder($oOrder->getId(), $oOrder->getUnzerOrderNr());
         if ($oxId) {
             $this->load($oxId);
@@ -95,16 +96,16 @@ class TmpOrder extends BaseModel
         /** @var Result $blocksData */
         $blocksData = $queryBuilder->execute();
         $result = is_a($blocksData, Result::class) ? $blocksData->fetchAssociative() : false;
-        return is_array($result) ? $result['oxid'] : '';
+        return isset($result['oxid']) && is_string($result['oxid']) ? $result['oxid']:  '';
     }
 
     /**
-     * @param int $unzerOrderNr
+     * @param string $unzerOrderNr
      * @return array
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function getTmpOrderByUnzerId(int $unzerOrderNr): array
+    public function getTmpOrderByUnzerId(string $unzerOrderNr): array
     {
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         /** @var QueryBuilder $queryBuilder */
