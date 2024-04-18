@@ -114,7 +114,7 @@ class Order extends Order_parent
         $tmpOrder = oxNew(TmpOrder::class);
         $tmpData = $tmpOrder->getTmpOrderByUnzerId($this->getUnzerOrderNr());
         if ($tmpOrder->load($tmpData['OXID'])) {
-            $tmpOrder->assign(['STATUS' => 'FINISHED']);
+            $tmpOrder->assign(['status' => 'FINISHED']);
             $tmpOrder->save();
         }
 
@@ -183,8 +183,8 @@ class Order extends Order_parent
 
         $this->_setOrderStatus('NOT_FINISHED');
         $tmpOrder = oxNew(TmpOrder::class);
-        $tmpOrder->prepareOrderForJson($this);
-        $tmpOrder->save();
+        $tmpOrder->saveTmpOrder($this);
+
         Registry::getSession()->setVariable('oxOrderIdOfTmpOrder', $this->getId());
 
         return $iRet;
