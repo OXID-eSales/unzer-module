@@ -161,7 +161,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         return true;
     }
 
-    public function getUnzerOrderId(): int
+    public function getUnzerOrderId(): string
     {
         return $this->unzerOrderId;
     }
