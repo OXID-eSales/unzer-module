@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
@@ -47,6 +48,12 @@ class Order extends Order_parent
 
         if (!$orderId) {
             return $iRet;
+        }
+
+        if ($this->_checkOrderExist($orderId)) {
+            $logger = $this->getServiceFromContainer(DebugHandler::class);
+            $logger->log('finalizeUnzerOrderAfterRedirect: Order already exists, no need to save again: ' . $orderId);
+            return self::ORDER_STATE_ORDEREXISTS;
         }
 
         $this->setId($orderId);
