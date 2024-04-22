@@ -165,7 +165,7 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return boolean
      */
-    public function isFlowCompatibleTheme(): bool
+    public function isFlowCompatibleTheme() //phpcs:ignore no return type because extended class method doesn't have it
     {
         if (is_null($this->isFlowCompatibleTheme)) {
             $this->isFlowCompatibleTheme = $this->isCompatibleTheme('flow');
@@ -178,7 +178,7 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return boolean
      */
-    public function isWaveCompatibleTheme(): bool
+    public function isWaveCompatibleTheme() //phpcs:ignore no return type because extended class method doesn't have it
     {
         if (is_null($this->isWaveCompatibleTheme)) {
             $this->isWaveCompatibleTheme = $this->isCompatibleTheme('wave');
