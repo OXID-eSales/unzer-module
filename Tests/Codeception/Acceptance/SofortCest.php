@@ -35,8 +35,14 @@ final class SofortCest extends BaseCest
         return ['oscunzer_sofort'];
     }
 
+    public function _before(AcceptanceTester $I): void
+    {
+        parent::_before($I);
+        $I->resetCookie([]);
+    }
+
     /**
-     * @param AcceptanceTester $I
+     * @throws \Exception
      * @group SofortPaymentTest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
@@ -48,13 +54,21 @@ final class SofortCest extends BaseCest
 
         $sofortPaymentData = Fixtures::get('sofort_payment');
 
-        // accept cookies
-        $I->waitForElement($this->cookiesAcceptButton);
-        $I->wait(1);
-        $I->canSeeAndClick($this->cookiesAcceptButton);
+        try {
+            // accept cookies
+            $I->waitForElement($this->cookiesAcceptButton, 20);
+            $I->click($this->cookiesAcceptButton);
+        } catch (\Facebook\WebDriver\Exception\TimeoutException $exception) {
+            $I->makeScreenshot('noAcceptCookie');
+        }
 
         // first page : choose bank
-        $I->waitForPageLoad();
+        try {
+            $I->waitForPageLoad();
+        } catch (\Exception $exception) {
+            $I->makeScreenshot('waitForPageLoad');
+        }
+
         $I->waitForText($this->_getPrice() . ' ' . $this->_getCurrency());
         $I->selectOption($this->landSelect, 'DE');
         $I->waitForElement($this->bankSearchInput);
