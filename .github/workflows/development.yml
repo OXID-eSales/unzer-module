@@ -381,16 +381,16 @@ jobs:
           make up
           sleep 2
 
-      - name: Install twig template engine and twig theme
+      - name: Composer require twig/twig, twig-components, demodata, apex theme
         run: |
           docker compose exec -T php composer require oxid-esales/twig-component:dev-b-7.0.x --no-update
           docker compose exec -T php composer require oxid-esales/twig-admin-theme:dev-b-7.0.x --no-update
           docker compose exec -T php composer require oxid-esales/apex-theme:dev-b-7.0.x --no-update
-          docker compose exec -T php composer update --no-interaction
-
-      - name: Install demodata
-        run: |
           docker compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-b-7.0.x --no-update
+          docker compose exec -T php composer require twig/twig:v3.8.0 --no-update
+
+      - name: Composer install
+        run: |
           docker compose exec -T php composer update --no-interaction
 
       - name: Activate theme
