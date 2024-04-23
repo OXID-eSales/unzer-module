@@ -181,7 +181,7 @@ class Payment
                 if ($transaction instanceof Authorization) {
                     /** @var string $pdfLink */
                     $pdfLink = $transaction->getPDFLink();
-                    $this->pdfLink = $pdfLink;
+                    $this->pdfLink = $pdfLink ?: '';
                 }
                 if ($this->isPdfSession()) {
                     $this->pdfLink = '';
