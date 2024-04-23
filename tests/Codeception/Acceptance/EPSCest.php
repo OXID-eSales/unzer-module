@@ -32,7 +32,7 @@ final class EPSCest extends BaseCest
     private $listboxUl = '#listbox-container';
     private $banknameInput = '#bankname';
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_eps'];
     }
@@ -68,8 +68,8 @@ final class EPSCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test EPS payment works');
-        $this->_initializeTest();
-        $this->_choosePayment($this->epsLabel);
+        $this->initializeTest();
+        $this->choosePayment($this->epsLabel);
 
         $epsPaymentData = Fixtures::get('eps_payment');
 
@@ -81,7 +81,7 @@ final class EPSCest extends BaseCest
         $I->waitForDocumentReadyState();
         $I->waitForElement("//div[@data-value='" . $epsPaymentData["option"] . "']");
         $I->click("//div[@data-value='" . $epsPaymentData["option"] . "']");
-        $this->_submitOrder();
+        $this->submitOrder();
 
         // first page : login
         $I->waitForPageLoad();
@@ -112,6 +112,6 @@ final class EPSCest extends BaseCest
         $I->waitForPageLoad();
         $I->waitForDocumentReadyState();
         $I->click($this->backlinkDiv);
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

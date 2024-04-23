@@ -23,7 +23,7 @@ final class Przelewy24Cest extends BaseCest
     private $bankLink = "//div[@data-for='MBANK_-_MTRANSFER-0-0-tip']";
     private $submitButton = "#user_account_pbl_correct";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_przelewy24'];
     }
@@ -80,10 +80,10 @@ final class Przelewy24Cest extends BaseCest
     {
         $I->wantToTest('Test Przelewy24 payment works');
 
-        $this->_initializeTest();
+        $this->initializeTest();
 
-        $this->_choosePayment($this->przelewy24PaymentLabel);
-        $this->_submitOrder();
+        $this->choosePayment($this->przelewy24PaymentLabel);
+        $this->submitOrder();
 
         // first page : choose bank
         $I->waitForDocumentReadyState();
@@ -100,6 +100,6 @@ final class Przelewy24Cest extends BaseCest
         // third page : expect end
         $I->waitForDocumentReadyState();
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

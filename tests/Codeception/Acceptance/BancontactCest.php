@@ -49,7 +49,7 @@ final class BancontactCest extends BaseCest
         );
     }
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_bancontact'];
     }
@@ -58,43 +58,43 @@ final class BancontactCest extends BaseCest
      * @param AcceptanceTester $I
      * @return void
      */
-    private function _prepareBancontactTest(AcceptanceTester $I)
+    private function prepareBancontactTest(AcceptanceTester $I)
     {
-        $this->_initializeTest();
+        $this->initializeTest();
 
-        $this->_choosePayment($this->bancontactLabel);
-        $this->_submitOrder();
+        $this->choosePayment($this->bancontactLabel);
+        $this->submitOrder();
     }
 
     /**
      * @param string $name Fixtures name
      * @return void
      */
-    private function _submitBancontactPayment(string $name)
+    private function submitBancontactPayment(string $name)
     {
-        $price = str_replace(',', '.', $this->_getPrice());
+        $price = str_replace(',', '.', $this->getPrice());
         $fixtures = Fixtures::get($name);
 
-        $this->_getAcceptance()->waitForText($price);
-        $this->_getAcceptance()->waitForElement($this->cardNumberInput);
-        $this->_getAcceptance()->fillField($this->cardNumberInput, $fixtures['cardnumber']);
-        $this->_getAcceptance()->selectOption($this->monthExpiredSelect, 12);
-        $this->_getAcceptance()->selectOption($this->yearExpiredSelect, date('Y'));
-        $this->_getAcceptance()->fillField($this->cvvCodeInput, $fixtures['CVC']);
-        $this->_getAcceptance()->click($this->continueButton);
+        $this->getAcceptance()->waitForText($price);
+        $this->getAcceptance()->waitForElement($this->cardNumberInput);
+        $this->getAcceptance()->fillField($this->cardNumberInput, $fixtures['cardnumber']);
+        $this->getAcceptance()->selectOption($this->monthExpiredSelect, 12);
+        $this->getAcceptance()->selectOption($this->yearExpiredSelect, date('Y'));
+        $this->getAcceptance()->fillField($this->cvvCodeInput, $fixtures['CVC']);
+        $this->getAcceptance()->click($this->continueButton);
 
-        $this->_getAcceptance()->waitForPageLoad();
-        $this->_getAcceptance()->waitForText($price);
-        $this->_getAcceptance()->waitForElement($this->continueButton);
-        $this->_getAcceptance()->click($this->continueButton);
+        $this->getAcceptance()->waitForPageLoad();
+        $this->getAcceptance()->waitForText($price);
+        $this->getAcceptance()->waitForElement($this->continueButton);
+        $this->getAcceptance()->click($this->continueButton);
     }
 
     /**
      * @return void
      */
-    private function _checkBancontactPayment()
+    private function checkBancontactPayment()
     {
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 
     /**
@@ -104,9 +104,9 @@ final class BancontactCest extends BaseCest
     public function checkMastercardPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Bancontact Mastercard payment works');
-        $this->_prepareBancontactTest($I);
-        $this->_submitBancontactPayment('mastercard_payment');
-        $this->_checkBancontactPayment();
+        $this->prepareBancontactTest($I);
+        $this->submitBancontactPayment('mastercard_payment');
+        $this->checkBancontactPayment();
     }
 
     /**
@@ -116,9 +116,9 @@ final class BancontactCest extends BaseCest
     public function checkVisaPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Bancontact Visa payment works');
-        $this->_prepareBancontactTest($I);
-        $this->_submitBancontactPayment('visa_payment');
-        $this->_checkBancontactPayment();
+        $this->prepareBancontactTest($I);
+        $this->submitBancontactPayment('visa_payment');
+        $this->checkBancontactPayment();
     }
 
     /**
@@ -128,8 +128,8 @@ final class BancontactCest extends BaseCest
     public function checkMaestroPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Bancontact Maestro payment works');
-        $this->_prepareBancontactTest($I);
-        $this->_submitBancontactPayment('maestro_payment');
-        $this->_checkBancontactPayment();
+        $this->prepareBancontactTest($I);
+        $this->submitBancontactPayment('maestro_payment');
+        $this->checkBancontactPayment();
     }
 }

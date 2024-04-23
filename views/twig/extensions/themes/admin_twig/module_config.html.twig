@@ -9,7 +9,7 @@
         }
     </style>
     {% if oModule.getInfo('id') == "osc-unzer" %}
-        {% set systemModeTrans = 'OSCUNZER_'|cat(systemMode)|translate %}
+        {% set systemModeTrans = ('OSCUNZER_' ~ systemMode) |translate %}
         {% if var_group == "unzerwebhooks" and module_var == "webhookConfiguration" %}
             <dl>
                 <dt>
@@ -75,10 +75,10 @@
                     {% endif %}
                     <div class="spacer"></div>
                 </dl>
-            {% elseif module_var == systemMode|cat(" - applepay_merchant_cert_key") or module_var == systemMode|cat(" - applepay_merchant_cert") %}
+            {% elseif module_var == systemMode  ~ "-applepay_merchant_cert_key" or module_var == systemMode ~ "-applepay_merchant_cert" %}
                 <dl>
                     <dt>
-                        {% if module_var == systemMode|cat(" - applepay_merchant_cert_key") %}
+                        {% if module_var == systemMode ~ "-applepay_merchant_cert_key" %}
                             <textarea class="txt"
                                       style="width: 250px; height: 200px;"
                                       name="{{ systemMode }}-applePayMerchantCertKey" {{ readonly }}>{{ applePayMerchantCertKey }}</textarea>
@@ -94,7 +94,7 @@
                     </dd>
                 </dl>
                 <div class="spacer"></div>
-            {% elseif module_var == systemMode|cat(" - applepay_merchant_identifier") %}
+            {% elseif module_var == systemMode ~ "-applepay_merchant_identifier" %}
                 {# before we check the applepay_merchant_identifier, we have a upload-function for payment-key and payment-cert #}
                 {% set hidePaymentProcessingTextareas = false %}
                 {% if oView.getApplePayPaymentProcessingCertExists() and oView.getApplePayPaymentProcessingKeyExists() %}

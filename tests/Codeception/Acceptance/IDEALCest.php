@@ -49,7 +49,7 @@ final class IDEALCest extends BaseCest
         );
     }
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_ideal'];
     }
@@ -61,18 +61,18 @@ final class IDEALCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test iDEAL payment works');
-        $this->_initializeTest();
-        $this->_choosePayment($this->idealPaymentLabel);
+        $this->initializeTest();
+        $this->choosePayment($this->idealPaymentLabel);
 
         $idealPaymentData = Fixtures::get('ideal_payment');
-        $price = str_replace(',', '.', $this->_getPrice());
+        $price = str_replace(',', '.', $this->getPrice());
 
         $I->scrollTo($this->paymentMethodForm);
         $I->wait(3);
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
         $I->click("//div[@data-value='" . $idealPaymentData["option"] . "']");
-        $this->_submitOrder();
+        $this->submitOrder();
 
         // first page : put in bank name
         $I->waitForText($price);
@@ -97,6 +97,6 @@ final class IDEALCest extends BaseCest
         $I->waitForElement($this->nextButton);
         $I->click($this->nextButton);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

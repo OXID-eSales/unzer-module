@@ -25,7 +25,7 @@ abstract class BaseCest
 
     public function _before(AcceptanceTester $I): void
     {
-        foreach ($this->_getOXID() as $payment) {
+        foreach ($this->getOXID() as $payment) {
             $I->updateInDatabase(
                 'oxpayments',
                 ['OXACTIVE' => 1],
@@ -124,10 +124,7 @@ abstract class BaseCest
         $I->clearShopCache();
     }
 
-    /**
-     * @return void
-     */
-    protected function _initializeTest()
+    protected function initializeTest(): void
     {
         $miniBasketMenuElement = '//button[@class="btn btn-minibasket"]';
         $this->I->openShop();
@@ -151,9 +148,9 @@ abstract class BaseCest
         $this->I->waitForElement($miniBasketMenuElement);
         $this->I->waitForPageLoad();
 
-        $this->_loginUser('client');
+        $this->loginUser('client');
 
-        $this->I->waitForElementClickable($miniBasketMenuElement);
+        $this->I->waitForElementClickable($miniBasketMenuElement, 15);
         $this->I->click($miniBasketMenuElement);
 
         $this->I->waitForText(Translator::translate('DISPLAY_BASKET'));
@@ -164,15 +161,12 @@ abstract class BaseCest
         $this->I->click(Translator::translate('CHECKOUT'));
         $this->I->waitForPageLoad();
 
-        $this->I->waitForText(Translator::translate('NEXT'));
+        $this->I->waitForText(Translator::translate('NEXT'), 10);
         $this->I->click(Translator::translate('NEXT'));
         $this->I->waitForPageLoad();
     }
 
-    /**
-     * @return void
-     */
-    protected function _initializeSecuredTest()
+    protected function initializeSecuredTest(): void
     {
         $miniBasketMenuElement = '//button[@class="btn btn-minibasket"]';
         $this->I->openShop();
@@ -196,7 +190,7 @@ abstract class BaseCest
         $this->I->waitForElement($miniBasketMenuElement);
         $this->I->waitForPageLoad();
 
-        $this->_loginUser('secured_client');
+        $this->loginUser('secured_client');
 
         $this->I->waitForElementClickable($miniBasketMenuElement);
         $this->I->click($miniBasketMenuElement);
@@ -214,14 +208,10 @@ abstract class BaseCest
         $this->I->waitForPageLoad();
     }
 
-    /**
-     * @param string $type
-     * @return void
-     */
-    protected function _loginUser(string $type)
+    protected function loginUser(string $type): void
     {
         $accountMenuButton = "//button[contains(@aria-label,'Usercenter')]";
-        $openAccountMenuButton = "//form[@class='px-3 py-2']";
+        $form = "//form[@class='px-3 py-2']";
         $userLoginName = '#loginEmail';
         $userLoginPassword = '#loginPasword';
         $userLoginButton = '//button[@class="btn btn-primary"]';
@@ -232,10 +222,17 @@ abstract class BaseCest
         $this->I->waitForPageLoad();
         $this->I->waitForElementVisible($accountMenuButton);
         $this->I->waitForElementClickable($accountMenuButton);
-        $this->I->click($accountMenuButton);
-        $this->I->waitForElementClickable($openAccountMenuButton);
+        $this->I->scrollTo($accountMenuButton);
+        $this->I->wait(10);
 
-        //$this->I->waitForText(Translator::translate('MY_ACCOUNT'));
+        try {
+            $this->I->click($accountMenuButton);
+        } catch (\Facebook\WebDriver\Exception\ElementClickInterceptedException $e) {
+            $this->I->makeScreenshot('cannotClickAccount');
+        }
+
+        $this->I->waitForElementClickable($form, 15);
+
         $this->I->waitForElementVisible($userLoginName);
         $this->I->fillField($userLoginName, $clientData['username']);
         $this->I->fillField($userLoginPassword, $clientData['password']);
@@ -243,11 +240,7 @@ abstract class BaseCest
         $this->I->waitForPageLoad();
     }
 
-    /**
-     * @param string $label
-     * @return void
-     */
-    protected function _choosePayment(string $label)
+    protected function choosePayment(string $label): void
     {
         $nextStepButton = '//button[@class="btn btn-highlight btn-lg w-100"]';
 
@@ -260,20 +253,14 @@ abstract class BaseCest
         $this->I->waitForPageLoad();
     }
 
-    /**
-     * @return void
-     */
-    protected function _checkSuccessfulPayment()
+    protected function checkSuccessfulPayment(int $timeout = 5): void
     {
         $this->I->waitForDocumentReadyState();
         $this->I->waitForPageLoad();
-        $this->I->waitForText(Translator::translate('THANK_YOU'));
+        $this->I->waitForText(Translator::translate('THANK_YOU'), $timeout);
     }
 
-    /**
-     * @return void
-     */
-    protected function _submitOrder()
+    protected function submitOrder(): void
     {
         $submitButton = '#submitOrder';
 
@@ -285,18 +272,9 @@ abstract class BaseCest
     }
 
     /**
-     * @param AcceptanceTester $I
-     * @return void
-     */
-    protected function _setAcceptance(AcceptanceTester $I)
-    {
-        $this->I = $I;
-    }
-
-    /**
      * @return AcceptanceTester
      */
-    protected function _getAcceptance(): AcceptanceTester
+    protected function getAcceptance(): AcceptanceTester
     {
         return $this->I;
     }
@@ -304,7 +282,7 @@ abstract class BaseCest
     /**
      * @return string price of order
      */
-    protected function _getPrice(): string
+    protected function getPrice(): string
     {
         $basketItem = Fixtures::get('product');
         return Registry::getLang()->formatCurrency(
@@ -315,35 +293,15 @@ abstract class BaseCest
     /**
      * @return string currency
      */
-    protected function _getCurrency(): string
+    protected function getCurrency(): string
     {
         $basketItem = Fixtures::get('product');
         return $basketItem['currency'];
     }
 
-    abstract protected function _getOXID(): array;
+    abstract protected function getOXID(): array;
 
-    /**
-     * If element is found return the text, if not return false
-     * @param $element
-     * @return bool
-     */
-    protected function _grabTextFromElementWhenPresent($element, $I)
-    {
-        try {
-            $I->seeElement($element);
-            $isFound = $I->grabTextFrom($element);
-        } catch (\Exception $e) {
-            $isFound = false;
-        }
-        return $isFound;
-    }
-
-    /**
-     * @param $element
-     * @return bool
-     */
-    protected function _checkElementExists($element, $I)
+    protected function checkElementExists($element, $I): bool
     {
         try {
             $isFound = $I->seeElement($element);

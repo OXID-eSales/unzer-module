@@ -27,7 +27,7 @@ final class PayPalCest extends BaseCest
     private string $submitButton = "#payment-submit-btn";
     private string $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_paypal'];
     }
@@ -38,10 +38,10 @@ final class PayPalCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I): void
     {
         $I->wantToTest('Test PayPal payment works');
-        $this->_initializeTest();
-        $this->_choosePayment($this->paypalPaymentLabel);
+        $this->initializeTest();
+        $this->choosePayment($this->paypalPaymentLabel);
         $I->makeScreenshot('order_filled');
-        $this->_submitOrder();
+        $this->submitOrder();
 
         $paypalPaymentData = Fixtures::get('paypal_payment');
 
@@ -49,7 +49,7 @@ final class PayPalCest extends BaseCest
         // accept cookies
         $I->waitForDocumentReadyState();
         $I->wait(3);
-        if ($this->_checkElementExists($this->acceptAllCookiesButton, $I)) {
+        if ($this->checkElementExists($this->acceptAllCookiesButton, $I)) {
             $I->click($this->acceptAllCookiesButton);
         }
 
@@ -65,13 +65,13 @@ final class PayPalCest extends BaseCest
 
         // card choose page
         $I->waitForDocumentReadyState();
-        $I->waitForText($this->_getPrice());
+        $I->waitForText($this->getPrice());
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
         $I->waitForDocumentReadyState();
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
         $I->wait(10);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment(30);
     }
 }
