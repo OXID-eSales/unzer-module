@@ -11,6 +11,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -99,14 +100,12 @@ abstract class UnzerPayment
     abstract public function getUnzerPaymentTypeObject(): BasePaymentType;
 
     /**
-     * @param User $userModel
-     * @param Basket $basketModel
-     * @return bool
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.StaticAccess)
-     * @throws JsonException
-     * @throws UnzerApiException
+     * @throws \JsonException
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
     public function execute(
         User $userModel,
@@ -116,12 +115,7 @@ abstract class UnzerPayment
         $request = Registry::getRequest();
         $paymentType = $this->getUnzerPaymentTypeObject();
         if ($paymentType instanceof Paypal) {
-            $paymentData = $request->getRequestParameter('paymentData');
-            $paymentData = is_string($paymentData) ? $paymentData : '';
-            $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
-            if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
-                $paymentType->setId($aPaymentData['id']);
-            }
+            $this->setPaypalPaymentDataId($request, $paymentType);
         }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
@@ -263,5 +257,20 @@ abstract class UnzerPayment
     {
         $translator = $this->getServiceFromContainer(Translator::class);
         return $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT');
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    private function setPaypalPaymentDataId(Request $request, Paypal $paymentType): void
+    {
+        $paymentDataRaw = $request->getRequestParameter('paymentData');
+        $paymentData = is_string($paymentDataRaw) ? $paymentDataRaw : '';
+        if (!empty($paymentData) && is_string($paymentDataRaw)) {
+            $aPaymentData = json_decode($paymentData, true, 512, JSON_THROW_ON_ERROR);
+            if (is_array($aPaymentData) && isset($aPaymentData['id'])) {
+                $paymentType->setId($aPaymentData['id']);
+            }
+        }
     }
 }
