@@ -381,7 +381,7 @@ jobs:
           make up
           sleep 2
 
-      - name: Install twig template engine, demodata and apex theme
+      - name: Composer require twig/twig, twig-components, demodata, apex theme
         run: |
           docker compose exec -T php composer require oxid-esales/twig-component:dev-b-7.0.x --no-update
           docker compose exec -T php composer require oxid-esales/twig-admin-theme:dev-b-7.0.x --no-update
