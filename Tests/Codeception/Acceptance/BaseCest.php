@@ -42,11 +42,13 @@ abstract class BaseCest
         }
 
         $product = Fixtures::get('product');
+
         $I->updateInDatabase(
             'oxarticles',
             ['OXSTOCK' => 10],
             ['OXID' => $product['id']]
         );
+
 
         // activate some countries and assign country to the payment.
         // Also make sure, that delivery set and delivery costs are properly assigned
@@ -69,6 +71,7 @@ abstract class BaseCest
         ];
         foreach ($aCountryId2paymentId as $countryId => $paymentId) {
             $tmpId = $paymentId . '.' . $country[$countryId];
+
             $I->updateInDatabase(
                 'oxcountry',
                 ['OXACTIVE' => '1'],
@@ -97,6 +100,7 @@ abstract class BaseCest
                         'OXTYPE' => 'oxcountry'
                     ]
                 );
+
                 $I->haveInDatabase(
                     'oxobject2delivery',
                     [

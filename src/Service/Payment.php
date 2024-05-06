@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Model\TmpFetchPayment;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -35,6 +36,8 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
  */
 class Payment
 {
+    use \OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+
     private const STATUS_OK = "OK";
     private const STATUS_NOT_FINISHED = "NOT_FINISHED";
     private const STATUS_ERROR = "ERROR";
@@ -65,6 +68,7 @@ class Payment
 
     /** @var \OxidSolutionCatalysts\Unzer\Service\Transaction $transactionService */
     protected $transactionService;
+    private bool $forceFetchRequest = false;
 
     /**
      * @param Session $session
@@ -222,6 +226,16 @@ class Payment
         return $result;
     }
 
+    public function setForceFetchPayment(bool $flag): void
+    {
+        $this->forceFetchRequest = $flag;
+    }
+
+    public function resetForceFetchPayment(): void
+    {
+        $this->forceFetchRequest = false;
+    }
+
     /**
      * @param string $customerType
      * @param string $currency
@@ -246,7 +260,7 @@ class Payment
         }
 
         $paymentId = $this->session->getVariable('paymentid');
-        if (is_string($paymentId)) {
+        if (is_string($paymentId) && !empty($paymentId)) {
             /** @var string $sessionOrderId */
             $sessionOrderId = $this->session->getVariable('sess_challenge');
             /** @var Order $order */
@@ -263,13 +277,9 @@ class Payment
                     }
                 }
             }
-            try {
-                $result = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
-            } catch (UnzerApiException $e) {
-                Registry::getLogger()->warning(
-                    'Payment not found with key: ' . $paymentId
-                );
-            }
+
+            $result = $this->getFetchPayment($paymentId, $customerType, $currency);
+
             $this->sessionUnzerPayment = $result;
         }
 
@@ -496,5 +506,31 @@ class Payment
     public function isPdfSession(): bool
     {
         return (bool) Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
+    }
+
+    /**
+     * @param string $paymentId
+     * @param string $customerType
+     * @param string $currency
+     * @return null|\UnzerSDK\Resources\Payment
+     */
+    private function getFetchPayment(string $paymentId, string $customerType, string $currency)
+    {
+        $tmpFetchPayment = oxNew(TmpFetchPayment::class);
+        $result = $tmpFetchPayment->loadFetchPayment($paymentId);
+
+        if (empty($result) || $this->forceFetchRequest) {
+            try {
+                $result = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
+                $tmpFetchPayment = oxnew(TmpFetchPayment::class);
+                $tmpFetchPayment->saveFetchPayment($paymentId, $result);
+            } catch (UnzerApiException $e) {
+                Registry::getLogger()->warning(
+                    'Payment not found with key: ' . $paymentId
+                );
+            }
+        }
+
+        return $result;
     }
 }

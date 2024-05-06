@@ -59,7 +59,9 @@ class Order extends Order_parent
         $this->setId($orderId);
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
         $unzerService = $this->getServiceFromContainer(Unzer::class);
+        $paymentService->setForceFetchPayment(true);
         $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
+        $paymentService->resetForceFetchPayment();
 
         // copies user info
         $this->_setUser($oUser);

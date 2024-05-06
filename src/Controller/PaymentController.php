@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Model\TmpFetchPayment;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Service\UserRepository;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions as UnzerDefinitionsService;
@@ -135,6 +136,7 @@ class PaymentController extends PaymentController_parent
                         ($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
                             $unzerPayment->getState() === PaymentState::STATE_PENDING)
                     ) {
+                        oxNew(TmpFetchPayment::class)->delete($paymentId);
                         $session->deleteVariable('paymentid');
                         $session->deleteVariable('UnzerOrderId');
                     }
