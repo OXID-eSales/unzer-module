@@ -9,6 +9,8 @@ namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Model\TmpFetchPayment;
+use oxregistry;
 
 class Config extends Config_parent
 {
@@ -24,6 +26,7 @@ class Config extends Config_parent
             /** @var \OxidSolutionCatalysts\Unzer\Model\Payment $oPayment */
             $oPayment = oxNew(Payment::class);
             if ($oPayment->load($paymentid) && $oPayment->isUnzerPayment() && !$oPayment->isUnzerPaymentTypeAllowed()) {
+                oxNew(TmpFetchPayment::class)->delete($paymentid);
                 Registry::getSession()->deleteVariable('paymentid');
             }
         }

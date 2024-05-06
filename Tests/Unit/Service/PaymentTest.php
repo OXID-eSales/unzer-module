@@ -10,9 +10,11 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\Model\TmpFetchPayment;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
@@ -121,6 +123,41 @@ class PaymentTest extends TestCase
 
             throw $exception;
         }
+    }
+
+
+    public function testTmpFetchPaymentExists(): void
+    {
+        $sql = "INSERT INTO "
+            . TmpFetchPayment::CORE_TABLE
+            . " SET OXID='myoxidid', OXSHOPID=1, FETCHPAYMENT='fetchpaymentblob'";
+        DatabaseProvider::getDb()->execute($sql);
+        $tmpFetchPayment = oxNew(TmpFetchPayment::class);
+        $tmpFetchPayment->load('myoxidid');
+        $this->assertSame('fetchpaymentblob', $tmpFetchPayment->getRawFieldData('fetchpayment'));
+        $sql = "DELETE FROM " . TmpFetchPayment::CORE_TABLE  . " WHERE OXID='myoxidid'";
+        DatabaseProvider::getDb()->execute($sql);
+    }
+
+    public function testGetTmpFetchPayment(): void
+    {
+        $dummyObject = new Payment();
+        $dummyObject->setId('uniquedummystring');
+
+        $serializedEcoded = base64_encode(serialize($dummyObject));
+
+        $sql = "INSERT INTO "
+            . TmpFetchPayment::CORE_TABLE
+            . " SET OXID='testingblob', OXSHOPID=1, FETCHPAYMENT='$serializedEcoded'";
+        DatabaseProvider::getDb()->execute($sql);
+
+        $tmpFetchPayment = oxNew(TmpFetchPayment::class);
+        $fetchPayment = $tmpFetchPayment->loadFetchPayment('testingblob');
+
+        $this->assertInstanceOf(Payment::class, $fetchPayment);
+        $this->assertSame('uniquedummystring', $fetchPayment->getId());
+        $sql = "DELETE FROM " . TmpFetchPayment::CORE_TABLE  . " WHERE OXID='testingblob'";
+        DatabaseProvider::getDb()->execute($sql);
     }
 
     protected function getSessionMock()

@@ -61,7 +61,6 @@ final class BancontactCest extends BaseCest
     private function _prepareBancontactTest(AcceptanceTester $I)
     {
         $this->_initializeTest();
-
         $orderPage = $this->_choosePayment($this->bancontactLabel);
         $orderPage->submitOrder();
     }
