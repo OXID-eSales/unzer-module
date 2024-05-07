@@ -138,7 +138,7 @@ class OrderController extends OrderController_parent
                 if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
-                        $oUser->getId(),
+                        $paymentService->getUnzerOrderId(),
                         $oBasket->getDiscountedProductsBruttoPrice()
                     );
                 }
