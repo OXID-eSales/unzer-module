@@ -133,12 +133,12 @@ class OrderController extends OrderController_parent
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
-
+                $unzerPaymentId = Registry::getSession()->getVariable('paymentid');
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
                 if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
-                        $paymentService->getUnzerOrderId(),
+                        $unzerPaymentId,
                         $oBasket->getDiscountedProductsBruttoPrice()
                     );
                 }
