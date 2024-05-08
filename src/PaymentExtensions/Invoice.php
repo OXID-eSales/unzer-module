@@ -7,7 +7,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
-use OxidSolutionCatalysts\Unzer\Model\TmpFetchPayment;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice as UnzerPaylaterInvoice;
@@ -99,11 +98,6 @@ class Invoice extends UnzerPayment
             $metadataObj,
             $basketObj
         );
-
-        $tmpFetchPayment = oxNew(TmpFetchPayment::class);
-        $tmpFetchPayment->saveFetchPayment((string)$transaction->getPaymentId(), $transaction->getPayment());
-
-        Registry::getSession()->setVariable('paymentid', $transaction->getPaymentId());
 
         $this->unzerService->setSessionVars($transaction);
 

@@ -25,6 +25,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInt
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
+use OxidSolutionCatalysts\Unzer\Model\TmpFetchPayment;
 use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentData;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\BasketItemTypes;
@@ -488,8 +489,12 @@ class Unzer
 
     public function getPaymentProcedure(string $paymentMethod): string
     {
-        if (in_array($paymentMethod, ['paypal', 'card', 'applepay', 'installment-secured', 'paylater-installment'])) {
+        if (in_array($paymentMethod, ['paypal', 'card', 'applepay', 'installment-secured'])) {
             return $this->moduleSettings->getPaymentProcedureSetting($paymentMethod);
+        }
+
+        if (in_array($paymentMethod, ['paylater-installment', 'invoice'])) {
+            return $this->moduleSettings::PAYMENT_CHARGE;
         }
 
         return $this->moduleSettings::PAYMENT_CHARGE;
@@ -536,14 +541,19 @@ class Unzer
         throw new Exception('oscunzer_WRONGPAYMENTID');
     }
 
+    /**
+     * @throws \Exception
+     */
     public function setSessionVars(AbstractTransactionType $charge): void
     {
+        $transactionPaymentId = (string)$charge->getPaymentId();
+
         // You'll need to remember the shortId to show it on the success or failure page
         if ($charge->getShortId() !== null && $this->session->getVariable('ShortId') !== $charge->getShortId()) {
             $this->session->setVariable('ShortId', $charge->getShortId());
         }
 
-        $this->session->setVariable('paymentid', $charge->getPaymentId());
+        $this->session->setVariable('paymentid', $transactionPaymentId);
 
         if ($charge instanceof Authorization) {
             $this->session->setVariable('UzrPdfLink', $charge->getPDFLink());
@@ -551,6 +561,9 @@ class Unzer
 
         /** @var \UnzerSDK\Resources\Payment $payment */
         $payment = $charge->getPayment();
+        $tmpFetchPayment = oxNew(TmpFetchPayment::class);
+        $tmpFetchPayment->saveFetchPayment($transactionPaymentId, $payment);
+
         $paymentType = $payment->getPaymentType();
 
         if (!$paymentType) {

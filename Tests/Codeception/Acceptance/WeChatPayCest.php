@@ -16,6 +16,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimula
 /**
  * @group unzer_module
  * @group SecondGroup
+ * @group SecondGroup2
  */
 final class WeChatPayCest extends BaseCest
 {
