@@ -50,24 +50,20 @@
     {% if false %}
     <script>
         {% endif %}
-{% capture assign = "unzerPaypalJS" %}
-        function executeUnzerPayment(event){
-
-            event.stopPropagation();
-            var zahlungsButton = $(event.currentTarget);
-            zahlungsButton.prop('disabled', true);
-            $( "#payment-saved-cards" ).submit();
-        }
-        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-            if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+    {% capture assign = "unzerPaypalJS" %}
+        document.querySelector( '#orderConfirmAgbBottom' ).addEventListener('submit', function( event ) {
+            debugger;
+            if(!document.querySelector( '#orderConfirmAgbBottom' ).classList.contains("submitable")){
                 event.preventDefault();
-                $( '#payment-saved-cards' ).submit();
+                document.querySelector( '#payment-saved-cards' ).requestSubmit();
             }
         });
+
         // Handling payment form submission
-        $( "#payment-saved-cards" ).submit(function( event ) {
+        document.querySelector( "#payment-saved-cards" ).addEventListener('submit', function( event ) {
+            debugger;
             event.preventDefault();
-            let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
+            let selectedPaymentTypeId = document.querySelector('input[name=paymenttypeid]:checked');
             let paymentData = {
                 id: selectedPaymentTypeId,
                 resources: {
@@ -76,21 +72,24 @@
             };
             let paymentDataString = JSON.stringify(paymentData);
 
-            let hiddenInput = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'paymentData')
-                .val(paymentDataString);
-            let hiddenInput1 = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'oscunzersavepayment')
-                .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+            let hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'paymentData';
+            hiddenInput.value  = paymentDataString;
 
-            $('#orderConfirmAgbBottom').addClass("submitable").append(hiddenInput).append(hiddenInput1).submit();
-           // zahlungsButton.prop('disabled', false);
+            let hiddenInput1 = document.createElement('input');
+            hiddenInput1.type = 'hidden';
+            hiddenInput1.name = 'oscunzersavepayment';
+            hiddenInput1.value = document.querySelector('#oscunzersavepayment').checked ? '1' : '0';
+
+            document.querySelector('#orderConfirmAgbBottom').classList.add("submitable");
+            document.querySelector('#orderConfirmAgbBottom').append(hiddenInput);
+            document.querySelector('#orderConfirmAgbBottom').append(hiddenInput1);
+            document.querySelector('#orderConfirmAgbBottom').submit();
         });
-{% endcapture %}
+    {% endcapture %}
     {% if false %}
-    </script>
+        </script>
     {% endif %}
     {{ script({ add: unzerPaypalJS, dynamic: __oxid_include_dynamic }) }}
-    {% endif %}
+{% endif %}
