@@ -234,15 +234,16 @@ class Payment
 
     /**
      * @param null $paymentExtension
+     * @param bool $noCache
      * @return UnzerPayment|null
-     * @throws UnzerApiException
      */
-    public function getSessionUnzerPayment($paymentExtension = null): ?UnzerPayment
+    public function getSessionUnzerPayment($paymentExtension = null, $noCache = false): ?UnzerPayment
     {
         $result = null;
-
-        if ($this->sessionUnzerPayment instanceof UnzerPayment) {
-            return $this->sessionUnzerPayment;
+        if ($noCache === false) {
+            if ($this->sessionUnzerPayment instanceof UnzerPayment) {
+                return $this->sessionUnzerPayment;
+            }
         }
 
         $paymentId = $this->session->getVariable('paymentid');
