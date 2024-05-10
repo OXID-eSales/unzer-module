@@ -146,7 +146,7 @@
             hiddenInput.name = 'paymentData';
             hiddenInput.value = paymentDataString;
             let form = document.getElementById('orderConfirmAgbBottom');
-            form.addClass("submitable")
+            form.classList.add("submitable")
             form.appendChild(hiddenInput)
             form.submit();
         } else {
