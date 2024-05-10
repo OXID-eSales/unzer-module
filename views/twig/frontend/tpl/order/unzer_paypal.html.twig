@@ -52,7 +52,6 @@
         {% endif %}
     {% capture assign = "unzerPaypalJS" %}
         document.querySelector( '#orderConfirmAgbBottom' ).addEventListener('submit', function( event ) {
-            debugger;
             if(!document.querySelector( '#orderConfirmAgbBottom' ).classList.contains("submitable")){
                 event.preventDefault();
                 document.querySelector( '#payment-saved-cards' ).requestSubmit();
@@ -61,7 +60,6 @@
 
         // Handling payment form submission
         document.querySelector( "#payment-saved-cards" ).addEventListener('submit', function( event ) {
-            debugger;
             event.preventDefault();
             let selectedPaymentTypeId = document.querySelector('input[name=paymenttypeid]:checked');
             let paymentData = {
