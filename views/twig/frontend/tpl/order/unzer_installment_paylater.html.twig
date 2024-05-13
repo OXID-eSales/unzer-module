@@ -78,7 +78,7 @@
 {% if false %}<script>{% endif %}
     function executeUnzerPayment(event) {
         event.stopPropagation();
-        document.querySelector("#payment-form-installment").submit();
+        document.querySelector("#payment-form-installment").requestSubmit();
     }
 
     // Create an Unzer instance with your public key
@@ -89,7 +89,7 @@
     document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function(event) {
         if (!this.classList.contains("submitable")) {
             event.preventDefault();
-            document.querySelector("#payment-form-installment").submit();
+            document.querySelector("#payment-form-installment").requestSubmit();
         }
     });
 
