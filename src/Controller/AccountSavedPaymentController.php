@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Core\Registry;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 class AccountSavedPaymentController extends AccountController
 {
@@ -41,7 +42,15 @@ class AccountSavedPaymentController extends AccountController
             if (empty($typeId['PAYMENTTYPEID'])) {
                 continue;
             }
-            $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
+            try {
+                $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
+            } catch (UnzerApiException $exception) {
+                if ($exception->getCode() !== 'API.500.100.001') {
+                    throw $exception;
+                }
+
+                $paymentTypes['invalid_payment_method'][$typeId['OXID']] = $paymentType->expose();
+            }
 
             if (strpos($typeId['PAYMENTTYPEID'], 'crd') && method_exists($paymentType, 'getBrand')) {
                 $paymentTypes[$paymentType->getBrand()][$typeId['OXID']] = $paymentType->expose();

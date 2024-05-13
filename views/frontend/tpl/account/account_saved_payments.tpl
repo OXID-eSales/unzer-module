@@ -20,7 +20,7 @@
             <tr>
                 <th scope="row">[{$paymentType.number}]</th>
                 <td>[{$paymentType.expiryDate}]</td>
-                <td>[{$type}]</td>
+                <td>[{if $type == 'invalid_payment_method'}][{oxmultilang ident="OSCUNZER_INVALID_PAYMENT_METHOD"}][{else}][{$type}][{/if}]</td>
 
                 <td>
                     <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
