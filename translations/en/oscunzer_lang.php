@@ -131,4 +131,5 @@ $aLang = [
     'OSCUNZER_NEW_CARD' => 'New Card',
     'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Invalid payment method',
     'OSCUNZER_NEW_CARD' => 'New Card',
+    'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Invalid payment method',
 ];
