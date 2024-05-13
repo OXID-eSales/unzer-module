@@ -15,6 +15,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 /**
  * @group unzer_module
  * @group SecondGroup
+ * @group SecondGroup2
  */
 final class SEPADirectDebitCest extends BaseCest
 {
