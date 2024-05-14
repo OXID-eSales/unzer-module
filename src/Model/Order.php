@@ -50,7 +50,7 @@ class Order extends Order_parent
             return $iRet;
         }
 
-        if ($this->_checkOrderExist($orderId)) {
+        if ($this->checkOrderExist($orderId)) {
             $logger = $this->getServiceFromContainer(DebugHandler::class);
             $logger->log('finalizeUnzerOrderAfterRedirect: Order already exists, no need to save again: ' . $orderId);
             return self::ORDER_STATE_ORDEREXISTS;
