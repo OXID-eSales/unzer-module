@@ -139,10 +139,10 @@
                             <td>{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE" }) }}</td>
                             {% if canRevertPartially or oOrder.oxorder__oxpaymenttype.value == "oscunzer_invoice" %}
                                 <td><input type="text" id ="amount_authorize" name="amount"
-                                           value="{{ AuthAmountRemaining|number_format(2, '.', ' ') }}"> {{ AuthCur }}</td>
+                                           value="{{ AuthAmountRemaining|number_format(2, '.', '') }}"> {{ AuthCur }}</td>
                             {% else %}
                                 <td><input type="hidden" id ="amount_authorize" name="amount"
-                                           value="{{ AuthAmountRemaining|number_format(2, '.', ' ') }}"></td>
+                                           value="{{ AuthAmountRemaining|number_format(2, '.', '') }}"></td>
                             {% endif %}
                             <td><button type="submit">{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL" }) }}</button></td>
                         </tr>
