@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.2.0] - unreleased - 2024-??-??
 
 ### NEW
-- new Paymentmethod Unzer installment (Paylater)
-- If customers - for whatever reason - interrupt the order in the checkout, the order is still saved using a temporary order and Unzer's webhook
+- New Paymentmethod Unzer installment (Paylater)
+- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook [oxid6]
 
 ### FIXED
 - [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)

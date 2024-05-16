@@ -79,28 +79,65 @@ $aLang = [
     'HELP_SHOP_MODULE_applepay_networks' => 'Credit cards supported by the merchant. Select at least one credit card that you want to offer the customer. If you do not select a credit card, all credit cards are displayed by default.',
     'SHOP_MODULE_applepay_label' => 'Company',
     'HELP_SHOP_MODULE_applepay_label' => 'If no value is entered, the company name stored in the basic settings is used instead',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2CEUR' => 'Sandbox Public-Key for B2C-purchases in EUR',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2CEUR' => 'Sandbox Private-Key for B2C-purchases in EUR',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2BEUR' => 'Sandbox Public-Key for B2B-purchases in EUR',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2BEUR' => 'Sandbox Private-Key for B2B-purchases in EUR',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2CCHF' => 'Sandbox Public-Key for B2C-purchases in CHF',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2CCHF' => 'Sandbox Private-Key for B2C-purchases in CHF',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2BCHF' => 'Sandbox Public-Key for B2B-purchases in CHF',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2BCHF' => 'Sandbox Private-Key for B2B-purchases in CHF',
+
+
+    //live general b2C EUR
     'SHOP_MODULE_production-UnzerPublicKeyB2CEUR' => 'Live Public-Key for B2C-purchases in EUR',
     'SHOP_MODULE_production-UnzerPrivateKeyB2CEUR' => 'Live Private-Key for B2C-purchases in EUR',
+
+    //live general b2B EUR
     'SHOP_MODULE_production-UnzerPublicKeyB2BEUR' => 'Live Public-Key for B2B-purchases in EUR',
     'SHOP_MODULE_production-UnzerPrivateKeyB2BEUR' => 'Live Private-Key for B2B-purchases in EUR',
+
+    //live general b2C CHF
     'SHOP_MODULE_production-UnzerPublicKeyB2CCHF' => 'Live Public-Key for B2C-purchases in CHF',
     'SHOP_MODULE_production-UnzerPrivateKeyB2CCHF' => 'Live Private-Key for B2C-purchases in CHF',
+
+    //live general b2B CHF
     'SHOP_MODULE_production-UnzerPublicKeyB2BCHF' => 'Live Public-Key for B2B-purchases in CHF',
     'SHOP_MODULE_production-UnzerPrivateKeyB2BCHF' => 'Live Private-Key for B2B-purchases in CHF',
-    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2CEUR' => 'Sandbox Public-Key for B2B-purchases in EUR',
-    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2CEUR' => 'Sandbox Private-Key for B2B-purchases in EUR',
+
+    //live Paylater b2C EUR
+    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CEUR' => 'Live Public-Key for Paylater B2C-purchases in EUR',
+    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CEUR' => 'Live Private-Key for Paylater B2C-purchases in EUR',
+    //live Paylater b2C CHF
+    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CCHF' => 'Live Public-Key for Paylater B2B-purchases in CHF',
+    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CCHF' => 'Live Private-Key for Paylater B2B-purchases in CHF',
+    //live Paylater b2B eur
+    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2BEUR' => 'Live Public-Key for Paylater B2B-purchases in EUR',
+    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2BEUR' => 'Live Private-Key for Paylater B2B-purchases in EUR',
+    //live Paylater b2B EUR
+    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2BCHF' => 'Live Public-Key for Paylater B2B-purchases in CHF',
+    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2BCHF' => 'Live Private-Key for Paylater B2B-purchases in CHF',
+
+    //sandbox general b2C EUR
+    'SHOP_MODULE_sandbox-UnzerPublicKeyB2CEUR' => 'Sandbox Public-Key for B2C-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2CEUR' => 'Sandbox Private-Key for B2C-purchases in EUR',
+
+    //sandbox general b2B EUR
+    'SHOP_MODULE_sandbox-UnzerPublicKeyB2BEUR' => 'Sandbox Public-Key for B2B-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2BEUR' => 'Sandbox Private-Key for B2B-purchases in EUR',
+
+    //sandbox general b2C CHF
+    'SHOP_MODULE_sandbox-UnzerPublicKeyB2CCHF' => 'Sandbox Public-Key for B2C-purchases in CHF',
+    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2CCHF' => 'Sandbox Private-Key for B2C-purchases in CHF',
+
+    //sandbox general b2B CHF
+    'SHOP_MODULE_sandbox-UnzerPublicKeyB2BCHF' => 'Sandbox Public-Key for B2B-purchases in CHF',
+    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2BCHF' => 'Sandbox Private-Key for B2B-purchases in CHF',
+
+    //sandbox Paylater b2C EUR
+    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2CEUR' => 'Sandbox Public-Key for Paylater B2C-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2CEUR' => 'Sandbox Private-Key for Paylater B2C-purchases in EUR',
+
+    //sandbox Paylater b2C CHF
     'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2CCHF' => 'Sandbox Public-Key for B2B-purchases in CHF',
     'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2CCHF' => 'Sandbox Private-Key for B2B-purchases in CHF',
-    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CEUR' => 'Live Public-Key for B2B-purchases in EUR',
-    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CEUR' => 'Live Private-Key for B2B-purchases in EUR',
-    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CCHF' => 'Live Public-Key for B2B-purchases in CHF',
-    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CCHF' => 'Live Private-Key for B2B-purchases in CHF',
+
+    //sandbox Paylater b2B EUR
+    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2BEUR' => 'Sandbox Public-Key for Paylater B2C-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2BEUR' => 'Sandbox Private-Key for Paylater B2C-purchases in EUR',
+    //sandbox Paylater b2B CHF
+    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2BCHF' => 'Sandbox Public-Key for B2B-purchases in CHF',
+    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2BCHF' => 'Sandbox Private-Key for B2B-purchases in CHF',
 ];

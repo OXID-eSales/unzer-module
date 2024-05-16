@@ -8,13 +8,14 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
+use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -233,11 +234,9 @@ class Payment
     }
 
     /**
-     * @param null $paymentExtension
      * @return UnzerPayment|null
-     * @throws UnzerApiException
      */
-    public function getSessionUnzerPayment($paymentExtension = null): ?UnzerPayment
+    public function getSessionUnzerPayment(): ?UnzerPayment
     {
         $result = null;
 
@@ -252,17 +251,11 @@ class Payment
             /** @var Order $order */
             $order = oxNew(Order::class);
             $order->load($sessionOrderId);
-            $customerType = 'B2C';
-            /** @var string $currency */
-            $currency = $order->getFieldData('oxcurrency') ?? '';
 
-            if ($paymentExtension !== null && $currency !== null) {
-                if ($order->getFieldData('oxpaymenttype') === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-                    if (Registry::getRequest()->getRequestParameter('unzer_customer_type') !== 'B2C') {
-                        $customerType = 'B2B';
-                    }
-                }
-            }
+            $paymentType = $this->getPaymentType($sessionOrderId, $order);
+            $currency = $this->getOrderCurrency($sessionOrderId, $order, $paymentType);
+            $customerType = $this->getCustomerType($currency, $paymentType);
+
             try {
                 $result = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
             } catch (UnzerApiException $e) {
@@ -274,6 +267,68 @@ class Payment
         }
 
         return $result;
+    }
+
+    private function getCustomerType(?string $currency, string $paymentType): string
+    {
+        $customerType = 'B2C';
+
+        if ($currency != null) {
+            if ($this->isPaylaterInvoice($paymentType)) {
+                $customerInRequest = Registry::getRequest()->getRequestParameter('unzer_customer_type');#
+                if ($customerInRequest !== 'B2C') {
+                    $customerType = 'B2B';
+                }
+            }
+        }
+        return $customerType;
+    }
+
+    private function isPaylaterInvoice(string $paymentType): bool
+    {
+        return in_array(
+            $paymentType,
+            [
+                UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID,
+                UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
+                UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID,
+            ]
+        );
+    }
+
+    private function getOrderCurrency(string $sessionOrderId, Order $order, string $paymentType): string
+    {
+        /** @var string $currency */
+        $currency = $order->getFieldData('oxcurrency') ?? '';
+
+        if ($this->isPaylaterInvoice($paymentType)) {
+            $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($sessionOrderId);
+            if ($tmpOrder !== null) {
+                /** @var \stdClass{name: string} $orderCurrency */
+                $orderCurencyStdCls = $tmpOrder->getOrderCurrency();
+                $currency = $orderCurencyStdCls->name;
+            }
+        }
+
+        return $currency;
+    }
+
+    private function getPaymentType(string $sessionOrderId, Order $order): string
+    {
+        $paymentType = $order->getFieldData('oxpaymenttype');
+
+        if (empty($paymentType)) {
+            $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($sessionOrderId);
+            if ($tmpOrder !== null) {
+                $paymentType = $tmpOrder->getFieldData('oxpaymenttype');
+            }
+        }
+
+        if (is_string($paymentType)) {
+            return $paymentType;
+        }
+
+        return '';
     }
 
     /**

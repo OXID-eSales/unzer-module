@@ -133,9 +133,9 @@ class OrderController extends OrderController_parent
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
-                $unzerPaymentId = Registry::getSession()->getVariable('paymentid');
+                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
-                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
                         $unzerPaymentId,
@@ -420,5 +420,15 @@ class OrderController extends OrderController_parent
             serialize($basketSummery) .
             serialize($basketContents)
         );
+    }
+
+    private function getUnzerPaymentIdFromSession(): string
+    {
+        $paymentId = Registry::getSession()->getVariable('paymentid');
+        if (is_string($paymentId)) {
+            return $paymentId;
+        }
+
+        return '';
     }
 }

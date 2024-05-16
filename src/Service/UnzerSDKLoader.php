@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Unzer;
 
 class UnzerSDKLoader
@@ -56,9 +57,10 @@ class UnzerSDKLoader
      */
     public function getUnzerSDK(string $customerType = '', string $currency = '', bool $type = false): Unzer
     {
-        if ($customerType != '' && $currency != '') {
+        if ($customerType !== '' && $currency !== '') {
             return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency, $type);
         }
+
         $key = $this->moduleSettings->getShopPrivateKey();
         $sdk = oxNew(Unzer::class, $key);
         if ($this->moduleSettings->isDebugMode()) {
@@ -83,7 +85,7 @@ class UnzerSDKLoader
         string $currency,
         bool $type = false
     ): Unzer {
-        if ($customerType == '' || $currency == '') {
+        if ($customerType === '' || $currency === '') {
             return $this->getUnzerSDK();
         }
         if ($type === false) {
@@ -151,6 +153,7 @@ class UnzerSDKLoader
                 $customerType = 'B2C';
             }
         }
+
         return $this->getUnzerSDK($customerType, $currency);
     }
 }

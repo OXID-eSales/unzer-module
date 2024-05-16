@@ -272,128 +272,60 @@ $aModule = [
             'type' => 'str',
             'value' => ''
         ],
-        // unzer invoice keypairs
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2CEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2CEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2BEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2BEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2BCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2BCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPublicKeyB2CEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPrivateKeyB2CEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPublicKeyB2BEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPrivateKeyB2BEUR',
-            'type' => 'str',
-            'value' => ''
-        ],
 
+        //live paylater b2C EUR
         [
             'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPublicKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPrivateKeyB2CCHF',
+            'name' => 'production-UnzerPaylaterPublicKeyB2CEUR',
             'type' => 'str',
             'value' => ''
         ],
         [
             'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPublicKeyB2BCHF',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        //live paylater b2B EUR
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPaylaterPublicKeyB2BEUR',
             'type' => 'str',
             'value' => ''
         ],
         [
             'group' => 'unzerinvoice',
-            'name' => 'production-UnzerPrivateKeyB2BCHF',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        //live paylater b2C CHF
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPaylaterPublicKeyB2CCHF',
             'type' => 'str',
             'value' => ''
         ],
         [
-            'group' => 'unzerpaylater',
-            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CEUR',
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        //live paylater b2B CHF
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPaylaterPublicKeyB2BCHF',
             'type' => 'str',
             'value' => ''
         ],
         [
-            'group' => 'unzerpaylater',
-            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CEUR',
+            'group' => 'unzerinvoice',
+            'name' => 'production-UnzerPaylaterPrivateKeyB2BCHF',
             'type' => 'str',
             'value' => ''
         ],
-        [
-            'group' => 'unzerpaylater',
-            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'unzerpaylater',
-            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CCHF',
-            'type' => 'str',
-            'value' => ''
-        ],
+        //live paylater b2C EUR
         [
             'group' => 'unzerpaylater',
             'name' => 'production-UnzerPaylaterPublicKeyB2CEUR',
@@ -406,6 +338,7 @@ $aModule = [
             'type' => 'str',
             'value' => ''
         ],
+        //live paylater b2C CHF
         [
             'group' => 'unzerpaylater',
             'name' => 'production-UnzerPaylaterPublicKeyB2CCHF',
@@ -418,6 +351,86 @@ $aModule = [
             'type' => 'str',
             'value' => ''
         ],
+        // sandbox unzer invoice default keypairs b2B EUR
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        // sandbox unzer invoice default keypairs b2C CHF
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        // sandbox unzer invoice default keypairs b2B CHF
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPublicKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPrivateKeyB2BCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        //sandbox unzer invoice paylater b2C EUR
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerinvoice',
+            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        //sandbox paylater b2B EUR
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPublicKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2BEUR',
+            'type' => 'str',
+            'value' => ''
+        ],
+        //sandbox paylater b2C CHF
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPublicKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'unzerpaylater',
+            'name' => 'sandbox-UnzerPaylaterPrivateKeyB2CCHF',
+            'type' => 'str',
+            'value' => ''
+        ],
+
+
         [
             'group' => 'unzerother',
             'name' => 'UnzerjQuery',

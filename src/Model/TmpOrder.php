@@ -124,4 +124,35 @@ class TmpOrder extends BaseModel
         $result = is_a($blocksData, Result::class) ? $blocksData->fetchAssociative() : false;
         return is_array($result) ? $result : [];
     }
+
+    public function getTmpOrderByOxOrderId(string $oxSessionOrderId): ?\OxidEsales\Eshop\Application\Model\Order
+    {
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $queryBuilderFactory->create();
+        $queryBuilder
+            ->select('*')
+            ->from('oscunzertmporder')
+            ->where('oxorderid = :oxorderid')
+            ->andWhere('status = "NOT_FINISHED"')
+            ->orderBy('timestamp', 'ASC')
+            ->setParameters(
+                ['oxorderid' => $oxSessionOrderId]
+            );
+        /** @var Result $blocksData */
+        $blocksData = $queryBuilder->execute();
+        $result = is_a($blocksData, Result::class) ? $blocksData->fetchAssociative() : false;
+
+        if (is_array($result) && isset($result['TMPORDER']) && is_string($result['TMPORDER'])) {
+            $tmpOrder = $result['TMPORDER'];
+            $result = unserialize(base64_decode($tmpOrder));
+            if (is_array($result) && isset($result['order']) && is_object($result['order'])) {
+                /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+                $order = $result['order'];
+                return $order;
+            }
+        }
+
+        return null;
+    }
 }

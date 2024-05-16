@@ -369,7 +369,7 @@ class AdminOrderController extends AdminDetailsController
             return;
         }
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
-        /** @var Order $oOrder */
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, (string)$reason);
         if ($oStatus instanceof UnzerApiException) {
