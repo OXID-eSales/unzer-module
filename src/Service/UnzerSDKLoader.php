@@ -54,51 +54,24 @@ class UnzerSDKLoader
      * @return Unzer
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function getUnzerSDK(string $paymentId = '', string $customerType = '', string $currency = ''): Unzer
     {
-        if ($paymentId !== '') {
-            return $this->getUnzerSDKForSpecialPayment($paymentId, $currency, $customerType);
-        }
-
-        $key = $this->moduleSettings->getStandardPrivateKey();
-        $sdk = oxNew(Unzer::class, $key);
-        if ($this->moduleSettings->isDebugMode()) {
-            $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
-        }
-        return $sdk;
-    }
-
-    /**
-     * Will return a Unzer SDK object using a specific key, depending on $customerType and $currency.
-     * Relevant for PaylaterInvoice. If $customerType or $currency is empty, the regular key is used.
-     * @param string $customerType
-     * @param string $currency
-     * @param bool $payLaterInstallment  - is PayLaterInstallment
-     * @return Unzer
-     *
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
-     * @SuppressWarnings(PHPMD.ElseExpression)
-     */
-    private function getUnzerSDKForSpecialPayment(
-        string $paymentType,
-        string $currency,
-        string $customerType = ''
-    ): Unzer {
-
-        $key = '';
-        if (UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID === $paymentType) {
+        if (UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID === $paymentId) {
             $key = $this->moduleSettings->getInvoicePrivateKeyByCustomerTypeAndCurrency(
                 $customerType,
                 $currency
             );
-        } elseif (UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID === $paymentType) {
+        } elseif (UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID === $paymentId) {
             $key = $this->moduleSettings->getInstallmentPrivateKeyByCurrency(
                 $currency
             );
+        } else {
+            $key = $this->moduleSettings->getStandardPrivateKey();
         }
-        $sdk = oxNew(Unzer::class, $key);
 
+        $sdk = oxNew(Unzer::class, $key);
         if ($this->moduleSettings->isDebugMode()) {
             $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
         }
