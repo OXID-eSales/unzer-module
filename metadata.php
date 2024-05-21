@@ -406,13 +406,13 @@ $aModule = [
         // sandbox Paylater Installment B2C EUR
         [
             'group' => 'unzerpaylater',
-            'name' => 'sandbox-UnzerPayLaterInvoiceB2BEURPrivateKey',
+            'name' => 'sandbox-UnzerPayLaterInstallmentB2CEURPrivateKey',
             'type' => 'str',
             'value' => ''
         ],
         [
             'group' => 'unzerpaylater',
-            'name' => 'sandbox-UnzerPayLaterInvoiceB2BEURPublicKey',
+            'name' => 'sandbox-UnzerPayLaterInstallmentB2CEURPublicKey',
             'type' => 'str',
             'value' => ''
         ],
