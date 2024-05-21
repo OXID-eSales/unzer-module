@@ -71,11 +71,7 @@ class UnzerSDKLoader
             $key = $this->moduleSettings->getStandardPrivateKey();
         }
 
-        $sdk = oxNew(Unzer::class, $key);
-        if ($this->moduleSettings->isDebugMode()) {
-            $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
-        }
-        return $sdk;
+        return $this->getUnzerSDKbyKey($key);
     }
 
     /**
