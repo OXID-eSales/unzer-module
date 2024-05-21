@@ -354,20 +354,20 @@ $aModule = [
         // sandbox Paylater Invoice B2C EUR
         [
             'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPrivateKeyB2BEUR',
+            'name' => 'sandbox-UnzerPayLaterInvoiceB2CEURPrivateKey',
             'type' => 'str',
             'value' => ''
         ],
         [
             'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPublicKeyB2BEUR',
+            'name' => 'sandbox-UnzerPayLaterInvoiceB2CEURPublicKey',
             'type' => 'str',
             'value' => ''
         ],
         // sandbox Paylater Invoice B2B EUR
         [
             'group' => 'unzerinvoice',
-            'name' => 'sandbox-UnzerPayLaterInvoiceB2CCHFPrivateKey',
+            'name' => 'sandbox-UnzerPayLaterInvoiceB2BEURPrivateKey',
             'type' => 'str',
             'value' => ''
         ],
