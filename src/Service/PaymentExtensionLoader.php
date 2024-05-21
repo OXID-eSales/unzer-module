@@ -114,14 +114,6 @@ class PaymentExtensionLoader
         string $customerType,
         string $currency
     ): AbstractUnzerPayment {
-        if ($payment->getId() === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return oxNew(
-                self::UNZERCLASSNAMEMAPPING[$payment->getId()],
-                $this->unzerSdkLoader->getUnzerSDK($customerType, $currency, true),
-                $this->unzerService,
-                $this->logger
-            );
-        }
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
             $this->unzerSdkLoader->getUnzerSDK(
