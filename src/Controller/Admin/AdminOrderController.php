@@ -49,8 +49,8 @@ class AdminOrderController extends AdminDetailsController
     /** @var Payment $oPayment */
     protected $oPayment = null;
 
-    /** @var string $sPaymentId */
-    protected $sPaymentId;
+    /** @var string $sTypeId */
+    protected $TypeId;
 
     /**
      * Executes parent method parent::render()
@@ -80,12 +80,13 @@ class AdminOrderController extends AdminDetailsController
 
             $this->_aViewData['paymentTitle'] = $this->oPayment->getFieldData('OXDESC');
             $this->_aViewData['oOrder'] = $oOrder;
+            $sPaymentId = $oOrder->getFieldData('oxpaymenttype');
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId());
-            $this->_aViewData['sPaymentId'] = $this->sPaymentId;
-            if ($this->sPaymentId) {
-                $this->getUnzerViewData($this->sPaymentId);
+            $this->sTypeId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId());
+            $this->_aViewData['sTypeId'] = $this->sTypeId;
+            if ($this->sTypeId) {
+                $this->getUnzerViewData($sPaymentId, $this->sTypeId);
             }
         } else {
             $translator = $this->getServiceFromContainer(Translator::class);
@@ -102,20 +103,21 @@ class AdminOrderController extends AdminDetailsController
     }
 
     /**
-     * @param string $sPaymentId
+     * @param string $sPaymentId - OXID Payment ID
+     * @param string $sTypeId - Unzer Type ID
      * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function getUnzerViewData(string $sPaymentId): void
+    protected function getUnzerViewData(string $sPaymentId, string $sTypeId): void
     {
         try {
             $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
             // initialize proper SDK object
             $sdk = $this->getUnzerSDK($sPaymentId, $transactionInfo['currency'], $transactionInfo['customertype']);
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
-            $unzerPayment = $sdk->fetchPayment($sPaymentId);
+            $unzerPayment = $sdk->fetchPayment($sTypeId);
             $fCancelled = 0.0;
             $fCharged = 0.0;
 

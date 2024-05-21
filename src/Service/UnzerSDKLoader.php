@@ -56,7 +56,7 @@ class UnzerSDKLoader
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function getUnzerSDK(string $paymentId = '', string $customerType = '', string $currency = ''): Unzer
+    public function getUnzerSDK(string $paymentId = '', string $currency = '', string $customerType = ''): Unzer
     {
         if (UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID === $paymentId) {
             $key = $this->moduleSettings->getInvoicePrivateKeyByCustomerTypeAndCurrency(
