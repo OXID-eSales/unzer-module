@@ -42,7 +42,7 @@ class ApiClient
 
         $this->headers = [
             'Accept' => '*/*',
-            'Authorization' => 'Basic ' . base64_encode($this->moduleSettings->getShopPrivateKey() . ':')
+            'Authorization' => 'Basic ' . base64_encode($this->moduleSettings->getStandardPrivateKey() . ':')
         ];
     }
 

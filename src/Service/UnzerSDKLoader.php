@@ -55,13 +55,13 @@ class UnzerSDKLoader
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getUnzerSDK(string $customerType = '', string $currency = '', bool $type = false): Unzer
+    public function getUnzerSDK(string $customerType = '', string $currency = '', bool $payLaterInstallment = false): Unzer
     {
         if ($customerType !== '' && $currency !== '') {
-            return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency, $type);
+            return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency, $payLaterInstallment);
         }
 
-        $key = $this->moduleSettings->getShopPrivateKey();
+        $key = $this->moduleSettings->getStandardPrivateKey();
         $sdk = oxNew(Unzer::class, $key);
         if ($this->moduleSettings->isDebugMode()) {
             $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
@@ -74,33 +74,30 @@ class UnzerSDKLoader
      * Relevant for PaylaterInvoice. If $customerType or $currency is empty, the regular key is used.
      * @param string $customerType
      * @param string $currency
-     * @param bool $type
+     * @param bool $payLaterInstallment  - is PayLaterInstallment
      * @return Unzer
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    public function getUnzerSDKbyCustomerTypeAndCurrency(
+    private function getUnzerSDKbyCustomerTypeAndCurrency(
         string $customerType,
         string $currency,
-        bool $type = false
+        bool $payLaterInstallment = false
     ): Unzer {
-        if ($customerType === '' || $currency === '') {
-            return $this->getUnzerSDK();
-        }
-        if ($type === false) {
+
+        if ($payLaterInstallment === false) {
             $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(
                 $customerType,
                 $currency
             );
-            $sdk = oxNew(Unzer::class, $key);
         } else {
             $key = $this->moduleSettings->getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
                 $customerType,
                 $currency
             );
-            $sdk = oxNew(Unzer::class, $key);
         }
+        $sdk = oxNew(Unzer::class, $key);
 
         if ($this->moduleSettings->isDebugMode()) {
             $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);

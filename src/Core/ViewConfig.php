@@ -80,7 +80,7 @@ class ViewConfig extends ViewConfig_parent
             return $this->moduleSettings->getShopPublicKeyInstallment();
         }
 
-        return $this->moduleSettings->getShopPublicKey();
+        return $this->moduleSettings->getStandardPublicKey();
     }
 
     /**
@@ -103,7 +103,7 @@ class ViewConfig extends ViewConfig_parent
             return $this->moduleSettings->getShopPrivateKeyInstallment();
         }
 
-        return $this->moduleSettings->getShopPrivateKey();
+        return $this->moduleSettings->getStandardPrivateKey();
     }
 
     public function getUnzerB2BPubKey(): string

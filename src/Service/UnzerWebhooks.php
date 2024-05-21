@@ -164,7 +164,7 @@ class UnzerWebhooks
     protected function cleanOldWebhook(): void
     {
         // v1.0.0 - the original URL and payment method
-        $shopKey = $this->moduleSettings->getShopPrivateKey();
+        $shopKey = $this->moduleSettings->getStandardPrivateKey();
         $orgEvent = WebhookEvents::PAYMENT;
         $orgUrl = $this->getWebhookURL([]);
         $unzerWebhooks = $this->getUnzerWebhooksByKey($shopKey);
