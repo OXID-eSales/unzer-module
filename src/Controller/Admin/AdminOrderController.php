@@ -50,7 +50,7 @@ class AdminOrderController extends AdminDetailsController
     protected $oPayment = null;
 
     /** @var string $sTypeId */
-    protected $TypeId;
+    protected string $sTypeId;
 
     /**
      * Executes parent method parent::render()
@@ -80,10 +80,11 @@ class AdminOrderController extends AdminDetailsController
 
             $this->_aViewData['paymentTitle'] = $this->oPayment->getFieldData('OXDESC');
             $this->_aViewData['oOrder'] = $oOrder;
+            /** @var string $sPaymentId */
             $sPaymentId = $oOrder->getFieldData('oxpaymenttype');
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            $this->sTypeId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId());
+            $this->sTypeId = $transactionService::getPaymentIdByOrderId($this->getEditObjectId());
             $this->_aViewData['sTypeId'] = $this->sTypeId;
             if ($this->sTypeId) {
                 $this->getUnzerViewData($sPaymentId, $this->sTypeId);
