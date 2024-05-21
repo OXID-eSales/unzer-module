@@ -48,17 +48,17 @@ class UnzerSDKLoader
     }
 
     /**
-     * @param string $customerType
+     * @param string $paymentId
      * @param string $currency
-     * @param bool $type
+     * @param string $customerType
      * @return Unzer
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getUnzerSDK(string $customerType = '', string $currency = '', bool $payLaterInstallment = false): Unzer
+    public function getUnzerSDK(string $paymentId = '', string $customerType = '', string $currency = ''): Unzer
     {
-        if ($customerType !== '' && $currency !== '') {
-            return $this->getUnzerSDKbyCustomerTypeAndCurrency($customerType, $currency, $payLaterInstallment);
+        if ($paymentId !== '') {
+            return $this->getUnzerSDKForSpecialPayment($paymentId, $currency, $customerType);
         }
 
         $key = $this->moduleSettings->getStandardPrivateKey();
@@ -80,20 +80,20 @@ class UnzerSDKLoader
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function getUnzerSDKbyCustomerTypeAndCurrency(
-        string $customerType,
+    private function getUnzerSDKForSpecialPayment(
+        string $paymentType,
         string $currency,
-        bool $payLaterInstallment = false
+        string $customerType = ''
     ): Unzer {
 
-        if ($payLaterInstallment === false) {
-            $key = $this->moduleSettings->getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(
+        $key = '';
+        if (UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID === $paymentType) {
+            $key = $this->moduleSettings->getInvoicePrivateKeyByCustomerTypeAndCurrency(
                 $customerType,
                 $currency
             );
-        } else {
-            $key = $this->moduleSettings->getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
-                $customerType,
+        } elseif (UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID === $paymentType) {
+            $key = $this->moduleSettings->getInstallmentPrivateKeyByCurrency(
                 $currency
             );
         }
@@ -137,20 +137,18 @@ class UnzerSDKLoader
 
         $customerType = '';
         $currency = '';
+        $paymentId = '';
         if ($row) {
             $currency = $row['CURRENCY'];
-            $paymentType = $row['OXPAYMENTTYPE'];
-            if ($paymentType == UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
+            $paymentId = $row['OXPAYMENTTYPE'];
+            if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
                 $customerType = 'B2C';
                 if (!empty($row['OXDELCOMPANY']) || !empty($row['OXBILLCOMPANY'])) {
                     $customerType = 'B2B';
                 }
             }
-            if ($paymentType === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-                $customerType = 'B2C';
-            }
         }
 
-        return $this->getUnzerSDK($customerType, $currency);
+        return $this->getUnzerSDK($paymentId, $currency, $customerType);
     }
 }

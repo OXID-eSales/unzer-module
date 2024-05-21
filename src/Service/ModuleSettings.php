@@ -639,9 +639,9 @@ class ModuleSettings
      * @param string $customerType
      * @return string
      */
-    public function getShopPublicKeyInvoice(string $customerType = 'B2C'): string
+    public function getInvoicePublicKey(string $customerType = 'B2C'): string
     {
-        $result = $this->getStandardPublicKey();
+        $result = '';
 
         if ($customerType === 'B2C' && $this->isB2CInvoiceEligibility()) {
             if ($this->isBasketCurrencyCHF()) {
@@ -668,7 +668,7 @@ class ModuleSettings
      * @param string $customerType
      * @return string
      */
-    public function getShopPrivateKeyInvoice(string $customerType = 'B2C'): string
+    public function getInvoicePrivateKey(string $customerType = 'B2C'): string
     {
         $result = '';
 
@@ -693,7 +693,7 @@ class ModuleSettings
         return $result;
     }
 
-    public function getShopPublicKeyInstallment(): string
+    public function getInstallmentPublicKey(): string
     {
         $result = '';
 
@@ -708,7 +708,7 @@ class ModuleSettings
 
         return $result;
     }
-    public function getShopPrivateKeyInstallment(): string
+    public function getInstallmentPrivateKey(): string
     {
         $result = '';
 
@@ -729,8 +729,10 @@ class ModuleSettings
      * @param string $currency
      * @return string
      */
-    public function getShopPrivateKeyInvoiceByCustomerTypeAndCurrency(string $customerType, string $currency): string
-    {
+    public function getInvoicePrivateKeyByCustomerTypeAndCurrency(
+        string $customerType,
+        string $currency
+    ): string {
         $key = '';
         if ($customerType === 'B2C' && $currency === 'EUR') {
             $key = $this->getInvoiceB2CEURPrivateKey();
@@ -744,23 +746,17 @@ class ModuleSettings
         return $key;
     }
     /**
-     * @param string $customerType
      * @param string $currency
      * @return string
      */
-    public function getShopPrivateKeyInstallmentByCustomerTypeAndCurrency(
-        string $customerType,
+    public function getInstallmentPrivateKeyByCurrency(
         string $currency
     ): string {
         $key = '';
-        if ($customerType === 'B2C' && $currency === 'EUR') {
+        if ($currency === 'EUR') {
             $key = $this->getInstallmentB2CEURPrivateKey();
-        } elseif ($customerType === 'B2C' && $currency === 'CHF') {
+        } elseif ($currency === 'CHF') {
             $key = $this->getInstallmentB2CCHFPrivateKey();
-        } elseif ($customerType === 'B2B' && $currency === 'EUR') {
-            $key = $this->getInvoiceB2BEURPrivateKey();
-        } elseif ($customerType === 'B2B' && $currency === 'CHF') {
-            $key = $this->getInvoiceB2BCHFPrivateKey();
         }
         return $key;
     }

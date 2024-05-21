@@ -95,10 +95,10 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
+    public function getUnzerSDK(string $paymentId = '', string $currency = '', string $customerType = ''): Unzer
     {
         return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK($customerType, $currency);
+            ->getUnzerSDK($paymentId, $currency, $customerType);
     }
 
     /**
@@ -113,7 +113,7 @@ class AdminOrderController extends AdminDetailsController
         try {
             $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
             // initialize proper SDK object
-            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency']);
+            $sdk = $this->getUnzerSDK($sPaymentId, $transactionInfo['currency'], $transactionInfo['customertype']);
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
             $unzerPayment = $sdk->fetchPayment($sPaymentId);
             $fCancelled = 0.0;

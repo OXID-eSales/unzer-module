@@ -224,13 +224,17 @@ class Payment
     }
 
     /**
-     * @param string $customerType
+     * @param string $paymentId
      * @param string $currency
+     * @param string $customerType
      * @return \UnzerSDK\Unzer
     */
-    protected function getUnzerSDK(string $customerType = '', string $currency = ''): \UnzerSDK\Unzer
-    {
-        return $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
+    protected function getUnzerSDK(
+        string $paymentId = '',
+        string $currency = '',
+        string $customerType = ''
+    ): \UnzerSDK\Unzer {
+        return $this->unzerSDKLoader->getUnzerSDK($paymentId, $currency, $customerType);
     }
 
     /**
@@ -257,7 +261,11 @@ class Payment
             $customerType = $this->getCustomerType($currency, $paymentType);
 
             try {
-                $result = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
+                $result = $this->unzerSDKLoader->getUnzerSDK(
+                    $paymentId,
+                    $currency,
+                    $customerType
+                )->fetchPayment($paymentId);
             } catch (UnzerApiException $e) {
                 Registry::getLogger()->warning(
                     'Payment not found with key: ' . $paymentId
@@ -463,13 +471,17 @@ class Payment
             return false;
         }
 
-        $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
+        $sPaymentId = $sPaymentId ?? $this->transactionService::getPaymentIdByOrderId($oOrder->getId());
         $transactionDetails = $this->transactionService->getCustomerTypeAndCurrencyByOrderId($oOrder->getId());
 
         $blSuccess = false;
 
         if ($sPaymentId) {
-            $sdk = $this->getUnzerSDK($transactionDetails['customertype'], $transactionDetails['currency']);
+            $sdk = $this->getUnzerSDK(
+                $sPaymentId,
+                $transactionDetails['currency'],
+                $transactionDetails['customertype']
+            );
             /** @var string $sInvoiceNr */
             $sInvoiceNr = $oOrder->getUnzerInvoiceNr();
 

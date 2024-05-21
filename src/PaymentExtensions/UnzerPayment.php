@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -204,7 +205,10 @@ abstract class UnzerPayment
             $auth->setRiskData($uzrRiskData);
             try {
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
-                $UnzerSdk = $loader->getUnzerSDK('B2C', $currency->name, true);
+                $UnzerSdk = $loader->getUnzerSDK(
+                    UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
+                    $currency->name
+                );
                 $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
