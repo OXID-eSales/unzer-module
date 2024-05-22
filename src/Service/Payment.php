@@ -8,7 +8,6 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -16,6 +15,7 @@ use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPaymentInterface;
@@ -104,6 +104,11 @@ class Payment
                 $customerType,
                 $currency
             );
+
+            $oOrder = oxNew(Order::class);
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            $oOrder->createTmpOrder($basket, $user, $paymentExtension->getUnzerOrderId());
+
             $paymentExtension->execute(
                 $user,
                 $basket
@@ -203,18 +208,18 @@ class Payment
         return $result;
     }
 
+
     /**
-     * @return int
-     * @throws UnzerApiException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
-    public function getUnzerOrderId(): int
+    public function getUnzerOrderId(): string
     {
-        $result = 0;
+        $result = '';
         $sessionUnzerPayment = $this->getSessionUnzerPayment();
         if ($sessionUnzerPayment) {
             $transaction = $sessionUnzerPayment->getInitialTransaction();
             if ($transaction) {
-                $result = (int)$transaction->getOrderId();
+                $result = (string)$transaction->getOrderId();
             }
         }
         return $result;
@@ -241,7 +246,7 @@ class Payment
         UnzerPaymentInterface|null $paymentExtension = null,
         string $currency = ''
     ): ?\UnzerSDK\Resources\Payment {
-        $paymentId = $this->session->getVariable('PaymentId');
+        $paymentId = $this->session->getVariable('PaymentId');  //TODO: check if there is value ever
         if (!is_string($paymentId)) {
             return null;
         }

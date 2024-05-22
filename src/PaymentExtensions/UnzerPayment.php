@@ -44,8 +44,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     /** @var UnzerService */
     protected $unzerService;
 
-    /** @var string */
-    protected $unzerOrderId;
+    protected string $unzerOrderId = '';
 
     /** @var string */
     protected $paymentMethod = '';
@@ -77,6 +76,12 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
         $this->logger = $logger;
     }
+
+    public function getUnzerOrderId(): string
+    {
+        return $this->unzerOrderId;
+    }
+
 
     /**
      * @return array

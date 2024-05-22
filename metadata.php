@@ -433,6 +433,12 @@ $aModule = [
             'type' => 'bool',
             'value' => '0',
         ],
+        [
+            'group' => 'unzerother',
+            'name' => 'UnzerWebhookTimeDifference',
+            'type' => 'str',
+            'value' => '5',
+        ],
         // this options are invisible because of missing group
         [
             'group' => '',

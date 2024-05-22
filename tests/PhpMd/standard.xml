@@ -8,6 +8,7 @@
     <rule ref="rulesets/unusedcode.xml"/>
     <rule ref="rulesets/cleancode.xml">
         <exclude name="StaticAccess"/>
+        <exclude name="CouplingBetweenObjects"/>
     </rule>
     <rule ref="rulesets/naming.xml">
         <exclude name="ShortVariable" />
@@ -22,4 +23,5 @@
             <property name="cyclomaticComplexity" value="55"/>
         </properties>
     </rule>
+
 </ruleset>

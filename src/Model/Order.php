@@ -20,6 +20,7 @@ use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use Psr\Container\ContainerInterface;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
@@ -35,6 +36,7 @@ class Order extends Order_parent
      * @param User $oUser
      * @return int|bool
      * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
      *
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -61,81 +63,148 @@ class Order extends Order_parent
         $unzerService = $this->getServiceFromContainer(Unzer::class);
         $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
 
-        if ($unzerPaymentStatus !== "ERROR") {
-            // copies user info
-            $this->setUser($oUser);
+        // copies user info
+        $this->setUser($oUser);
 
-            // copies user info
-            $this->assignUserInformation($oUser);
+        // copies user info
+        $this->assignUserInformation($oUser);
 
-            // copies basket info
-            $this->loadFromBasket($oBasket);
+        // copies basket info
+        $this->loadFromBasket($oBasket);
 
-            $oUserPayment = $this->setPayment($oBasket->getPaymentId());
+        $oUserPayment = $this->setPayment($oBasket->getPaymentId());
 
-            // set folder information, order is new
-            $this->setFolder();
+        // set folder information, order is new
+        $this->setFolder();
 
-            //saving all order data to DB
-            $this->save();
+        //saving all order data to DB
+        $this->save();
 
-            if (!$this->getFieldData('oxordernr')) {
-                $this->setNumber();
-            }
+        if (!$this->getFieldData('oxordernr')) {
+            $this->setNumber();
+        }
 
-            // setUnzerOrderId
-            $this->setUnzerOrderNr($paymentService->getUnzerOrderId());
-            $unzerService->resetUnzerOrderId();
+        // setUnzerOrderId
+        $unzerOrderId = $paymentService->getUnzerOrderId();
+        $this->setUnzerOrderNr($unzerOrderId);
+        $unzerService->resetUnzerOrderId();
 
-            // deleting remark info only when order is finished
-            Registry::getSession()->deleteVariable('ordrem');
+        // deleting remark info only when order is finished
+        Registry::getSession()->deleteVariable('ordrem');
 
-            //#4005: Order creation time is not updated when order processing is complete
-            $this->updateOrderDate();
+        //#4005: Order creation time is not updated when order processing is complete
+        $this->updateOrderDate();
 
-            // store orderid
-            $oBasket->setOrderId($orderId);
+        // store orderid
+        $oBasket->setOrderId($orderId);
 
-            // updating wish lists
-            $this->updateWishlist($oBasket->getContents(), $oUser);
+        // updating wish lists
+        $this->updateWishlist($oBasket->getContents(), $oUser);
 
-            // updating users notice list
-            $this->updateNoticeList($oBasket->getContents(), $oUser);
+        // updating users notice list
+        $this->updateNoticeList($oBasket->getContents(), $oUser);
 
-            // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
-            $this->markVouchers($oBasket, $oUser);
+        // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
+        $this->markVouchers($oBasket, $oUser);
 
-            // send order by email to shop owner and current user
-            // don't let order fail due to stock check while sending out the order mail
-            Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
-            $iRet = $this->sendOrderByEmail($oUser, $oBasket, $oUserPayment);
-            Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
+        // send order by email to shop owner and current user
+        // don't let order fail due to stock check while sending out the order mail
+        Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
+        $iRet = $this->sendOrderByEmail($oUser, $oBasket, $oUserPayment);
+        Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
 
-            $this->setOrderStatus($unzerPaymentStatus);
+        $this->setOrderStatus($unzerPaymentStatus);
 
-            if ($unzerPaymentStatus === 'OK') {
-                $this->markUnzerOrderAsPaid();
-            }
+        if ($unzerPaymentStatus === 'OK') {
+            $this->markUnzerOrderAsPaid();
+        }
 
-            $this->initWriteTransactionToDB();
-        } else {
-            // payment is canceled
-            $this->delete();
+        $this->initWriteTransactionToDB();
+
+        $tmpOrder = oxNew(TmpOrder::class);
+        $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerOrderId);
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $tmpOrder->assign(['status' => 'FINISHED']);
+            $tmpOrder->save();
         }
 
         return $iRet;
     }
 
-    public function getUnzerOrderNr(): int
+    public function createTmpOrder(
+        Basket $oBasket,
+        User $oUser,
+        string $unzerOrderId
+    ): bool|int {
+        $orderId = Registry::getSession()->getVariable('sess_challenge');
+        $orderId = is_string($orderId) ? $orderId : '';
+        $iRet = self::ORDER_STATE_PAYMENTERROR;
+
+        if (!$orderId) {
+            return $iRet;
+        }
+
+        if ($this->checkOrderExist($orderId)) {
+            // we might use this later, this means that somebody clicked like mad on order button
+            return self::ORDER_STATE_ORDEREXISTS;
+        }
+
+        $this->setId($orderId);
+
+        // copies user info
+        $this->setUser($oUser);
+        $this->assignUserInformation($oUser);
+
+        // copies basket info
+        $this->loadFromBasket($oBasket);
+
+        $oUserPayment = $this->setPayment($oBasket->getPaymentId());
+        $this->_oPayment = $oUserPayment;
+
+        // set folder information, order is new
+        $this->setFolder();
+
+        // setUnzerOrderId
+        $this->setUnzerOrderNr($unzerOrderId);
+
+        $blRet = $this->executePayment($oBasket, $oUserPayment);
+        if ($blRet !== true) {
+            return $blRet;
+        }
+        // deleting remark info only when order is finished
+
+        //#4005: Order creation time is not updated when order processing is complete
+        $this->updateOrderDate();
+
+        $oBasket->setOrderId($orderId);
+
+        // updating wish lists
+        $this->updateWishlist($oBasket->getContents(), $oUser);
+
+        // updating users notice list
+        $this->updateNoticeList($oBasket->getContents(), $oUser);
+
+        // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
+        $this->markVouchers($oBasket, $oUser);
+
+        $this->setOrderStatus('NOT_FINISHED');
+        $tmpOrder = oxNew(TmpOrder::class);
+        $tmpOrder->saveTmpOrder($this);
+        Registry::getSession()->setVariable('oxOrderIdOfTmpOrder', $this->getId());
+
+        return $iRet;
+    }
+
+    public function getUnzerOrderNr(): string
     {
         $value = $this->getFieldData('oxunzerordernr');
-        return is_numeric($value) ? (int)$value : 0;
+        return is_string($value) ? $value : '';
     }
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function setUnzerOrderNr(int $unzerOrderId): int
+    public function setUnzerOrderNr(string $unzerOrderId): string
     {
         /** @var ContainerInterface $container */
         $container = ContainerFactory::getInstance()
@@ -164,6 +233,37 @@ class Order extends Order_parent
         $this->oxorder__oxunzerordernr = new Field($unzerOrderId);
 
         return $unzerOrderId;
+    }
+
+    /**
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    public function finalizeTmpOrder(\UnzerSDK\Resources\Payment $unzerPayment, bool $error = false): void
+    {
+        // set order in any case as Paid
+        $this->markUnzerOrderAsPaid();
+
+        if ($error === true) {
+            $this->setOrderStatus('ERROR');
+        } else {
+            switch ($unzerPayment->getState()) {
+                case PaymentState::STATE_PENDING:
+                    $this->setOrderStatus('NOT_FINISHED');
+                    break;
+                case PaymentState::STATE_CANCELED:
+                    $this->cancelOrder();
+                    break;
+            }
+        }
+
+        if (!$this->getFieldData('oxordernr')) {
+            $this->setNumber();
+        }
+
+        $this->initWriteTransactionToDB($unzerPayment);
+        $this->save();
     }
 
     /**
