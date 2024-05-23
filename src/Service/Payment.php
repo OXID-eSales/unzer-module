@@ -237,6 +237,7 @@ class Payment
      * @return \UnzerSDK\Resources\Payment|null
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getSessionUnzerPayment(
         UnzerPaymentInterface|null $paymentExtension = null,
@@ -279,11 +280,9 @@ class Payment
                 $customerType = 'B2B';
             }
         }
-        if ($this->sdk !== null) {
-            $sdk = $this->sdk;
-        } else {
-            $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
-            $this->sdk = $sdk;
+        $sdk = $this->sdk;
+        if ($sdk == null) {
+            $sdk = $this->sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
         }
         if (
             $order->getFieldData('oxpaymenttype')
