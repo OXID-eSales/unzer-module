@@ -43,6 +43,7 @@ class Payment
     private const STATUS_ERROR = "ERROR";
 
     protected Session $session;
+    protected ?\UnzerSDK\Unzer $sdk = null;
 
     protected PaymentExtensionLoader $paymentExtLoader;
 
@@ -236,6 +237,7 @@ class Payment
      * @return \UnzerSDK\Resources\Payment|null
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getSessionUnzerPayment(
         UnzerPaymentInterface|null $paymentExtension = null,
@@ -278,8 +280,10 @@ class Payment
                 $customerType = 'B2B';
             }
         }
-
-        $sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
+        $sdk = $this->sdk;
+        if ($sdk == null) {
+            $sdk = $this->sdk = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency);
+        }
         if (
             $order->getFieldData('oxpaymenttype')
             === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID
@@ -305,7 +309,7 @@ class Payment
     public function doUnzerCancel(
         Order $oOrder,
         string $unzerid,
-        string $chargeid,
+        string|null $chargeid,
         float $amount,
         string $reason
     ): Exception|bool|UnzerApiException {
