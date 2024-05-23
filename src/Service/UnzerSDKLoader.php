@@ -7,10 +7,11 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use OxidEsales\Eshop\Core\Session;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use RuntimeException;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Unzer;
 
 class UnzerSDKLoader
@@ -23,12 +24,8 @@ class UnzerSDKLoader
     /**
      * @var DebugHandler
      */
-    private $debugHandler;
+    private DebugHandler $debugHandler;
 
-    /**
-     * @var Session
-     */
-    private $session;
 
     /**
      * @param ModuleSettings $moduleSettings
@@ -38,13 +35,10 @@ class UnzerSDKLoader
      */
     public function __construct(
         ModuleSettings $moduleSettings,
-        DebugHandler $debugHandler,
-        Session $session
+        DebugHandler $debugHandler
     ) {
         $this->moduleSettings = $moduleSettings;
         $this->debugHandler = $debugHandler;
-        $this->session = $session;
-        $ignore = $this->session->isAdmin();
     }
 
     /**
@@ -55,6 +49,7 @@ class UnzerSDKLoader
      *
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @throws UnzerException
      */
     public function getUnzerSDK(string $paymentId = '', string $currency = '', string $customerType = ''): Unzer
     {
@@ -71,44 +66,39 @@ class UnzerSDKLoader
             $key = $this->moduleSettings->getStandardPrivateKey();
         }
 
-        $logger = \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(DebugHandler::class);
-        $logger->log("******\n\n\n**** paymentID= $paymentId ;  cur = $currency ; customer = $customerType key = $key");
+        try {
+            $sdk = $this->getUnzerSDKbyKey($key);
+        } catch (UnzerException $e) {
+            $logEntry = sprintf(
+                'Try to get the SDK with the Key "%s" defined by paymentId "%s", currency "%s", customerType "%s"',
+                $key,
+                $paymentId,
+                $currency,
+                $customerType
+            );
+            $this->debugHandler->log($logEntry);
+            throw new UnzerException($logEntry);
+        }
 
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
-        $caller = $backtrace[1];
-        $caller2 = $backtrace[2];
-
-        $message = sprintf(
-            "+++++ Method %s called from %s:%d\n",
-            $caller['function'],
-            $caller['file'],
-            $caller['line']
-        );
-
-        $message .= sprintf(
-        "Which is called from %s called from %s:%d \n\n\n",
-        $caller2['function'],
-        $caller2['file'],
-        $caller2['line']
-    );
-
-        $logger->log($message);
-
-        return $this->getUnzerSDKbyKey($key);
+        return $sdk;
     }
 
     /**
      * Creates an UnzerSDK object based upon a specific private key.
      * @param string $key
      * @return Unzer
+     * @throws UnzerException
      */
     public function getUnzerSDKbyKey(string $key): Unzer
     {
-        $sdk = oxNew(Unzer::class, $key);
-        if ($this->moduleSettings->isDebugMode()) {
-            $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
+        try {
+            $sdk = oxNew(Unzer::class, $key);
+            if ($this->moduleSettings->isDebugMode()) {
+                $sdk->setDebugMode(true)->setDebugHandler($this->debugHandler);
+            }
+        } catch (RuntimeException $e) {
+            $this->debugHandler->log($e->getMessage());
+            throw new UnzerException($e->getMessage());
         }
         return $sdk;
     }
@@ -118,6 +108,7 @@ class UnzerSDKLoader
      * @param string $sPaymentId
      * @return Unzer
      *
+     * @throws UnzerException|DatabaseConnectionException
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getUnzerSDKbyPaymentType(string $sPaymentId): Unzer

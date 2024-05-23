@@ -95,10 +95,6 @@ class DispatcherController extends FrontendController
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
         $paymentId = $resource->getId();
 
-        if (!$transaction->isValidTransactionTypeId($typeid)) {
-         //   Registry::getUtils()->showMessageAndExit("Invalid type id");
-        }
-
         if (is_string($paymentId)) {
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
             $order = oxNew(Order::class);

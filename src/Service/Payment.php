@@ -248,7 +248,7 @@ class Payment
             return $this->sessionUnzerPayment;
         }
 
-        $uzrPaymentId = $this->session->getVariable('UzrPaymentId');
+        $uzrPaymentId = $this->session->getVariable('UnzerPaymentId');
 
         if (is_string($uzrPaymentId)) {
             /** @var string $sessionOrderId */

@@ -543,7 +543,7 @@ class Unzer
             $this->session->setVariable('ShortId', $charge->getShortId());
         }
 
-        $this->session->setVariable('UzrPaymentId', $charge->getPaymentId());
+        $this->session->setVariable('UnzerPaymentId', $charge->getPaymentId());
 
         if ($charge instanceof Authorization) {
             $this->session->setVariable('UzrPdfLink', $charge->getPDFLink());

@@ -9,9 +9,11 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Core\Registry;
+use UnzerSDK\Exceptions\UnzerApiException;
 
 class AccountSavedPaymentController extends AccountController
 {
@@ -32,46 +34,44 @@ class AccountSavedPaymentController extends AccountController
 
     protected function setPaymentListsToView(): void
     {
-        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
-        $unzerSDK = $UnzerSdk->getUnzerSDK();
-
-        $ids = $this->getTransactionIds();
+        $transactionService = $this->getServiceFromContainer(Transaction::class);
+        $ids = $transactionService->getTrancactionIds($this->getUser());
         $paymentTypes = false;
-        foreach ($ids as $typeId) {
-            if (empty($typeId['PAYMENTTYPEID'])) {
+        foreach ($ids as $typeData) {
+            $paymentTypeId = $typeData['PAYMENTTYPEID'];
+            $paymentId = $typeData['OXPAYMENTTYPE'];
+            $currency = $typeData['CURRENCY'];
+            $customerType = $typeData['CUSTOMERTYPE'];
+            $transactionOxId = $typeData['OXID'];
+
+            if (empty($paymentTypeId)) {
                 continue;
             }
-            $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
 
-            if (strpos($typeId['PAYMENTTYPEID'], 'crd') && method_exists($paymentType, 'getBrand')) {
-                $paymentTypes[$paymentType->getBrand()][$typeId['OXID']] = $paymentType->expose();
+            try {
+                $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
+                $unzerSDK = $UnzerSdk->getUnzerSDK(
+                    $paymentId,
+                    $currency,
+                    $customerType
+                );
+                $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
+            } catch (UnzerApiException $e) {
+                continue;
             }
-            if (strpos($typeId['PAYMENTTYPEID'], 'ppl')) {
-                $paymentTypes['paypal'][$typeId['OXID']] = $paymentType->expose();
+
+            if (strpos($paymentTypeId, 'crd') && method_exists($paymentType, 'getBrand')) {
+                $paymentTypes[$paymentType->getBrand()][$transactionOxId] = $paymentType->expose();
             }
-            if (strpos($typeId['PAYMENTTYPEID'], 'sdd')) {
-                $paymentTypes['sepa'][$typeId['OXID']] = $paymentType->expose();
+            if (strpos($paymentTypeId, 'ppl')) {
+                $paymentTypes['paypal'][$transactionOxId] = $paymentType->expose();
+            }
+            if (strpos($paymentTypeId, 'sdd')) {
+                $paymentTypes['sepa'][$transactionOxId] = $paymentType->expose();
             }
         }
 
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    protected function getTransactionIds(): array
-    {
-        $result = [];
-        if ($this->getUser()) {
-            $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $result = $oDB->getAll(
-                "SELECT OXID, PAYMENTTYPEID from oscunzertransaction
-                where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL GROUP BY PAYMENTTYPEID ",
-                [':oxuserid' => $this->getUser()->getId()]
-            );
-        }
-        return $result;
     }
 
     /**

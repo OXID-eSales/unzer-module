@@ -125,7 +125,7 @@ class TmpOrder extends BaseModel
         return is_array($result) ? $result : [];
     }
 
-    public function getTmpOrderByOxOrderId(string $oxSessionOrderId): ?\OxidEsales\Eshop\Application\Model\Order
+    public function getTmpOrderByOxOrderId(string $oxSessionOrderId): ?CoreOrderModel
     {
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         /** @var QueryBuilder $queryBuilder */

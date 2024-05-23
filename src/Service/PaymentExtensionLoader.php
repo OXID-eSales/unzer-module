@@ -81,6 +81,10 @@ class PaymentExtensionLoader
     }
 
     /**
+     * Please only use this method if you want to have static information about the payment method and do not
+     * need functions of the SDK. The SDK must always be loaded with the correct credentials. This is only
+     * guaranteed if method getPaymentExtensionByCustomerTypeAndCurrency is used, as only this loads the SDK
+     * with the correct credentials at all times
      * @param PaymentModel $payment
      * @return AbstractUnzerPayment
      */
@@ -95,6 +99,9 @@ class PaymentExtensionLoader
     }
 
     /**
+     * Please only use this method if you need the SDK. This is the only way to load the SDK with the correct
+     * credentials. The getPaymentExtension method is only used to obtain static information about the payment
+     * method.
      * @param PaymentModel $payment
      * @param string $customerType
      * @param string $currency

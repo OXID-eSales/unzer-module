@@ -28,7 +28,6 @@ use UnzerSDK\Resources\PaymentTypes\Paypal;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
-use JsonException;
 
 /**
  *  TODO: Decrease count of dependencies to 13
@@ -214,8 +213,10 @@ abstract class UnzerPayment
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }
         } else {
+            $priceObj = $basketModel->getPrice();
+            $price = $priceObj ? $priceObj->getPrice() : 0;
             $transaction = $paymentType->{$paymentProcedure}(
-                $basketModel->getPrice()->getPrice(),
+                $price,
                 $basketModel->getBasketCurrency()->name,
                 $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
                 $customer,

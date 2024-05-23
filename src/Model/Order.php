@@ -193,7 +193,7 @@ class Order extends Order_parent
         $tmpOrder = oxNew(TmpOrder::class);
         $tmpOrder->saveTmpOrder($this);
 
-        Registry::getSession()->setVariable('oxOrderIdOfTmpOrder', $this->getId());
+        Registry::getSession()->setVariable('oxOrderIdOfTmpOrder', $orderId);
 
         return $iRet;
     }
