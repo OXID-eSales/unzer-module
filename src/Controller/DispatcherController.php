@@ -70,8 +70,7 @@ class DispatcherController extends FrontendController
         $url = parse_url($aJson['retrieveUrl']);
         /** @var Transaction $transaction */
         $transaction = $this->getServiceFromContainer(Transaction::class);
-        $aPath = explode("/", $url['path']);
-        $typeid = end($aPath);
+
         /** @var Request $request */
         $request = Registry::getRequest();
         /** @var string $context */

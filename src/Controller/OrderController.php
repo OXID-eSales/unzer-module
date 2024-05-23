@@ -378,7 +378,7 @@ class OrderController extends OrderController_parent
                             $customerType
                         );
                         $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
-                    } catch (UnzerException|UnzerApiException $e) {
+                    } catch (UnzerException | UnzerApiException $e) {
                         $userId = $this->getUser() ? $this->getUser()->getId() : 'unknown';
                         $logEntry = sprintf(
                             'The incorrect data used to initialize the SDK comes from the transactions of the user: "%s"',
