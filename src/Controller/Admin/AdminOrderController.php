@@ -382,7 +382,7 @@ class AdminOrderController extends AdminDetailsController
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
         /** @var Order $oOrder */
         $oOrder = $this->getEditObject();
-        $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, (string)$reason);
+        $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, floatval($amount), (string)$reason);
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errCancel'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
         }

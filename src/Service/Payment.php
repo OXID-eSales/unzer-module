@@ -43,7 +43,7 @@ class Payment
     private const STATUS_ERROR = "ERROR";
 
     protected Session $session;
-    protected $sdk = null;
+    protected ?\UnzerSDK\Unzer $sdk = null;
 
     protected PaymentExtensionLoader $paymentExtLoader;
 
