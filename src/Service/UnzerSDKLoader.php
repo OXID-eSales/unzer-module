@@ -71,6 +71,31 @@ class UnzerSDKLoader
             $key = $this->moduleSettings->getStandardPrivateKey();
         }
 
+        $logger = \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(DebugHandler::class);
+        $logger->log("******\n\n\n**** paymentID= $paymentId ;  cur = $currency ; customer = $customerType key = $key");
+
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
+        $caller = $backtrace[1];
+        $caller2 = $backtrace[2];
+
+        $message = sprintf(
+            "+++++ Method %s called from %s:%d\n",
+            $caller['function'],
+            $caller['file'],
+            $caller['line']
+        );
+
+        $message .= sprintf(
+        "Which is called from %s called from %s:%d \n\n\n",
+        $caller2['function'],
+        $caller2['file'],
+        $caller2['line']
+    );
+
+        $logger->log($message);
+
         return $this->getUnzerSDKbyKey($key);
     }
 
