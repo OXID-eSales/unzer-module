@@ -139,7 +139,7 @@ class OrderController extends OrderController_parent
                     $paymentService->doUnzerCollect(
                         $oOrder,
                         $unzerPaymentId,
-                        $oBasket->getDiscountedProductsBruttoPrice()
+                        (float)$oOrder->getTotalOrderSum()
                     );
                 }
 
@@ -424,7 +424,7 @@ class OrderController extends OrderController_parent
 
     private function getUnzerPaymentIdFromSession(): string
     {
-        $paymentId = Registry::getSession()->getVariable('paymentid');
+        $paymentId = Registry::getSession()->getVariable('UzrPaymentId');
         if (is_string($paymentId)) {
             return $paymentId;
         }

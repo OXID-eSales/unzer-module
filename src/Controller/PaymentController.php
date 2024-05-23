@@ -122,6 +122,7 @@ class PaymentController extends PaymentController_parent
     {
         $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
         $unzerSDK = $unzerSDK->getUnzerSDK();
+
         $oxOrderIdOfTmpOrder = $session->getVariable('oxOrderIdOfTmpOrder');
         $paymentId = is_string($session->getVariable('paymentid')) ? $session->getVariable('paymentid') : '';
         if ($oxOrderIdOfTmpOrder) {
