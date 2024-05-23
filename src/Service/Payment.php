@@ -18,6 +18,7 @@ use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use stdClass;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment as UnzerPayment;
 use UnzerSDK\Resources\AbstractUnzerResource;
@@ -238,14 +239,17 @@ class Payment
     }
 
     /**
+     * @param bool $noCache
      * @return UnzerPayment|null
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getSessionUnzerPayment(): ?UnzerPayment
+    public function getSessionUnzerPayment(bool $noCache = false): ?UnzerPayment
     {
         $result = null;
-
-        if ($this->sessionUnzerPayment instanceof UnzerPayment) {
-            return $this->sessionUnzerPayment;
+        if ($noCache === false) {
+            if ($this->sessionUnzerPayment instanceof UnzerPayment) {
+                return $this->sessionUnzerPayment;
+            }
         }
 
         $uzrPaymentId = $this->session->getVariable('UnzerPaymentId');
@@ -282,7 +286,7 @@ class Payment
     {
         $customerType = 'B2C';
 
-        if ($currency != null) {
+        if ($currency !== null) {
             if ($this->isPaylaterInvoice($paymentType)) {
                 $customerInRequest = Registry::getRequest()->getRequestParameter('unzer_customer_type');#
                 if ($customerInRequest !== 'B2C') {
@@ -295,14 +299,11 @@ class Payment
 
     private function isPaylaterInvoice(string $paymentType): bool
     {
-        return in_array(
-            $paymentType,
-            [
-                UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID,
-                UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
-                UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID,
-            ]
-        );
+        return in_array($paymentType, [
+            UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID,
+            UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
+            UnzerDefinitions::INSTALLMENT_UNZER_PAYMENT_ID,
+        ], true);
     }
 
     private function getOrderCurrency(string $sessionOrderId, Order $order, string $paymentType): string
@@ -313,12 +314,11 @@ class Payment
         if ($this->isPaylaterInvoice($paymentType)) {
             $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($sessionOrderId);
             if ($tmpOrder !== null) {
-                /** @var \stdClass{name: string} $orderCurrency */
+                /** @var stdClass{name: string} $orderCurrency */
                 $orderCurencyStdCls = $tmpOrder->getOrderCurrency();
                 $currency = $orderCurencyStdCls->name;
             }
         }
-
         return $currency;
     }
 

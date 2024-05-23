@@ -9,6 +9,8 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
@@ -49,25 +51,32 @@ class AccountSavedPaymentController extends AccountController
             }
 
             try {
-                $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
-                $unzerSDK = $UnzerSdk->getUnzerSDK(
+                $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK(
                     $paymentId,
                     $currency,
                     $customerType
                 );
                 $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
-            } catch (UnzerApiException $e) {
-                continue;
-            }
-
-            if (strpos($paymentTypeId, 'crd') && method_exists($paymentType, 'getBrand')) {
-                $paymentTypes[$paymentType->getBrand()][$transactionOxId] = $paymentType->expose();
-            }
-            if (strpos($paymentTypeId, 'ppl')) {
-                $paymentTypes['paypal'][$transactionOxId] = $paymentType->expose();
-            }
-            if (strpos($paymentTypeId, 'sdd')) {
-                $paymentTypes['sepa'][$transactionOxId] = $paymentType->expose();
+                if (strpos($paymentTypeId, 'crd') && method_exists($paymentType, 'getBrand')) {
+                    $paymentTypes[$paymentType->getBrand()][$transactionOxId] = $paymentType->expose();
+                }
+                if (strpos($paymentTypeId, 'ppl')) {
+                    $paymentTypes['paypal'][$transactionOxId] = $paymentType->expose();
+                }
+                if (strpos($paymentTypeId, 'sdd')) {
+                    $paymentTypes['sepa'][$transactionOxId] = $paymentType->expose();
+                }
+            } catch (UnzerApiException | UnzerException $e) {
+                if ($e->getCode() !== 'API.500.100.001') {
+                    $logEntry = sprintf(
+                        'Unknown error code while creating the PaymentList: "%s"',
+                        $e->getCode()
+                    );
+                    $logger = $this->getServiceFromContainer(DebugHandler::class);
+                    $logger->log($logEntry);
+                    continue;
+                }
+                $paymentTypes['invalid_payment_method_with_id'][$transactionOxId] = $paymentTypeId;
             }
         }
 

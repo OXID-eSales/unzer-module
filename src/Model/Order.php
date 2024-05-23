@@ -115,7 +115,7 @@ class Order extends Order_parent
         }
 
         $this->initWriteTransactionToDB(
-            $paymentService->getSessionUnzerPayment()
+            $paymentService->getSessionUnzerPayment( true)
         );
 
         // cleanUp Tmp Order

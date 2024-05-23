@@ -381,7 +381,8 @@ class OrderController extends OrderController_parent
                     } catch (UnzerException | UnzerApiException $e) {
                         $userId = $this->getUser() ? $this->getUser()->getId() : 'unknown';
                         $logEntry = sprintf(
-                            'The incorrect data used to initialize the SDK comes from the transactions of the user: "%s"',
+                            'The incorrect data used to initialize the SDK ' .
+                            'comes from the transactions of the user: "%s"',
                             $userId
                         );
                         $logger = $this->getServiceFromContainer(DebugHandler::class);
