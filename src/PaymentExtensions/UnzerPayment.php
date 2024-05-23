@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -27,7 +28,6 @@ use UnzerSDK\Resources\PaymentTypes\Paypal;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Unzer;
-use JsonException;
 
 /**
  *  TODO: Decrease count of dependencies to 13
@@ -204,14 +204,19 @@ abstract class UnzerPayment
             $auth->setRiskData($uzrRiskData);
             try {
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
-                $UnzerSdk = $loader->getUnzerSDK('B2C', $currency->name, true);
+                $UnzerSdk = $loader->getUnzerSDK(
+                    UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
+                    $currency->name
+                );
                 $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }
         } else {
+            $priceObj = $basketModel->getPrice();
+            $price = $priceObj ? $priceObj->getPrice() : 0;
             $transaction = $paymentType->{$paymentProcedure}(
-                $basketModel->getPrice()->getPrice(),
+                $price,
                 $basketModel->getBasketCurrency()->name,
                 $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
                 $customer,
