@@ -107,7 +107,7 @@
             {% if AuthAmountRemaining > 0 %}
                 <h3>{{ translate({ ident: "OSCUNZER_AUTHORIZATION" }) }}</h3>
                 <form name="uzr" id="uzr_collect" action="{{ oViewConf.getSelfLink() }}" method="post">
-                    <input type="hidden" name="stoken" value="{{ oViewConf.getSessionChallengeToken() }}">
+                    {{ oViewConf.getHiddenSid()|raw }}
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerCollect">
                     <input type="hidden" name="oxid" value="{{ oxid }}">
