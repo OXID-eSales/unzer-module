@@ -50,8 +50,8 @@ class AdminOrderController extends AdminDetailsController
     /** @var Payment $oPayment */
     protected $oPayment = null;
 
-    /** @var string $sPaymentId */
-    protected $sPaymentId;
+    /** @var string $sTypeId */
+    protected string $sTypeId;
 
     /**
      * Executes parent method parent::render()
@@ -69,15 +69,8 @@ class AdminOrderController extends AdminDetailsController
 
         $this->_aViewData["sOxid"] = $this->getEditObjectId();
 
-        /** @var Order $oOrder */
-        $oOrder = $this->getEditObject();
         $transactionList = oxNew(TransactionList::class);
-        $oxTransId = $oOrder->getFieldData('OXTRANSID');
-        $oxTransId = is_string($oxTransId) ? $oxTransId : null;
-        $transactionList->getTransactionList(
-            $this->getEditObjectId(),
-            $oxTransId
-        );
+        $transactionList->getTransactionList($this->getEditObjectId());
         if ($transactionList->count()) {
             $this->_aViewData['oUnzerTransactions'] = $transactionList;
         }
@@ -88,12 +81,14 @@ class AdminOrderController extends AdminDetailsController
 
             $this->_aViewData['paymentTitle'] = $this->oPayment->getFieldData('OXDESC');
             $this->_aViewData['oOrder'] = $oOrder;
+            /** @var string $sPaymentId */
+            $sPaymentId = $oOrder->getFieldData('oxpaymenttype');
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId());
-            $this->_aViewData['sPaymentId'] = $this->sPaymentId;
-            if ($this->sPaymentId) {
-                $this->getUnzerViewData($this->sPaymentId);
+            $this->sTypeId = $transactionService::getPaymentIdByOrderId($this->getEditObjectId());
+            $this->_aViewData['sTypeId'] = $this->sTypeId;
+            if ($this->sTypeId) {
+                $this->getUnzerViewData($sPaymentId, $this->sTypeId);
             }
         } else {
             $translator = $this->getServiceFromContainer(Translator::class);
@@ -103,29 +98,28 @@ class AdminOrderController extends AdminDetailsController
         return "@osc-unzer/admin/tpl/oscunzer_order";
     }
 
-    public function getUnzerSDK(string $customerType, string $currency, bool $type): Unzer
+    public function getUnzerSDK(string $paymentId = '', string $currency = '', string $customerType = ''): Unzer
     {
         return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK($customerType, $currency, $type);
+            ->getUnzerSDK($paymentId, $currency, $customerType);
     }
 
     /**
-     * @param string $sPaymentId
+     * @param string $sPaymentId - OXID Payment ID
+     * @param string $sTypeId - Unzer Type ID
      * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function getUnzerViewData(string $sPaymentId): void
+    protected function getUnzerViewData(string $sPaymentId, string $sTypeId): void
     {
         try {
             $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
-            $paymentId = $this->getEditObject()->getFieldData('oxpaymenttype');
-            $type = $paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID;
-
-            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency'], $type);
-
-            $unzerPayment = $sdk->fetchPayment($sPaymentId);
+            // initialize proper SDK object
+            $sdk = $this->getUnzerSDK($sPaymentId, $transactionInfo['currency'], $transactionInfo['customertype']);
+            /** @var \UnzerSDK\Resources\Payment $unzerPayment */
+            $unzerPayment = $sdk->fetchPayment($sTypeId);
             $fCancelled = 0.0;
             $fCharged = 0.0;
 
@@ -396,8 +390,6 @@ class AdminOrderController extends AdminDetailsController
         $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        /** @var float $amount */
-        $amount = Registry::getRequest()->getRequestParameter('amount');
         /** @var string $sAmount */
         $sAmount = Registry::getRequest()->getRequestParameter('amount');
         $amount = floatval($sAmount);
@@ -492,9 +484,9 @@ class AdminOrderController extends AdminDetailsController
     /**
      * Returns editable order object
      *
-     * @return Order
+     * @return Order|null
      */
-    public function getEditObject(): object
+    public function getEditObject(): ?object
     {
         $soxId = $this->getEditObjectId();
         if ($this->editObject === null && $soxId != '-1') {
