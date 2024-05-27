@@ -11,11 +11,11 @@ use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
-use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
+use PHPUnit\Framework\TestCase;
 
-class ModuleSettingsTest extends IntegrationTestCase
+class ModuleSettingsTest extends TestCase
 {
     /**
      * @dataProvider getSettingsDataProvider
@@ -86,7 +86,7 @@ class ModuleSettingsTest extends IntegrationTestCase
                     ['sandbox-UnzerPublicKey', Module::MODULE_ID, 'sandboxPublicKey'],
                     ['production-UnzerPublicKey', Module::MODULE_ID, 'productionPublicKey'],
                 ],
-                'settingMethod' => 'getShopPublicKey',
+                'settingMethod' => 'getStandardPublicKey',
                 'settingValue' => 'sandboxPublicKey'
             ],
             [
@@ -95,7 +95,7 @@ class ModuleSettingsTest extends IntegrationTestCase
                     ['sandbox-UnzerPublicKey', Module::MODULE_ID, 'sandboxPublicKey'],
                     ['production-UnzerPublicKey', Module::MODULE_ID, 'productionPublicKey'],
                 ],
-                'settingMethod' => 'getShopPublicKey',
+                'settingMethod' => 'getStandardPublicKey',
                 'settingValue' => 'productionPublicKey'
             ],
             [
@@ -104,7 +104,7 @@ class ModuleSettingsTest extends IntegrationTestCase
                     ['sandbox-UnzerPrivateKey', Module::MODULE_ID, 'sandboxPrivateKey'],
                     ['production-UnzerPrivateKey', Module::MODULE_ID, 'productionPrivateKey'],
                 ],
-                'settingMethod' => 'getShopPrivateKey',
+                'settingMethod' => 'getStandardPrivateKey',
                 'settingValue' => 'sandboxPrivateKey'
             ],
             [
@@ -113,7 +113,7 @@ class ModuleSettingsTest extends IntegrationTestCase
                     ['sandbox-UnzerPrivateKey', Module::MODULE_ID, 'sandboxPrivateKey'],
                     ['production-UnzerPrivateKey', Module::MODULE_ID, 'productionPrivateKey'],
                 ],
-                'settingMethod' => 'getShopPrivateKey',
+                'settingMethod' => 'getStandardPrivateKey',
                 'settingValue' => 'productionPrivateKey'
             ],
             [

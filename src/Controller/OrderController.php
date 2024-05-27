@@ -19,6 +19,7 @@ use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
+use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -129,13 +130,13 @@ class OrderController extends OrderController_parent
 
             if ('thankyou' === $nextStep) {
                 $oDB->commitTransaction();
-
+                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
-                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
                         $oUser->getId(),
-                        $oBasket->getDiscountedProductsBruttoPrice()
+                        (float)$oOrder->getTotalOrderSum()
                     );
                 }
 
@@ -332,52 +333,57 @@ class OrderController extends OrderController_parent
 
     protected function getSavedPayment(): void
     {
-        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
-        $unzerSDK = $UnzerSdk->getUnzerSDK();
-
-        $ids = $this->getTrancactionIds();
+        $transactionService = $this->getServiceFromContainer(Transaction::class);
+        $ids = $transactionService->getTransactionIds($this->getUser());
         $paymentTypes = false;
         if ($ids) {
-            foreach ($ids as $typeId) {
-                if (!empty($typeId['PAYMENTTYPEID'])) {
+            foreach ($ids as $typeData) {
+                $paymentTypeId = $typeData['PAYMENTTYPEID'] ?: '';
+                $paymentId = $typeData['OXPAYMENTTYPE'] ?: '';
+                $currency = $typeData['CURRENCY'] ?: '';
+                $customerType = $typeData['CUSTOMERTYPE'] ?: '';
+                if (!empty($paymentTypeId)) {
                     try {
-                        $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
-                    } catch (UnzerApiException $e) {
+                        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
+                        $unzerSDK = $UnzerSdk->getUnzerSDK(
+                            $paymentId,
+                            $currency,
+                            $customerType
+                        );
+                        $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
+                    } catch (UnzerException | UnzerApiException $e) {
+                        $userId = $this->getUser() ? $this->getUser()->getId() : 'unknown';
+                        $logEntry = sprintf(
+                            'The incorrect data used to initialize the SDK ' .
+                            'comes from the transactions of the user: "%s"',
+                            $userId
+                        );
+                        $logger = $this->getServiceFromContainer(DebugHandler::class);
+                        $logger->log($logEntry);
                         continue;
                     }
-
-                    if (strpos($typeId['PAYMENTTYPEID'], 'crd')) {
-                        $paymentTypes['card'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    if (strpos($paymentTypeId, 'crd')) {
+                        $paymentTypes['card'][$paymentTypeId] = $paymentType->expose();
                     }
-                    if (strpos($typeId['PAYMENTTYPEID'], 'ppl')) {
-                        $paymentTypes['paypal'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    if (strpos($paymentTypeId, 'ppl')) {
+                        $paymentTypes['paypal'][$paymentTypeId] = $paymentType->expose();
                     }
-                    if (strpos($typeId['PAYMENTTYPEID'], 'sdd')) {
-                        $paymentTypes['sepa'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    if (strpos($paymentTypeId, 'sdd')) {
+                        $paymentTypes['sepa'][$paymentTypeId] = $paymentType->expose();
                     }
                 }
             }
         }
-
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    protected function getTrancactionIds(): array
+    private function getUnzerPaymentIdFromSession(): string
     {
-        $result = [];
-        if ($this->getUser() && $this->getUser()->getId() !== null) {
-            $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $result = $oDB->getAll(
-                "SELECT PAYMENTTYPEID from oscunzertransaction
-                     where OXUSERID = :oxuserid
-                       AND PAYMENTTYPEID IS NOT NULL
-                     GROUP BY PAYMENTTYPEID ",
-                [':oxuserid' => $this->getUser()->getId()]
-            );
+        $paymentId = Registry::getSession()->getVariable('UnzerPaymentId');
+        if (is_string($paymentId)) {
+            return $paymentId;
         }
-        return $result;
+
+        return '';
     }
 }

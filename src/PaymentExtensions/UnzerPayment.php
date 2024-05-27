@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
@@ -196,8 +197,12 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             );
             $auth->setRiskData($uzrRiskData);
             try {
+                /** @var UnzerSDKLoader $loader */
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
-                $UnzerSdk = $loader->getUnzerSDK('B2C', $currency->name, true);
+                $UnzerSdk = $loader->getUnzerSDK(
+                    UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
+                    $currency->name
+                );
                 $transaction = $UnzerSdk->performAuthorization(
                     $auth,
                     $paymentType,
@@ -211,8 +216,11 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             return $transaction;
         }
 
+        $priceObj = $basketModel->getPrice();
+        $price = $priceObj ? $priceObj->getPrice() : 0; //@TODO Check weather Unzer accepts 0 as price
+
         return $paymentType->{$paymentProcedure}(
-            $basketModel->getPrice()->getPrice(),
+            $price,
             $basketModel->getBasketCurrency()->name,
             $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
             $customer,
