@@ -29,6 +29,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 
@@ -138,6 +139,11 @@ class OrderController extends OrderController_parent
                 $oDB->commitTransaction();
                 $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
+
+                if ($this->isPaymentCancelled($paymentService)) {
+                    $this->redirectUserToCheckout($unzerService, $oOrder);
+                }
+
                 if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
@@ -429,5 +435,23 @@ class OrderController extends OrderController_parent
         }
 
         return '';
+    }
+
+    private function isPaymentCancelled(PaymentService $paymentService): bool
+    {
+        return $paymentService->getSessionUnzerPayment()->getState() === PaymentState::STATE_CANCELED;
+    }
+
+    /**
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
+     */
+    private function redirectUserToCheckout(Unzer $unzerService, \OxidSolutionCatalysts\Unzer\Model\Order  $order)
+    {
+        $translator = $this->getServiceFromContainer(Translator::class);
+        $unzerOrderNr = $order->getUnzerOrderNr();
+        throw new RedirectWithMessage(
+            $unzerService->prepareRedirectUrl('payment?payerror=-6'),
+            sprintf($translator->translate('OSCUNZER_CANCEL_DURING_CHECKOUT'), $unzerOrderNr)
+        );
     }
 }

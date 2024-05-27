@@ -15,6 +15,7 @@ $aLang = [
 
     // Error
     'OSCUNZER_ERROR_DURING_CHECKOUT' => 'Bei der Abwicklung der Zahlung ist ein Fehler aufgetreten. Der Prozess wurde rückgängig gemacht. Bitte wählen Sie alternativ eine andere Zahlart aus.',
+    'OSCUNZER_CANCEL_DURING_CHECKOUT' => "Die Zahlung wurde abgebrochen. Wir haben Ihre Bestellung mit der Nummer %s gespeichert",
 
     // Invoice
     'OSCUNZER_BANK_DETAILS_AMOUNT' => 'Bitte überweisen sie den Betrag von %s %s auf folgendes Bankkonto:<br /><br />',
