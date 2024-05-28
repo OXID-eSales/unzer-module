@@ -240,6 +240,7 @@ class Transaction
         );
         $params = [
             'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'remaining' => $unzerPayment->getAmount()->getRemaining(),
             'currency' => $unzerPayment->getCurrency(),
             'typeid'   => $unzerPayment->getId(),
             'oxaction' => $oxaction,
