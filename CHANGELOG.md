@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Avoid checking AppleCert if ApplePay is off
 - Fix Save Module Config
 - Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
+- Inform the customer in frontend, if the payment was cancelled by customer during checkout
 
 ## [1.1.3] - 2023-11-14
 
