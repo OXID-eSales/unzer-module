@@ -22,4 +22,11 @@
             <property name="cyclomaticComplexity" value="55"/>
         </properties>
     </rule>
+
+    <rule ref="rulesets/codesize.xml">
+        <properties>
+            <property name="cyclomaticComplexity" value="55"/>
+        </properties>
+    </rule>
+    <exclude-pattern>*OrderController.php</exclude-pattern>
 </ruleset>

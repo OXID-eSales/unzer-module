@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [2.2.0] - 2024-??-??
-- [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
+- [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and duplicate order mails ...
+- Inform the customer in the frontend, if the payment was cancelled by the customer during checkout
 
 ### NEW
 - provide content for smarty and twig
