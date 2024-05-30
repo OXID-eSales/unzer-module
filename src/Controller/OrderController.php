@@ -10,13 +10,13 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
-use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
@@ -139,16 +139,16 @@ class OrderController extends OrderController_parent
                 $this->redirectUserToCheckout($unzerService, $oOrder);
             }
 
-                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
-                    $paymentService->doUnzerCollect(
-                        $oOrder,
-                        $oUser->getId(),
-                        $oBasket->getDiscountedProductsBruttoPrice()
-                    );
-                }
+            if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                $paymentService->doUnzerCollect(
+                    $oOrder,
+                    $oUser->getId(),
+                    $oBasket->getDiscountedProductsBruttoPrice()
+                );
+            }
 
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
-            }
+        }
 
             $oDB->rollbackTransaction();
             $translator = $this->getServiceFromContainer(Translator::class);
@@ -156,7 +156,7 @@ class OrderController extends OrderController_parent
                 $unzerService->prepareRedirectUrl($nextStep),
                 $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT')
             );
-        }
+    }
 
     /**
      * @return bool|null
@@ -309,7 +309,7 @@ class OrderController extends OrderController_parent
         }
 
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
-        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
+        /** @var Payment $payment */
         $payment = $this->getPayment();
         $paymentOk = $paymentService->executeUnzerPayment($payment);
 
@@ -402,6 +402,7 @@ class OrderController extends OrderController_parent
     private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
     {
         $translator = $this->getServiceFromContainer(Translator::class);
+        /** @var UnzerOrder $order */
         $unzerOrderNr = $order->getUnzerOrderNr();
         throw new RedirectWithMessage(
             $unzerService->prepareRedirectUrl('payment?payerror=-6'),
