@@ -45,6 +45,7 @@ $aLang = [
     'HELP_SHOP_MODULE_UnzerOption_oscunzer_installment_rate' => 'Zinssatz in %, Dezimaltrennzeichen "." z.B.: "4.5"',
     'SHOP_MODULE_UnzerjQuery' => 'Einbindung von jQuery über das Modul',
     'HELP_SHOP_MODULE_UnzerSystemMode' => 'Wechseln Sie hier zwischen Sandbox (Testmodus) und Livebetrieb',
+    'SHOP_MODULE_UnzerWebhookTimeDifference' => 'Zeitgrenze in Minuten, bis wann Bestellungen mittels Webhook erstellt werden',
     'SHOP_MODULE_UnzerDebug' => 'Debug-Modus aktivieren',
     'HELP_SHOP_MODULE_UnzerDebug' => 'Im aktiven Debug-Modus werden Log-Files in das Verzeichnis /log/unzer geschrieben.',
     'HELP_SHOP_MODULE_UnzerLogLevel' => 'Das Log Level bestimmt, welche Ereignisse in der Logdatei protokolliert werden.

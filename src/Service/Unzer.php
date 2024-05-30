@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Doctrine\DBAL\Driver\ResultStatement;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
@@ -26,6 +27,7 @@ use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerModelOrder;
 use OxidSolutionCatalysts\Unzer\Model\UnzerPaymentData;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\CompanyRegistrationTypes;
 use UnzerSDK\Constants\CompanyTypes;
 use UnzerSDK\Constants\CustomerGroups;
@@ -56,6 +58,8 @@ use DateTime;
  */
 class Unzer
 {
+    use ServiceContainer;
+
     /** @var Session */
     protected $session;
 
@@ -604,16 +608,16 @@ class Unzer
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function generateUnzerOrderId(): int
+    public function generateUnzerOrderId(): string
     {
         $config = Registry::getConfig();
         $session = Registry::getSession();
         $unzerOrderId = $session->getVariable('UnzerOrderId');
-        $unzerOrderId = is_numeric($unzerOrderId) ? (int)$unzerOrderId : 0;
+        $unzerOrderId = is_string($unzerOrderId) ? $unzerOrderId : '';
         if (!$unzerOrderId) {
             $separateNumbering = $config->getConfigParam('blSeparateNumbering');
             $counterIdent = $separateNumbering ? 'oxUnzerOrder_' . $config->getShopId() : 'oxUnzerOrder';
-            $unzerOrderId = oxNew(Counter::class)->getNext($counterIdent);
+            $unzerOrderId = (string)oxNew(Counter::class)->getNext($counterIdent);
             $session->setVariable('UnzerOrderId', $unzerOrderId);
         }
         return $unzerOrderId;
@@ -658,11 +662,10 @@ class Unzer
         return $paymentProcedure === ModuleSettings::PAYMENT_CHARGE;
     }
 
-    private function getPaymentMethodFromOrder(int $oxUnzerOrderNr): string
+    private function getPaymentMethodFromOrder(string $oxUnzerOrderNr): string
     {
         /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = ContainerFactory::getInstance()
-            ->getContainer()->get(QueryBuilderFactoryInterface::class);
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
 
         $queryBuilder = $queryBuilderFactory->create();
 
@@ -677,12 +680,12 @@ class Unzer
 
         $result = $query->setParameters($parameters)->execute();
 
-        if ($result instanceof \Doctrine\DBAL\Driver\ResultStatement) {
+        if ($result instanceof ResultStatement) {
             /** @var string $value */
             $value = $result->fetchColumn();
             if (empty($value)) {
                 $value = '';
-            };
+            }
             return $value;
         }
 

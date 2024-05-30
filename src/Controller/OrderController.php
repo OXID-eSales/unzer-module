@@ -114,49 +114,49 @@ class OrderController extends OrderController_parent
         if (!$oBasket->getProductsCount()) {
             return;
         }
-        $oDB = DatabaseProvider::getDb();
+            $oDB = DatabaseProvider::getDb();
 
         /** @var UnzerOrder $oOrder */
-        $oOrder = $this->getActualOrder();
+            $oOrder = $this->getActualOrder();
 
-        $oDB->startTransaction();
+            $oDB->startTransaction();
 
-        //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
-        $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+            //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
+            $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
-        // performing special actions after user finishes order (assignment to special user groups)
-        $oUser->onOrderExecute($oBasket, $iSuccess);
+            // performing special actions after user finishes order (assignment to special user groups)
+            $oUser->onOrderExecute($oBasket, $iSuccess);
 
-        $nextStep = $this->getNextStep($iSuccess);
-        $unzerService = $this->getServiceFromContainer(Unzer::class);
-        Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
+            $nextStep = $this->getNextStep($iSuccess);
+            $unzerService = $this->getServiceFromContainer(Unzer::class);
+            Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
         if (stripos($nextStep, 'thankyou') !== false) {
-            $oDB->commitTransaction();
+                $oDB->commitTransaction();
             $paymentService = $this->getServiceFromContainer(PaymentService::class);
 
             if ($this->isPaymentCancelled($paymentService)) {
                 $this->redirectUserToCheckout($unzerService, $oOrder);
             }
 
-            if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
-                $paymentService->doUnzerCollect(
-                    $oOrder,
-                    $oUser->getId(),
-                    $oBasket->getDiscountedProductsBruttoPrice()
-                );
+                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                    $paymentService->doUnzerCollect(
+                        $oOrder,
+                        $oUser->getId(),
+                        $oBasket->getDiscountedProductsBruttoPrice()
+                    );
+                }
+
+                throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
             }
 
-            throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
+            $oDB->rollbackTransaction();
+            $translator = $this->getServiceFromContainer(Translator::class);
+            throw new RedirectWithMessage(
+                $unzerService->prepareRedirectUrl($nextStep),
+                $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT')
+            );
         }
-
-        $oDB->rollbackTransaction();
-        $translator = $this->getServiceFromContainer(Translator::class);
-        throw new RedirectWithMessage(
-            $unzerService->prepareRedirectUrl($nextStep),
-            $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT')
-        );
-    }
 
     /**
      * @return bool|null

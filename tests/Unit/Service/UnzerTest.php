@@ -121,9 +121,9 @@ class UnzerTest extends IntegrationTestCase
         $paymentService = $this->getPaymentServiceMock($sut);
 
         $paymentService->method('getUnzerOrderId')
-            ->willReturn(666);
+            ->willReturn('666');
 
-        $sql = "INSERT INTO oxorder SET OXID=9999, OXPAYMENTTYPE='oscunzer_paypal', OXUNZERORDERNR=666";
+        $sql = "INSERT INTO oxorder SET OXID=9999, OXPAYMENTTYPE='oscunzer_paypal', OXUNZERORDERNR='666'";
         DatabaseProvider::getDb()->execute($sql);
 
         $this->assertFalse($sut->ifImmediatePostAuthCollect($paymentService));
