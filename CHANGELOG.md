@@ -6,13 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [2.2.0] - 2024-??-??
-- [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
 
 ### NEW
 - provide content for smarty and twig
+- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook
 
 ### FIXED
 - fix: PayPal sporadically fails on GHA CC Tests
+- [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
 
 ## [2.1.4] - 2023-11-23
 

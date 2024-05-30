@@ -127,7 +127,7 @@ class OrderController extends OrderController_parent
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
-            if ('thankyou' === $nextStep) {
+            if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
 
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
