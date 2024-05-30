@@ -134,6 +134,11 @@ class OrderController extends OrderController_parent
         if (stripos($nextStep, 'thankyou') !== false) {
             $oDB->commitTransaction();
             $paymentService = $this->getServiceFromContainer(PaymentService::class);
+
+            if ($this->isPaymentCancelled($paymentService)) {
+                $this->redirectUserToCheckout($unzerService, $oOrder);
+            }
+
             if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
                 $paymentService->doUnzerCollect(
                     $oOrder,
@@ -143,11 +148,6 @@ class OrderController extends OrderController_parent
             }
 
             throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
-        }
-
-        $paymentService = $this->getServiceFromContainer(PaymentService::class);
-        if ($this->isPaymentCancelled($paymentService)) {
-            $this->redirectUserToCheckout($unzerService, $oOrder);
         }
 
         $oDB->rollbackTransaction();
