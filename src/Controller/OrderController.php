@@ -18,6 +18,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -122,7 +123,7 @@ class OrderController extends OrderController_parent
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var UnzerOrder $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();
@@ -215,7 +216,7 @@ class OrderController extends OrderController_parent
      */
     public function saveUnzerTransaction(): void
     {
-        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+        /** @var UnzerOrder $oOrder */
         $order = $this->getActualOrder();
         $order->initWriteTransactionToDB();
     }
@@ -264,7 +265,7 @@ class OrderController extends OrderController_parent
      */
     public function getActualOrder(): Order
     {
-        if (!($this->actualOrder instanceof \OxidSolutionCatalysts\Unzer\Model\Order)) {
+        if (!($this->actualOrder instanceof Order)) {
             $this->actualOrder = oxNew(Order::class);
             /** @var string $sess_challenge */
             $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
@@ -445,7 +446,7 @@ class OrderController extends OrderController_parent
     /**
      * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
      */
-    private function redirectUserToCheckout(Unzer $unzerService, \OxidSolutionCatalysts\Unzer\Model\Order  $order)
+    private function redirectUserToCheckout(Unzer $unzerService, Order $order)
     {
         $translator = $this->getServiceFromContainer(Translator::class);
         $unzerOrderNr = $order->getUnzerOrderNr();
