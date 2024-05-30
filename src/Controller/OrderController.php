@@ -17,6 +17,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
+use OxidSolutionCatalysts\Unzer\Model\Payment as UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
@@ -327,7 +328,7 @@ class OrderController extends OrderController_parent
      */
     public function getExecuteFnc()
     {
-        /** @var Payment $payment */
+        /** @var UnzerPayment $payment */
         $payment = $this->getPayment();
         if (
             $payment->isUnzerPayment()
