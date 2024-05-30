@@ -10,12 +10,14 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
-use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
+use OxidSolutionCatalysts\Unzer\Model\Payment as UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
@@ -25,6 +27,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 
 /**
@@ -109,10 +112,12 @@ class OrderController extends OrderController_parent
         // get basket contents
         $oUser = $this->getUser();
         $oBasket = Registry::getSession()->getBasket();
-        if ($oBasket->getProductsCount()) {
+        if (!$oBasket->getProductsCount()) {
+            return;
+        }
             $oDB = DatabaseProvider::getDb();
 
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var UnzerOrder $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();
@@ -127,20 +132,24 @@ class OrderController extends OrderController_parent
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
-            if (stripos($nextStep, 'thankyou') !== false) {
+        if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
+            $paymentService = $this->getServiceFromContainer(PaymentService::class);
 
-                $paymentService = $this->getServiceFromContainer(PaymentService::class);
-                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
-                    $paymentService->doUnzerCollect(
-                        $oOrder,
-                        $oUser->getId(),
-                        $oBasket->getDiscountedProductsBruttoPrice()
-                    );
-                }
+            if ($this->isPaymentCancelled($paymentService)) {
+                $this->redirectUserToCheckout($unzerService, $oOrder);
+            }
+
+            if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                $paymentService->doUnzerCollect(
+                    $oOrder,
+                    $oUser->getId(),
+                    $oBasket->getDiscountedProductsBruttoPrice()
+                );
+            }
 
                 throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
-            }
+        }
 
             $oDB->rollbackTransaction();
             $translator = $this->getServiceFromContainer(Translator::class);
@@ -148,7 +157,6 @@ class OrderController extends OrderController_parent
                 $unzerService->prepareRedirectUrl($nextStep),
                 $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT')
             );
-        }
     }
 
     /**
@@ -195,7 +203,7 @@ class OrderController extends OrderController_parent
      */
     public function saveUnzerTransaction(): void
     {
-        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+        /** @var UnzerOrder $order */
         $order = $this->getActualOrder();
         $order->initWriteTransactionToDB();
     }
@@ -244,7 +252,7 @@ class OrderController extends OrderController_parent
      */
     public function getActualOrder(): Order
     {
-        if (!($this->actualOrder instanceof \OxidSolutionCatalysts\Unzer\Model\Order)) {
+        if (!($this->actualOrder instanceof Order)) {
             $this->actualOrder = oxNew(Order::class);
             /** @var string $sess_challenge */
             $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
@@ -302,7 +310,7 @@ class OrderController extends OrderController_parent
         }
 
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
-        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
+        /** @var Payment $payment */
         $payment = $this->getPayment();
         $paymentOk = $paymentService->executeUnzerPayment($payment);
 
@@ -320,7 +328,7 @@ class OrderController extends OrderController_parent
      */
     public function getExecuteFnc()
     {
-        /** @var Payment $payment */
+        /** @var UnzerPayment $payment */
         $payment = $this->getPayment();
         if (
             $payment->isUnzerPayment()
@@ -379,5 +387,27 @@ class OrderController extends OrderController_parent
             );
         }
         return $result;
+    }
+
+    private function isPaymentCancelled(PaymentService $paymentService): bool
+    {
+        $return = false;
+        $sessionUnzerPaymentObj = $paymentService->getSessionUnzerPayment();
+        if ($sessionUnzerPaymentObj !== null) {
+            $return = $sessionUnzerPaymentObj->getState() === PaymentState::STATE_CANCELED;
+        }
+
+        return $return;
+    }
+
+    private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
+    {
+        $translator = $this->getServiceFromContainer(Translator::class);
+        /** @var UnzerOrder $order */
+        $unzerOrderNr = $order->getUnzerOrderNr();
+        throw new RedirectWithMessage(
+            $unzerService->prepareRedirectUrl('payment?payerror=-6'),
+            sprintf($translator->translate('OSCUNZER_CANCEL_DURING_CHECKOUT'), $unzerOrderNr)
+        );
     }
 }
