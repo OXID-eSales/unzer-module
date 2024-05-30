@@ -116,7 +116,7 @@ class OrderController extends OrderController_parent
         }
             $oDB = DatabaseProvider::getDb();
 
-        /** @var UnzerOrder $oOrder */
+            /** @var UnzerOrder $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();
@@ -251,7 +251,7 @@ class OrderController extends OrderController_parent
      */
     public function getActualOrder(): Order
     {
-        if (!($this->actualOrder instanceof UnzerOrder)) {
+        if (!($this->actualOrder instanceof Order)) {
             $this->actualOrder = oxNew(Order::class);
             /** @var string $sess_challenge */
             $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
@@ -399,7 +399,7 @@ class OrderController extends OrderController_parent
         return $return;
     }
 
-    private function redirectUserToCheckout(Unzer $unzerService, UnzerOrder $order): void
+    private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
     {
         $translator = $this->getServiceFromContainer(Translator::class);
         $unzerOrderNr = $order->getUnzerOrderNr();
