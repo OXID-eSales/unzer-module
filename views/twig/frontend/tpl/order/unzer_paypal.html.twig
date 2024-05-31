@@ -21,7 +21,7 @@
                         <th scope="row">{{ paymentType.email }}</th>
                         <td>{{ type }}</td>
                         <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" {% if loop.first %}checked{% endif %} style="-webkit-appearance: radio">
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
                         </td>
                     </tr>
                     {% endfor %}
@@ -58,32 +58,82 @@
             }
         });
 
+        document.getElementsByName('paymenttypeid').forEach(input => input.addEventListener('change', function(event) {
+            event.preventDefault();
+            document.getElementsByName('paymenttypeid').forEach(input => { input.checked = false; });
+            this.checked = true;
+        }));
+
+        document.querySelector('#oscunzersavepayment').addEventListener('change', function(event) {
+            event.preventDefault();
+            document.getElementsByName('paymenttypeid').forEach(input => { input.checked = false; });
+        });
+
+        let unzerInstance = new unzer('{{ unzerpub }}', { locale: "{{ unzerLocale }}" });
+        let PayPal = unzerInstance.Paypal();
+
         // Handling payment form submission
         document.querySelector( "#payment-saved-cards" ).addEventListener('submit', function( event ) {
             event.preventDefault();
-            let selectedPaymentTypeId = document.querySelector('input[name=paymenttypeid]:checked');
-            let paymentData = {
-                id: selectedPaymentTypeId,
-                resources: {
-                    typeId: selectedPaymentTypeId
-                }
-            };
-            let paymentDataString = JSON.stringify(paymentData);
+            let checkedInput = document.querySelector('input[name=paymenttypeid]:checked');
+            if (checkedInput) {
+                let selectedPaymentTypeId = checkedInput.value;
+                let paymentData = {
+                    id: selectedPaymentTypeId,
+                    resources: {
+                        typeId: selectedPaymentTypeId
+                    }
+                };
+                let paymentDataString = JSON.stringify(paymentData);
 
-            let hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'paymentData';
-            hiddenInput.value  = paymentDataString;
+                let hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'paymentData';
+                hiddenInput.value = paymentDataString;
 
-            let hiddenInput1 = document.createElement('input');
-            hiddenInput1.type = 'hidden';
-            hiddenInput1.name = 'oscunzersavepayment';
-            hiddenInput1.value = document.querySelector('#oscunzersavepayment').checked ? '1' : '0';
+                let hiddenInput1 = document.createElement('input');
+                hiddenInput1.type = 'hidden';
+                hiddenInput1.name = 'oscunzersavepayment';
+                hiddenInput1.value = document.querySelector('#oscunzersavepayment').checked ? '1' : '0';
 
-            document.querySelector('#orderConfirmAgbBottom').classList.add("submitable");
-            document.querySelector('#orderConfirmAgbBottom').append(hiddenInput);
-            document.querySelector('#orderConfirmAgbBottom').append(hiddenInput1);
-            document.querySelector('#orderConfirmAgbBottom').submit();
+                document.querySelector('#orderConfirmAgbBottom').classList.add("submitable");
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenInput);
+                document.querySelector('#orderConfirmAgbBottom').append(hiddenInput1);
+                document.querySelector('#orderConfirmAgbBottom').submit();
+            } else {
+                PayPal.createResource().then(function(result) {
+                    let hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'paymentData';
+                    hiddenInput.value = JSON.stringify(result);
+
+                    let hiddenInput1 = document.createElement('input');
+                    hiddenInput1.type = 'hidden';
+                    hiddenInput1.name = 'oscunzersavepayment';
+                    hiddenInput1.value = document.querySelector('#oscunzersavepayment').checked ? '1' : '0';
+
+                    document.querySelector('#orderConfirmAgbBottom').classList.add("submitable");
+                    document.querySelector('#orderConfirmAgbBottom').append(hiddenInput);
+                    document.querySelector('#orderConfirmAgbBottom').append(hiddenInput1);
+                    document.querySelector('#orderConfirmAgbBottom').submit();
+                }).catch(function(error) {
+                    console.error('error' + error.message);
+
+                    window.scrollTo({
+                        top: document.getElementById("orderPayment").offsetTop - 150,
+                        behavior: 'smooth'
+                    });
+
+                    let errorField = document.getElementById("card-element-id-number");
+                    let errorDiv = errorField.querySelector('div');
+                    errorDiv.classList.add('error');
+                    let errorEl = errorField.querySelector('div.error.message');
+                    errorEl.style.display = 'inline-block';
+                    errorEl.textContent = error.message;
+                    zahlungsButton.disabled = false;
+                    document.getElementById('submitOrder').disabled = false;
+                });
+            }
         });
     {% endcapture %}
     {% if false %}
