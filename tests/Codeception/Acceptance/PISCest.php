@@ -44,6 +44,7 @@ final class PISCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("PIS payment is removed. Marking this test to be removed");
         $I->wantToTest('Test PIS payment works');
 
         $this->initializeTest();
