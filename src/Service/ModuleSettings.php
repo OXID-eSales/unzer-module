@@ -568,10 +568,24 @@ class ModuleSettings
         );
     }
 
+    private function getInvoiceB2BEURPublicKey(): string
+    {
+        /** @var string $key */
+        $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2BEURPublicKey');
+        return $key;
+    }
+
     private function getInvoiceB2CEURPrivateKey(): string
     {
         /** @var string $key */
         $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2CEURPrivateKey');
+        return $key;
+    }
+
+    private function getInvoiceB2CCHFPublicKey(): string
+    {
+        /** @var string $key */
+        $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2CCHFPublicKey');
         return $key;
     }
 

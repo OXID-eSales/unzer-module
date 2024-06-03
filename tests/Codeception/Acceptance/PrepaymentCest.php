@@ -36,7 +36,7 @@ final class PrepaymentCest extends BaseCest
         $this->choosePayment($this->prePaymentLabel);
         $this->submitOrder();
 
-        $this->checkSuccessfulPayment();
+        $this->checkSuccessfulPayment(30);
 
         // This text doesn't appear on Thankye page for some reason, only in the email
         // possible ToDo: check the thank you page

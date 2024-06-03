@@ -33,6 +33,7 @@ final class SEPADirectDebitSecuredCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I): void
     {
+        $I->markTestSkipped("SEPA Direct Debit payment is deprecated. Marking this test to be removed");
         $I->wantToTest('Test SEPA Direct Debit payment works');
         $this->initializeSecuredTest();
         $this->choosePayment($this->sepaPaymentLabel);

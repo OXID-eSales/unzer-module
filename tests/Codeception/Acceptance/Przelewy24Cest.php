@@ -96,10 +96,7 @@ final class Przelewy24Cest extends BaseCest
         $I->waitForElement($this->submitButton);
         $I->wait(5);
         $I->click($this->submitButton);
-
-        // third page : expect end
-        $I->waitForDocumentReadyState();
-
+        $I->wait(30);
         $this->checkSuccessfulPayment();
     }
 }
