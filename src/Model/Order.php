@@ -330,7 +330,47 @@ class Order extends Order_parent
         return $number;
     }
 
-    public function delete($sOxId = ''): bool
+    /**
+     * @param $unzerPayment Payment
+     * @return void
+     * @throws Exception
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.ElseExpression)
+     */
+    public function finalizeTmpOrder(\UnzerSDK\Resources\Payment $unzerPayment, bool $error = false): void
+    {
+        // set order in any case as Paid
+        $this->markUnzerOrderAsPaid();
+
+        if ($error === true) {
+            $this->setOrderStatus('ERROR');
+        } else {
+            switch ($unzerPayment->getState()) {
+                case PaymentState::STATE_PENDING:
+                    $this->setOrderStatus('NOT_FINISHED');
+                    break;
+                case PaymentState::STATE_CANCELED:
+                    $this->cancelOrder();
+                    break;
+            }
+        }
+
+        if (!$this->getFieldData('oxordernr')) {
+            $this->setNumber();
+        }
+
+        $this->initWriteTransactionToDB($unzerPayment);
+        $this->save();
+    }
+
+    /**
+     * @inerhitDoc
+     *
+     * @param string $sOxId Ordering ID (default null)
+     *
+     * @return bool
+     */
+    public function delete($sOxId = null)
     {
         $sOxId = $sOxId ?? $this->getId();
 
