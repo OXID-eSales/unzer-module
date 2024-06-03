@@ -129,14 +129,8 @@ class OrderController extends OrderController_parent
 
             if ('thankyou' === $nextStep) {
                 $oDB->commitTransaction();
-
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
-
-                if ($this->isPaymentCancelled($paymentService)) {
-                    $this->redirectUserToCheckout($unzerService, $oOrder);
-                }
-
-                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
                         $oUser->getId(),

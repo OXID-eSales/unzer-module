@@ -657,7 +657,7 @@ class Unzer
 
     public function ifImmediatePostAuthCollect(Payment $paymentService): bool
     {
-        $paymentMethod = $this->getPaymentMethodFromOrder($paymentService->getUnzerOrderId());
+        $paymentMethod = $this->getPaymentMethodFromOrder((string)$paymentService->getUnzerOrderId());
         $paymentProcedure = $this->getPaymentProcedure(str_replace('oscunzer_', '', $paymentMethod));
         return $paymentProcedure === ModuleSettings::PAYMENT_CHARGE;
     }
