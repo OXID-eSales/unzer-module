@@ -71,14 +71,13 @@ class Payment
      * @param TransactionService $transactionService
      */
     public function __construct(
-        Session                $session,
+        Session $session,
         PaymentExtensionLoader $paymentExtLoader,
-        Translator             $translator,
-        Unzer                  $unzerService,
-        UnzerSDKLoader         $unzerSDKLoader,
-        TransactionService     $transactionService
-    )
-    {
+        Translator $translator,
+        Unzer $unzerService,
+        UnzerSDKLoader $unzerSDKLoader,
+        TransactionService $transactionService
+    ) {
         $this->session = $session;
         $this->paymentExtLoader = $paymentExtLoader;
         $this->translator = $translator;
@@ -245,14 +244,10 @@ class Payment
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getSessionUnzerPayment(
-        UnzerPaymentInterface|null $paymentExtension = null,
-        string                     $currency = ''
-    ): ?\UnzerSDK\Resources\Payment
-    {
+        ?UnzerPaymentInterface $paymentExtension = null,
+        string $currency = ''
+    ): ?\UnzerSDK\Resources\Payment {
         $uzrPaymentId = $this->session->getVariable('UnzerPaymentId');
-        if (!is_string($uzrPaymentId)) {
-            return null;
-        }
         $result = null;
 
         if (is_string($uzrPaymentId)) {
@@ -352,13 +347,12 @@ class Payment
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function doUnzerCancel(
-        Order  $oOrder,
+        Order $oOrder,
         string $unzerid,
-        ?string $chargeid,
-        float  $amount,
+        string $chargeid,
+        float $amount,
         string $reason
-    ): Exception|bool|UnzerApiException
-    {
+    ): Exception|bool|UnzerApiException {
         try {
             $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
 
@@ -393,10 +387,9 @@ class Payment
      */
     public function doUnzerCollect(
         ?UnzerOrder $oOrder,
-        string      $unzerid,
-        float       $amount
-    ): Exception|bool|UnzerApiException
-    {
+        string $unzerid,
+        float $amount
+    ): Exception|bool|UnzerApiException {
         if (!($oOrder instanceof Order)) {
             return false;
         }
