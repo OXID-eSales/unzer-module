@@ -367,7 +367,14 @@ class OrderController extends OrderController_parent
     protected function getSavedPayment(): void
     {
         $transactionService = $this->getServiceFromContainer(Transaction::class);
-        $ids = $transactionService->getTrancactionIds($this->getUser());
+
+        $user = $this->getUser();
+
+        if ($user === null) {
+            return;
+        }
+
+        $ids = $transactionService->getTrancactionIds();
         $paymentTypes = false;
         if ($ids) {
             foreach ($ids as $typeData) {
@@ -439,13 +446,19 @@ class OrderController extends OrderController_parent
 
     private function isPaymentCancelled(PaymentService $paymentService): bool
     {
-        return $paymentService->getSessionUnzerPayment()->getState() === PaymentState::STATE_CANCELED;
+        $paymentResource = $paymentService->getSessionUnzerPayment();
+
+        if ($paymentResource !== null) {
+            return $paymentResource->getState() === PaymentState::STATE_CANCELED;
+        }
+
+        return false;
     }
 
     /**
      * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
      */
-    private function redirectUserToCheckout(Unzer $unzerService, \OxidSolutionCatalysts\Unzer\Model\Order  $order)
+    private function redirectUserToCheckout(Unzer $unzerService, \OxidSolutionCatalysts\Unzer\Model\Order $order): void
     {
         $translator = $this->getServiceFromContainer(Translator::class);
         $unzerOrderNr = $order->getUnzerOrderNr();

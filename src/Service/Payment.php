@@ -362,6 +362,7 @@ class Payment
             } else {
                 $payment = $sdk->fetchPayment($unzerid);
                 $cancellation = new Cancellation($amount);
+                $cancellation->setReasonCode($reason);
                 $cancellation = $sdk->cancelChargedPayment($payment, $cancellation);
             }
 

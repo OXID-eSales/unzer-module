@@ -142,11 +142,17 @@ class Transaction
      */
     public function writeCancellationToDB(string $orderid, string $userId, ?Cancellation $unzerCancel): bool
     {
+        $unzerCancelReason = '';
+        if ($unzerCancel !== null) {
+            $unzerCancelReason = $unzerCancel->getReasonCode() ?? '';
+        }
+
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+            'cancelreason' => $unzerCancelReason,
         ];
 
         if ($unzerCancel instanceof Cancellation) {
