@@ -273,8 +273,10 @@
                         <td>[{$oUnzerCancel.cancelDate|escape}]</td>
                         <td>[{$oUnzerCancel.cancellationId|escape}]</td>
                         <td>[{$oUnzerCancel.cancelledAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]</td>
-                        [{if $blCancelReasonReq}]
-                            <td>[{$oUnzerCancel.cancelReason|escape}]</td>
+                        [{if $blCancelReasonReq && $oUnzerCancel.cancelReason != ''}]
+                            [{assign var="escaped_reason" value=$oUnzerCancel.cancelReason|escape}]
+                            [{assign var="translate_ident" value='OSCUNZER_REASON_'|cat:$escaped_reason|cat:''}]
+                            <td>[{oxmultilang ident=$translate_ident}]</td>
                         [{/if}]
                     </tr>
                 [{/foreach}]
@@ -304,33 +306,65 @@
     [{/block}]
 </div>
 [{capture assign="cancelConfirm"}]
-let handleUnzerForm = function(formElement) {
-    if(formElement.id.indexOf('uzr_') === 0) { // make absolutely sure to start with "uzr_"
-        let paymentId = formElement.id.slice(4);
-        let amountId = 'amount_' + paymentId; // f.e. "uzr_s-chg-1"
-        let inAmount = document.getElementById(amountId);
+    [{if false }]<script>[{/if}]
 
-        if (null !== inAmount) {
-            return window.confirm('[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]' + ' ' + inAmount.value + ' [{$uzrCurrency}]');
-        }
-        return false;
-    }
-    // if it is not a form we want to process, let it proceed
-    return true;
-};
+    let handleUnzerForm = function(formElement) {
+        if(formElement.id.indexOf('uzr_') === 0) { // make absolutely sure to start with "uzr_"
 
-document.addEventListener('DOMContentLoaded', function () {
-    let forms = document.querySelectorAll('form[id^="uzr_s-chg"]');
-    for(var i = 0; i < forms.length; i++) {
-        forms[i].addEventListener('submit', function(event) {
-            let returnValue = handleUnzerForm(this);
-            if (!returnValue) {
-                event.preventDefault();
+            let chargeId = '[{$oUnzerCharge.chargeId}]';
+            let paymentId = formElement.id.slice(4);
+            let amountId = 'amount_' + paymentId;
+            let reasonId = 'reason_' + chargeId;
+            let inAmount = document.getElementById(amountId);
+            let inReason = document.getElementById(reasonId);
+            let formData = new FormData(formElement);
+
+            if (null !== inAmount.value) {
+                let alertMsg = '[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]'
+                    + ' ' + inAmount.value + ' [{$uzrCurrency}]';
+                if (window.confirm(alertMsg)) {
+                    if (inReason) {
+                        formData.append('reason', inReason.value);
+                    }
+
+                    fetch(formElement.action, {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Failed to submit the form. Please try again.');
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    });
+
+                    return false;
+                }
             }
-            return returnValue;
-        });
-    }
-}, false);
+            return false;
+        }
+        // if it is not a form we want to process, let it proceed
+        return true;
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let forms = document.querySelectorAll('form[id^="uzr_s-chg"]');
+        for(var i = 0; i < forms.length; i++) {
+            forms[i].addEventListener('submit', function(event) {
+                let returnValue = handleUnzerForm(this);
+                if (!returnValue) {
+                    event.preventDefault();
+                }
+                return returnValue;
+            });
+        }
+    }, false);
+
+    [{if false }]</script>[{/if}]
+
 [{/capture}]
 [{oxscript add=$cancelConfirm}]
 
