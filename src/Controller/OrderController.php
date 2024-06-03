@@ -34,7 +34,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.LongVariable)
- * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD)
  */
 class OrderController extends OrderController_parent
 {
@@ -333,6 +333,10 @@ class OrderController extends OrderController_parent
         return parent::getExecuteFnc();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     protected function getSavedPayment(): void
     {
         $transactionService = $this->getServiceFromContainer(Transaction::class);

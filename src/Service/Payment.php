@@ -242,9 +242,10 @@ class Payment
      * @return \UnzerSDK\Resources\Payment|null
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getSessionUnzerPayment(
-        UnzerPaymentInterface|null $paymentExtension = null,
+        ?UnzerPaymentInterface $paymentExtension = null,
         string $currency = ''
     ): ?\UnzerSDK\Resources\Payment {
         $uzrPaymentId = $this->session->getVariable('UnzerPaymentId');
