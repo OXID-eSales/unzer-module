@@ -15,9 +15,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
-use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
-use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
@@ -33,7 +31,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
  * TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.LongVariable)
- * @SuppressWarnings(PHPMD)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class OrderController extends OrderController_parent
 {
@@ -131,7 +129,7 @@ class OrderController extends OrderController_parent
 
             if ('thankyou' === $nextStep) {
                 $oDB->commitTransaction();
-                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
+
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
 
                 if ($this->isPaymentCancelled($paymentService)) {
@@ -337,10 +335,6 @@ class OrderController extends OrderController_parent
         return parent::getExecuteFnc();
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
     protected function getSavedPayment(): void
     {
         $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);

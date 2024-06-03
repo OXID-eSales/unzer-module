@@ -23,9 +23,6 @@ use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class DispatcherController extends FrontendController
 {
     use ServiceContainer;
@@ -136,20 +133,6 @@ class DispatcherController extends FrontendController
                     );
                 } else {
                     $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
-                }
-            } else {
-                $tmpOrder = oxNew(TmpOrder::class);
-                $orderId = $unzerPayment->getBasket() ? $unzerPayment->getBasket()->getOrderId() : '';
-                $tmpData = $tmpOrder->getTmpOrderByUnzerId($orderId);
-                if (
-                    isset($tmpData['OXID']) &&
-                    $tmpOrder->load($tmpData['OXID']) &&
-                    $this->hasExceededTimeLimit($tmpOrder)
-                ) {
-                    $bError = !($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
-                        $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
-                        $unzerPayment->getState() === PaymentState::STATE_PENDING);
-                    $this->handleTmpOrder($unzerPayment, $tmpOrder, $tmpData, $bError);
                 }
             }
         }

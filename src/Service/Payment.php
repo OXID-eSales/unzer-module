@@ -242,6 +242,7 @@ class Payment
      * @return \UnzerSDK\Resources\Payment|null
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getSessionUnzerPayment(
         ?UnzerPaymentInterface $paymentExtension = null,

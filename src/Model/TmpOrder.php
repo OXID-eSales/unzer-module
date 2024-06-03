@@ -8,7 +8,6 @@
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use Doctrine\DBAL\Driver\Exception as DBALException;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Driver\Result;
 use OxidEsales\Eshop\Core\Model\BaseModel;
