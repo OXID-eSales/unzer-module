@@ -9,6 +9,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\EshopCommunity\Application\Model\User;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
@@ -492,12 +493,21 @@ class ModuleSettings
                     $this->hasWebhookConfiguration('b2bchf'))
         );
     }
+
+    function isB2BEligibility(){
+        $user = oxNew(User::class)->getUser();
+        $userCompany = $user->getFieldData('oxcompany');
+
+        return !empty($userCompany);
+    }
+
     /**
      * @return bool
      */
     public function isInstallmentEligibility(): bool
     {
         return (
+            !$this->isB2BEligibility() && //B2C Customers only
             ($this->isB2CInstallmentEligibility() &&
                 $this->hasWebhookConfiguration('b2ceurinstallment') &&
                 $this->hasWebhookConfiguration('b2cchfinstallment'))
