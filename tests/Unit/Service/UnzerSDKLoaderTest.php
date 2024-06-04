@@ -7,19 +7,21 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
+use Monolog\Logger;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use PHPUnit\Framework\TestCase;
 use UnzerSDK\Unzer;
 
-class UnzerSDKLoaderTest extends IntegrationTestCase
+class UnzerSDKLoaderTest extends TestCase
 {
     public function testSimpleSDKLoading(): void
     {
         $sut = $this->getSut([
-            'getShopPrivateKey' => 's-priv-someExampleOfGoodKey',
+            'getStandardPrivateKey' => 's-priv-someExampleOfGoodKey',
             'isDebugMode' => false
         ]);
 
@@ -32,18 +34,18 @@ class UnzerSDKLoaderTest extends IntegrationTestCase
     public function testSimpleSDKLoadingWithWrongKey(): void
     {
         $sut = $this->getSut([
-            'getShopPrivateKey' => 'someWrongKey',
+            'getStandardPrivateKey' => 'someWrongKey',
             'isDebugMode' => false
         ]);
 
-        $this->expectExceptionMessageMatches("@^Illegal key@i");
+        $this->expectExceptionMessageMatches("@^Try to get the SDK with the Key \"someWrongKey\".*@i");
         $this->assertInstanceOf(Unzer::class, $sut->getUnzerSDK());
     }
 
     public function testDebugSDKLoading(): void
     {
         $sut = $this->getSut([
-            'getShopPrivateKey' => 's-priv-someExampleOfGoodKey',
+            'getStandardPrivateKey' => 's-priv-someExampleOfGoodKey',
             'isDebugMode' => true
         ]);
 
@@ -55,7 +57,10 @@ class UnzerSDKLoaderTest extends IntegrationTestCase
     protected function getSut($moduleSettingValues): UnzerSDKLoader
     {
         $moduleSettings = $this->createConfiguredMock(ModuleSettings::class, $moduleSettingValues);
-        $debugHandler = $this->createPartialMock(DebugHandler::class, []);
+        $debugHandler = $this->createMock(DebugHandler::class);
+        $debugHandler
+            ->method('getLogger')
+            ->willReturn($this->createPartialMock(Logger::class, ['info']));
         $session = $this->createConfiguredMock(Session::class, []);
 
         return new UnzerSDKLoader($moduleSettings, $debugHandler, $session);

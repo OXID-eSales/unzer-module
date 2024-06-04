@@ -69,13 +69,13 @@ class ViewConfig extends ViewConfig_parent
     {
         $paymentId = Registry::getSession()->getBasket()->getPaymentId();
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-            return $this->moduleSettings->getShopPublicKeyInvoice();
+            return $this->moduleSettings->getInvoicePublicKey();
         }
         if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return $this->moduleSettings->getShopPublicKeyInstallment();
+            return $this->moduleSettings->getInstallmentPublicKey();
         }
 
-        return $this->moduleSettings->getShopPublicKey();
+        return $this->moduleSettings->getStandardPublicKey();
     }
 
     /**
@@ -87,36 +87,36 @@ class ViewConfig extends ViewConfig_parent
     {
         $paymentId = Registry::getSession()->getBasket()->getPaymentId();
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-            return $this->moduleSettings->getShopPrivateKeyInvoice();
+            return  $this->moduleSettings->getInvoicePrivateKey();
         }
         if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return $this->moduleSettings->getShopPrivateKeyInstallment();
+            return $this->moduleSettings->getInstallmentPrivateKey();
         }
 
-        return $this->moduleSettings->getShopPrivateKey();
+        return $this->moduleSettings->getStandardPrivateKey();
     }
 
     public function getUnzerB2BPubKey(): string
     {
-        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2B');
+        $key = $this->moduleSettings->getInvoicePublicKey('B2B');
         return $key;
     }
 
     public function getUnzerB2BPrivKey(): string
     {
-        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2B');
+        $key = $this->moduleSettings->getInvoicePrivateKey('B2B');
         return $key;
     }
 
     public function getUnzerB2CPubKey(): string
     {
-        $key = $this->moduleSettings->getShopPublicKeyInvoice('B2C');
+        $key = $this->moduleSettings->getInvoicePublicKey();
         return $key;
     }
 
     public function getUnzerB2CPrivKey(): string
     {
-        $key = $this->moduleSettings->getShopPrivateKeyInvoice('B2C');
+        $key = $this->moduleSettings->getInvoicePrivateKey('B2C');
         return $key;
     }
 

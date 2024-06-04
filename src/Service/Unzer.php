@@ -557,7 +557,7 @@ class Unzer
             $this->session->setVariable('ShortId', $charge->getShortId());
         }
 
-        $this->session->setVariable('PaymentId', $charge->getPaymentId());
+        $this->session->setVariable('UnzerPaymentId', $charge->getPaymentId());
 
         if ($charge instanceof Authorization) {
             $this->session->setVariable('UzrPdfLink', $charge->getPDFLink());
@@ -657,7 +657,7 @@ class Unzer
 
     public function ifImmediatePostAuthCollect(Payment $paymentService): bool
     {
-        $paymentMethod = $this->getPaymentMethodFromOrder($paymentService->getUnzerOrderId());
+        $paymentMethod = $this->getPaymentMethodFromOrder((string)$paymentService->getUnzerOrderId());
         $paymentProcedure = $this->getPaymentProcedure(str_replace('oscunzer_', '', $paymentMethod));
         return $paymentProcedure === ModuleSettings::PAYMENT_CHARGE;
     }

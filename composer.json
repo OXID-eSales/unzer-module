@@ -15,7 +15,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "unzerdev/php-sdk": "^v3.4.1",
+    "unzerdev/php-sdk": "^v3.6.0",
     "guzzlehttp/guzzle": "^7.4"
   },
   "require-dev": {

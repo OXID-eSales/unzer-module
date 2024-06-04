@@ -5,13 +5,12 @@
  * See LICENSE file for license details.
  */
 
-declare(strict_types=1);
-
 namespace OxidSolutionCatalysts\Unzer\Model;
 
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Driver\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Driver\Result;
+use Exception;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;

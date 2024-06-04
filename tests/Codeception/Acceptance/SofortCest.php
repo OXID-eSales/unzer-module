@@ -40,6 +40,7 @@ final class SofortCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I): void
     {
+        $I->markTestSkipped("Sofort payment needs to be refoactored due to some external changes");
         $I->wantToTest('Test Sofort payment works');
         $this->initializeTest();
         $this->choosePayment($this->sofortPaymentLabel);

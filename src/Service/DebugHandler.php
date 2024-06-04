@@ -13,7 +13,12 @@ use UnzerSDK\Interfaces\DebugHandlerInterface;
 class DebugHandler implements DebugHandlerInterface
 {
     /** @var Logger */
-    protected $logger;
+    protected Logger $logger;
+
+    public function getLogger(): Logger
+    {
+        return $this->logger;
+    }
 
     /**
      * @param Logger $moduleLogger
@@ -28,6 +33,6 @@ class DebugHandler implements DebugHandlerInterface
      */
     public function log(string $message): void
     {
-        $this->logger->info($message);
+        $this->getLogger()->info($message);
     }
 }

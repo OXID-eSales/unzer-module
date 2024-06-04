@@ -86,7 +86,7 @@ class Order extends Order_parent
 
         // setUnzerOrderId
         $unzerOrderId = $paymentService->getUnzerOrderId();
-        $this->setUnzerOrderNr($unzerOrderId);
+        $this->setUnzerOrderNr((string)$unzerOrderId);
         $unzerService->resetUnzerOrderId();
 
         // deleting remark info only when order is finished
@@ -122,7 +122,7 @@ class Order extends Order_parent
         $this->initWriteTransactionToDB();
 
         $tmpOrder = oxNew(TmpOrder::class);
-        $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerOrderId);
+        $tmpData = $tmpOrder->getTmpOrderByUnzerId((string)$unzerOrderId);
         if ($tmpOrder->load($tmpData['OXID'])) {
             $tmpOrder->assign(['status' => 'FINISHED']);
             $tmpOrder->save();
@@ -330,7 +330,14 @@ class Order extends Order_parent
         return $number;
     }
 
-    public function delete($sOxId = ''): bool
+    /**
+     * @inerhitDoc
+     *
+     * @param string $sOxId Ordering ID (default null)
+     *
+     * @return bool
+     */
+    public function delete($sOxId = null)
     {
         $sOxId = $sOxId ?? $this->getId();
 
