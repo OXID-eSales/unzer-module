@@ -32,6 +32,7 @@ final class InvoiceSecuredCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("Invoice secured payment is deprecated. Marking this test to be removed");
         $I->wantToTest('Test Invoice payment works');
         $this->initializeSecuredTest();
         $this->choosePayment($this->invoicePaymentLabel);

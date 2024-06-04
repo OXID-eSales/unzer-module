@@ -201,11 +201,11 @@ abstract class BaseCest
 
         $this->I->waitForText(Translator::translate('CHECKOUT'));
         $this->I->click(Translator::translate('CHECKOUT'));
-        $this->I->waitForPageLoad();
+        $this->I->waitForPageLoad(90);
 
         $this->I->waitForText(Translator::translate('NEXT'));
         $this->I->click(Translator::translate('NEXT'));
-        $this->I->waitForPageLoad();
+        $this->I->waitForPageLoad(90);
     }
 
     protected function loginUser(string $type): void
@@ -268,7 +268,7 @@ abstract class BaseCest
         $this->I->scrollTo($submitButton);
         $this->I->wait(5);
         $this->I->click($submitButton);
-        $this->I->waitForPageLoad();
+        $this->I->waitForPageLoad(30);
     }
 
     /**

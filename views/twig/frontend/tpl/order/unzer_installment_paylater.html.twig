@@ -25,15 +25,6 @@
     {% set iBirthdayYear = 0 %}
 {% endif %}
 
-{% if (oxcmp_user.oxuser__oxcompany.value or (invadr and invadr.oxaddress__oxcompany.value)) %}
-    {% set isCompany = true %}
-{% endif %}
-
-{% if isCompany %}
-    {% set customerType = "B2B" %}
-{% else %}
-    {% set customerType = "B2C" %}
-{% endif %}
 <form id="payment-form-installment" class="unzerUI-PaylaterInstallment__form" novalidate>
     <br />
     <div id="unzer-installment">
@@ -78,7 +69,7 @@
 {% if false %}<script>{% endif %}
     function executeUnzerPayment(event) {
         event.stopPropagation();
-        document.querySelector("#payment-form-installment").submit();
+        document.querySelector("#payment-form-installment").requestSubmit();
     }
 
     // Create an Unzer instance with your public key
@@ -89,7 +80,7 @@
     document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function(event) {
         if (!this.classList.contains("submitable")) {
             event.preventDefault();
-            document.querySelector("#payment-form-installment").submit();
+            document.querySelector("#payment-form-installment").requestSubmit();
         }
     });
 
@@ -116,7 +107,7 @@
                 let hiddenCustomerType = document.createElement('input');
                 hiddenCustomerType.setAttribute('type', 'hidden');
                 hiddenCustomerType.setAttribute('name', 'unzer_customer_type');
-                hiddenCustomerType.value = '{{ customerType }}';
+                hiddenCustomerType.value = 'B2C'; // Currently there is no Installment option for B2B Customer
                 document.querySelector('#orderConfirmAgbBottom').appendChild(hiddenCustomerType);
 
                 let hiddenInputBirthdate = document.createElement('input');

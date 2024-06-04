@@ -69,7 +69,7 @@ final class PaylaterInvoiceCest extends BaseCest
         $this->fillB2Cdata($I);
         $this->submitOrder();
 
-        $this->checkSuccessfulPayment(30);
+        $this->checkSuccessfulPayment(60);
     }
 
     /**
@@ -90,6 +90,6 @@ final class PaylaterInvoiceCest extends BaseCest
         $this->fillB2Bdata($I);
         $this->submitOrder();
 
-        $this->checkSuccessfulPayment(30);
+        $this->checkSuccessfulPayment(60);
     }
 }

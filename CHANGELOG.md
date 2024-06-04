@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### FIXED
 - fix: PayPal sporadically fails on GHA CC Tests
 - [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
+- refactor of the correct use of the appropriate credentials depending on the payment method used
 
 ## [2.1.4] - 2023-11-23
 
