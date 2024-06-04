@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - provide content for smarty and twig
 - If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook
+- Save Payment Data for registered Users
 
 ### FIXED
 - fix: PayPal sporadically fails on GHA CC Tests
