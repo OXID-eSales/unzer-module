@@ -24,7 +24,7 @@
                     <td>{{ type }}</td>
 
                     <td>
-                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" {% if loop.first %}checked{% endif %} style="-webkit-appearance: radio">
+                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
                     </td>
                 </tr>
             {% endfor %}
@@ -102,6 +102,12 @@
 
     let unzerInstance = new unzer('{{ unzerpub }}', { locale: "{{ unzerLocale }}" });
     let Card = unzerInstance.Card();
+
+    document.getElementsByName('paymenttypeid').forEach(input => input.addEventListener('change', function(event) {
+        event.preventDefault();
+        document.getElementsByName('paymenttypeid').forEach(input => { input.checked = false; });
+        this.checked = true;
+    }));
 
     if (document.querySelectorAll('input[name="newccard"]').length === 0) {
         document.getElementById('orderConfirmAgbBottom').classList.add('new-card-selected');
