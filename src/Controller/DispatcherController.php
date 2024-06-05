@@ -214,7 +214,7 @@ class DispatcherController extends FrontendController
             ->where('timestamp < :timestamp');
 
         $parameters = [
-            ':timestamp' => date("Y-m-d H:i:s", ( time()-( 60 * 60 * 24 ) ))
+            ':timestamp' => date("Y-m-d H:i:s", ( time() - ( 60 * 60 * 24 ) ))
         ];
 
         $query->setParameters($parameters)->execute();
