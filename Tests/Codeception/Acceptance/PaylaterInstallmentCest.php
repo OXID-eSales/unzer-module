@@ -63,5 +63,4 @@ final class PaylaterInstallmentCest extends BaseCest
 
         $I->seeElement($this->paymentLabel);
     }
-
 }
