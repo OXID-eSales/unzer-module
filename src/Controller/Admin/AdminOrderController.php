@@ -299,6 +299,8 @@ class AdminOrderController extends AdminDetailsController
 
     /**
      * @return array
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
      */
     protected function getCustomerTypeAndCurrencyFromTransaction(): array
     {
@@ -307,6 +309,7 @@ class AdminOrderController extends AdminDetailsController
     }
 
     /**
+     * @return void
      */
     protected function forceReloadListFrame(): void
     {
