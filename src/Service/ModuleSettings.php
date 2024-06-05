@@ -494,7 +494,8 @@ class ModuleSettings
         );
     }
 
-    function isB2BEligibility(){
+    public function isB2BEligibility(): bool
+    {
         $user = oxNew(User::class)->getUser();
         $userCompany = $user->getFieldData('oxcompany');
 
