@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Application\Model\Order;
@@ -54,20 +56,19 @@ class Transaction
         $this->utilsDate = $utilsDate;
     }
 
-    /**
-     * @param string $orderid
-     * @param string $userId
-     * @param Payment|null $unzerPayment
-     * @param Shipment|null $unzerShipment
-     * @return bool
-     * @throws \Exception
-    */
     public function writeTransactionToDB(
         string $orderid,
         string $userId,
         ?Payment $unzerPayment,
         ?Shipment $unzerShipment = null
     ): bool {
+
+        $m = traceLastThreeMethodCalls();
+
+        \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()
+            ->getContainer()->get(DebugHandler::class)
+            ->log($m);
+
         $transaction = $this->getNewTransactionObject();
 
         $oOrder = oxNew(Order::class);
@@ -80,6 +81,7 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'customertype' => '',
         ];
+
         if ($unzerPayment) {
             $params = $unzerShipment ?
                 array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment)) :
@@ -102,7 +104,13 @@ class Transaction
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
         $oxid = $this->prepareTransactionOxid($params);
+
         if (!$transaction->load($oxid)) {
+
+            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
+                $transaction->setTransStatus('aborted');
+            }
+
             $transaction->assign($params);
             $transaction->setId($oxid);
             $transaction->save();
@@ -206,11 +214,6 @@ class Transaction
         return false;
     }
 
-    /**
-     * @param array $params
-     * @return string
-     * @throws \JsonException
-     */
     protected function prepareTransactionOxid(array $params): string
     {
         unset($params['oxactiondate'], $params['serialized_basket'], $params['customertype']);
@@ -220,10 +223,6 @@ class Transaction
         return md5($jsonEncode);
     }
 
-    /**
-     * @param array $params
-     * @return string
-     */
     protected function getInitOrderOxid(array $params): string
     {
         $params['oxaction'] = "init";
@@ -439,7 +438,7 @@ class Transaction
             $result = $rows[0]['OXID'];
         }
 
-        return $result;
+        return ($result === null) ? '' : $result;
     }
 
     /**
@@ -509,4 +508,32 @@ class Transaction
         }
         return $result;
     }
+}
+
+function traceLastThreeMethodCalls(): string
+{
+    // Get the debug backtrace
+    $backtrace = debug_backtrace();
+
+    // Remove the current function call from the backtrace
+    array_shift($backtrace);
+
+    // Extract the last three method calls from the backtrace
+    $lastThreeCalls = array_slice($backtrace, 0, 3);
+
+
+    $m = '';
+    // Print the last three method calls
+    foreach ($lastThreeCalls as $call) {
+        $m .= 'Function: ' . (isset($call['function']) ? $call['function'] : 'N/A') . "\n";
+        if (isset($call['class'])) {
+            $m .= 'Class: ' . $call['class'] . "\n";
+            $m .= 'Type: ' . $call['type'] . "\n";
+        }
+        $m .= 'File: ' . (isset($call['file']) ? $call['file'] : 'N/A') . "\n";
+        $m .= 'Line: ' . (isset($call['line']) ? $call['line'] : 'N/A') . "\n";
+        $m .= "\n";
+    }
+
+    return $m;
 }

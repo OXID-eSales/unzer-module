@@ -112,6 +112,11 @@ class Transaction extends BaseModel
         return $this->getRawField('TRACEID');
     }
 
+    public function setTransStatus(string $status): void
+    {
+        $this->setFieldData('OXTRANSSTATUS', $status);
+    }
+
     /**
      * @return array|null
      */
