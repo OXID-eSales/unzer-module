@@ -12,14 +12,12 @@ use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPaymentInterface;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use stdClass;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -40,9 +38,9 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
  */
 class Payment
 {
-    private const STATUS_OK = "OK";
-    private const STATUS_NOT_FINISHED = "NOT_FINISHED";
-    private const STATUS_ERROR = "ERROR";
+    public const STATUS_OK = "OK";
+    public const STATUS_NOT_FINISHED = "NOT_FINISHED";
+    public const STATUS_ERROR = "ERROR";
 
     protected Session $session;
 
@@ -92,6 +90,9 @@ class Payment
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
+        \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()
+            ->getContainer()->get(DebugHandler::class)
+            ->log("\n\n\n execute unzer payment method \n\n\n");
         $paymentExtension = null;
         try {
             /** @var string $customerType */
@@ -106,16 +107,22 @@ class Payment
                 $customerType,
                 $currency
             );
+
+            $oOrder = oxNew(Order::class);
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            $oOrder->createTmpOrder($basket, $user, $paymentExtension->getUnzerOrderId());
+
             $paymentExtension->execute(
                 $user,
                 $basket
             );
+
             /** @var string $sess_challenge */
             $sess_challenge = $this->session->getVariable('sess_challenge');
             $this->transactionService->writeTransactionToDB(
                 $sess_challenge,
                 $this->session->getUser()->getId(),
-                $this->getSessionUnzerPayment($paymentExtension, $currency)
+                $this->getSessionUnzerPayment()
             );
 
             $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
@@ -244,16 +251,26 @@ class Payment
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getSessionUnzerPayment(
-        ?UnzerPaymentInterface $paymentExtension = null,
-        string $currency = ''
-    ): ?\UnzerSDK\Resources\Payment {
-        $uzrPaymentId = $this->session->getVariable('UnzerPaymentId');
+    public function getSessionUnzerPayment(bool $noCache = false): ?UnzerPayment
+    {
+
         $result = null;
+        if ($noCache === false) {
+            if ($this->sessionUnzerPayment instanceof UnzerPayment) {
+                return $this->sessionUnzerPayment;
+            }
+        }
+
+        $uzrPaymentId = $this->session->getVariable('UnzerPaymentId');
 
         if (is_string($uzrPaymentId)) {
             /** @var string $sessionOrderId */
             $sessionOrderId = $this->session->getVariable('sess_challenge');
+
+            if ($sessionOrderId == null) {
+                return null;
+            }
+
             /** @var Order $order */
             $order = oxNew(Order::class);
             $order->load($sessionOrderId);
@@ -274,6 +291,7 @@ class Payment
                 );
             }
         }
+        $this->sessionUnzerPayment = $result;
 
         return $result;
     }
@@ -415,7 +433,7 @@ class Payment
             $payment = $charge->getPayment();
             if (
                 $charge->isSuccess() &&
-                ($payment instanceof \UnzerSDK\Resources\Payment) &&
+                ($payment instanceof UnzerPayment) &&
                 $payment->getAmount()->getRemaining() == 0
             ) {
                 $oOrder->markUnzerOrderAsPaid();

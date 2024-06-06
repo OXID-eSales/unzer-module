@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -22,6 +23,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Payment;
 
 class DispatcherController extends FrontendController
 {
@@ -134,9 +136,53 @@ class DispatcherController extends FrontendController
                 } else {
                     $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
                 }
+            } else {
+                $tmpOrder = oxNew(TmpOrder::class);
+                $orderId = $unzerPayment->getBasket() ? $unzerPayment->getBasket()->getOrderId() : '';
+                $tmpData = $tmpOrder->getTmpOrderByUnzerId($orderId);
+                if (
+                    isset($tmpData['OXID']) &&
+                    $tmpOrder->load($tmpData['OXID']) &&
+                    $this->hasExceededTimeLimit($tmpOrder)
+                ) {
+                    $bError = !($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
+                        $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
+                        $unzerPayment->getState() === PaymentState::STATE_PENDING);
+                    $this->handleTmpOrder($unzerPayment, $tmpOrder, $tmpData, $bError);
+                }
             }
         }
 
+        Registry::getUtils()->showMessageAndExit($result);
+    }
+
+    private function hasExceededTimeLimit(TmpOrder $tmpOrder): bool
+    {
+        $defTimeDiffMin = Registry::getConfig()->getConfigParam('defTimeDiffMin', 5);
+        $timeDiffSec = $defTimeDiffMin * 60;
+        $tmpOrderTime = is_string($tmpOrder->getFieldData('timestamp')) ? $tmpOrder->getFieldData('timestamp') : '';
+        $tmpOrderTimeUnix = strtotime($tmpOrderTime);
+        $nowTimeUnix = time();
+        $difference = $nowTimeUnix - $tmpOrderTimeUnix;
+
+        return $difference >= $timeDiffSec;
+    }
+
+    private function handleTmpOrder(Payment $unzerPayment, TmpOrder $tmpOrder, array $tmpData, bool $bError)
+    {
+        $translator = $this->getServiceFromContainer(Translator::class);
+        $result = $translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']), ['allowed_classes' => [Order::class]]);
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            $oOrder = is_array($aOrderData) && isset($aOrderData['order']) ? $aOrderData['order'] : null;
+            if ($oOrder) {
+                $oOrder->finalizeTmpOrder($unzerPayment, $bError);
+                $tmpOrder->assign(['status' => 'FINISHED']);
+                $tmpOrder->save();
+                $result = $translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
+            }
+        }
         Registry::getUtils()->showMessageAndExit($result);
     }
 }

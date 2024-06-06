@@ -117,16 +117,17 @@ class Order extends Order_parent
 
         if ($unzerPaymentStatus === 'OK') {
             $this->markUnzerOrderAsPaid();
+            $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
         }
 
-        $this->initWriteTransactionToDB();
-
-        $tmpOrder = oxNew(TmpOrder::class);
-        $tmpData = $tmpOrder->getTmpOrderByUnzerId((string)$unzerOrderId);
-        if ($tmpOrder->load($tmpData['OXID'])) {
-            $tmpOrder->assign(['status' => 'FINISHED']);
-            $tmpOrder->save();
+        if ($unzerPaymentStatus === \OxidSolutionCatalysts\Unzer\Service\Payment::STATUS_NOT_FINISHED) {
+            $this->setOrderStatus('ABORTED');
+            $this->setTmpOrderStatus($unzerOrderId, 'ABORTED');
         }
+
+        $this->initWriteTransactionToDB(
+            $paymentService->getSessionUnzerPayment(false)
+        );
 
         return $iRet;
     }
@@ -302,16 +303,17 @@ class Order extends Order_parent
     {
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $this->getFieldData('oxpaymenttype');
-        if (
-            strpos($oxpaymenttype, "oscunzer") !== false
-        ) {
+        if (strpos($oxpaymenttype, "oscunzer") !== false) {
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
+
+            $unzerPayment = $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
+                $unzerPayment :
+                $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment();
+
             return $transactionService->writeTransactionToDB(
                 $this->getId(),
                 $this->getOrderUser()->getId() ?: '',
-                $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
-                    $unzerPayment :
-                    $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
+                $unzerPayment
             );
         }
 
@@ -352,5 +354,15 @@ class Order extends Order_parent
         }
 
         return parent::delete($sOxId);
+    }
+
+    private function setTmpOrderStatus(string $unzerOrderId, string $status): void
+    {
+        $tmpOrder = oxNew(TmpOrder::class);
+        $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerOrderId);
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $tmpOrder->assign(['status' => $status]);
+            $tmpOrder->save();
+        }
     }
 }
