@@ -165,7 +165,13 @@
                     let hiddenInput2 = document.createElement('input');
                     hiddenInput2.type = 'hidden';
                     hiddenInput2.name = 'oscunzersavepayment';
-                    hiddenInput2.value = document.getElementById('oscunzersavepayment').checked ? '1' : '0';
+
+                    let oscunzerSavePayment = document.getElementById('oscunzersavepayment');
+
+                    hiddenInput2.value = '0';
+                    if (oscunzerSavePayment) {
+                        hiddenInput2.value = oscunzerSavePayment.checked ? '1' : '0';
+                    }
 
                     let form = document.getElementById('orderConfirmAgbBottom');
                     form.classList.add("submitable")
