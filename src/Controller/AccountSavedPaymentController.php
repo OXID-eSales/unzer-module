@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
@@ -87,11 +88,12 @@ class AccountSavedPaymentController extends AccountController
                 if (strpos($paymentTypeId, 'sdd')) {
                     $paymentTypes['sepa'][$transactionOxId] = $paymentType->expose();
                 }
-            } catch (UnzerApiException | UnzerException $e) {
+            } catch (UnzerApiException | UnzerException | \Throwable $e) {
                 if ($e->getCode() !== 'API.500.100.001') {
                     $logEntry = sprintf(
-                        'Unknown error code while creating the PaymentList: "%s"',
-                        $e->getCode()
+                        'Unknown error code while creating the PaymentList: "%s", message: "%s" ',
+                        $e->getCode(),
+                        $e->getMessage()
                     );
                     $logger = $this->getServiceFromContainer(DebugHandler::class);
                     $logger->log($logEntry);
