@@ -16,6 +16,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\Mod
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
 use Exception;
+use OxidEsales\EshopCommunity\Application\Model\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -499,11 +500,21 @@ class ModuleSettings
     public function isInstallmentEligibility(): bool
     {
         return (
-        ($this->isB2CInstallmentEligibility() &&
-            $this->hasWebhookConfiguration('b2ceurinstallment') ||
-            $this->hasWebhookConfiguration('b2cchfinstallment'))
-        );
+            !$this->isB2BEligibility() && //B2C Customers only
+            ($this->isB2CInstallmentEligibility() &&
+                $this->hasWebhookConfiguration('b2ceurinstallment') ||
+                $this->hasWebhookConfiguration('b2cchfinstallment'))
+            );
     }
+
+    public function isB2BEligibility(): bool
+    {
+        $user = oxNew(User::class)->getUser();
+        $userCompany = $user->getFieldData('oxcompany');
+
+        return !empty($userCompany);
+    }
+
     /**
      * @return bool
      */
