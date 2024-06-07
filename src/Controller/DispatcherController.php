@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -23,6 +24,9 @@ use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class DispatcherController extends FrontendController
 {
     use ServiceContainer;
@@ -137,6 +141,29 @@ class DispatcherController extends FrontendController
             }
         }
 
+        $this->cleanUpTmpOrder();
         Registry::getUtils()->showMessageAndExit($result);
+    }
+
+    /**
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function cleanUpTmpOrder()
+    {
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->delete('oscunzertmporder')
+            ->where('timestamp < :timestamp');
+
+        $parameters = [
+            ':timestamp' => date("Y-m-d H:i:s", ( time() - ( 60 * 60 * 24 ) ))
+        ];
+
+        $query->setParameters($parameters)->execute();
     }
 }
