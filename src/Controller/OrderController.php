@@ -213,6 +213,7 @@ class OrderController extends OrderController_parent
 
     /**
      * @return void
+     * @throws UnzerApiException
      */
     public function saveUnzerTransaction(): void
     {
@@ -440,12 +441,11 @@ class OrderController extends OrderController_parent
 
     private function isPaymentCancelled(PaymentService $paymentService): bool
     {
-        $unzerPayment = $paymentService->getSessionUnzerPayment();
-        if (!is_null($unzerPayment)) {
-            return $unzerPayment->getState() === PaymentState::STATE_CANCELED;
+        $payment = $paymentService->getSessionUnzerPayment();
+        if (null == $payment) {
+            return false;
         }
-
-        return false;
+        return $payment->getState() === PaymentState::STATE_CANCELED;
     }
 
     /**
