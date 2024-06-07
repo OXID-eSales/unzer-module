@@ -49,8 +49,8 @@ class AdminOrderController extends AdminDetailsController
     /** @var Payment $oPayment */
     protected $oPayment = null;
 
-    /** @var string $sPaymentId */
-    protected $sPaymentId;
+    /** @var string $sTypeId */
+    protected string $sTypeId;
 
     /**
      * Executes parent method parent::render()
@@ -80,12 +80,14 @@ class AdminOrderController extends AdminDetailsController
 
             $this->_aViewData['paymentTitle'] = $this->oPayment->getFieldData('OXDESC');
             $this->_aViewData['oOrder'] = $oOrder;
+            /** @var string $sPaymentId */
+            $sPaymentId = $oOrder->getFieldData('oxpaymenttype');
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            $this->sPaymentId = $transactionService->getPaymentIdByOrderId($this->getEditObjectId());
-            $this->_aViewData['sPaymentId'] = $this->sPaymentId;
-            if ($this->sPaymentId) {
-                $this->getUnzerViewData($this->sPaymentId);
+            $this->sTypeId = $transactionService::getPaymentIdByOrderId($this->getEditObjectId());
+            $this->_aViewData['sTypeId'] = $this->sTypeId;
+            if ($this->sTypeId) {
+                $this->getUnzerViewData($sPaymentId, $this->sTypeId);
             }
         } else {
             $translator = $this->getServiceFromContainer(Translator::class);
@@ -95,27 +97,28 @@ class AdminOrderController extends AdminDetailsController
         return "oscunzer_order.tpl";
     }
 
-    public function getUnzerSDK(string $customerType = '', string $currency = ''): Unzer
+    public function getUnzerSDK(string $paymentId = '', string $currency = '', string $customerType = ''): Unzer
     {
         return $this->getServiceFromContainer(UnzerSDKLoader::class)
-            ->getUnzerSDK($customerType, $currency);
+            ->getUnzerSDK($paymentId, $currency, $customerType);
     }
 
     /**
-     * @param string $sPaymentId
+     * @param string $sPaymentId - OXID Payment ID
+     * @param string $sTypeId - Unzer Type ID
      * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function getUnzerViewData(string $sPaymentId): void
+    protected function getUnzerViewData(string $sPaymentId, string $sTypeId): void
     {
         try {
             $transactionInfo = $this->getCustomerTypeAndCurrencyFromTransaction();
             // initialize proper SDK object
-            $sdk = $this->getUnzerSDK($transactionInfo['customertype'], $transactionInfo['currency']);
+            $sdk = $this->getUnzerSDK($sPaymentId, $transactionInfo['currency'], $transactionInfo['customertype']);
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
-            $unzerPayment = $sdk->fetchPayment($sPaymentId);
+            $unzerPayment = $sdk->fetchPayment($sTypeId);
             $fCancelled = 0.0;
             $fCharged = 0.0;
 
@@ -271,6 +274,8 @@ class AdminOrderController extends AdminDetailsController
 
     /**
      * @return array
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
      */
     protected function getCustomerTypeAndCurrencyFromTransaction(): array
     {
@@ -279,6 +284,7 @@ class AdminOrderController extends AdminDetailsController
     }
 
     /**
+     * @return void
      */
     protected function forceReloadListFrame(): void
     {
@@ -369,7 +375,7 @@ class AdminOrderController extends AdminDetailsController
             return;
         }
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
-        /** @var Order $oOrder */
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, (string)$reason);
         if ($oStatus instanceof UnzerApiException) {

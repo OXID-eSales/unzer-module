@@ -79,28 +79,40 @@ $aLang = [
     'HELP_SHOP_MODULE_applepay_networks' => 'Vom Händler unterstützte Kreditkarten. Wählen Sie mindestens eine Kreditkarte aus, die Sie dem Kunden anbieten wollen. Wenn Sie keine Kreditkarte auswählen, so werden standardmäßig alle Kreditkarten angezeigt.',
     'SHOP_MODULE_applepay_label' => 'Firma',
     'HELP_SHOP_MODULE_applepay_label' => 'Wenn kein Wert eingetragen ist, wird stattdessen der in den Grundeinstellungen hinterlegte Firmenname verwendet',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2CEUR' => 'Sandbox öffentlicher Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2CEUR' => 'Sandbox privater Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2BEUR' => 'Sandbox öffentlicher Schlüssel für B2B-Käufe in EUR',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2BEUR' => 'Sandbox privater Schlüssel für B2B-Käufe in EUR',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2CCHF' => 'Sandbox öffentlicher Schlüssel für B2C-Käufe in CHF',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2CCHF' => 'Sandbox privater Schlüssel für B2C-Käufe in CHF',
-    'SHOP_MODULE_sandbox-UnzerPublicKeyB2BCHF' => 'Sandbox öffentlicher Schlüssel für B2B-Käufe in CHF',
-    'SHOP_MODULE_sandbox-UnzerPrivateKeyB2BCHF' => 'Sandbox privater Schlüssel für B2B-Käufe in CHF',
-    'SHOP_MODULE_production-UnzerPublicKeyB2CEUR' => 'Live öffentlicher Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_production-UnzerPrivateKeyB2CEUR' => 'Live privater Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_production-UnzerPublicKeyB2BEUR' => 'Live öffentlicher Schlüssel für B2B-Käufe in EUR',
-    'SHOP_MODULE_production-UnzerPrivateKeyB2BEUR' => 'Live privater Schlüssel für B2B-Käufe in EUR',
-    'SHOP_MODULE_production-UnzerPublicKeyB2CCHF' => 'Live öffentlicher Schlüssel für B2C-Käufe in CHF',
-    'SHOP_MODULE_production-UnzerPrivateKeyB2CCHF' => 'Live privater Schlüssel für B2C-Käufe in CHF',
-    'SHOP_MODULE_production-UnzerPublicKeyB2BCHF' => 'Live öffentlicher Schlüssel für B2B-Käufe in CHF',
-    'SHOP_MODULE_production-UnzerPrivateKeyB2BCHF' => 'Live privater Schlüssel für B2B-Käufe in CHF',
-    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2CEUR' => 'Sandbox öffentlicher Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2CEUR' => 'Sandbox privater Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_sandbox-UnzerPaylaterPublicKeyB2CCHF' => 'Sandbox öffentlicher Schlüssel für B2C-Käufe in CHF',
-    'SHOP_MODULE_sandbox-UnzerPaylaterPrivateKeyB2CCHF' => 'Sandbox privater Schlüssel für B2C-Käufe in CHF',
-    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CEUR' => 'Live öffentlicher Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CEUR' => 'Live privater Schlüssel für B2C-Käufe in EUR',
-    'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CCHF' => 'Live öffentlicher Schlüssel für B2C-Käufe in CHF',
-    'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CCHF' => 'Live privater Schlüssel für B2C-Käufe in CHF',
+    // live Paylater Invoice B2C EUR
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2CEURPrivateKey' => 'Live privater Schlüssel für Rechnung B2C-Käufe in EUR',
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2CEURPublicKey' => 'Live öffentlicher Schlüssel für Rechnung B2C-Käufe in EUR',
+    // live Paylater Invoice B2B EUR
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2BEURPrivateKey' => 'Live privater Schlüssel für Rechnung B2B-Käufe in EUR',
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2BEURPublicKey' => 'Live öffentlicher Schlüssel für Rechnung B2B-Käufe in EUR',
+    // live Paylater Invoice B2C CHF
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2CCHFPrivateKey' => 'Live privater Schlüssel für Rechnung B2C-Käufe in CHF',
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2CCHFPublicKey' => 'Live öffentlicher Schlüssel für Rechnung B2C-Käufe in CHF',
+    // live Paylater Invoice B2B CHF
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2BCHFPrivateKey' => 'Live privater Schlüssel für Rechnung B2B-Käufe in CHF',
+    'SHOP_MODULE_production-UnzerPayLaterInvoiceB2BCHFPublicKey' => 'Live öffentlicher Schlüssel für Rechnung B2B-Käufe in CHF',
+    // live Paylater Installment B2C EUR
+    'SHOP_MODULE_production-UnzerPayLaterInstallmentB2CEURPrivateKey' => 'Live privater Schlüssel für Ratenkauf B2C-Käufe in EUR',
+    'SHOP_MODULE_production-UnzerPayLaterInstallmentB2CEURPublicKey' => 'Live öffentlicher Schlüssel für Ratenkauf B2C-Käufe in EUR',
+    // live Paylater Installment B2C CHF
+    'SHOP_MODULE_production-UnzerPayLaterInstallmentB2CCHFPrivateKey' => 'Live privater Schlüssel für Ratenkauf B2C-Käufe in CHF',
+    'SHOP_MODULE_production-UnzerPayLaterInstallmentB2CCHFPublicKey' => 'Live öffentlicher Schlüssel für Ratenkauf B2C-Käufe in CHF',
+    // sandbox Paylater Invoice B2C EUR
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPrivateKey' => 'Sandbox privater Schlüssel für Rechnung B2C-Käufe in EUR',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPublicKey' => 'Sandbox öffentlicher Schlüssel für Rechnung B2C-Käufe in EUR',
+    // sandbox Paylater Invoice B2B EUR
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPrivateKey' => 'Sandbox privater Schlüssel für Rechnung B2B-Käufe in EUR',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPublicKey' => 'Sandbox öffentlicher Schlüssel Rechnung für B2B-Käufe in EUR',
+    // sandbox Paylater Invoice B2C CHF
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CCHFPrivateKey' => 'Sandbox privater Schlüssel für Rechnung B2C-Käufe in CHF',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CCHFPublicKey' => 'Sandbox öffentlicher Schlüssel für Rechnung B2C-Käufe in CHF',
+    // sandbox Paylater Invoice B2B CHF
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BCHFPrivateKey' => 'Sandbox privater Schlüssel für Rechnung B2B-Käufe in CHF',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BCHFPublicKey' => 'Sandbox öffentlicher Schlüssel für Rechnung B2B-Käufe in CHF',
+    // sandbox Paylater Installment B2C EUR
+    'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CEURPrivateKey' => 'Sandbox privater Schlüssel für Ratenkauf B2C-Käufe in EUR',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CEURPublicKey' => 'Sandbox öffentlicher Schlüssel für Ratenkauf B2C-Käufe in EUR',
+    // sandbox Paylater Installment B2C EUR
+    'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPrivateKey' => 'Sandbox privater Schlüssel für Ratenkauf B2C-Käufe in CHF',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPublicKey' => 'Sandbox öffentlicher Schlüssel für Ratenkauf B2C-Käufe in CHF',
 ];

@@ -81,6 +81,10 @@ class PaymentExtensionLoader
     }
 
     /**
+     * Please only use this method if you want to have static information about the payment method and do not
+     * need functions of the SDK. The SDK must always be loaded with the correct credentials. This is only
+     * guaranteed if method getPaymentExtensionByCustomerTypeAndCurrency is used, as only this loads the SDK
+     * with the correct credentials at all times
      * @param PaymentModel $payment
      * @return AbstractUnzerPayment
      */
@@ -95,6 +99,9 @@ class PaymentExtensionLoader
     }
 
     /**
+     * Please only use this method if you need the SDK. This is the only way to load the SDK with the correct
+     * credentials. The getPaymentExtension method is only used to obtain static information about the payment
+     * method.
      * @param PaymentModel $payment
      * @param string $customerType
      * @param string $currency
@@ -105,17 +112,13 @@ class PaymentExtensionLoader
         string $customerType,
         string $currency
     ): AbstractUnzerPayment {
-        if ($payment->getId() === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return oxNew(
-                self::UNZERCLASSNAMEMAPPING[$payment->getId()],
-                $this->unzerSdkLoader->getUnzerSDK($customerType, $currency, true),
-                $this->unzerService,
-                $this->logger
-            );
-        }
         return oxNew(
             self::UNZERCLASSNAMEMAPPING[$payment->getId()],
-            $this->unzerSdkLoader->getUnzerSDK($customerType, $currency),
+            $this->unzerSdkLoader->getUnzerSDK(
+                $payment->getId(),
+                $currency,
+                $customerType
+            ),
             $this->unzerService,
             $this->logger
         );

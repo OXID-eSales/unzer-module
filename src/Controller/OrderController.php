@@ -18,16 +18,21 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
+use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
+use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 
 /**
  * TODO: Decrease count of dependencies to 13
@@ -118,7 +123,7 @@ class OrderController extends OrderController_parent
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var UnzerOrder $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();
@@ -133,13 +138,18 @@ class OrderController extends OrderController_parent
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
-                $unzerPaymentId = Registry::getSession()->getVariable('paymentid');
+                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
-                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+
+                if ($this->isPaymentCancelled($paymentService)) {
+                    $this->redirectUserToCheckout($unzerService, $oOrder);
+                }
+
+                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
                         $unzerPaymentId,
-                        $oBasket->getDiscountedProductsBruttoPrice()
+                        (float)$oOrder->getTotalOrderSum()
                     );
                 }
 
@@ -203,10 +213,11 @@ class OrderController extends OrderController_parent
 
     /**
      * @return void
+     * @throws UnzerApiException
      */
     public function saveUnzerTransaction(): void
     {
-        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+        /** @var UnzerOrder $order */
         $order = $this->getActualOrder();
         $order->initWriteTransactionToDB();
     }
@@ -255,7 +266,7 @@ class OrderController extends OrderController_parent
      */
     public function getActualOrder(): Order
     {
-        if (!($this->actualOrder instanceof \OxidSolutionCatalysts\Unzer\Model\Order)) {
+        if (!($this->actualOrder instanceof Order)) {
             $this->actualOrder = oxNew(Order::class);
             /** @var string $sess_challenge */
             $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
@@ -357,52 +368,48 @@ class OrderController extends OrderController_parent
     }
     protected function getSavedPayment(): void
     {
-        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
-        $unzerSDK = $UnzerSdk->getUnzerSDK();
-
-        $ids = $this->getTrancactionIds();
+        $transactionService = $this->getServiceFromContainer(Transaction::class);
+        $ids = $transactionService->getTrancactionIds($this->getUser());
         $paymentTypes = false;
         if ($ids) {
-            foreach ($ids as $typeId) {
-                if (!empty($typeId['PAYMENTTYPEID'])) {
+            foreach ($ids as $typeData) {
+                $paymentTypeId = $typeData['PAYMENTTYPEID'] ?: '';
+                $paymentId = $typeData['OXPAYMENTTYPE'] ?: '';
+                $currency = $typeData['CURRENCY'] ?: '';
+                $customerType = $typeData['CUSTOMERTYPE'] ?: '';
+                if (!empty($paymentTypeId)) {
                     try {
-                        $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
-                    } catch (UnzerApiException $e) {
+                        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
+                        $unzerSDK = $UnzerSdk->getUnzerSDK(
+                            $paymentId,
+                            $currency,
+                            $customerType
+                        );
+                        $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
+                    } catch (UnzerException | UnzerApiException $e) {
+                        $userId = $this->getUser() ? $this->getUser()->getId() : 'unknown';
+                        $logEntry = sprintf(
+                            'The incorrect data used to initialize the SDK ' .
+                            'comes from the transactions of the user: "%s"',
+                            $userId
+                        );
+                        $logger = $this->getServiceFromContainer(DebugHandler::class);
+                        $logger->log($logEntry);
                         continue;
                     }
-
-                    if (strpos($typeId['PAYMENTTYPEID'], 'crd')) {
-                        $paymentTypes['card'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    if (strpos($paymentTypeId, 'crd')) {
+                        $paymentTypes['card'][$paymentTypeId] = $paymentType->expose();
                     }
-                    if (strpos($typeId['PAYMENTTYPEID'], 'ppl')) {
-                        $paymentTypes['paypal'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    if (strpos($paymentTypeId, 'ppl')) {
+                        $paymentTypes['paypal'][$paymentTypeId] = $paymentType->expose();
                     }
-                    if (strpos($typeId['PAYMENTTYPEID'], 'sdd')) {
-                        $paymentTypes['sepa'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
+                    if (strpos($paymentTypeId, 'sdd')) {
+                        $paymentTypes['sepa'][$paymentTypeId] = $paymentType->expose();
                     }
                 }
             }
         }
-
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
-    protected function getTrancactionIds(): array
-    {
-        $result = [];
-        if ($this->getUser() && $this->getUser()->getId() !== null) {
-            $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $result = $oDB->getAll(
-                "SELECT PAYMENTTYPEID from oscunzertransaction
-                where OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL
-                GROUP BY PAYMENTTYPEID ",
-                [':oxuserid' => $this->getUser()->getId()]
-            );
-        }
-        return $result;
     }
 
     protected function getBasketHash(): string
@@ -419,6 +426,42 @@ class OrderController extends OrderController_parent
         return md5(
             serialize($basketSummery) .
             serialize($basketContents)
+        );
+    }
+
+    private function getUnzerPaymentIdFromSession(): string
+    {
+        $paymentId = Registry::getSession()->getVariable('UnzerPaymentId');
+        if (is_string($paymentId)) {
+            return $paymentId;
+        }
+
+        return '';
+    }
+
+    private function isPaymentCancelled(PaymentService $paymentService): bool
+    {
+        $payment = $paymentService->getSessionUnzerPayment();
+        if (null == $payment) {
+            return false;
+        }
+        return $payment->getState() === PaymentState::STATE_CANCELED;
+    }
+
+    /**
+     * @param Unzer $unzerService
+     * @param Order $order
+     * @return void
+     * @throws RedirectWithMessage
+     */
+    private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
+    {
+        $translator = $this->getServiceFromContainer(Translator::class);
+        /** @var UnzerOrder $order */
+        $unzerOrderNr = $order->getUnzerOrderNr();
+        throw new RedirectWithMessage(
+            $unzerService->prepareRedirectUrl('payment?payerror=-6'),
+            sprintf($translator->translate('OSCUNZER_CANCEL_DURING_CHECKOUT'), $unzerOrderNr)
         );
     }
 }

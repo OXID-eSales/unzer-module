@@ -15,6 +15,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -70,8 +71,7 @@ class DispatcherController extends FrontendController
         $url = parse_url($aJson['retrieveUrl']);
         /** @var Transaction $transaction */
         $transaction = $this->getServiceFromContainer(Transaction::class);
-        $aPath = explode("/", $url['path']);
-        $typeid = end($aPath);
+
         /** @var Request $request */
         $request = Registry::getRequest();
         /** @var string $context */
@@ -94,10 +94,6 @@ class DispatcherController extends FrontendController
         $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDKbyKey($unzerKey);
         $resource = $unzer->fetchResourceFromEvent($jsonRequest);
         $paymentId = $resource->getId();
-
-        if (!$transaction->isValidTransactionTypeId($typeid)) {
-         //   Registry::getUtils()->showMessageAndExit("Invalid type id");
-        }
 
         if (is_string($paymentId)) {
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
@@ -151,6 +147,7 @@ class DispatcherController extends FrontendController
             }
         }
 
+        $this->cleanUpTmpOrder();
         Registry::getUtils()->showMessageAndExit($result);
     }
 
@@ -199,5 +196,27 @@ class DispatcherController extends FrontendController
         $difference = $nowTimeUnix - $tmpOrderTimeUnix;
 
         return $difference >= $timeDiffSec;
+    }
+
+    /**
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function cleanUpTmpOrder()
+    {
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->delete('oscunzertmporder')
+            ->where('timestamp < :timestamp');
+
+        $parameters = [
+            ':timestamp' => date("Y-m-d H:i:s", ( time() - ( 60 * 60 * 24 ) ))
+        ];
+
+        $query->setParameters($parameters)->execute();
     }
 }

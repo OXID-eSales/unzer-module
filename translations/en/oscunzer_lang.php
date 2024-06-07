@@ -15,6 +15,7 @@ $aLang = [
 
     // Error
     'OSCUNZER_ERROR_DURING_CHECKOUT' => 'An error occurred while processing the payment. The process was reversed. Alternatively, please select another payment method.',
+    'OSCUNZER_CANCEL_DURING_CHECKOUT' => 'The payment was cancelled. This order is saved as "not finished" under the number %s in your customer account so that you can track the process.',
 
     //Invoice
     'OSCUNZER_BANK_DETAILS_AMOUNT' => 'Please transfer the amount of %s %s to the following account:<br /><br />',
@@ -125,4 +126,5 @@ $aLang = [
     'OSCUNZER_CARD_NUMBER' => 'Card Number',
     'OSCUNZER_EXPIRY_DATE' => 'Expiry Date',
     'OSCUNZER_NEW_CARD' => 'New Card',
+    'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Invalid payment method',
 ];

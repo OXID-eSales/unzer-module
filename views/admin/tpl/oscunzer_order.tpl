@@ -49,7 +49,7 @@
                         <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
                         <td>[{'OSCUNZER_TRANSACTION_STATUS_'|cat:$transaction_state|oxmultilangassign}]</td>
                         <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
-                        <td>[{$oUnzerTransaction->getUnzerAmount()|string_format:"%.2f"}]
+                        <td>[{$oUnzerTransaction->getUnzerRemaining()|string_format:"%.2f"}]
                             [{$oUnzerTransaction->getUnzerCurrency()}]
                         </td>
                     </tr>
@@ -93,7 +93,7 @@
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="sendShipmentNotification">
                     <input type="hidden" name="oxid" value="[{$oxid}]">
-                    <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                    <input type="hidden" name="unzerid" value="[{$sTypeId}]">
                     <button type="submit">[{oxmultilang ident="OSCUNZER_SHIPMENT_NOTIFICATION"}]</button>
                 </form>
             [{/if}]
@@ -110,7 +110,7 @@
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerCollect">
                     <input type="hidden" name="oxid" value="[{$oxid}]">
-                    <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                    <input type="hidden" name="unzerid" value="[{$sTypeId}]">
                     <table>
                         <tbody>
                         <tr>
@@ -130,7 +130,7 @@
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerAuthorizationCancel">
                     <input type="hidden" name="oxid" value="[{$oxid}]">
-                    <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                    <input type="hidden" name="unzerid" value="[{$sTypeId}]">
                     <table>
                         <tbody>
                         <tr>
@@ -177,7 +177,7 @@
                                 [{$oViewConf->getHiddenSid()}]
                                 <input type="hidden" name="chargeid" value="[{$oUnzerCharge.chargeId}]">
                                 <input type="hidden" name="chargedamount" value="[{$oUnzerCharge.chargedAmount}]">
-                                <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                                <input type="hidden" name="unzerid" value="[{$sTypeId}]">
                                 <input type="hidden" name="cl" value="unzer_admin_order">
                                 <input type="hidden" name="fnc" value="doUnzerCancel">
                                 <input type="hidden" name="oxid" value="[{$oxid}]">
@@ -220,7 +220,7 @@
                     [{if $canCancelAmount > 0}]
                         <form name="uzr" id="uzr_s-chg_payout" action="[{$oViewConf->getSelfLink()}]" method="post">
                             [{$oViewConf->getHiddenSid()}]
-                            <input type="hidden" name="unzerid" value="[{$sPaymentId}]">
+                            <input type="hidden" name="unzerid" value="[{$sTypeId}]">
                             <input type="hidden" name="chargedamount" value="[{$canCancelAmount}]">
                             <input type="hidden" name="cl" value="unzer_admin_order">
                             <input type="hidden" name="fnc" value="doUnzerCancel">

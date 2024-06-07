@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.2.0] - unreleased - 2024-??-??
 
 ### NEW
-- new Paymentmethod Unzer installment (Paylater)
-- If customers - for whatever reason - interrupt the order in the checkout, the order is still saved using a temporary order and Unzer's webhook
+- New Paymentmethod Unzer installment (Paylater)
+- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup  temporary order
 
 ### FIXED
+- refactor of the correct use of the appropriate credentials depending on the payment method used
 - [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)
 - [0007586](https://bugs.oxid-esales.com/view.php?id=7586) - Fix: Unable to finish the checkout process using the Apple Pay as the payment method
 - [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
@@ -22,6 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - use Module-Logger also in UnzerPayment
 - Avoid checking AppleCert if ApplePay is off
 - Fix Save Module Config
+- Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
+- Inform the customer in frontend, if the payment was cancelled by customer during checkout
 
 ## [1.1.3] - 2023-11-14
 

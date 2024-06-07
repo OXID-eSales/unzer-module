@@ -86,7 +86,7 @@ class ModuleSettingsTest extends TestCase
                     ['sandbox-UnzerPublicKey', Module::MODULE_ID, 'sandboxPublicKey'],
                     ['production-UnzerPublicKey', Module::MODULE_ID, 'productionPublicKey'],
                 ],
-                'settingMethod' => 'getShopPublicKey',
+                'settingMethod' => 'getStandardPublicKey',
                 'settingValue' => 'sandboxPublicKey'
             ],
             [
@@ -95,7 +95,7 @@ class ModuleSettingsTest extends TestCase
                     ['sandbox-UnzerPublicKey', Module::MODULE_ID, 'sandboxPublicKey'],
                     ['production-UnzerPublicKey', Module::MODULE_ID, 'productionPublicKey'],
                 ],
-                'settingMethod' => 'getShopPublicKey',
+                'settingMethod' => 'getStandardPublicKey',
                 'settingValue' => 'productionPublicKey'
             ],
             [
@@ -104,7 +104,7 @@ class ModuleSettingsTest extends TestCase
                     ['sandbox-UnzerPrivateKey', Module::MODULE_ID, 'sandboxPrivateKey'],
                     ['production-UnzerPrivateKey', Module::MODULE_ID, 'productionPrivateKey'],
                 ],
-                'settingMethod' => 'getShopPrivateKey',
+                'settingMethod' => 'getStandardPrivateKey',
                 'settingValue' => 'sandboxPrivateKey'
             ],
             [
@@ -113,7 +113,7 @@ class ModuleSettingsTest extends TestCase
                     ['sandbox-UnzerPrivateKey', Module::MODULE_ID, 'sandboxPrivateKey'],
                     ['production-UnzerPrivateKey', Module::MODULE_ID, 'productionPrivateKey'],
                 ],
-                'settingMethod' => 'getShopPrivateKey',
+                'settingMethod' => 'getStandardPrivateKey',
                 'settingValue' => 'productionPrivateKey'
             ],
             [

@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -239,6 +240,7 @@ class Transaction
         );
         $params = [
             'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'remaining' => $unzerPayment->getAmount()->getRemaining(),
             'currency' => $unzerPayment->getCurrency(),
             'typeid'   => $unzerPayment->getId(),
             'oxaction' => $oxaction,
@@ -481,5 +483,37 @@ class Transaction
             return true;
         }
         return false;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    public function getTrancactionIds(?User $user = null): array
+    {
+        $result = [];
+
+        // check user Model
+        if (!$user) {
+            return $result;
+        }
+
+        // check user Id
+        $userId = $user->getId() ?: null;
+        if (!$userId) {
+            return $result;
+        }
+
+        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
+        if ($oDB) {
+            $result = $oDB->getAll(
+                "SELECT ot.OXID, ot.PAYMENTTYPEID, ot.CURRENCY, ot.CUSTOMERTYPE, o.OXPAYMENTTYPE
+                        from oscunzertransaction as ot
+                        left join oxorder as o ON (ot.oxorderid = o.OXID) 
+            where ot.OXUSERID = :oxuserid AND ot.PAYMENTTYPEID IS NOT NULL
+            GROUP BY ot.PAYMENTTYPEID ",
+                [':oxuserid' => $userId]
+            );
+        }
+        return $result;
     }
 }
