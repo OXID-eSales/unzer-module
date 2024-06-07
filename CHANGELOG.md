@@ -5,8 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [2.2.0] - 2024-??-??
 
 ### NEW
+- New Paymentmethod Unzer installment (Paylater)
 - provide content for smarty and twig
 - If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup temporary order
 - Save Payment Data for registered Users
