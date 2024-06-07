@@ -8,13 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### NEW
 - provide content for smarty and twig
-- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook
+- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup temporary order
 - Save Payment Data for registered Users
 
 ### FIXED
 - fix: PayPal sporadically fails on GHA CC Tests
 - [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
 - refactor of the correct use of the appropriate credentials depending on the payment method used
+- Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
 
 ## [2.1.4] - 2023-11-23
 

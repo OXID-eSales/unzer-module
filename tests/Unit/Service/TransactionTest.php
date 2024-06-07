@@ -72,7 +72,8 @@ class TransactionTest extends IntegrationTestCase
             'oxaction' => 'statename',
             'metadata' => 'metadataJson',
             'customerid' => 'unzerCustomerId',
-            'customertype' => ''
+            'customertype' => '',
+            'remaining' => 0.0
         ]);
 
         $this->assertTrue($sut->writeTransactionToDB("orderId", "userId", $payment));
