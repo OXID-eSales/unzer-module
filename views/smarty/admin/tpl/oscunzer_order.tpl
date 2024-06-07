@@ -49,7 +49,7 @@
                         <td>[{$oUnzerTransaction->getUnzerCustomerId()|escape}]</td>
                         <td>[{'OSCUNZER_TRANSACTION_STATUS_'|cat:$transaction_state|oxmultilangassign}]</td>
                         <td>[{$oUnzerTransaction->getUnzerTypeId()|escape}]</td>
-                        <td>[{$oUnzerTransaction->getUnzerAmount()|string_format:"%.2f"}]
+                        <td>[{$oUnzerTransaction->getUnzerRemaining()|string_format:"%.2f"}]
                             [{$oUnzerTransaction->getUnzerCurrency()}]
                         </td>
                     </tr>

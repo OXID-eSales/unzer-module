@@ -95,6 +95,15 @@ class Transaction extends BaseModel
         return $this->getRawField('AMOUNT');
     }
 
+    public function getUnzerRemaining(): ?string
+    {
+        if ($this->getUnzerState() === 'partly') {
+            return $this->getRawField('REMAINING');
+        }
+
+        return $this->getUnzerAmount();
+    }
+
     /**
      * @return string|null
      */

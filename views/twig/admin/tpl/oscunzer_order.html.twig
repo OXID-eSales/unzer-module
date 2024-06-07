@@ -49,7 +49,7 @@
                     <td>{{ oUnzerTransaction.getUnzerCustomerId()|escape }}</td>
                     <td>{{ 'OSCUNZER_TRANSACTION_STATUS_'|cat(transaction_state)|translate }}</td>
                     <td>{{ oUnzerTransaction.getUnzerTypeId()|escape }}</td>
-                    <td>{{ oUnzerTransaction.getUnzerAmount()|number_format(2, '.', ' ') }}
+                    <td>{{ oUnzerTransaction.getUnzerRemaining()|number_format(2, '.', ' ') }}
                         {{ oUnzerTransaction.getUnzerCurrency() }}
                     </td>
                 </tr>
