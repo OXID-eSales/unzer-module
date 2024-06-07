@@ -449,11 +449,15 @@ class OrderController extends OrderController_parent
     }
 
     /**
-     * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
+     * @param Unzer $unzerService
+     * @param Order $order
+     * @return void
+     * @throws RedirectWithMessage
      */
-    private function redirectUserToCheckout(Unzer $unzerService, UnzerOrder $order): void
+    private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
     {
         $translator = $this->getServiceFromContainer(Translator::class);
+        /** @var UnzerOrder $order */
         $unzerOrderNr = $order->getUnzerOrderNr();
         throw new RedirectWithMessage(
             $unzerService->prepareRedirectUrl('payment?payerror=-6'),

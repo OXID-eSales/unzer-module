@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### NEW
 - New Paymentmethod Unzer installment (Paylater)
-- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook [oxid6]
+- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup  temporary order
 
 ### FIXED
 - refactor of the correct use of the appropriate credentials depending on the payment method used
