@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - fix: PayPal sporadically fails on GHA CC Tests
 - [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
 - refactor of the correct use of the appropriate credentials depending on the payment method used
+- Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
 
 ## [2.1.4] - 2023-11-23
 
