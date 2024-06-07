@@ -213,10 +213,11 @@ class OrderController extends OrderController_parent
 
     /**
      * @return void
+     * @throws UnzerApiException
      */
     public function saveUnzerTransaction(): void
     {
-        /** @var UnzerOrder $oOrder */
+        /** @var UnzerOrder $order */
         $order = $this->getActualOrder();
         $order->initWriteTransactionToDB();
     }
@@ -440,15 +441,23 @@ class OrderController extends OrderController_parent
 
     private function isPaymentCancelled(PaymentService $paymentService): bool
     {
-        return $paymentService->getSessionUnzerPayment()->getState() === PaymentState::STATE_CANCELED;
+        $payment = $paymentService->getSessionUnzerPayment();
+        if (null == $payment) {
+            return false;
+        }
+        return $payment->getState() === PaymentState::STATE_CANCELED;
     }
 
     /**
-     * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
+     * @param Unzer $unzerService
+     * @param Order $order
+     * @return void
+     * @throws RedirectWithMessage
      */
-    private function redirectUserToCheckout(Unzer $unzerService, Order $order)
+    private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
     {
         $translator = $this->getServiceFromContainer(Translator::class);
+        /** @var UnzerOrder $order */
         $unzerOrderNr = $order->getUnzerOrderNr();
         throw new RedirectWithMessage(
             $unzerService->prepareRedirectUrl('payment?payerror=-6'),
