@@ -27,7 +27,7 @@
                         <input type="hidden" name="cl" value="unzer_saved_payments">
                         <input type="hidden" name="fnc" value="deletePayment">
                         <input type="hidden" name="paymenttypeid" value="[{$paymenttypeid}]">
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-danger">[{oxmultilang ident="DD_DELETE"}]</button>
                     </form>
                 </td>
             </tr>
@@ -58,7 +58,7 @@
                         <input type="hidden" name="cl" value="unzer_saved_payments">
                         <input type="hidden" name="fnc" value="deletePayment">
                         <input type="hidden" name="paymenttypeid" value="[{$paymenttypeid}]">
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-danger">[{oxmultilang ident="DD_DELETE"}]</button>
                     </form>
                 </td>
             </tr>
@@ -88,7 +88,7 @@
                         <input type="hidden" name="cl" value="unzer_saved_payments">
                         <input type="hidden" name="fnc" value="deletePayment">
                         <input type="hidden" name="paymenttypeid" value="[{$paymenttypeid}]">
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-danger">[{oxmultilang ident="DD_DELETE"}]</button>
                     </form>
                 </td>
             </tr>
