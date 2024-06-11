@@ -93,8 +93,6 @@ class TmpOrder extends BaseModel
     }
 
     /**
-     * @param string $unzerOrderNr
-     * @return array
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */

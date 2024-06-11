@@ -85,7 +85,7 @@ class Order extends Order_parent
         }
 
         // setUnzerOrderId
-        $unzerOrderId = $paymentService->getUnzerOrderId();
+        $unzerOrderId = (string)$paymentService->getUnzerOrderId();
         $this->setUnzerOrderNr((string)$unzerOrderId);
         $unzerService->resetUnzerOrderId();
 
@@ -308,7 +308,7 @@ class Order extends Order_parent
 
             $unzerPayment = $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
                 $unzerPayment :
-                $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment();
+                $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment(true);
 
             return $transactionService->writeTransactionToDB(
                 $this->getId(),

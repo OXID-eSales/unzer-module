@@ -161,7 +161,7 @@ class InstallmentController extends FrontendController
                 PaymentService::class
             );
             /** @var Payment $sessionUnzerPayment */
-            $sessionUnzerPayment = $payment->getSessionUnzerPayment();
+            $sessionUnzerPayment = $payment->getSessionUnzerPayment(true);
             $this->uzrPayment = $sessionUnzerPayment;
         }
         return $this->uzrPayment;
