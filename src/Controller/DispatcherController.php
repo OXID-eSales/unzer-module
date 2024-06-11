@@ -5,16 +5,14 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
-use Exception;
 use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -22,138 +20,199 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\PaymentState;
-use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment;
 
 class DispatcherController extends FrontendController
 {
     use ServiceContainer;
 
-    /**
-     * @return void
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @throws UnzerApiException
-     * @throws Exception
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.ElseExpression)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
+    private Transaction $transaction;
+    private UnzerWebhooks $unzerWebhooks;
+    private UnzerSDKLoader $unzerSDKLoader;
+    private Translator $translator;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->transaction = $this->getServiceFromContainer(Transaction::class);
+        $this->unzerWebhooks = $this->getServiceFromContainer(UnzerWebhooks::class);
+        $this->unzerSDKLoader = $this->getServiceFromContainer(UnzerSDKLoader::class);
+        $this->translator = $this->getServiceFromContainer(Translator::class);
+    }
+
     public function updatePaymentTransStatus(): void
     {
-        $result = '';
-
-        /** @var string $jsonRequest */
         $jsonRequest = file_get_contents('php://input');
-
-        $aJson = [];
-
-        try {
-            /** @var array $aJson */
-            $aJson = json_decode($jsonRequest, true, 512, JSON_THROW_ON_ERROR);
-            if (!count($aJson)) {
-                throw new JsonException('Invalid Json');
-            }
-        } catch (JsonException $e) {
-            Registry::getUtils()->showMessageAndExit("Invalid Json");
+        if ($jsonRequest === false) {
+            $this->exitWithMessage("Invalid Json");
+            return;
         }
 
-        /** @var array $url */
-        $url = parse_url($aJson['retrieveUrl']);
-        /** @var Transaction $transaction */
-        $transaction = $this->getServiceFromContainer(Transaction::class);
-        $aPath = explode("/", $url['path']);
-        $typeid = end($aPath);
+        $aJson = $this->decodeJson((string)$jsonRequest);
+        if (!is_array($aJson) || !isset($aJson['retrieveUrl'])) {
+            $this->exitWithMessage("Invalid Json");
+            return;
+        }
 
-        /** @var Request $request */
-        $request = Registry::getRequest();
-        /** @var string $context */
-        $context = $request->getRequestParameter('context', 'shop');
-        $unzerWebhooks = $this->getServiceFromContainer(UnzerWebhooks::class);
-        $unzerKey = $unzerWebhooks->getUnzerKeyFromWebhookContext($context);
+        $url = null;
+        if (isset($aJson['retrieveUrl'])) {
+            $url = parse_url($aJson['retrieveUrl']);
+        }
+
+        if (!is_array($url)) {
+            $this->exitWithMessage("Invalid URL");
+            return;
+        }
+
+        $typeid = $this->getTypeId($url);
+        if ($this->isInvalidRequest($url, $typeid)) {
+            $this->exitWithMessage("Invalid Webhook call");
+            return;
+        }
+
+        $unzerKey = $this->getUnzerKeyFromContext();
         if (empty($unzerKey)) {
-            Registry::getUtils()->showMessageAndExit("Invalid Webhook call");
+            $this->exitWithMessage("Invalid Webhook context");
+            return;
+        }
+
+        $unzer = $this->unzerSDKLoader->getUnzerSDKbyKey($unzerKey);
+        $resource = $unzer->fetchResourceFromEvent((string)$jsonRequest);
+        $paymentId = $resource->getId();
+
+        if ($paymentId) {
+            $result = $this->processPayment($unzer, $paymentId);
+            Registry::getUtils()->showMessageAndExit($result);
+        }
+    }
+
+    private function exitWithMessage(string $message): void
+    {
+        Registry::getUtils()->showMessageAndExit($message);
+    }
+
+    private function getUnzerKeyFromContext(): string
+    {
+        $context = $this->getContext();
+        return $this->unzerWebhooks->getUnzerKeyFromWebhookContext($context);
+    }
+
+    private function processPayment(\UnzerSDK\Unzer $unzer, string $paymentId): string
+    {
+        $order = oxNew(Order::class);
+        $data = $this->transaction::getTransactionDataByPaymentId($paymentId);
+
+        if (!is_array($data) || !isset($data[0]['OXORDERID'])) {
+            return "Invalid Order Data";
+        }
+
+        $unzerPayment = $unzer->fetchPayment($paymentId);
+        if ($order->load($data[0]['OXORDERID'])) {
+            return $this->updateOrder($order, $unzerPayment, $paymentId);
+        }
+
+        return $this->handleTmpOrder($unzerPayment);
+    }
+
+    private function decodeJson(string $jsonRequest): ?array
+    {
+        try {
+            $aJson = json_decode($jsonRequest, true, 512, JSON_THROW_ON_ERROR);
+            return is_array($aJson) ? $aJson : null;
+        } catch (JsonException $e) {
+            return null;
+        }
+    }
+
+    private function getTypeId(array $url): string
+    {
+        $pathSegments = explode("/", $url['path']);
+        return end($pathSegments);
+    }
+
+    private function isInvalidRequest(array $url, string $typeid): bool
+    {
+        return $url['scheme'] !== "https" ||
+            ($url['host'] !== "api.unzer.com" && $url['host'] !== "sbx-api.heidelpay.com") ||
+            !$this->transaction->isValidTransactionTypeId($typeid);
+    }
+
+    private function getContext(): string
+    {
+        $context = Registry::getRequest()->getRequestParameter('context', 'shop');
+        return is_string($context) ? $context : 'shop';
+    }
+
+    private function updateOrder(Order $order, Payment $unzerPayment, string $paymentId): string
+    {
+        switch ($unzerPayment->getState()) {
+            case PaymentState::STATE_COMPLETED:
+                $this->markUnzerOrderAsPaid($order);
+                break;
+            case PaymentState::STATE_CANCELED:
+                $this->cancelOrder($order);
+                break;
         }
 
         if (
-            $url['scheme'] !== "https" ||
-            (
-                $url['host'] !== "api.unzer.com" &&
-                $url['host'] !== "sbx-api.heidelpay.com"
+            $this->transaction->writeTransactionToDB(
+                $order->getId(),
+                $order->getOrderUser()->getId() ?: '',
+                $unzerPayment
             )
         ) {
-            Registry::getUtils()->showMessageAndExit("No valid retrieveUrl");
+            return sprintf(
+                $this->translator->translate('oscunzer_TRANSACTION_CHANGE'),
+                $unzerPayment->getStateName(),
+                $paymentId
+            );
         }
 
-        if (!$transaction->isValidTransactionTypeId($typeid)) {
-            Registry::getUtils()->showMessageAndExit("Invalid type id");
+        return $this->translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
+    }
+
+    private function handleTmpOrder(Payment $unzerPayment): string
+    {
+        $tmpOrder = oxNew(TmpOrder::class);
+        $orderId = $unzerPayment->getBasket() ? $unzerPayment->getBasket()->getOrderId() : '';
+        $tmpData = $tmpOrder->getTmpOrderByUnzerId($orderId);
+
+        if (
+            isset($tmpData['OXID']) &&
+            $tmpOrder->load($tmpData['OXID']) &&
+            $this->hasExceededTimeLimit($tmpOrder)
+        ) {
+            $bError = !(
+                $unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
+                $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
+                $unzerPayment->getState() === PaymentState::STATE_PENDING
+            );
+
+            return $this->finalizeTmpOrder($unzerPayment, $tmpOrder, $tmpData, $bError);
         }
 
-        $unzer = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDKbyKey($unzerKey);
-        $resource = $unzer->fetchResourceFromEvent($jsonRequest);
+        return $this->translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
+    }
 
-        $paymentId = $resource->getId();
+    private function finalizeTmpOrder(
+        Payment $unzerPayment,
+        TmpOrder $tmpOrder,
+        array $tmpData,
+        bool $bError
+    ): string {
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']), ['allowed_classes' => [Order::class]]);
+            $oOrder = is_array($aOrderData) && isset($aOrderData['order']) ? $aOrderData['order'] : null;
 
-        if (!$transaction->isValidTransactionTypeId($typeid)) {
-            Registry::getUtils()->showMessageAndExit("Invalid type id");
-        }
-
-        if (is_string($paymentId)) {
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
-            $order = oxNew(Order::class);
-            /** @var array $data */
-            $data = $transaction::getTransactionDataByPaymentId($paymentId);
-
-            $unzerPayment = $unzer->fetchPayment($paymentId);
-
-            if ($order->load($data[0]['OXORDERID'])) {
-                if ($unzerPayment->getState() === PaymentState::STATE_COMPLETED) {
-                    $order->markUnzerOrderAsPaid();
-                }
-
-                if ($unzerPayment->getState() === PaymentState::STATE_CANCELED) {
-                    $order->cancelOrder();
-                }
-
-                $translator = $this->getServiceFromContainer(Translator::class);
-                $transactionService = $this->getServiceFromContainer(Transaction::class);
-
-                if (
-                    $transactionService->writeTransactionToDB(
-                        $order->getId(),
-                        $order->getOrderUser()->getId() ?: '',
-                        $unzerPayment
-                    )
-                ) {
-                    $result = sprintf(
-                        $translator->translate('oscunzer_TRANSACTION_CHANGE'),
-                        $unzerPayment->getStateName(),
-                        $paymentId
-                    );
-                } else {
-                    $result = $translator->translate('oscunzer_TRANSACTION_NOTHINGTODO') . $paymentId;
-                }
-            } else {
-                $tmpOrder = oxNew(TmpOrder::class);
-                $orderId = $unzerPayment->getBasket() ? $unzerPayment->getBasket()->getOrderId() : '';
-                $tmpData = $tmpOrder->getTmpOrderByUnzerId($orderId);
-                if (
-                    isset($tmpData['OXID']) &&
-                    $tmpOrder->load($tmpData['OXID']) &&
-                    $this->hasExceededTimeLimit($tmpOrder)
-                ) {
-                    $bError = !($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
-                        $unzerPayment->getState() === PaymentState::STATE_CANCELED ||
-                        $unzerPayment->getState() === PaymentState::STATE_PENDING);
-                    $this->handleTmpOrder($unzerPayment, $tmpOrder, $tmpData, $bError);
-                }
+            if ($oOrder) {
+                $oOrder->finalizeTmpOrder($unzerPayment, $bError);
+                $tmpOrder->assign(['status' => 'FINISHED']);
+                $tmpOrder->save();
+                return $this->translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
             }
         }
 
-        Registry::getUtils()->showMessageAndExit($result);
+        return $this->translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
     }
 
     private function hasExceededTimeLimit(TmpOrder $tmpOrder): bool
@@ -168,21 +227,15 @@ class DispatcherController extends FrontendController
         return $difference >= $timeDiffSec;
     }
 
-    private function handleTmpOrder(Payment $unzerPayment, TmpOrder $tmpOrder, array $tmpData, bool $bError)
+    private function markUnzerOrderAsPaid(Order $order): void
     {
-        $translator = $this->getServiceFromContainer(Translator::class);
-        $result = $translator->translate('oscunzer_ERROR_HANDLE_TMP_ORDER');
-        if ($tmpOrder->load($tmpData['OXID'])) {
-            $aOrderData = unserialize(base64_decode($tmpData['TMPORDER']), ['allowed_classes' => [Order::class]]);
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
-            $oOrder = is_array($aOrderData) && isset($aOrderData['order']) ? $aOrderData['order'] : null;
-            if ($oOrder) {
-                $oOrder->finalizeTmpOrder($unzerPayment, $bError);
-                $tmpOrder->assign(['status' => 'FINISHED']);
-                $tmpOrder->save();
-                $result = $translator->translate('oscunzer_SUCCESS_HANDLE_TMP_ORDER');
-            }
-        }
-        Registry::getUtils()->showMessageAndExit($result);
+        $order->assign(['oxtransstatus' => 'Paid']);
+        $order->save();
+    }
+
+    private function cancelOrder(Order $order): void
+    {
+        $order->assign(['oxtransstatus' => 'Cancelled']);
+        $order->save();
     }
 }

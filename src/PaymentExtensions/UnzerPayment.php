@@ -159,7 +159,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
 
         if ($savePayment === "1" && $userModel->getId()) {
             $transactionService = $this->getServiceFromContainer(Transaction::class);
-            $payment = $this->getServiceFromContainer(Payment::class)->getSessionUnzerPayment();
+            $payment = $this->getServiceFromContainer(Payment::class)->getSessionUnzerPayment(true);
             try {
                 $transactionService->writeTransactionToDB(
                     Registry::getSession()->getSessionChallengeToken(),

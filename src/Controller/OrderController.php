@@ -398,7 +398,7 @@ class OrderController extends OrderController_parent
      */
     private function isPaymentCancelled(PaymentService $paymentService): bool
     {
-        $paymentResource = $paymentService->getSessionUnzerPayment();
+        $paymentResource = $paymentService->getSessionUnzerPayment(true);
 
         if ($paymentResource !== null) {
             return in_array(
@@ -455,14 +455,18 @@ class OrderController extends OrderController_parent
 
     private function isPaymentCancelledAfterFirstTransaction(PaymentService $paymentService): bool
     {
-        $paymentResource = $paymentService->getSessionUnzerPayment();
+        $paymentResource = $paymentService->getSessionUnzerPayment(true);
 
         if ($paymentResource === null || $paymentResource->getState() !== 0) {
             return false;
         }
 
+
+        $tmpOrderArray = [];
         $orderId = $paymentResource->getOrderId();
-        $tmpOrderArray = oxNew(TmpOrder::class)->getTmpOrderByUnzerId($orderId);
+        if ($orderId !== null) {
+            $tmpOrderArray = oxNew(TmpOrder::class)->getTmpOrderByUnzerId($orderId);
+        }
 
         if (empty($tmpOrderArray)) {
             return false;

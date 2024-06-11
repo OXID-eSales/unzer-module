@@ -90,9 +90,6 @@ class Payment
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
-        \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()
-            ->getContainer()->get(DebugHandler::class)
-            ->log("\n\n\n execute unzer payment method \n\n\n");
         $paymentExtension = null;
         try {
             /** @var string $customerType */
@@ -122,7 +119,7 @@ class Payment
             $this->transactionService->writeTransactionToDB(
                 $sess_challenge,
                 $this->session->getUser()->getId(),
-                $this->getSessionUnzerPayment()
+                $this->getSessionUnzerPayment(true)
             );
 
             $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
@@ -175,7 +172,7 @@ class Payment
     {
         $result = self::STATUS_ERROR;
         /** @var UnzerPayment $sessionUnzerPayment */
-        $sessionUnzerPayment = $this->getSessionUnzerPayment();
+        $sessionUnzerPayment = $this->getSessionUnzerPayment(true);
         if (is_null($sessionUnzerPayment)) {
             return $result;
         }
@@ -219,7 +216,7 @@ class Payment
     public function getUnzerOrderId(): int
     {
         $result = 0;
-        $sessionUnzerPayment = $this->getSessionUnzerPayment();
+        $sessionUnzerPayment = $this->getSessionUnzerPayment(true);
         if ($sessionUnzerPayment) {
             $transaction = $sessionUnzerPayment->getInitialTransaction();
             if ($transaction) {
@@ -244,18 +241,13 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPaymentInterface|null $paymentExtension
-     * @param string $currency
-     * @return \UnzerSDK\Resources\Payment|null
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getSessionUnzerPayment(bool $noCache = false): ?UnzerPayment
+    public function getSessionUnzerPayment(bool $cached): ?UnzerPayment
     {
-
         $result = null;
-        if ($noCache === false) {
+        if ($cached === true) {
             if ($this->sessionUnzerPayment instanceof UnzerPayment) {
                 return $this->sessionUnzerPayment;
             }

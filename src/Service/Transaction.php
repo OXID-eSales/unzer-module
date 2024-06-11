@@ -62,13 +62,6 @@ class Transaction
         ?Payment $unzerPayment,
         ?Shipment $unzerShipment = null
     ): bool {
-
-        $m = traceLastThreeMethodCalls();
-
-        \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()
-            ->getContainer()->get(DebugHandler::class)
-            ->log($m);
-
         $transaction = $this->getNewTransactionObject();
 
         $oOrder = oxNew(Order::class);
@@ -106,7 +99,6 @@ class Transaction
         $oxid = $this->prepareTransactionOxid($params);
 
         if (!$transaction->load($oxid)) {
-
             if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
                 $transaction->setTransStatus('aborted');
             }
@@ -507,32 +499,4 @@ class Transaction
         }
         return $result;
     }
-}
-
-function traceLastThreeMethodCalls(): string
-{
-    // Get the debug backtrace
-    $backtrace = debug_backtrace();
-
-    // Remove the current function call from the backtrace
-    array_shift($backtrace);
-
-    // Extract the last three method calls from the backtrace
-    $lastThreeCalls = array_slice($backtrace, 0, 3);
-
-
-    $m = '';
-    // Print the last three method calls
-    foreach ($lastThreeCalls as $call) {
-        $m .= 'Function: ' . (isset($call['function']) ? $call['function'] : 'N/A') . "\n";
-        if (isset($call['class'])) {
-            $m .= 'Class: ' . $call['class'] . "\n";
-            $m .= 'Type: ' . $call['type'] . "\n";
-        }
-        $m .= 'File: ' . (isset($call['file']) ? $call['file'] : 'N/A') . "\n";
-        $m .= 'Line: ' . (isset($call['line']) ? $call['line'] : 'N/A') . "\n";
-        $m .= "\n";
-    }
-
-    return $m;
 }
