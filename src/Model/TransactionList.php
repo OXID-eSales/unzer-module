@@ -22,7 +22,7 @@ class TransactionList extends ListModel
     /**
      * @return void
      */
-    public function getTransactionList(string $orderId)
+    public function getTransactionList(string $orderId): void
     {
         $oListObject = $this->getBaseObject();
         $sFieldList = $oListObject->getSelectFields();
@@ -33,6 +33,24 @@ class TransactionList extends ListModel
 
         $query = "select $sFieldList from " . $oListObject->getViewName() . "
             where oxshopid = :shopid and oxorderid = :orderid order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
+
+        $this->selectString($query, $params);
+    }
+
+    public function getTransactionListByTraceId(string $traceId): void
+    {
+        $oListObject = $this->getBaseObject();
+        $sFieldList = $oListObject->getSelectFields();
+
+        $shopId = Registry::getConfig()->getShopId();
+
+        $params = [':shopid' => $shopId, ':traceid' => $traceId];
+
+        $query = "select $sFieldList from " . $oListObject->getViewName() . "
+            where oxshopid = :shopid 
+                and traceid = :traceid 
+                and oxaction = 'canceled'
+            order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
 
         $this->selectString($query, $params);
     }

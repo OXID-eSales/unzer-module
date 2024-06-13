@@ -286,7 +286,6 @@ class OrderController extends OrderController_parent
         $user = $this->getUser();
         if (!$user || (!$user->getFieldData('oxpassword'))) {
             $bSavedPayment = 0;
-            return $bSavedPayment;
         }
         return $bSavedPayment;
     }
@@ -369,7 +368,14 @@ class OrderController extends OrderController_parent
     protected function getSavedPayment(): void
     {
         $transactionService = $this->getServiceFromContainer(Transaction::class);
-        $ids = $transactionService->getTrancactionIds($this->getUser());
+
+        $user = $this->getUser();
+
+        if ($user === null) {
+            return;
+        }
+
+        $ids = $transactionService->getTrancactionIds();
         $paymentTypes = false;
         if ($ids) {
             foreach ($ids as $typeData) {
@@ -441,11 +447,13 @@ class OrderController extends OrderController_parent
 
     private function isPaymentCancelled(PaymentService $paymentService): bool
     {
-        $payment = $paymentService->getSessionUnzerPayment();
-        if (null == $payment) {
-            return false;
+        $paymentResource = $paymentService->getSessionUnzerPayment();
+
+        if ($paymentResource !== null) {
+            return $paymentResource->getState() === PaymentState::STATE_CANCELED;
         }
-        return $payment->getState() === PaymentState::STATE_CANCELED;
+
+        return false;
     }
 
     /**

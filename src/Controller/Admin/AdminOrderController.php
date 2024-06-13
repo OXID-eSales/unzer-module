@@ -119,7 +119,6 @@ class AdminOrderController extends AdminDetailsController
             $sdk = $this->getUnzerSDK($sPaymentId, $transactionInfo['currency'], $transactionInfo['customertype']);
             /** @var \UnzerSDK\Resources\Payment $unzerPayment */
             $unzerPayment = $sdk->fetchPayment($sTypeId);
-            $fCancelled = 0.0;
             $fCharged = 0.0;
 
             $paymentType = $unzerPayment->getPaymentType();
@@ -184,25 +183,13 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['totalAmountCharge'] = $fCharged;
             $this->_aViewData['remainingAmountCharge'] = floatval($editObject->getTotalOrderSum()) - $fCharged;
 
-            $cancellations = [];
-            /** @var Cancellation $cancellation */
-            foreach ($unzerPayment->getCancellations() as $cancellation) {
-                if ($cancellation->isSuccess()) {
-                    $aRv = [];
-                    $aRv['cancelledAmount'] = $cancellation->getAmount();
-                    $aRv['cancelDate'] = $this->toLocalDateString($cancellation->getDate() ?? '');
-                    $aRv['cancellationId'] = $cancellation->getId();
-                    $aRv['cancelReason'] = $cancellation->getReasonCode();
-                    $fCancelled += $cancellation->getAmount();
-                    $cancellations[] = $aRv;
-                }
-            }
+            $fCancelled = $this->getFullCancelled($unzerPayment);
             $this->_aViewData['totalAmountCancel'] = $fCancelled;
             $this->_aViewData['canCancelAmount'] = $fCharged - $fCancelled;
 
             $this->_aViewData['blCancellationAllowed'] = $fCancelled < $fCharged;
             $this->_aViewData['aCharges'] = $charges;
-            $this->_aViewData['aCancellations'] = $cancellations;
+            $this->_aViewData['aCancellations'] = $this->getCancellationsViewData((string)$unzerPayment->getTraceId());
             $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
 
             if (
@@ -218,6 +205,39 @@ class AdminOrderController extends AdminDetailsController
                 $e->getMessage()
             );
         }
+    }
+
+    private function getCancellationsViewData(string $traceId): array
+    {
+        $transactionList = oxNew(TransactionList::class);
+        $transactionList->getTransactionListByTraceId($traceId);
+
+        $cancellations = [];
+
+        foreach ($transactionList as $transaction) {
+            if ($transaction === null) {
+                continue;
+            }
+            $actionData = ($transaction->oscunzertransaction__oxactiondate !== null ) ?
+                $transaction->oscunzertransaction__oxactiondate->value : '';
+
+            $date = $this->toLocalDateString($actionData);
+
+            $amount = ($transaction->oscunzertransaction__amount)
+                ? $transaction->oscunzertransaction__amount->value : 0.0;
+
+            $reason = ($transaction->oscunzertransaction__cancelreason)
+                ? $transaction->oscunzertransaction__cancelreason->value : '';
+
+            $cancellations[] = [
+                'cancelledAmount' => $amount,
+                'cancelDate' => $date,
+                'cancellationId' => $transaction->getId(),
+                'cancelReason' => $reason,
+            ];
+        }
+
+        return $cancellations;
     }
 
     /**
@@ -503,5 +523,18 @@ class AdminOrderController extends AdminDetailsController
         $datetime = new DateTime($gmtDateString, new DateTimeZone('GMT'));
         $datetime->setTimezone(new DateTimeZone(date_default_timezone_get()));
         return $datetime->format('Y-m-d H:i:s');
+    }
+
+    private function getFullCancelled(\UnzerSDK\Resources\Payment $unzerPayment): float
+    {
+        $fCancelled = 0.0;
+        /** @var Cancellation $cancellation */
+        foreach ($unzerPayment->getCancellations() as $cancellation) {
+            if ($cancellation->isSuccess()) {
+                $fCancelled += $cancellation->getAmount();
+            }
+        }
+
+        return $fCancelled;
     }
 }
