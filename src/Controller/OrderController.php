@@ -286,7 +286,6 @@ class OrderController extends OrderController_parent
         $user = $this->getUser();
         if (!$user || (!$user->getFieldData('oxpassword'))) {
             $bSavedPayment = 0;
-            return $bSavedPayment;
         }
         return $bSavedPayment;
     }
@@ -455,8 +454,6 @@ class OrderController extends OrderController_parent
         }
 
         return false;
-        }
-        return $payment->getState() === PaymentState::STATE_CANCELED;
     }
 
     /**
