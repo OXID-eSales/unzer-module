@@ -106,7 +106,7 @@ class Transaction
             }
         }
 
-        if ($this->saveTransaction($params)) {
+        if ($this->saveTransaction($params, $oOrder)) {
             $this->deleteInitOrder($params);
 
             // Fallback: set ShortID as OXTRANSID
@@ -140,8 +140,12 @@ class Transaction
      * @return bool
      * @throws \Exception
      */
-    public function writeCancellationToDB(string $orderid, string $userId, ?Cancellation $unzerCancel): bool
-    {
+    public function writeCancellationToDB(
+        string $orderid,
+        string $userId,
+        ?Cancellation $unzerCancel,
+        Order $oOrder
+    ): bool {
         $unzerCancelReason = '';
         if ($unzerCancel !== null) {
             $unzerCancelReason = $unzerCancel->getReasonCode() ?? '';
@@ -159,7 +163,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
         }
 
-        return $this->saveTransaction($params);
+        return $this->saveTransaction($params, $oOrder);
     }
 
     /**
@@ -169,7 +173,7 @@ class Transaction
      * @throws \Exception
      * @return bool
      */
-    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
+    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge, Order $oOrder): bool
     {
         $params = [
             'oxorderid' => $orderid,
@@ -182,7 +186,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
         }
 
-        return $this->saveTransaction($params);
+        return $this->saveTransaction($params, $oOrder);
     }
 
     /**
@@ -200,7 +204,7 @@ class Transaction
         return md5($jsonEncode);
     }
 
-    protected function saveTransaction(array $params): bool
+    protected function saveTransaction(array $params, Order $oOrder): bool
     {
         $result = false;
 
@@ -213,6 +217,10 @@ class Transaction
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
         $oxid = $this->prepareTransactionOxid($params);
         if (!$transaction->load($oxid)) {
+            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
+                $transaction->setTransStatus('aborted');
+            }
+
             $transaction->assign($params);
             $transaction->setId($oxid);
             $transaction->save();

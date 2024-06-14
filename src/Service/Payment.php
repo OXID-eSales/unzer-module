@@ -37,9 +37,9 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
  */
 class Payment
 {
-    private const STATUS_OK = "OK";
-    private const STATUS_NOT_FINISHED = "NOT_FINISHED";
-    private const STATUS_ERROR = "ERROR";
+    public const STATUS_OK = "OK";
+    public const STATUS_NOT_FINISHED = "NOT_FINISHED";
+    public const STATUS_ERROR = "ERROR";
 
     /** @var \OxidEsales\Eshop\Core\Session $session */
     protected $session;
@@ -93,19 +93,22 @@ class Payment
     }
 
     /**
-     * @throws Redirect
-     * @throws RedirectWithMessage
+     * @throws \JsonException
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         $paymentExtension = null;
-        try {
-            /** @var string $customerType */
-            $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
-            $user = $this->session->getUser();
-            $basket = $this->session->getBasket();
-            $currency = $basket->getBasketCurrency()->name;
+        /** @var string $customerType */
+        $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
+        $user = $this->session->getUser();
+        $basket = $this->session->getBasket();
+        $currency = $basket->getBasketCurrency()->name;
 
+        try {
             $paymentExtension = $this->paymentExtLoader->getPaymentExtensionByCustomerTypeAndCurrency(
                 $paymentModel,
                 $customerType,
@@ -257,6 +260,10 @@ class Payment
         if (is_string($uzrPaymentId)) {
             /** @var string $sessionOrderId */
             $sessionOrderId = $this->session->getVariable('sess_challenge');
+
+            if ($sessionOrderId == null) {
+                return null;
+            }
             /** @var Order $order */
             $order = oxNew(Order::class);
             $order->load($sessionOrderId);
@@ -371,7 +378,8 @@ class Payment
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $cancellation
+                $cancellation,
+                $oOrder
             );
         } catch (UnzerApiException $e) {
             return $e;
@@ -407,7 +415,8 @@ class Payment
             $this->transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $charge
+                $charge,
+                $oOrder
             );
             $payment = $charge->getPayment();
             if (

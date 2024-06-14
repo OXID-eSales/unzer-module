@@ -112,19 +112,17 @@ class Order extends Order_parent
 
         if ($unzerPaymentStatus === 'OK') {
             $this->markUnzerOrderAsPaid();
+            $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
+        }
+
+        if ($unzerPaymentStatus === \OxidSolutionCatalysts\Unzer\Service\Payment::STATUS_NOT_FINISHED) {
+            $this->_setOrderStatus('ABORTED');
+            $this->setTmpOrderStatus($unzerOrderId, 'ABORTED');
         }
 
         $this->initWriteTransactionToDB(
             $paymentService->getSessionUnzerPayment(true)
         );
-
-        // cleanUp Tmp Order
-        $tmpOrder = oxNew(TmpOrder::class);
-        $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerOrderId);
-        if ($tmpOrder->load($tmpData['OXID'])) {
-            $tmpOrder->assign(['status' => 'FINISHED']);
-            $tmpOrder->save();
-        }
 
         return $iRet;
     }
@@ -363,5 +361,15 @@ class Order extends Order_parent
     public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
     {
         return parent::_setFieldData($fieldName, $value, $dataType);
+    }
+
+    private function setTmpOrderStatus(string $unzerOrderId, string $status): void
+    {
+        $tmpOrder = oxNew(TmpOrder::class);
+        $tmpData = $tmpOrder->getTmpOrderByUnzerId($unzerOrderId);
+        if ($tmpOrder->load($tmpData['OXID'])) {
+            $tmpOrder->assign(['status' => $status]);
+            $tmpOrder->save();
+        }
     }
 }
