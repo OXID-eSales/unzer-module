@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - refactor of the correct use of the appropriate credentials depending on the payment method used
 - Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
 - Inform the customer in frontend, if the payment was cancelled by customer during checkout
+- fix system crashes sporadically [not always replicatable] on card payment on return from the 3d-auth page with this in log
 
 ## [2.1.4] - 2023-11-23
 
