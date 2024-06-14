@@ -19,6 +19,7 @@ use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
+use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -78,6 +79,12 @@ class OrderController extends OrderController_parent
         $this->_aViewData['uzrcurrency'] = $this->getActCurrency();
 
         $this->getSavedPayment();
+
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+
+        if ($this->isPaymentCancelledAfterFirstTransaction($paymentService)) {
+            $this->cleanUpCancelledPayments();
+        }
 
         return parent::render();
     }
@@ -445,31 +452,86 @@ class OrderController extends OrderController_parent
         return '';
     }
 
+    /**
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     */
     private function isPaymentCancelled(PaymentService $paymentService): bool
     {
         $paymentResource = $paymentService->getSessionUnzerPayment();
 
         if ($paymentResource !== null) {
-            return $paymentResource->getState() === PaymentState::STATE_CANCELED;
+            return in_array(
+                $paymentResource->getState(),
+                [
+                    PaymentState::STATE_CANCELED,
+                    \OxidSolutionCatalysts\Unzer\Service\Payment::STATUS_NOT_FINISHED
+                ]
+            );
         }
 
         return false;
     }
 
     /**
-     * @param Unzer $unzerService
-     * @param Order $order
-     * @return void
-     * @throws RedirectWithMessage
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
      */
-    private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
+    private function redirectUserToCheckout(Unzer $unzerService, \OxidSolutionCatalysts\Unzer\Model\Order $order): void
     {
         $translator = $this->getServiceFromContainer(Translator::class);
-        /** @var UnzerOrder $order */
         $unzerOrderNr = $order->getUnzerOrderNr();
         throw new RedirectWithMessage(
             $unzerService->prepareRedirectUrl('payment?payerror=-6'),
             sprintf($translator->translate('OSCUNZER_CANCEL_DURING_CHECKOUT'), $unzerOrderNr)
         );
+    }
+
+    private function cleanUpCancelledPayments(): void
+    {
+        $oUser = $this->getUser();
+        $oBasket = Registry::getSession()->getBasket();
+        if ($oBasket->getProductsCount()) {
+            $oDB = DatabaseProvider::getDb();
+
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            $oOrder = $this->getActualOrder();
+
+            $oDB->startTransaction();
+
+            //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
+            $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+
+            // performing special actions after user finishes order (assignment to special user groups)
+            $oUser->onOrderExecute($oBasket, $iSuccess);
+
+            $unzerService = $this->getServiceFromContainer(Unzer::class);
+            Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
+
+            $oDB->commitTransaction();
+
+            $this->redirectUserToCheckout($unzerService, $oOrder);
+        }
+    }
+
+    private function isPaymentCancelledAfterFirstTransaction(PaymentService $paymentService): bool
+    {
+        $paymentResource = $paymentService->getSessionUnzerPayment();
+
+        if ($paymentResource === null || $paymentResource->getState() !== 0) {
+            return false;
+        }
+
+        $orderId = $paymentResource->getOrderId();
+
+        if ($orderId === null) {
+            return false;
+        }
+
+        $tmpOrderArray = oxNew(TmpOrder::class)->getTmpOrderByUnzerId($orderId);
+
+        if (empty($tmpOrderArray)) {
+            return false;
+        }
+
+        return true;
     }
 }

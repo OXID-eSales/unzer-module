@@ -19,7 +19,7 @@ class UnzerSDKLoaderTest extends TestCase
     public function testSimpleSDKLoading(): void
     {
         $sut = $this->getSut([
-            'getShopPrivateKey' => 's-priv-someExampleOfGoodKey',
+            'getStandardPrivateKey' => 's-priv-someExampleOfGoodKey',
             'isDebugMode' => false
         ]);
 
@@ -32,7 +32,7 @@ class UnzerSDKLoaderTest extends TestCase
     public function testSimpleSDKLoadingWithWrongKey(): void
     {
         $sut = $this->getSut([
-            'getShopPrivateKey' => 'someWrongKey',
+            'getUnzerPrivateKey' => 'someWrongKey',
             'isDebugMode' => false
         ]);
 
@@ -43,7 +43,7 @@ class UnzerSDKLoaderTest extends TestCase
     public function testDebugSDKLoading(): void
     {
         $sut = $this->getSut([
-            'getShopPrivateKey' => 's-priv-someExampleOfGoodKey',
+            'getStandardPrivateKey' => 's-priv-someExampleOfGoodKey',
             'isDebugMode' => true
         ]);
 

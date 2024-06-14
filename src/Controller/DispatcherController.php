@@ -5,7 +5,6 @@
  * See LICENSE file for license details.
  */
 
-
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use JsonException;
