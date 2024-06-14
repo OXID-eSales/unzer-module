@@ -212,6 +212,10 @@ class Transaction
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
         $oxid = $this->prepareTransactionOxid($params);
         if (!$transaction->load($oxid)) {
+            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
+                $transaction->setTransStatus('aborted');
+            }
+
             $transaction->assign($params);
             $transaction->setId($oxid);
             if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
