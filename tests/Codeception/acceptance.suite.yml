@@ -28,7 +28,7 @@ modules:
         module_dump: '%MODULE_DUMP_PATH%'
         mysql_config: '%MYSQL_CONFIG_PATH%'
         populate: true # run populator before all tests
-        cleanup: false # run populator before each test
+        cleanup: false # run populator before each test#
         populator: >
             bin/oe-console oe:setup:demodata &&
             bin/oe-console oe:module:activate osc-unzer &&
