@@ -1,10 +1,9 @@
-<dl>
-    <dt>
-        <input id="payment_{{ sPaymentID }}" type="radio" name="paymentid" value="{{ sPaymentID }}" {% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %}checked{% endif %}>
-        <label for="payment_{{ sPaymentID }}"><b>{{ paymentmethod.oxpayments__oxdesc.value }}</b></label>
-    </dt>
-    <dd class="payment-option{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
-        <div class="clearfix"></div>
+<div class="payment-option">
+    <div class="payment-option-form">
+        <input class="form-check-input" id="payment_{{ sPaymentID }}" type="radio" name="paymentid" value="{{ sPaymentID }}" {% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %}checked{% endif %}>
+        <label class="form-check-label" for="payment_{{ sPaymentID }}">{{ paymentmethod.oxpayments__oxdesc.value }}</label>
+    </div>
+    <div class="payment-option-info{% if oView.getCheckedPaymentId() == paymentmethod.oxpayments__oxid.value %} activePayment{% endif %}">
         {% block checkout_payment_longdesc %}
             {% if paymentmethod.oxpayments__oxlongdesc.value|striptags|trim %}
                 <div class="desc">
@@ -12,5 +11,5 @@
                 </div>
             {% endif %}
         {% endblock %}
-    </dd>
-</dl>
+    </div>
+</div>
