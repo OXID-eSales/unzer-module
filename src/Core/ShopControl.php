@@ -25,8 +25,9 @@ class ShopControl extends ShopControl_parent
     /**
      * @param StandardException $exception
      * @phpstan-return void
+     * no returnvalue because of compatibility with core
      */
-    protected function handleBaseException($exception): void
+    protected function handleBaseException($exception)
     {
         if ($exception instanceof UnzerException) {
             $this->handleCustomUnzerException($exception);
