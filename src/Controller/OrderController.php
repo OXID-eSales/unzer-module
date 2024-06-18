@@ -460,13 +460,18 @@ class OrderController extends OrderController_parent
         $paymentResource = $paymentService->getSessionUnzerPayment();
 
         if ($paymentResource !== null) {
-            return in_array(
+            if ($paymentResource->getState() === 0) {
+                return false;
+            }
+
+            if (in_array(
                 $paymentResource->getState(),
                 [
                     PaymentState::STATE_CANCELED,
                     \OxidSolutionCatalysts\Unzer\Service\Payment::STATUS_NOT_FINISHED
-                ]
-            );
+                ])) {
+                return true;
+            }
         }
 
         return false;
@@ -508,6 +513,8 @@ class OrderController extends OrderController_parent
 
             $oDB->commitTransaction();
 
+            Registry::getSession()->setVariable('sess_challenge', $this->getUtilsObjectInstance()->generateUID());
+            Registry::getSession()->setBasket($oBasket);
             $this->redirectUserToCheckout($unzerService, $oOrder);
         }
     }
@@ -526,10 +533,16 @@ class OrderController extends OrderController_parent
             return false;
         }
 
-        $tmpOrderArray = oxNew(TmpOrder::class)->getTmpOrderByUnzerId($orderId);
+        $oTmpOrder = oxNew(TmpOrder::class);
+        $tmpOrderArray = $oTmpOrder->getTmpOrderByUnzerId($orderId);
 
         if (empty($tmpOrderArray)) {
             return false;
+        }
+
+
+        if ($oTmpOrder->load($tmpOrderArray['OXID'])) {
+            $oTmpOrder->delete();
         }
 
         return true;
