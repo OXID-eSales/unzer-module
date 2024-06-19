@@ -149,7 +149,7 @@ class OrderController extends OrderController_parent
                 $paymentService = $this->getServiceFromContainer(PaymentService::class);
 
                 if ($this->isPaymentCancelled($paymentService)) {
-                    $this->redirectUserToCheckout($unzerService, $oOrder);
+                    $this->cleanUpCancelledPayments();
                 }
 
                 if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
@@ -463,7 +463,7 @@ class OrderController extends OrderController_parent
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
-            /** @var UnzerOrder $oOrder */
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();
