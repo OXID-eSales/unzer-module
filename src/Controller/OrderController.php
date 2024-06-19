@@ -78,7 +78,7 @@ class OrderController extends OrderController_parent
         $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();
         $this->_aViewData['uzrcurrency'] = $this->getActCurrency();
 
-        $this->getSavedPayment();
+        $this->setSavedPaymentsViewData();
 
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
 
@@ -372,56 +372,21 @@ class OrderController extends OrderController_parent
         }
         return parent::getExecuteFnc();
     }
-    protected function getSavedPayment(): void
+    protected function setSavedPaymentsViewData(): void
     {
-        $transactionService = $this->getServiceFromContainer(Transaction::class);
-
         $user = $this->getUser();
 
         if (!$user) {
             return;
         }
 
-        $ids = $transactionService->getTrancactionIds();
-        $paymentTypes = false;
+        $transactionService = $this->getServiceFromContainer(Transaction::class);
+        $ids = $transactionService->getTrancactionIds($user);
+        $paymentTypes = [];
         if ($ids) {
-            foreach ($ids as $typeData) {
-                $paymentTypeId = $typeData['PAYMENTTYPEID'] ?: '';
-                $paymentId = $typeData['OXPAYMENTTYPE'] ?: '';
-                $currency = $typeData['CURRENCY'] ?: '';
-                $customerType = $typeData['CUSTOMERTYPE'] ?: '';
-                if (!empty($paymentTypeId)) {
-                    try {
-                        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
-                        $unzerSDK = $UnzerSdk->getUnzerSDK(
-                            $paymentId,
-                            $currency,
-                            $customerType
-                        );
-                        $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
-                    } catch (UnzerException | UnzerApiException $e) {
-                        $userId = $this->getUser() ? $this->getUser()->getId() : 'unknown';
-                        $logEntry = sprintf(
-                            'The incorrect data used to initialize the SDK ' .
-                            'comes from the transactions of the user: "%s"',
-                            $userId
-                        );
-                        $logger = $this->getServiceFromContainer(DebugHandler::class);
-                        $logger->log($logEntry);
-                        continue;
-                    }
-                    if (strpos($paymentTypeId, 'crd')) {
-                        $paymentTypes['card'][$paymentTypeId] = $paymentType->expose();
-                    }
-                    if (strpos($paymentTypeId, 'ppl')) {
-                        $paymentTypes['paypal'][$paymentTypeId] = $paymentType->expose();
-                    }
-                    if (strpos($paymentTypeId, 'sdd')) {
-                        $paymentTypes['sepa'][$paymentTypeId] = $paymentType->expose();
-                    }
-                }
-            }
+            $paymentTypes = $transactionService->getSavedPaymentsForUser($user, $ids, true);
         }
+
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
     }
 
@@ -537,7 +502,7 @@ class OrderController extends OrderController_parent
         $oTmpOrder = oxNew(TmpOrder::class);
         $tmpOrderArray = $oTmpOrder->getTmpOrderByUnzerId($orderId);
 
-        if (empty($tmpOrderArray)) {
+        if (empty($tmpOrderArray) || $tmpOrderArray === []) {
             return false;
         }
 
