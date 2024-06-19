@@ -315,6 +315,9 @@ abstract class UnzerPayment implements UnzerPaymentInterface
                     return true;
                 }
             }
+            if ($currentPaymentType instanceof Paypal)  {
+               return true; //we do not save it here
+            }
         }
 
         return false;

@@ -424,7 +424,7 @@ class OrderController extends OrderController_parent
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
-            /** @var UnzerOrder $oOrder */
+            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();

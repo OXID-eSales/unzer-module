@@ -85,7 +85,9 @@ class AdminOrderController extends AdminDetailsController
             $sPaymentId = $oOrder->getFieldData('oxpaymenttype');
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-            $this->sTypeId = $transactionService::getPaymentIdByOrderId($this->getEditObjectId());
+            $orderId = $this->getEditObjectId();
+            $paymentId = $transactionService::getPaymentIdByOrderId($orderId); //somthesing like s-chg-XXXX
+            $this->sTypeId = $paymentId; /** may@throws \TypeError if $paymentId due to wrong payment cancellation */
             $this->_aViewData['sTypeId'] = $this->sTypeId;
             if ($this->sTypeId) {
                 $this->getUnzerViewData($sPaymentId, $this->sTypeId);
