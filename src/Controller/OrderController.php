@@ -68,7 +68,7 @@ class OrderController extends OrderController_parent
         $this->_aViewData['unzerThreatMetrixSessionID'] = $unzer->generateUnzerThreatMetrixIdInSession();
         $this->_aViewData['uzrcurrency'] = $this->getActCurrency();
 
-        $this->getSavedPayment();
+        $this->setSavedPaymentsViewData();
 
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
 
@@ -341,34 +341,19 @@ class OrderController extends OrderController_parent
         }
         return parent::getExecuteFnc();
     }
-
-    protected function getSavedPayment(): void
+    protected function setSavedPaymentsViewData(): void
     {
-        $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
-        $unzerSDK = $UnzerSdk->getUnzerSDK();
+        $user = $this->getUser();
 
-        $ids = $this->getTrancactionIds();
-        $paymentTypes = false;
+        if (!$user) {
+            return;
+        }
+
+        $transactionService = $this->getServiceFromContainer(Transaction::class);
+        $ids = $transactionService->getTrancactionIds($user);
+        $paymentTypes = [];
         if ($ids) {
-            foreach ($ids as $typeId) {
-                if (!empty($typeId['PAYMENTTYPEID'])) {
-                    try {
-                        $paymentType = $unzerSDK->fetchPaymentType($typeId['PAYMENTTYPEID']);
-                    } catch (UnzerApiException $e) {
-                        continue;
-                    }
-
-                    if (strpos($typeId['PAYMENTTYPEID'], 'crd')) {
-                        $paymentTypes['card'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
-                    }
-                    if (strpos($typeId['PAYMENTTYPEID'], 'ppl')) {
-                        $paymentTypes['paypal'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
-                    }
-                    if (strpos($typeId['PAYMENTTYPEID'], 'sdd')) {
-                        $paymentTypes['sepa'][$typeId['PAYMENTTYPEID']] = $paymentType->expose();
-                    }
-                }
-            }
+            $paymentTypes = $transactionService->getSavedPaymentsForUser($user, $ids, true);
         }
 
         $this->_aViewData['unzerPaymentType'] = $paymentTypes;
@@ -483,7 +468,7 @@ class OrderController extends OrderController_parent
         $oTmpOrder = oxNew(TmpOrder::class);
         $tmpOrderArray = $oTmpOrder->getTmpOrderByUnzerId($orderId);
 
-        if (empty($tmpOrderArray)) {
+        if (empty($tmpOrderArray) || $tmpOrderArray === []) {
             return false;
         }
 

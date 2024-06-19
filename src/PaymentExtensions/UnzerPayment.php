@@ -16,15 +16,17 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Service\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
+use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
+use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
 use UnzerSDK\Resources\PaymentTypes\Paypal as PayPalPaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
@@ -157,19 +159,8 @@ abstract class UnzerPayment implements UnzerPaymentInterface
 
         $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
 
-        if ($savePayment === "1" && $userModel->getId()) {
-            $transactionService = $this->getServiceFromContainer(Transaction::class);
-            $payment = $this->getServiceFromContainer(Payment::class)->getSessionUnzerPayment(true);
-            try {
-                $transactionService->writeTransactionToDB(
-                    Registry::getSession()->getSessionChallengeToken(),
-                    $userModel->getId(),
-                    $payment
-                );
-            } catch (Exception $e) {
-                $this->logger
-                    ->log('Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage());
-            }
+        if ($savePayment === "1" && $userModel->getId() && !$this->existsInSavedPaymentsList($userModel)) {
+            $this->savePayment($userModel);
         }
 
         return true;
@@ -282,5 +273,61 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             }
             throw new Exception($exceptionMessage);
         }
+    }
+
+    private function savePayment($userModel)
+    {
+        /** @var TransactionService $transactionService */
+        $transactionService = $this->getServiceFromContainer(
+            TransactionService::class
+        );
+        $payment = $this->getServiceFromContainer(PaymentService::class)
+            ->getSessionUnzerPayment();
+        try {
+            $transactionService->writeTransactionToDB(
+                Registry::getSession()->getSessionChallengeToken(),
+                $userModel->getId(),
+                $payment
+            );
+        } catch (Exception $e) {
+            $this->logger
+                ->log('Could not save Transaction for PaymentID (savePayment): ' . $e->getMessage());
+        }
+    }
+
+    private function existsInSavedPaymentsList(User $userModel)
+    {
+        /** @var Transaction $transactionService */
+        $transactionService = $this->getServiceFromContainer(Transaction::class);
+        $ids = $transactionService->getTrancactionIds($userModel);
+        $savedUserPayments = [];
+        if ($ids) {
+            $savedUserPayments = $transactionService->getSavedPaymentsForUser($userModel, $ids, true);
+        }
+
+        $currentPayment = $this->getServiceFromContainer(PaymentService::class)
+            ->getSessionUnzerPayment();
+
+        $currentPaymentType = $currentPayment->getPaymentType();
+        foreach ($savedUserPayments as $savedPayment) {
+            if ($currentPaymentType instanceof UnzerSDKPaymentTypeCard)  {
+                if ($this->areCardsEqual($currentPaymentType, $savedPayment)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function areCardsEqual(UnzerSDKPaymentTypeCard $card1, array $card2): bool
+    {
+
+
+
+
+        return $card1->getNumber() === $card2[array_key_first($card2)]['number'] &&
+            $card1->getExpiryDate() === $card2[array_key_first($card2)]['expiryDate'] &&
+            $card1->getCardHolder() === $card2[array_key_first($card2)]['cardHolder'];
     }
 }
