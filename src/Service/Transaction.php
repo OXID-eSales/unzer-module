@@ -48,14 +48,17 @@ class Transaction
 {
     use ServiceContainer;
 
-    /** @var Context */
-    protected $context;
+    protected Context $context;
 
-    /** @var UtilsDate */
-    protected $utilsDate;
+    protected UtilsDate $utilsDate;
 
-    /** @var array $paymentTypes */
-    private $paymentTypes = [];
+    private array $paymentTypes = [];
+
+    private array $transPaymentTypeIds = [
+        'crd' => 'card',
+        'ppl' => 'paypal',
+        'sdd' => 'sepa'
+    ];
 
     /**
      * @param Context $context
@@ -538,51 +541,68 @@ class Transaction
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function getSavedPaymentsForUser(?User $user, array $ids, bool $cache): array
     {
-        if ($cache === true) {
-            if (count($this->paymentTypes) > 0) {
-                return $this->paymentTypes;
-            }
+        if ($cache && count($this->paymentTypes) > 0) {
+            return $this->paymentTypes;
         }
 
         foreach ($ids as $typeData) {
             $paymentTypeId = $typeData['PAYMENTTYPEID'] ?: '';
-            $paymentId = $typeData['OXPAYMENTTYPE'] ?: '';
-            $currency = $typeData['CURRENCY'] ?: '';
-            $customerType = $typeData['CUSTOMERTYPE'] ?: '';
-            if (!empty($paymentTypeId)) {
-                try {
-                    $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
-                    $unzerSDK = $UnzerSdk->getUnzerSDK(
-                        $paymentId,
-                        $currency,
-                        $customerType
-                    );
-                    $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
-                } catch (UnzerException | UnzerApiException $e) {
-                    $userId = $user ? $user->getId() : 'unknown';
-                    $logEntry = sprintf(
-                        'The incorrect data used to initialize the SDK ' .
-                        'comes from the transactions of the user: "%s"',
-                        $userId
-                    );
-                    $logger = $this->getServiceFromContainer(DebugHandler::class);
-                    $logger->log($logEntry);
-                    continue;
-                }
-                if (strpos($paymentTypeId, 'crd')) {
-                    $this->paymentTypes['card'][$paymentTypeId] = $paymentType->expose();
-                }
-                if (strpos($paymentTypeId, 'ppl')) {
-                    $this->paymentTypes['paypal'][$paymentTypeId] = $paymentType->expose();
-                }
-                if (strpos($paymentTypeId, 'sdd')) {
-                    $this->paymentTypes['sepa'][$paymentTypeId] = $paymentType->expose();
+            if ($paymentTypeId) {
+                $paymentTypes = $this->setPaymentTypes(
+                    $user,
+                    $typeData['PAYMENTTYPEID'] ?: '',
+                    $typeData['CURRENCY'] ?: '',
+                    $typeData['CUSTOMERTYPE'] ?: '',
+                    $paymentTypeId
+                );
+                if ($paymentTypes) {
+                    $this->paymentTypes = $paymentTypes;
                 }
             }
         }
 
         return $this->paymentTypes;
+    }
+
+    private function setPaymentTypes(
+        ?User $user,
+        string $paymentId,
+        string $currency,
+        string $customerType,
+        string $paymentTypeId
+    ): ?array {
+        $result = [];
+
+        try {
+            $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
+            $unzerSDK = $UnzerSdk->getUnzerSDK(
+                $paymentId,
+                $currency,
+                $customerType
+            );
+            $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
+        } catch (UnzerException | UnzerApiException $e) {
+            $userId = $user ? $user->getId() : 'unknown';
+            $logEntry = sprintf(
+                'The incorrect data used to initialize the SDK ' .
+                'comes from the transactions of the user: "%s"',
+                $userId
+            );
+            $logger = $this->getServiceFromContainer(DebugHandler::class);
+            $logger->log($logEntry);
+            return null;
+        }
+
+        foreach ($this->transPaymentTypeIds as $unzerId => $oxVar) {
+            if (strpos($paymentTypeId, $unzerId)) {
+                $result[$oxVar][$paymentTypeId] = $paymentType->expose();
+            }
+        }
+        return $result;
     }
 }

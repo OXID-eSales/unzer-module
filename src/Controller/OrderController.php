@@ -20,20 +20,17 @@ use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
-use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
-use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
-use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 
 /**
  * TODO: Decrease count of dependencies to 13
