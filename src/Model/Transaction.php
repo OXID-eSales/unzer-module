@@ -139,7 +139,7 @@ class Transaction extends BaseModel
      */
     private function getRawField(string $sFieldName): ?string
     {
-        $sLongFieldName = $this->getFieldLongName($sFieldName);
+        $sLongFieldName = $this->_getFieldLongName($sFieldName);
 
         if (isset($this->{$sLongFieldName})) {
             $fieldData = $this->{$sLongFieldName};
@@ -158,5 +158,10 @@ class Transaction extends BaseModel
         }
 
         return null;
+    }
+
+    public function setPaymentTypeId(?string $status): void
+    {
+        $this->setFieldData('PAYMENTTYPEID', $status);
     }
 }

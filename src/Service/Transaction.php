@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -71,7 +71,6 @@ class Transaction
         ?Payment $unzerPayment,
         ?Shipment $unzerShipment = null
     ): bool {
-        $transaction = $this->getNewTransactionObject();
 
         $oOrder = oxNew(Order::class);
         $oOrder->load($orderid);
@@ -85,9 +84,12 @@ class Transaction
         ];
 
         if ($unzerPayment) {
-            $params = $unzerShipment ?
-                array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment)) :
-                array_merge($params, $this->getUnzerPaymentData($unzerPayment));
+            if ($unzerShipment !== null) {
+                $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
+            } else {
+                $paymentData = $this->getUnzerPaymentData($unzerPayment);
+                $params = array_merge($params, $paymentData);
+            }
 
             // for PaylaterInvoice, store the customer type
             if (
@@ -103,23 +105,11 @@ class Transaction
             }
         }
 
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = $this->prepareTransactionOxid($params);
-
-        if (!$transaction->load($oxid)) {
-            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
-                $transaction->setTransStatus('aborted');
-            }
-
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
+        if ($this->saveTransaction($params, $oOrder)) {
             $this->deleteInitOrder($params);
 
             // Fallback: set ShortID as OXTRANSID
             $shortId = $params['shortid'] ?? '';
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder->setUnzerTransId($shortId);
 
             return true;
@@ -149,34 +139,30 @@ class Transaction
      * @return bool
      * @throws \Exception
      */
-    public function writeCancellationToDB(string $orderid, string $userId, ?Cancellation $unzerCancel): bool
-    {
-        $transaction = $this->getNewTransactionObject();
+    public function writeCancellationToDB(
+        string $orderid,
+        string $userId,
+        ?Cancellation $unzerCancel,
+        Order $oOrder
+    ): bool {
+        $unzerCancelReason = '';
+        if ($unzerCancel !== null) {
+            $unzerCancelReason = $unzerCancel->getReasonCode() ?? '';
+        }
 
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+            'cancelreason' => $unzerCancelReason,
         ];
 
         if ($unzerCancel instanceof Cancellation) {
             $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
         }
 
-
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = $this->prepareTransactionOxid($params);
-        if (!$transaction->load($oxid)) {
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
-
-            return true;
-        }
-
-        return false;
+        return $this->saveTransaction($params, $oOrder);
     }
 
     /**
@@ -186,10 +172,8 @@ class Transaction
      * @throws \Exception
      * @return bool
      */
-    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
+    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge, Order $oOrder): bool
     {
-        $transaction = $this->getNewTransactionObject();
-
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
@@ -201,27 +185,48 @@ class Transaction
             $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
         }
 
+        return $this->saveTransaction($params, $oOrder);
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    protected function prepareTransactionOxid(array $params): string
+    {
+        unset($params['oxactiondate']);
+        unset($params['serialized_basket']);
+        unset($params['customertype']);
+
+        /** @var string $jsonEncode */
+        $jsonEncode = json_encode($params);
+        return md5($jsonEncode);
+    }
+
+    protected function saveTransaction(array $params, Order $oOrder): bool
+    {
+        $result = false;
+
+        $transaction = $this->getNewTransactionObject();
+
+        //check if metadata exists
+        $params['metadata'] = $params['metadata'] ?? json_encode('', JSON_THROW_ON_ERROR);
+
         // building oxid from unique index columns
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
         $oxid = $this->prepareTransactionOxid($params);
         if (!$transaction->load($oxid)) {
             $transaction->assign($params);
             $transaction->setId($oxid);
+            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
+                $transaction->setTransStatus('aborted');
+            }
             $transaction->save();
 
             return true;
         }
 
         return false;
-    }
-
-    protected function prepareTransactionOxid(array $params): string
-    {
-        unset($params['oxactiondate'], $params['serialized_basket'], $params['customertype']);
-
-        /** @var string $jsonEncode */
-        $jsonEncode = json_encode($params, JSON_THROW_ON_ERROR);
-        return md5($jsonEncode);
     }
 
     protected function getInitOrderOxid(array $params): string
@@ -250,7 +255,8 @@ class Transaction
             'oxaction' => $oxaction,
             'traceid'  => $unzerPayment->getTraceId()
         ];
-        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+        $savePayment = Registry::getSession()->getVariable('oscunzersavepayment');
+
         $paymentType = $unzerPayment->getPaymentType();
         if ($savePayment === "1" && $paymentType instanceof BasePaymentType) {
             $params['paymenttypeid'] = $paymentType->getId();
@@ -401,7 +407,7 @@ class Transaction
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public static function getPaymentIdByOrderId(string $orderid)
+    public function getPaymentIdByOrderId(string $orderid)
     {
         $result = '';
 
@@ -529,12 +535,23 @@ class Transaction
                     $typeData['CUSTOMERTYPE'] ?: '',
                     $paymentTypeId
                 );
-                if ($paymentTypes) {
-                    $this->paymentTypes = $paymentTypes;
+            }
+
+            if ($paymentTypes) {
+                foreach ($paymentTypes as $key => $paymentType) {
+                    $tmpArr[$key][] = $paymentType;
                 }
             }
         }
 
+        $result = [];
+        foreach ($tmpArr as $key => $paymentType) {
+            foreach ($paymentType as $id => $paymentDetails) {
+                $result[$key][array_key_first($paymentDetails)] = $paymentDetails[array_key_first($paymentDetails)];
+            }
+        }
+
+        $this->paymentTypes = $result;
         return $this->paymentTypes;
     }
 

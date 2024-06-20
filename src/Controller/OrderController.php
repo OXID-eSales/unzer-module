@@ -471,11 +471,6 @@ class OrderController extends OrderController_parent
             return false;
         }
 
-
-        if ($oTmpOrder->load($tmpOrderArray['OXID'])) {
-            $oTmpOrder->delete();
-        }
-
         return true;
     }
 }

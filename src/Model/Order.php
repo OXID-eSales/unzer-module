@@ -118,11 +118,9 @@ class Order extends Order_parent
         if ($unzerPaymentStatus === 'OK') {
             $this->markUnzerOrderAsPaid();
             $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
-        }
-
-        if ($unzerPaymentStatus === \OxidSolutionCatalysts\Unzer\Service\Payment::STATUS_NOT_FINISHED) {
-            $this->setOrderStatus('ABORTED');
-            $this->setTmpOrderStatus($unzerOrderId, 'ABORTED');
+        } else {
+            $this->_setOrderStatus($unzerPaymentStatus); //ERROR if paypal
+            $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
         }
 
         $this->initWriteTransactionToDB(

@@ -107,13 +107,11 @@ class AccountSavedPaymentController extends AccountController
      */
     public function deletePayment(): void
     {
-        $paymenttypeid = Registry::getRequest()->getRequestParameter('paymenttypeid');
-        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $oDB->getAll(
-            "UPDATE oscunzertransaction
-                SET PAYMENTTYPEID = NULL
-                WHERE OXUSERID = :oxuserid AND OXID = :oxid",
-            [':oxuserid' => $this->getUser()->getId(), 'oxid' => $paymenttypeid]
-        );
+        $paymentTypeId = Registry::getRequest()->getRequestParameter('paymenttypeid');
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Transaction $transaction */
+        $transaction = oxNew(\OxidSolutionCatalysts\Unzer\Model\Transaction::class);
+        $transaction->load($paymentTypeId);
+        $transaction->setPaymentTypeId(null);
+        $transaction->save();
     }
 }

@@ -482,7 +482,7 @@ class Payment
             return false;
         }
 
-        $sPaymentId = $sPaymentId ?? $this->transactionService::getPaymentIdByOrderId($oOrder->getId());
+        $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
         $transactionDetails = $this->transactionService->getCustomerTypeAndCurrencyByOrderId($oOrder->getId());
 
         $blSuccess = false;
