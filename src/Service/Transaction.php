@@ -97,10 +97,14 @@ class Transaction
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'customertype' => '',
         ];
+
         if ($unzerPayment) {
-            $params = $unzerShipment ?
-                array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment)) :
-                array_merge($params, $this->getUnzerPaymentData($unzerPayment));
+            if ($unzerShipment !== null) {
+                $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
+            } else {
+                $paymentData = $this->getUnzerPaymentData($unzerPayment);
+                $params = array_merge($params, $paymentData);
+            }
 
             // for PaylaterInvoice, store the customer type
             if (
@@ -227,12 +231,11 @@ class Transaction
         // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
         $oxid = $this->prepareTransactionOxid($params);
         if (!$transaction->load($oxid)) {
+            $transaction->assign($params);
+            $transaction->setId($oxid);
             if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
                 $transaction->setTransStatus('aborted');
             }
-
-            $transaction->assign($params);
-            $transaction->setId($oxid);
             $transaction->save();
 
             $result = true;
@@ -263,14 +266,15 @@ class Transaction
             strtolower($unzerPayment->getStateName())
         );
         $params = [
-            'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'amount' => $unzerPayment->getAmount()->getTotal(),
             'remaining' => $unzerPayment->getAmount()->getRemaining(),
             'currency' => $unzerPayment->getCurrency(),
-            'typeid'   => $unzerPayment->getId(),
+            'typeid' => $unzerPayment->getId(),
             'oxaction' => $oxaction,
-            'traceid'  => $unzerPayment->getTraceId()
+            'traceid' => $unzerPayment->getTraceId()
         ];
-        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+        $savePayment = Registry::getSession()->getVariable('oscunzersavepayment');
+
         $paymentType = $unzerPayment->getPaymentType();
         if ($savePayment === "1" && $paymentType) {
             $typeId = $paymentType->getId();
@@ -432,7 +436,7 @@ class Transaction
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public static function getPaymentIdByOrderId(string $orderid)
+    public function getPaymentIdByOrderId(string $orderid)
     {
         $result = '';
 
@@ -560,12 +564,23 @@ class Transaction
                     $typeData['CUSTOMERTYPE'] ?: '',
                     $paymentTypeId
                 );
-                if ($paymentTypes) {
-                    $this->paymentTypes = $paymentTypes;
+            }
+
+            if ($paymentTypes) {
+                foreach ($paymentTypes as $key => $paymentType) {
+                    $tmpArr[$key][] = $paymentType;
                 }
             }
         }
 
+        $result = [];
+        foreach ($tmpArr as $key => $paymentType) {
+            foreach ($paymentType as $id => $paymentDetails) {
+                $result[$key][array_key_first($paymentDetails)] = $paymentDetails[array_key_first($paymentDetails)];
+            }
+        }
+
+        $this->paymentTypes = $result;
         return $this->paymentTypes;
     }
 

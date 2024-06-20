@@ -150,11 +150,19 @@ abstract class UnzerPayment
         if ($request->getRequestParameter('birthdate')) {
             $userModel->save();
         }
+
         $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
 
-        if ($savePayment === "1" && $userModel->getId() && !$this->existsInSavedPaymentsList($userModel)) {
-            $this->savePayment($userModel);
+        if ($this->existsInSavedPaymentsList($userModel)) {
+            $savePayment = "0";
         }
+
+        Registry::getSession()->setVariable('oscunzersavepayment', $savePayment);
+
+        if ($userModel->getId()) {
+            $this->savePayment($userModel, $savePayment);
+        }
+
         return true;
     }
 
@@ -304,10 +312,16 @@ abstract class UnzerPayment
                 if ($currentPaymentType instanceof UnzerSDKPaymentTypeCard) {
                     if ($this->areCardsEqual($currentPaymentType, $savedPayment)) {
                         return true;
+                    } else {
+                        continue;
                     }
                 }
                 if ($currentPaymentType instanceof Paypal) {
-                    return true; //we do not save it here
+                    if ($this->arePayPalAccountsEqual($currentPaymentType, $savedPayment)) {
+                        return true;
+                    } else {
+                        continue;
+                    }
                 }
             }
         }
@@ -317,12 +331,23 @@ abstract class UnzerPayment
 
     private function areCardsEqual(UnzerSDKPaymentTypeCard $card1, array $card2): bool
     {
+        foreach ($card2 as $card) {
+            if ( $card1->getNumber() === $card['number'] &&
+                $card1->getExpiryDate() === $card['expiryDate'] &&
+                $card1->getCardHolder() === $card['cardHolder'] ) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-
-
-
-        return $card1->getNumber() === $card2[array_key_first($card2)]['number'] &&
-            $card1->getExpiryDate() === $card2[array_key_first($card2)]['expiryDate'] &&
-            $card1->getCardHolder() === $card2[array_key_first($card2)]['cardHolder'];
+    private function arePayPalAccountsEqual(Paypal $currentPaymentType, $savedPayment)
+    {
+        foreach ($savedPayment as $paypalAccount) {
+            if ( $currentPaymentType->getEmail()  === $paypalAccount['email'] ) {
+                return true;
+            }
+        }
+        return false;
     }
 }
