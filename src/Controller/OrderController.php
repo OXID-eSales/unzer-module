@@ -378,7 +378,7 @@ class OrderController extends OrderController_parent
 
         $user = $this->getUser();
 
-        if ($user === null) {
+        if (!$user) {
             return;
         }
 
@@ -464,12 +464,12 @@ class OrderController extends OrderController_parent
                 return false;
             }
 
-            if (in_array(
-                $paymentResource->getState(),
-                [
-                    PaymentState::STATE_CANCELED,
-                    \OxidSolutionCatalysts\Unzer\Service\Payment::STATUS_NOT_FINISHED
-                ])) {
+            if (
+                in_array($paymentResource->getState(), [
+                PaymentState::STATE_CANCELED,
+                PaymentService::STATUS_NOT_FINISHED
+                ], true)
+            ) {
                 return true;
             }
         }
@@ -480,9 +480,10 @@ class OrderController extends OrderController_parent
     /**
      * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
      */
-    private function redirectUserToCheckout(Unzer $unzerService, \OxidSolutionCatalysts\Unzer\Model\Order $order): void
+    private function redirectUserToCheckout(Unzer $unzerService, Order $order): void
     {
         $translator = $this->getServiceFromContainer(Translator::class);
+        /** @var UnzerOrder $order */
         $unzerOrderNr = $order->getUnzerOrderNr();
         throw new RedirectWithMessage(
             $unzerService->prepareRedirectUrl('payment?payerror=-6'),
@@ -497,7 +498,7 @@ class OrderController extends OrderController_parent
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var UnzerOrder $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();
