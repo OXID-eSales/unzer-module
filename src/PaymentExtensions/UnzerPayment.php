@@ -16,7 +16,6 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
@@ -275,7 +274,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         }
     }
 
-    private function savePayment($userModel)
+    private function savePayment(User $user): void
     {
         /** @var TransactionService $transactionService */
         $transactionService = $this->getServiceFromContainer(
@@ -286,7 +285,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         try {
             $transactionService->writeTransactionToDB(
                 Registry::getSession()->getSessionChallengeToken(),
-                $userModel->getId(),
+                $user->getId(),
                 $payment
             );
         } catch (Exception $e) {
@@ -295,28 +294,30 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         }
     }
 
-    private function existsInSavedPaymentsList(User $userModel)
+    private function existsInSavedPaymentsList(User $user): bool
     {
-        /** @var Transaction $transactionService */
-        $transactionService = $this->getServiceFromContainer(Transaction::class);
-        $ids = $transactionService->getTrancactionIds($userModel);
+        /** @var TransactionService $transactionService */
+        $transactionService = $this->getServiceFromContainer(TransactionService::class);
+        $ids = $transactionService->getTrancactionIds($user);
         $savedUserPayments = [];
         if ($ids) {
-            $savedUserPayments = $transactionService->getSavedPaymentsForUser($userModel, $ids, true);
+            $savedUserPayments = $transactionService->getSavedPaymentsForUser($user, $ids, true);
         }
 
         $currentPayment = $this->getServiceFromContainer(PaymentService::class)
             ->getSessionUnzerPayment();
 
-        $currentPaymentType = $currentPayment->getPaymentType();
-        foreach ($savedUserPayments as $savedPayment) {
-            if ($currentPaymentType instanceof UnzerSDKPaymentTypeCard)  {
-                if ($this->areCardsEqual($currentPaymentType, $savedPayment)) {
-                    return true;
+        if ($currentPayment) {
+            $currentPaymentType = $currentPayment->getPaymentType();
+            foreach ($savedUserPayments as $savedPayment) {
+                if ($currentPaymentType instanceof UnzerSDKPaymentTypeCard) {
+                    if ($this->areCardsEqual($currentPaymentType, $savedPayment)) {
+                        return true;
+                    }
                 }
-            }
-            if ($currentPaymentType instanceof Paypal)  {
-               return true; //we do not save it here
+                if ($currentPaymentType instanceof Paypal) {
+                    return true; //we do not save it here
+                }
             }
         }
 
