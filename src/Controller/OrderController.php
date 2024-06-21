@@ -13,13 +13,16 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
+use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
@@ -27,6 +30,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\Paypal;
 
 /**
  * TODO: Decrease count of dependencies to 13
@@ -124,6 +128,9 @@ class OrderController extends OrderController_parent
 
             $oDB->startTransaction();
 
+            $paymentService = $this->getServiceFromContainer(PaymentService::class);
+            $this->setSavePaymentFlag($oUser, $paymentService);
+
             //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
             $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
@@ -132,21 +139,20 @@ class OrderController extends OrderController_parent
 
             $nextStep = $this->getNextStep($iSuccess);
             $unzerService = $this->getServiceFromContainer(Unzer::class);
-            Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
-            if ('thankyou' === $nextStep) {
+            if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
-                $paymentService = $this->getServiceFromContainer(PaymentService::class);
+                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
 
                 if ($this->isPaymentCancelled($paymentService)) {
                     $this->cleanUpCancelledPayments();
                 }
 
-                if ($unzerService->ifImmediatePostAuthCollect($paymentService)) {
+                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
                     $paymentService->doUnzerCollect(
                         $oOrder,
-                        $oUser->getId(),
-                        $oBasket->getDiscountedProductsBruttoPrice()
+                        $unzerPaymentId,
+                        (float)$oOrder->getTotalOrderSum()
                     );
                 }
 
@@ -203,6 +209,7 @@ class OrderController extends OrderController_parent
 
     /**
      * @return void
+     * @throws UnzerApiException
      */
     public function saveUnzerTransaction(): void
     {
@@ -340,6 +347,7 @@ class OrderController extends OrderController_parent
         }
         return parent::getExecuteFnc();
     }
+
     protected function setSavedPaymentsViewData(): void
     {
         $user = $this->getUser();
@@ -472,5 +480,19 @@ class OrderController extends OrderController_parent
         }
 
         return true;
+    }
+
+    private function setSavePaymentFlag($oUser, $paymentService): void
+    {
+        $unzerSessionPayment = $paymentService->getSessionUnzerPayment();
+        if ($unzerSessionPayment->getPaymentType() instanceof Paypal) {
+            $paymentModel = $this->getPayment();
+            $paymentExtension = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(\OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader::class)
+                ->getPaymentExtension($paymentModel);
+            $savePayment = ($paymentExtension->existsInSavedPaymentsList($oUser)) ? "0" : "1";
+            Registry::getSession()->setVariable('oscunzersavepayment', $savePayment);
+        }
     }
 }

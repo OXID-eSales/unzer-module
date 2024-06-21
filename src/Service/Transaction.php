@@ -248,19 +248,24 @@ class Transaction
             strtolower($unzerPayment->getStateName())
         );
         $params = [
-            'amount'   => $unzerPayment->getAmount()->getTotal(),
+            'amount' => $unzerPayment->getAmount()->getTotal(),
             'remaining' => $unzerPayment->getAmount()->getRemaining(),
             'currency' => $unzerPayment->getCurrency(),
-            'typeid'   => $unzerPayment->getId(),
+            'typeid' => $unzerPayment->getId(),
             'oxaction' => $oxaction,
-            'traceid'  => $unzerPayment->getTraceId()
+            'traceid' => $unzerPayment->getTraceId()
         ];
         $savePayment = Registry::getSession()->getVariable('oscunzersavepayment');
 
         $paymentType = $unzerPayment->getPaymentType();
-        if ($savePayment === "1" && $paymentType instanceof BasePaymentType) {
-            $params['paymenttypeid'] = $paymentType->getId();
+        $firstPaypalCall = Registry::getSession()->getVariable('oscunzersavepayment_paypal');
+
+        if ($savePayment === "1" && $paymentType && $firstPaypalCall === "0") {
+            $typeId = $paymentType->getId();
+            $params['paymenttypeid'] = $typeId;
         }
+        Registry::getSession()->setVariable('oscunzersavepayment_paypal', "0");
+
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
             $initialTransaction->getShortId() :

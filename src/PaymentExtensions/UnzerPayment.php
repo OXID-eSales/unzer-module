@@ -14,7 +14,6 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Request;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -74,7 +73,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
 
-        $this->unzerOrderId = (string)$this->unzerService->generateUnzerOrderId();
+        $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
         $this->logger = $logger;
@@ -84,8 +83,6 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     {
         return $this->unzerOrderId;
     }
-
-
     /**
      * @return array
      */
@@ -108,10 +105,6 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     abstract public function getUnzerPaymentTypeObject(): BasePaymentType;
 
     /**
-     * @param User $userModel
-     * @param Basket $basketModel
-     * @return bool
-     *
      * @throws \JsonException
      * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
      * @throws \UnzerSDK\Exceptions\UnzerApiException
@@ -127,6 +120,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $paymentType = $this->getUnzerPaymentTypeObject();
         if ($paymentType instanceof PayPalPaymentType) {
             $this->setPaypalPaymentDataId($request, $paymentType);
+            Registry::getSession()->setVariable('oscunzersavepayment_paypal', "1");
         }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
@@ -161,11 +155,9 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         }
 
         $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-
-        if ($this->existsInSavedPaymentsList($userModel)) {
+        if ($this->existsInSavedPaymentsList($userModel) || $savePayment === "0") {
             $savePayment = "0";
         }
-
         Registry::getSession()->setVariable('oscunzersavepayment', $savePayment);
 
         if ($userModel->getId()) {
@@ -245,7 +237,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     private function throwExceptionIfPaymentDataError(): void
     {
         /** @var UnzerService $unzerService */
-        $unzerService = ContainerFactory::getInstance()->getContainer()->get(UnzerService::class);
+        $unzerService = $this->getServiceFromContainer(UnzerService::class);
         $unzerPaymentData = $unzerService->getUnzerPaymentDataFromRequest();
 
         if ($unzerPaymentData->isSuccess === false && $unzerPaymentData->isError === true) {
@@ -307,7 +299,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         }
     }
 
-    private function existsInSavedPaymentsList(User $user): bool
+    public function existsInSavedPaymentsList(User $user): bool
     {
         /** @var TransactionService $transactionService */
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
