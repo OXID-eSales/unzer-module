@@ -117,6 +117,7 @@ abstract class UnzerPayment
         $paymentType = $this->getUnzerPaymentTypeObject();
         if ($paymentType instanceof Paypal) {
             $this->setPaypalPaymentDataId($request, $paymentType);
+            Registry::getSession()->setVariable('oscunzersavepayment_paypal', "1");
         }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
@@ -143,7 +144,6 @@ abstract class UnzerPayment
             $customer = $this->unzerSDK->createCustomer($customer);
         }
 
-
         $transaction = $this->doTransactions($basketModel, $customer, $userModel, $paymentType);
         $this->unzerService->setSessionVars($transaction);
 
@@ -152,11 +152,9 @@ abstract class UnzerPayment
         }
 
         $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-
-        if ($this->existsInSavedPaymentsList($userModel)) {
+        if ($this->existsInSavedPaymentsList($userModel) || $savePayment === "0") {
             $savePayment = "0";
         }
-
         Registry::getSession()->setVariable('oscunzersavepayment', $savePayment);
 
         if ($userModel->getId()) {
@@ -293,7 +291,7 @@ abstract class UnzerPayment
         }
     }
 
-    private function existsInSavedPaymentsList(User $user): bool
+    public function existsInSavedPaymentsList(User $user): bool
     {
         /** @var TransactionService $transactionService */
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
@@ -319,8 +317,6 @@ abstract class UnzerPayment
                 if ($currentPaymentType instanceof Paypal) {
                     if ($this->arePayPalAccountsEqual($currentPaymentType, $savedPayment)) {
                         return true;
-                    } else {
-                        continue;
                     }
                 }
             }
