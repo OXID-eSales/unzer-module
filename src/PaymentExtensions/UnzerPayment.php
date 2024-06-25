@@ -114,10 +114,11 @@ abstract class UnzerPayment
     ): bool {
         $this->throwExceptionIfPaymentDataError();
         $request = Registry::getRequest();
+        $session = Registry::getSession();
         $paymentType = $this->getUnzerPaymentTypeObject();
         if ($paymentType instanceof Paypal) {
             $this->setPaypalPaymentDataId($request, $paymentType);
-            Registry::getSession()->setVariable('oscunzersavepayment_paypal', true);
+            $session->setVariable('oscunzersavepayment_paypal', true);
         }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
@@ -151,11 +152,11 @@ abstract class UnzerPayment
             $userModel->save();
         }
 
-        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-        if ($this->existsInSavedPaymentsList($userModel) || $savePayment) {
+        $savePayment = $request->getRequestParameter('oscunzersavepayment');
+        if (!$savePayment || $this->existsInSavedPaymentsList($userModel)) {
             $savePayment = true;
         }
-        Registry::getSession()->setVariable('oscunzersavepayment', $savePayment);
+        $session->setVariable('oscunzersavepayment', $savePayment);
 
         if ($userModel->getId()) {
             $this->savePayment($userModel);
