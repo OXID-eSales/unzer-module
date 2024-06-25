@@ -120,6 +120,7 @@ $aLang = [
     'OSCUNZER_SAVED_PAYMENTS' => 'Gespeicherte Zahlungsarten',
     'OSCUNZER_SAVE_PAYMENT' => 'Zahlungsart speichern',
     'OSCUNZER_SAVE_PAYPAL' => 'Neuer PayPal-Account',
+    'OSCUNZER_SAVE_PAYMENT_PAYPAL' => 'PayPal-Zugang im nächsten Schritt speichern',
     'OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS' => 'Keine Zahlungsarten gespeichert',
     'OSCUNZER_BRAND' => 'Marke',
     'OSCUNZER_HOLDER' => 'Inhaber',
@@ -128,4 +129,6 @@ $aLang = [
     'OSCUNZER_EXPIRY_DATE' => 'Ablaufdatum',
     'OSCUNZER_DELETE' => 'Löschen',
     'OSCUNZER_REMOVE_PAYMENT' => 'Gespeicherte Zahlungsart löschen?',
+    'OSCUNZER_NEW_CARD' => 'Neue Kreditkarte',
+    'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Ungültige Zahlart',
 ];

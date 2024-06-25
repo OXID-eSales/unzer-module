@@ -118,8 +118,8 @@ $aLang = [
     'OSCUNZER_PAYMENT_METHOD_SOFORT' => 'Sofort',
     'OSCUNZER_PAYMENT_METHOD_WECHATPAY' => 'WeChat Pay',
     'OSCUNZER_SAVED_PAYMENTS' => 'Saved Payments',
-    'OSCUNZER_SAVE_PAYMENT' => ' Save Payment / New Payment',
-    'OSCUNZER_SAVE_PAYPAL' => 'New PayPal Account',
+    'OSCUNZER_SAVE_PAYMENT' => 'Save Payment',
+    'OSCUNZER_SAVE_PAYMENT_PAYPAL' => 'Save PayPal access in the next step',
     'OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS' => 'No saved Payments',
     'OSCUNZER_BRAND' => 'Brand',
     'OSCUNZER_HOLDER' => 'Holder',
@@ -128,4 +128,6 @@ $aLang = [
     'OSCUNZER_EXPIRY_DATE' => 'Expiry Date',
     'OSCUNZER_DELETE' => 'Delete',
     'OSCUNZER_REMOVE_PAYMENT' => 'Delete Payment?',
+    'OSCUNZER_NEW_CARD' => 'New Card',
+    'OSCUNZER_INVALID_PAYMENT_METHOD' => 'Invalid payment method',
 ];
