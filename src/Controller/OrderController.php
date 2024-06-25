@@ -166,6 +166,9 @@ class OrderController extends OrderController_parent
                     );
                 }
 
+                Registry::getSession()->deleteVariable('oscunzersavepayment');
+                Registry::getSession()->deleteVariable('oscunzersavepayment_paypal');
+
                 if ($oBasket->getPaymentId() !== CoreUnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
                     throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
                 }
@@ -487,6 +490,8 @@ class OrderController extends OrderController_parent
 
             Registry::getSession()->setVariable('sess_challenge', $this->getUtilsObjectInstance()->generateUID());
             Registry::getSession()->setBasket($oBasket);
+            Registry::getSession()->deleteVariable('oscunzersavepayment');
+            Registry::getSession()->deleteVariable('oscunzersavepayment_paypal');
             $this->redirectUserToCheckout($unzerService, $oOrder);
         }
     }
@@ -519,12 +524,15 @@ class OrderController extends OrderController_parent
     {
         $unzerSessionPayment = $paymentService->getSessionUnzerPayment();
         if ($unzerSessionPayment && $unzerSessionPayment->getPaymentType() instanceof Paypal) {
+            $session = Registry::getSession();
             /** @var Payment $paymentModel */
             $paymentModel = $this->getPayment();
             $paymentExtension = $this->getServiceFromContainer(PaymentExtensionLoader::class)
                 ->getPaymentExtension($paymentModel);
+            $savePayment = $session->getVariable('oscunzersavepayment');
             $exists = $paymentExtension->existsInSavedPaymentsList($oUser);
-            Registry::getSession()->setVariable('oscunzersavepayment', $exists);
+            $savePayment = $savePayment && $exists ? false : $savePayment;
+            $session->setVariable('oscunzersavepayment', $savePayment);
         }
     }
 }
