@@ -41,7 +41,7 @@
                 <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
                     <input id="oscunzersavepayment" type="checkbox" name="oscunzersavepayment" value="0" style="-webkit-appearance: checkbox">
                     <label for="oscunzersavepayment">
-                        [{oxmultilang ident="OSCUNZER_SAVE_PAYMENT"}]
+                        [{oxmultilang ident="OSCUNZER_SAVE_PAYMENT_PAYPAL"}]
                     </label>
                 </div>
             </div>
