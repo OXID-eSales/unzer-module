@@ -126,6 +126,7 @@
                 </form>
             [{/if}]
             [{if $AuthAmountRemaining > 0}]
+                <br />
                 <form name="uzr" id="uzr_authorize" action="[{$oViewConf->getSelfLink()}]" method="post">
                     <input type="hidden" name="cl" value="unzer_admin_order">
                     <input type="hidden" name="fnc" value="doUnzerAuthorizationCancel">
@@ -138,11 +139,12 @@
                             [{if $canRevertPartially || $oOrder->oxorder__oxpaymenttype->value == 'oscunzer_invoice'}]
                             <td><input type="text" id ="amount_authorize" name="amount"
                                        value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
+                            <td>
                             [{else}]
-                            <td><input type="hidden" id ="amount_authorize" name="amount"
-                                       value="[{$AuthAmountRemaining|string_format:"%.2f"}]"></td>
+                            <td colspan="2"><input type="hidden" id ="amount_authorize" name="amount"
+                                       value="[{$AuthAmountRemaining|string_format:"%.2f"}]">
                             [{/if}]
-                            <td><button type="submit">[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL"}]</button></td>
+                            <button type="submit">[{oxmultilang ident="OSCUNZER_AUTHORIZE_CANCEL"}]</button></td>
                         </tr>
                         </tbody>
                     </table>
