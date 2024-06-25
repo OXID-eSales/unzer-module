@@ -26,7 +26,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
-use UnzerSDK\Resources\PaymentTypes\Paypal as PayPalPaymentType;
+use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaymentTypePaypal;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
@@ -117,10 +117,11 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     ): bool {
         $this->throwExceptionIfPaymentDataError();
         $request = Registry::getRequest();
+        $session = Registry::getSession();
         $paymentType = $this->getUnzerPaymentTypeObject();
-        if ($paymentType instanceof PayPalPaymentType) {
+        if ($paymentType instanceof UnzerSDKPaymentTypePaypal) {
             $this->setPaypalPaymentDataId($request, $paymentType);
-            Registry::getSession()->setVariable('oscunzersavepayment_paypal', "1");
+            $session->setVariable('oscunzersavepayment_paypal', true);
         }
         /** @var string $companyType */
         $companyType = $request->getRequestParameter('unzer_company_form', '');
@@ -154,11 +155,11 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $userModel->save();
         }
 
-        $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-        if ($this->existsInSavedPaymentsList($userModel) || $savePayment === "0") {
-            $savePayment = "0";
+        $savePayment = $request->getRequestParameter('oscunzersavepayment');
+        if (!$savePayment || $this->existsInSavedPaymentsList($userModel)) {
+            $savePayment = true;
         }
-        Registry::getSession()->setVariable('oscunzersavepayment', $savePayment);
+        $session->setVariable('oscunzersavepayment', $savePayment);
 
         if ($userModel->getId()) {
             $this->savePayment($userModel);
@@ -267,7 +268,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     /**
      * @throws \JsonException
      */
-    private function setPaypalPaymentDataId(Request $request, Paypal $paymentType): void
+    private function setPaypalPaymentDataId(Request $request, UnzerSDKPaymentTypePaypal $paymentType): void
     {
         $paymentDataRaw = $request->getRequestParameter('paymentData');
         $paymentData = is_string($paymentDataRaw) ? $paymentDataRaw : '';
@@ -286,7 +287,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             TransactionService::class
         );
         $payment = $this->getServiceFromContainer(PaymentService::class)
-            ->getSessionUnzerPayment();
+            ->getSessionUnzerPayment(true);
         try {
             $transactionService->writeTransactionToDB(
                 Registry::getSession()->getSessionChallengeToken(),
@@ -303,14 +304,14 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     {
         /** @var TransactionService $transactionService */
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
-        $ids = $transactionService->getTrancactionIds($user);
+        $ids = $transactionService->getTransactionIds($user);
         $savedUserPayments = [];
         if ($ids) {
             $savedUserPayments = $transactionService->getSavedPaymentsForUser($user, $ids, true);
         }
 
         $currentPayment = $this->getServiceFromContainer(PaymentService::class)
-            ->getSessionUnzerPayment();
+            ->getSessionUnzerPayment(true);
 
         if ($currentPayment) {
             $currentPaymentType = $currentPayment->getPaymentType();
