@@ -23,7 +23,7 @@ class Card extends UnzerPayment
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
          return $this->unzerSDK->fetchPaymentType(
-            $this->unzerService->getUnzerPaymentIdFromRequest()
-        );
+             $this->unzerService->getUnzerPaymentIdFromRequest()
+         );
     }
 }

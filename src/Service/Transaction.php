@@ -99,12 +99,10 @@ class Transaction
         ];
 
         if ($unzerPayment) {
-            if ($unzerShipment !== null) {
-                $params = array_merge($params, $this->getUnzerShipmentData($unzerShipment, $unzerPayment));
-            } else {
-                $paymentData = $this->getUnzerPaymentData($unzerPayment);
-                $params = array_merge($params, $paymentData);
-            }
+            $unzerPaymentData = $unzerShipment !== null ?
+                $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
+                $this->getUnzerPaymentData($unzerPayment);
+            $params = array_merge($params, $unzerPaymentData);
 
             // for PaylaterInvoice, store the customer type
             if (
@@ -551,6 +549,7 @@ class Transaction
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getSavedPaymentsForUser(?User $user, array $ids, bool $cache): array
     {
@@ -558,7 +557,9 @@ class Transaction
             return $this->paymentTypes;
         }
 
+        $tmpArr = [];
         foreach ($ids as $typeData) {
+            $paymentTypes = null;
             $paymentTypeId = $typeData['PAYMENTTYPEID'] ?: '';
             if ($paymentTypeId) {
                 $paymentTypes = $this->setPaymentTypes(
@@ -579,8 +580,9 @@ class Transaction
 
         $result = [];
         foreach ($tmpArr as $key => $paymentType) {
-            foreach ($paymentType as $id => $paymentDetails) {
-                $result[$key][array_key_first($paymentDetails)] = $paymentDetails[array_key_first($paymentDetails)];
+            foreach ($paymentType as $paymentDetails) {
+                $keyDetail = array_key_first($paymentDetails);
+                $result[$key][$keyDetail] = $paymentDetails[$keyDetail];
             }
         }
 
