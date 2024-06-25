@@ -276,11 +276,11 @@ class Transaction
         $paymentType = $unzerPayment->getPaymentType();
         $firstPaypalCall = Registry::getSession()->getVariable('oscunzersavepayment_paypal');
 
-        if ($savePayment === "1" && $paymentType && $firstPaypalCall === "0") {
+        if ($savePayment && $paymentType && !$firstPaypalCall) {
             $typeId = $paymentType->getId();
             $params['paymenttypeid'] = $typeId;
         }
-        Registry::getSession()->setVariable('oscunzersavepayment_paypal', "0");
+        Registry::getSession()->deleteVariable('oscunzersavepayment_paypal');
 
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
