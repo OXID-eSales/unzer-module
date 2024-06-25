@@ -13,7 +13,6 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -21,6 +20,7 @@ use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
+use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\ResponseHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -28,6 +28,8 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\Paypal;
@@ -431,7 +433,7 @@ class OrderController extends OrderController_parent
         if ($oBasket->getProductsCount()) {
             $oDB = DatabaseProvider::getDb();
 
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var UnzerOrder $oOrder */
             $oOrder = $this->getActualOrder();
 
             $oDB->startTransaction();
@@ -475,24 +477,23 @@ class OrderController extends OrderController_parent
         $oTmpOrder = oxNew(TmpOrder::class);
         $tmpOrderArray = $oTmpOrder->getTmpOrderByUnzerId($orderId);
 
-        if (empty($tmpOrderArray) || $tmpOrderArray === []) {
+        if (!$tmpOrderArray) {
             return false;
         }
 
         return true;
     }
 
-    private function setSavePaymentFlag($oUser, $paymentService): void
+    private function setSavePaymentFlag(User $oUser, PaymentService $paymentService): void
     {
         $unzerSessionPayment = $paymentService->getSessionUnzerPayment();
-        if ($unzerSessionPayment->getPaymentType() instanceof Paypal) {
+        if ($unzerSessionPayment && $unzerSessionPayment->getPaymentType() instanceof Paypal) {
+            /** @var Payment $paymentModel */
             $paymentModel = $this->getPayment();
-            $paymentExtension = ContainerFactory::getInstance()
-                ->getContainer()
-                ->get(\OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader::class)
+            $paymentExtension = $this->getServiceFromContainer(PaymentExtensionLoader::class)
                 ->getPaymentExtension($paymentModel);
-            $savePayment = ($paymentExtension->existsInSavedPaymentsList($oUser)) ? "0" : "1";
-            Registry::getSession()->setVariable('oscunzersavepayment', $savePayment);
+            $exists = $paymentExtension->existsInSavedPaymentsList($oUser);
+            Registry::getSession()->setVariable('oscunzersavepayment', $exists);
         }
     }
 }

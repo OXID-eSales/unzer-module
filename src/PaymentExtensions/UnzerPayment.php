@@ -319,11 +319,13 @@ abstract class UnzerPayment implements UnzerPaymentInterface
                     if ($this->areCardsEqual($currentPaymentType, $savedPayment)) {
                         return true;
                     }
+                    continue;
                 }
-                if ($currentPaymentType instanceof Paypal) {
-                    if ($this->arePayPalAccountsEqual($currentPaymentType, $savedPayment)) {
-                        return true;
-                    }
+                if (
+                    ($currentPaymentType instanceof Paypal) &&
+                    $this->arePayPalAccountsEqual($currentPaymentType, $savedPayment)
+                ) {
+                    return true;
                 }
             }
         }
@@ -334,19 +336,21 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     private function areCardsEqual(UnzerSDKPaymentTypeCard $card1, array $card2): bool
     {
         foreach ($card2 as $card) {
-            if ( $card1->getNumber() === $card['number'] &&
+            if (
+                $card1->getNumber() === $card['number'] &&
                 $card1->getExpiryDate() === $card['expiryDate'] &&
-                $card1->getCardHolder() === $card['cardHolder'] ) {
+                $card1->getCardHolder() === $card['cardHolder']
+            ) {
                 return true;
             }
         }
         return false;
     }
 
-    private function arePayPalAccountsEqual(Paypal $currentPaymentType, $savedPayment)
+    private function arePayPalAccountsEqual(Paypal $currentPaymentType, array $savedPayment): bool
     {
         foreach ($savedPayment as $paypalAccount) {
-            if ( $currentPaymentType->getEmail()  === $paypalAccount['email'] ) {
+            if ($currentPaymentType->getEmail() === $paypalAccount['email']) {
                 return true;
             }
         }

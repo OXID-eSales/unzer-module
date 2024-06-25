@@ -107,7 +107,8 @@ class AccountSavedPaymentController extends AccountController
      */
     public function deletePayment(): void
     {
-        $paymentTypeId = Registry::getRequest()->getRequestParameter('paymenttypeid');
+        $paymentTypeId = Registry::getRequest()->getRequestParameter('paymenttypeid', '');
+        $paymentTypeId = is_string($paymentTypeId) ? $paymentTypeId : '';
         /** @var \OxidSolutionCatalysts\Unzer\Model\Transaction $transaction */
         $transaction = oxNew(\OxidSolutionCatalysts\Unzer\Model\Transaction::class);
         $transaction->load($paymentTypeId);
