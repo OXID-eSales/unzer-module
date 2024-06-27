@@ -35,6 +35,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\PaymentTypes\Paypal;
 
 /**
@@ -523,7 +524,8 @@ class OrderController extends OrderController_parent
     private function setSavePaymentFlag(User $oUser, PaymentService $paymentService): void
     {
         $unzerSessionPayment = $paymentService->getSessionUnzerPayment();
-        if ($unzerSessionPayment && $unzerSessionPayment->getPaymentType() instanceof Paypal) {
+        $currentPayment = $unzerSessionPayment->getPaymentType();
+        if ($currentPayment instanceof Paypal || $currentPayment instanceof Card) {
             $session = Registry::getSession();
             /** @var Payment $paymentModel */
             $paymentModel = $this->getPayment();

@@ -21,6 +21,7 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\Basket as UnzerResourceBasket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
@@ -116,6 +117,7 @@ abstract class UnzerPayment
         $request = Registry::getRequest();
         $session = Registry::getSession();
         $paymentType = $this->getUnzerPaymentTypeObject();
+        //payment type here is saved payment
         if ($paymentType instanceof Paypal) {
             $this->setPaypalPaymentDataId($request, $paymentType);
             $session->setVariable('oscunzersavepayment_paypal', true);
@@ -189,16 +191,16 @@ abstract class UnzerPayment
             $auth->setCurrency($currency->name);
             $auth->setReturnUrl($this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()));
             $auth->setOrderId($this->unzerOrderId);
-
             $uzrRiskData = $this->unzerService->getUnzerRiskData(
                 $customer,
                 $userModel
             );
             $auth->setRiskData($uzrRiskData);
+            $sdkPaymentID = UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID;
             try {
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
                 $UnzerSdk = $loader->getUnzerSDK(
-                    UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID,
+                    $sdkPaymentID,
                     $currency->name
                 );
                 $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
@@ -208,15 +210,11 @@ abstract class UnzerPayment
         } else {
             $priceObj = $basketModel->getPrice();
             $price = $priceObj ? $priceObj->getPrice() : 0;
-            $transaction = $paymentType->{$paymentProcedure}(
-                $price,
-                $basketModel->getBasketCurrency()->name,
-                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
-                $customer,
-                $this->unzerOrderId,
-                $this->unzerService->getShopMetadata($this->paymentMethod),
-                $uzrBasket
-            );
+            if ($this->isSavedPayment()) {
+                $transaction = $this->performTransactionForSavedPayment($paymentType, $paymentProcedure, $price, $basketModel, $customer, $uzrBasket);
+            } else {
+                $transaction = $this->performDefaultTransaction($paymentType, $paymentProcedure, $price, $basketModel, $customer, $uzrBasket);
+            }
         }
         return $transaction;
     }
@@ -348,5 +346,68 @@ abstract class UnzerPayment
             }
         }
         return false;
+    }
+
+    private function isSavedPayment(): bool
+    {
+        return Registry::getRequest()->getRequestParameter('is_saved_payment_in_action') === '1';
+    }
+
+    private function performDefaultTransaction(
+        BasePaymentType $paymentType,
+        string $paymentProcedure,
+        float $price,
+        Basket $basketModel,
+        Customer $customer,
+        UnzerResourceBasket $uzrBasket): AbstractTransactionType
+    {
+        return $paymentType->{$paymentProcedure}(
+            $price,
+            $basketModel->getBasketCurrency()->name,
+            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+            $customer,
+            $this->unzerOrderId,
+            $this->unzerService->getShopMetadata($this->paymentMethod),
+            $uzrBasket
+        );
+    }
+
+    private function performTransactionForSavedPayment(
+        BasePaymentType $paymentType,
+        string $paymentProcedure,
+        float $price,
+        Basket $basketModel,
+        Customer $customer,
+        UnzerResourceBasket $uzrBasket): AbstractTransactionType
+    {
+        if ($paymentType instanceof Paypal) {
+            return $paymentType->{$paymentProcedure}(
+                $price,
+                $basketModel->getBasketCurrency()->name,
+                $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+                $customer,
+                $this->unzerOrderId,
+                $this->unzerService->getShopMetadata($this->paymentMethod),
+                $uzrBasket,
+                false,
+                null,
+                null,
+                \UnzerSDK\Constants\RecurrenceTypes::ONE_CLICK
+            );
+        }
+
+        return $paymentType->{$paymentProcedure}(
+            $price,
+            $basketModel->getBasketCurrency()->name,
+            $this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()),
+            $customer,
+            $this->unzerOrderId,
+            $this->unzerService->getShopMetadata($this->paymentMethod),
+            $uzrBasket,
+            true,
+            null,
+            null,
+            \UnzerSDK\Constants\RecurrenceTypes::ONE_CLICK
+        );
     }
 }
