@@ -219,7 +219,7 @@
                             </form>
                         </tr>
                     [{/foreach}]
-                    [{if $canCancelAmount > 0}]
+                    [{if !$aCharges|count && $canCancelAmount > 0}]
                         <form name="uzr" id="uzr_s-chg_payout" action="[{$oViewConf->getSelfLink()}]" method="post">
                             [{$oViewConf->getHiddenSid()}]
                             <input type="hidden" name="unzerid" value="[{$sTypeId}]">
@@ -313,37 +313,15 @@
     let handleUnzerForm = function(formElement) {
         if(formElement.id.indexOf('uzr_') === 0) { // make absolutely sure to start with "uzr_"
 
-            let chargeId = '[{$oUnzerCharge.chargeId}]';
             let paymentId = formElement.id.slice(4);
             let amountId = 'amount_' + paymentId;
-            let reasonId = 'reason_' + chargeId;
             let inAmount = document.getElementById(amountId);
-            let inReason = document.getElementById(reasonId);
-            let formData = new FormData(formElement);
 
             if (null !== inAmount.value) {
                 let alertMsg = '[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]'
                     + ' ' + inAmount.value + ' [{$uzrCurrency}]';
                 if (window.confirm(alertMsg)) {
-                    if (inReason) {
-                        formData.append('reason', inReason.value);
-                    }
-
-                    fetch(formElement.action, {
-                        method: 'POST',
-                        body: formData
-                    }).then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert('Failed to submit the form. Please try again.');
-                        }
-                    }).catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                    });
-
-                    return false;
+                    return true;
                 }
             }
             return false;
