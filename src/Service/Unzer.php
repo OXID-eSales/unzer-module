@@ -537,6 +537,7 @@ class Unzer
     {
         $paymentData = $this->getPaymentDataArrayFromRequest();
 
+        //getting we the old payment ID
         if (array_key_exists('id', $paymentData)) {
             return $paymentData['id'];
         }
