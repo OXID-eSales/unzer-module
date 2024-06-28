@@ -35,6 +35,8 @@ use UnzerSDK\Unzer;
  *  TODO: Decrease count of dependencies to 13
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.NumberOfChildren)
+ *  TODO: Decrease overall complexity below 50
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class UnzerPayment
 {
@@ -213,9 +215,23 @@ abstract class UnzerPayment
             $priceObj = $basketModel->getPrice();
             $price = $priceObj ? $priceObj->getPrice() : 0;
             if ($this->isSavedPayment()) {
-                $transaction = $this->performTransactionForSavedPayment($paymentType, $paymentProcedure, $price, $basketModel, $customer, $uzrBasket);
+                $transaction = $this->performTransactionForSavedPayment(
+                    $paymentType,
+                    $paymentProcedure,
+                    $price,
+                    $basketModel,
+                    $customer,
+                    $uzrBasket
+                );
             } else {
-                $transaction = $this->performDefaultTransaction($paymentType, $paymentProcedure, $price, $basketModel, $customer, $uzrBasket);
+                $transaction = $this->performDefaultTransaction(
+                    $paymentType,
+                    $paymentProcedure,
+                    $price,
+                    $basketModel,
+                    $customer,
+                    $uzrBasket
+                );
             }
         }
         return $transaction;
@@ -361,8 +377,8 @@ abstract class UnzerPayment
         float $price,
         Basket $basketModel,
         Customer $customer,
-        UnzerResourceBasket $uzrBasket): AbstractTransactionType
-    {
+        UnzerResourceBasket $uzrBasket
+    ): AbstractTransactionType {
         return $paymentType->{$paymentProcedure}(
             $price,
             $basketModel->getBasketCurrency()->name,
@@ -380,8 +396,8 @@ abstract class UnzerPayment
         float $price,
         Basket $basketModel,
         Customer $customer,
-        UnzerResourceBasket $uzrBasket): AbstractTransactionType
-    {
+        UnzerResourceBasket $uzrBasket
+    ): AbstractTransactionType {
         if ($paymentType instanceof Paypal) {
             return $paymentType->{$paymentProcedure}(
                 $price,

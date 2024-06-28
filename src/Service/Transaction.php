@@ -258,6 +258,7 @@ class Transaction
      * @param Payment $unzerPayment
      * @return array
      * @throws UnzerApiException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
@@ -267,12 +268,12 @@ class Transaction
             strtolower($unzerPayment->getStateName())
         );
         $params = [
-            'amount' => $unzerPayment->getAmount()->getTotal(),
+            'amount'    => $unzerPayment->getAmount()->getTotal(),
             'remaining' => $unzerPayment->getAmount()->getRemaining(),
-            'currency' => $unzerPayment->getCurrency(),
-            'typeid' => $unzerPayment->getId(),
-            'oxaction' => $oxaction,
-            'traceid' => $unzerPayment->getTraceId()
+            'currency'  => $unzerPayment->getCurrency(),
+            'typeid'    => $unzerPayment->getId(),
+            'oxaction'  => $oxaction,
+            'traceid'   => $unzerPayment->getTraceId()
         ];
         $savePayment = Registry::getSession()->getVariable('oscunzersavepayment');
 
@@ -282,7 +283,7 @@ class Transaction
         if (
              ($savePayment && ($paymentType instanceof UnzerResourcePaypal && $firstPaypalCall))
             || ($savePayment && $paymentType instanceof UnzerResourceCard)
-            ) {
+        ) {
             $typeId = $paymentType->getId();
             $params['paymenttypeid'] = $typeId;
         }

@@ -276,7 +276,7 @@ class Order extends Order_parent
                     $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
                         $unzerPayment :
                         $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
-            );
+                );
         }
 
         return false;
