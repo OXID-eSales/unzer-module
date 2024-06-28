@@ -91,6 +91,7 @@ class AdminOrderController extends AdminDetailsController
             if ($this->sTypeId) {
                 $this->getUnzerViewData($sPaymentId, $this->sTypeId);
             }
+            $this->_aViewData['uzrCurrency'] = $oOrder->getFieldData('oxcurrency');
         } else {
             $translator = $this->getServiceFromContainer(Translator::class);
             $this->_aViewData['sMessage'] = $translator->translate("OSCUNZER_NO_UNZER_ORDER");
