@@ -106,9 +106,13 @@
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
 
     if ($('input[name="newccard"]').length === 0) {
-
+         let hiddenInput4 = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'is_saved_payment_in_action')
+                        .val(0);
         $('#orderConfirmAgbBottom').addClass('new-card-selected');
         $('#newcc').show();
+
         Card = unzerInstance.Card();
         addPaymentElements(Card);
     } else {
@@ -129,6 +133,7 @@
 
     $( "#payment-form-card" ).submit(function( event ) {
         event.preventDefault();
+        debugger
         if (Card) {
             Card.createResource()
                 .then(function(result) {
@@ -143,6 +148,7 @@
 
                     $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
                     $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
+
                     $('#orderConfirmAgbBottom' ).addClass("submitable");
                     $('#orderConfirmAgbBottom').submit();
                 })
@@ -168,6 +174,14 @@
             .attr('name', 'paymentData')
             .val(paymentDataString);
         $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput3);
+
+        let hiddenInput4 = $(document.createElement('input'))
+                        .attr('type', 'hidden')
+                        .attr('name', 'is_saved_payment_in_action')
+                        .val(1);
+
+        $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput4);
+        console.log( $('#orderConfirmAgbBottom').find(".hidden"));
         $('#orderConfirmAgbBottom' ).addClass("submitable");
         $('#orderConfirmAgbBottom').submit();
     });

@@ -11,6 +11,7 @@ use Doctrine\DBAL\Driver\Result;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order;
+use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use PDO;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -29,9 +30,11 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
+use UnzerSDK\Resources\PaymentTypes\Card as UnzerResourceCard;
 use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
+use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerResourcePaypal;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -255,6 +258,7 @@ class Transaction
      * @param Payment $unzerPayment
      * @return array
      * @throws UnzerApiException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getUnzerPaymentData(Payment $unzerPayment): array
     {
@@ -264,19 +268,22 @@ class Transaction
             strtolower($unzerPayment->getStateName())
         );
         $params = [
-            'amount' => $unzerPayment->getAmount()->getTotal(),
+            'amount'    => $unzerPayment->getAmount()->getTotal(),
             'remaining' => $unzerPayment->getAmount()->getRemaining(),
-            'currency' => $unzerPayment->getCurrency(),
-            'typeid' => $unzerPayment->getId(),
-            'oxaction' => $oxaction,
-            'traceid' => $unzerPayment->getTraceId()
+            'currency'  => $unzerPayment->getCurrency(),
+            'typeid'    => $unzerPayment->getId(),
+            'oxaction'  => $oxaction,
+            'traceid'   => $unzerPayment->getTraceId()
         ];
         $savePayment = Registry::getSession()->getVariable('oscunzersavepayment');
 
         $paymentType = $unzerPayment->getPaymentType();
         $firstPaypalCall = Registry::getSession()->getVariable('oscunzersavepayment_paypal');
 
-        if ($savePayment && $paymentType && $firstPaypalCall) {
+        if (
+             ($savePayment && ($paymentType instanceof UnzerResourcePaypal && $firstPaypalCall))
+            || ($savePayment && $paymentType instanceof UnzerResourceCard)
+        ) {
             $typeId = $paymentType->getId();
             $params['paymenttypeid'] = $typeId;
         }

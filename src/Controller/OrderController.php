@@ -35,6 +35,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\PaymentTypes\Paypal;
 
 /**
@@ -388,6 +389,19 @@ class OrderController extends OrderController_parent
         if (!$user) {
             return;
         }
+        $sPaymentId = Registry::getSession()->getVariable('paymentid');
+        if (
+            !in_array(
+                $sPaymentId,
+                [
+                CoreUnzerDefinitions::CARD_UNZER_PAYMENT_ID,
+                CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID
+                ],
+                true
+            )
+        ) {
+            return;
+        }
 
         $transactionService = $this->getServiceFromContainer(Transaction::class);
         $ids = $transactionService->getTrancactionIds($user);
@@ -523,16 +537,19 @@ class OrderController extends OrderController_parent
     private function setSavePaymentFlag(User $oUser, PaymentService $paymentService): void
     {
         $unzerSessionPayment = $paymentService->getSessionUnzerPayment();
-        if ($unzerSessionPayment && $unzerSessionPayment->getPaymentType() instanceof Paypal) {
-            $session = Registry::getSession();
-            /** @var Payment $paymentModel */
-            $paymentModel = $this->getPayment();
-            $paymentExtension = $this->getServiceFromContainer(PaymentExtensionLoader::class)
-                ->getPaymentExtension($paymentModel);
-            $savePayment = $session->getVariable('oscunzersavepayment');
-            $exists = $paymentExtension->existsInSavedPaymentsList($oUser);
-            $savePayment = $savePayment && $exists ? false : $savePayment;
-            $session->setVariable('oscunzersavepayment', $savePayment);
+        if ($unzerSessionPayment) {
+            $currentPayment = $unzerSessionPayment->getPaymentType();
+            if ($currentPayment instanceof Paypal || $currentPayment instanceof Card) {
+                $session = Registry::getSession();
+                /** @var Payment $paymentModel */
+                $paymentModel = $this->getPayment();
+                $paymentExtension = $this->getServiceFromContainer(PaymentExtensionLoader::class)
+                    ->getPaymentExtension($paymentModel);
+                $savePayment = $session->getVariable('oscunzersavepayment');
+                $exists = $paymentExtension->existsInSavedPaymentsList($oUser);
+                $savePayment = $savePayment && $exists ? false : $savePayment;
+                $session->setVariable('oscunzersavepayment', $savePayment);
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ use OxidEsales\Codeception\Module\Translation\Translator;
 abstract class BaseCest
 {
     private int $amount = 1;
-    private AcceptanceTester $I;
+    public AcceptanceTester $I;
     private Page $paymentSelection;
 
     public function _before(AcceptanceTester $I): void
@@ -186,14 +186,6 @@ abstract class BaseCest
     protected function _setAcceptance(AcceptanceTester $I)
     {
         $this->I = $I;
-    }
-
-    /**
-     * @return AcceptanceTester
-     */
-    protected function _getAcceptance(): AcceptanceTester
-    {
-        return $this->I;
     }
 
     /**

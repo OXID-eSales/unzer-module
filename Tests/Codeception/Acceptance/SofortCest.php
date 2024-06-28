@@ -15,6 +15,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 /**
  * @group unzer_module
  * @group ThirdGroup
+ * @Irgnore("Skipped becouse of dynamic nature of user verification of the SEPA site")
  */
 final class SofortCest extends BaseCest
 {
