@@ -281,7 +281,7 @@ class Transaction
         $firstPaypalCall = Registry::getSession()->getVariable('oscunzersavepayment_paypal');
 
         if (
-             ($savePayment && ($paymentType instanceof UnzerResourcePaypal && $firstPaypalCall))
+             ($savePayment && ($paymentType instanceof UnzerResourcePaypal && !$firstPaypalCall))
             || ($savePayment && $paymentType instanceof UnzerResourceCard)
         ) {
             $typeId = $paymentType->getId();
