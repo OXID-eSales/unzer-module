@@ -28,8 +28,6 @@
                         </td>
                     </tr>
                     [{/foreach}]
-
-
                 </tbody>
             </table>
             [{/if}]
@@ -50,11 +48,9 @@
         </form>
     </div>
 
+[{capture assign="unzerPaypalJS"}]
+[{if false}]<script>[{/if}]
 
-    [{if false}]
-    <script>
-        [{/if}]
-            [{capture assign="unzerPaypalJS"}]
         $( '#orderConfirmAgbBottom' ).submit(function( event ) {
             if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
                 event.preventDefault();
@@ -82,15 +78,23 @@
                 .attr('type', 'hidden')
                 .attr('name', 'oscunzersavepayment')
                 .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+
             $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
             $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput3);
+
+            let hiddenInput4 = $(document.createElement('input'))
+                .attr('type', 'hidden')
+                .attr('name', 'is_saved_payment_in_action')
+                .val(1);
+
+            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput4);
+
+            console.log(hiddenInput4);
 
             $('#orderConfirmAgbBottom').addClass("submitable");
             $("#orderConfirmAgbBottom").submit();
         });
-        [{/capture}]
-            [{if false}]
-    </script>
-    [{/if}]
-    [{oxscript add=$unzerPaypalJS}]
 
+ [{if false}]</script>[{/if}]
+    [{/capture}]
+    [{oxscript add=$unzerPaypalJS}]

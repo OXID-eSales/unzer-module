@@ -269,13 +269,14 @@ class Order extends Order_parent
         if (
             strpos($oxpaymenttype, "oscunzer") !== false
         ) {
-            return $this->getServiceFromContainer(TransactionService::class)->writeTransactionToDB(
-                $this->getId(),
-                $this->getOrderUser()->getId() ?: '',
-                $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
-                    $unzerPayment :
-                    $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
-            );
+            return $this->getServiceFromContainer(TransactionService::class)
+                ->writeTransactionToDB(
+                    $this->getId(),
+                    $this->getOrderUser()->getId() ?: '',
+                    $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
+                        $unzerPayment :
+                        $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment()
+                );
         }
 
         return false;
