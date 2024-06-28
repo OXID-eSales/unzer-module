@@ -389,6 +389,10 @@ class OrderController extends OrderController_parent
         if (!$user) {
             return;
         }
+        $sPaymentId = Registry::getSession()->getVariable('paymentid');
+        if (!in_array($sPaymentId, [CoreUnzerDefinitions::CARD_UNZER_PAYMENT_ID, CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID], true)) {
+            return;
+        }
 
         $transactionService = $this->getServiceFromContainer(Transaction::class);
         $ids = $transactionService->getTrancactionIds($user);
