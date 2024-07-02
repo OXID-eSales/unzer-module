@@ -16,7 +16,6 @@ use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
-use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use stdClass;
