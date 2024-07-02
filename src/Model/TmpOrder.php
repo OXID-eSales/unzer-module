@@ -125,6 +125,10 @@ class TmpOrder extends BaseModel
         return is_array($result) ? $result : [];
     }
 
+    /**
+     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function getTmpOrderByOxOrderId(string $oxSessionOrderId): ?CoreOrderModel
     {
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
@@ -138,14 +142,15 @@ class TmpOrder extends BaseModel
             ->setParameters(
                 ['oxorderid' => $oxSessionOrderId]
             );
-        /** @var Result $blocksData */
-        $result = $queryBuilder->execute()->fetchAssociative();
+        /** @var Result $rawRes */
+        $rawRes = $queryBuilder->execute();
+        $result = $rawRes->fetchAssociative();
 
         if (is_array($result) && isset($result['TMPORDER']) && is_string($result['TMPORDER'])) {
             $tmpOrder = $result['TMPORDER'];
             $result = unserialize(base64_decode($tmpOrder));
             if (is_array($result) && isset($result['order']) && is_object($result['order'])) {
-                /** @var \OxidSolutionCatalysts\Unzer\Model\Order $order */
+                /** @var CoreOrderModel $order */
                 $order = $result['order'];
                 return $order;
             }
