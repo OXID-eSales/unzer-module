@@ -5,10 +5,13 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Service\UserRepository;
 use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions as UnzerDefinitionsService;
@@ -17,6 +20,7 @@ use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Unzer;
 
 class PaymentController extends PaymentController_parent
 {
@@ -114,35 +118,73 @@ class PaymentController extends PaymentController_parent
         }
     }
 
-
-    protected function checkForDuplicateOrderAttempt(Session $session): void
+    /**
+     * @param $session Session
+     * @return void
+     */
+    private function checkForDuplicateOrderAttempt(Session $session): void
     {
-        $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
-        $unzerSDK = $unzerSDK->getUnzerSDK();
-        $oxOrderIdOfTmpOrder = $session->getVariable('oxOrderIdOfTmpOrder');
-        $paymentId = is_string($session->getVariable('paymentid')) ? $session->getVariable('paymentid') : '';
-        if ($oxOrderIdOfTmpOrder) {
-            if ($paymentId) {
-                try {
-                    $unzerPayment = $unzerSDK->fetchPayment($paymentId);
-                    $unzerOrderId = $unzerPayment->getOrderId();
-                    $sessionUnzerOrderId = $session->getVariable('UnzerOrderId');
-                    if (
-                        (int) $unzerOrderId === $sessionUnzerOrderId &&
-                        ($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
-                            $unzerPayment->getState() === PaymentState::STATE_PENDING)
-                    ) {
-                        $session->deleteVariable('paymentid');
-                        $session->deleteVariable('UnzerOrderId');
-                    }
-                } catch (UnzerApiException $e) {
-                    Registry::getLogger()->warning(
-                        'Payment not found with key: ' . $paymentId . ' and message: ' . $e->getMessage()
-                    );
+        $oxOrderIdOfTmpOrder = is_string($session->getVariable('oxOrderIdOfTmpOrder')) ?
+            $session->getVariable('oxOrderIdOfTmpOrder') :
+            '';
+
+        $unzerPaymentId = is_string($session->getVariable('UnzerPaymentId')) ?
+            $session->getVariable('UnzerPaymentId') :
+            '';
+
+        $unzerSDK = $this->getUnzerSDKFromTmpOrder($oxOrderIdOfTmpOrder);
+
+        if ($unzerSDK && $unzerPaymentId) {
+            try {
+                $unzerPayment = $unzerSDK->fetchPayment($unzerPaymentId);
+                $unzerOrderId = $unzerPayment->getOrderId();
+                $sessionUnzerOrderId = $session->getVariable('UnzerOrderId');
+                if (
+                    (int) $unzerOrderId === $sessionUnzerOrderId &&
+                    ($unzerPayment->getState() === PaymentState::STATE_COMPLETED ||
+                        $unzerPayment->getState() === PaymentState::STATE_PENDING)
+                ) {
+                    $session->deleteVariable('UnzerPaymentId');
+                    $session->deleteVariable('UnzerOrderId');
                 }
+            } catch (UnzerApiException $e) {
+                Registry::getLogger()->warning(
+                    'Payment not found with key: ' . $unzerPaymentId . ' and message: ' . $e->getMessage()
+                );
             }
+
             $session->deleteVariable('sess_challenge');
             $session->deleteVariable('oxOrderIdOfTmpOrder');
         }
+    }
+
+    /**
+     * @param $oxOrderIdOfTmpOrder string
+     * @return Unzer|null
+     */
+    private function getUnzerSDKFromTmpOrder(string $oxSessionOrderId): ?Unzer
+    {
+        $result = null;
+        /** @var Order $tmpOrder */
+        $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($oxSessionOrderId);
+        if ($tmpOrder) {
+            $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
+
+            /** @var string $paymentId */
+            $paymentId = $tmpOrder->getFieldData('oxpaymenttype');
+            /** @var string $currency */
+            $currency = $tmpOrder->getFieldData('oxcurrency');
+            $customerType = !empty($tmpOrder->getFieldData('oxdelcompany'))
+            || !empty($tmpOrder->getFieldData('oxbillcompany')) ?
+                'B2B' :
+                'B2C';
+
+            $result = $unzerSDK->getUnzerSDK(
+                $paymentId,
+                $currency,
+                $customerType
+            );
+        }
+        return $result;
     }
 }

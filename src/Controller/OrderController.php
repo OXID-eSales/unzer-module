@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use Exception;
@@ -135,6 +137,7 @@ class OrderController extends OrderController_parent
             $oDB->startTransaction();
 
             $paymentService = $this->getServiceFromContainer(PaymentService::class);
+
             $this->setSavePaymentFlag($oUser, $paymentService);
 
             //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
@@ -371,6 +374,19 @@ class OrderController extends OrderController_parent
         if (!$user) {
             return;
         }
+        $sPaymentId = Registry::getSession()->getVariable('paymentid');
+        if (
+            !in_array(
+                $sPaymentId,
+                [
+                CoreUnzerDefinitions::CARD_UNZER_PAYMENT_ID,
+                CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID
+                ],
+                true
+            )
+        ) {
+            return;
+        }
 
         $transactionService = $this->getServiceFromContainer(Transaction::class);
         $ids = $transactionService->getTransactionIds($user);
@@ -433,12 +449,15 @@ class OrderController extends OrderController_parent
 
             $oDB->startTransaction();
 
-            //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
-            $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+            $isOrderAlreadyCancelled = Registry::getSession()->getVariable('orderCancellationProcessed');
+            if (!$isOrderAlreadyCancelled) {
+                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+                $oUser->onOrderExecute($oBasket, $iSuccess);
+            }
+            Registry::getSession()->deleteVariable('orderCancellationProcessed');
+            //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...
 
             // performing special actions after user finishes order (assignment to special user groups)
-            $oUser->onOrderExecute($oBasket, $iSuccess);
-
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
@@ -446,6 +465,7 @@ class OrderController extends OrderController_parent
 
             Registry::getSession()->setVariable('sess_challenge', $this->getUtilsObjectInstance()->generateUID());
             Registry::getSession()->setBasket($oBasket);
+            Registry::getSession()->deleteVariable('orderCancellationProcessed');
             Registry::getSession()->deleteVariable('oscunzersavepayment');
             Registry::getSession()->deleteVariable('oscunzersavepayment_paypal');
             $this->redirectUserToCheckout($unzerService, $oOrder);
@@ -456,16 +476,15 @@ class OrderController extends OrderController_parent
     {
         $paymentResource = $paymentService->getSessionUnzerPayment(true);
 
-        if ($paymentResource === null || $paymentResource->getState() !== 0) {
+        if ($paymentResource === null) {
             return false;
         }
 
-
-        $tmpOrderArray = [];
-        $orderId = $paymentResource->getOrderId();
-        if ($orderId !== null) {
-            $tmpOrderArray = oxNew(TmpOrder::class)->getTmpOrderByUnzerId($orderId);
+        if ($paymentResource->getState() === PaymentState::STATE_CANCELED) {
+            return true;
         }
+
+        $orderId = $paymentResource->getOrderId();
 
         if ($orderId === null) {
             return false;

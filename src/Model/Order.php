@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use Exception;
@@ -12,14 +14,12 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use Psr\Container\ContainerInterface;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 
@@ -119,6 +119,7 @@ class Order extends Order_parent
             $this->markUnzerOrderAsPaid();
             $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
         } else {
+            Registry::getSession()->setVariable('orderCancellationProcessed', true);
             $this->setOrderStatus($unzerPaymentStatus); //ERROR if paypal
             $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
         }
@@ -205,12 +206,8 @@ class Order extends Order_parent
      */
     public function setUnzerOrderNr(string $unzerOrderId): string
     {
-        /** @var ContainerInterface $container */
-        $container = ContainerFactory::getInstance()
-            ->getContainer();
-
         /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $container->get(QueryBuilderFactoryInterface::class);
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
 
         $queryBuilder = $queryBuilderFactory->create();
 
@@ -296,6 +293,7 @@ class Order extends Order_parent
      * @param \UnzerSDK\Resources\Payment|null $unzerPayment
      * @return bool
      * @throws UnzerApiException
+     * @throws Exception
      */
     public function initWriteTransactionToDB($unzerPayment = null): bool
     {
@@ -352,6 +350,17 @@ class Order extends Order_parent
         }
 
         return parent::delete($sOxId);
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $value
+     * @param int $dataType
+     * @return false|void
+     */
+    public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
+    {
+        return parent::_setFieldData($fieldName, $value, $dataType);
     }
 
     private function setTmpOrderStatus(string $unzerOrderId, string $status): void
