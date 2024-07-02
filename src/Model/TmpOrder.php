@@ -32,11 +32,6 @@ class TmpOrder extends BaseModel
         $this->init('oscunzertmporder');
     }
 
-    public function save()
-    {
-        return parent::save();
-    }
-
     /**
      * @throws DBALException
      * @throws Exception

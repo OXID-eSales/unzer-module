@@ -9,16 +9,20 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use stdClass;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Payment as UnzerPayment;
 use UnzerSDK\Resources\AbstractUnzerResource;
@@ -94,11 +98,9 @@ class Payment
     }
 
     /**
-     * @throws \JsonException
-     * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
-     * @throws \OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage
-     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws Redirect
+     * @throws RedirectWithMessage
+     * @throws UnzerException
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
@@ -117,7 +119,7 @@ class Payment
             );
 
             $oOrder = oxNew(Order::class);
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var Order $oOrder */
             $oOrder->createTmpOrder($basket, $user, $paymentExtension->getUnzerOrderId());
 
             $paymentExtension->execute(
@@ -181,7 +183,7 @@ class Payment
             return $result;
         }
 
-        if ($sessionUnzerPayment->getState() === \UnzerSDK\Constants\PaymentState::STATE_CANCELED) {
+        if ($sessionUnzerPayment->getState() === PaymentState::STATE_CANCELED) {
             return self::STATUS_CANCELED;
         }
 
@@ -393,7 +395,7 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param Order|null $oOrder
      * @param string $unzerid
      * @param float $amount
      * @return UnzerApiException|bool
@@ -439,7 +441,7 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param Order|null $oOrder
      * @param string $unzerid
      * @param float $amount
      * @return UnzerApiException|bool
@@ -472,13 +474,13 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param Order|null $oOrder
      * @param string|null $sPaymentId
      * @return UnzerApiException|bool
      *
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function sendShipmentNotification($oOrder, $sPaymentId = null)
@@ -547,7 +549,7 @@ class Payment
     /**
      * @param UnzerPayment $unzerPayment
      * @return BasePaymentType|AbstractUnzerResource The updated PaymentType object.
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws UnzerApiException
      */
     public function setInstallmentDueDate($unzerPayment)
     {
