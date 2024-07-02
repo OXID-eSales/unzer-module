@@ -114,6 +114,7 @@ class Order extends Order_parent
             $this->markUnzerOrderAsPaid();
             $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
         } else {
+            Registry::getSession()->setVariable('orderCancellationProcessed', true);
             $this->_setOrderStatus($unzerPaymentStatus); //ERROR if paypal
             $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
         }

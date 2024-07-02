@@ -160,11 +160,11 @@ class PaymentController extends PaymentController_parent
      * @param $oxOrderIdOfTmpOrder string
      * @return Unzer|null
      */
-    private function getUnzerSDKFromTmpOrder(string $oxOrderIdOfTmpOrder): ?Unzer
+    private function getUnzerSDKFromTmpOrder(string $oxSessionOrderId): ?Unzer
     {
         $result = null;
         /** @var Order $tmpOrder */
-        $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($oxOrderIdOfTmpOrder);
+        $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($oxSessionOrderId);
         if ($tmpOrder) {
             $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
 

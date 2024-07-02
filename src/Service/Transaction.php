@@ -452,7 +452,7 @@ class Transaction
         if ($orderid) {
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback')",
+                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback', 'canceled')",
                 [$orderid]
             );
 
@@ -475,7 +475,7 @@ class Transaction
         if ($orderid) {
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT OXID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback')
+                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'canceled', 'chargeback')
                 ORDER BY OXTIMESTAMP DESC LIMIT 1",
                 [$orderid]
             );
