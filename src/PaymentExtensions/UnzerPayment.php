@@ -158,8 +158,8 @@ abstract class UnzerPayment
 
         if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal) {
             $savePayment = $request->getRequestParameter('oscunzersavepayment');
-            if (!$savePayment || $this->existsInSavedPaymentsList($userModel)) {
-                $savePayment = true;
+            if ($savePayment && $this->existsInSavedPaymentsList($userModel)) {
+                $savePayment = false;
             }
             $session->setVariable('oscunzersavepayment', $savePayment);
         }
@@ -328,7 +328,6 @@ abstract class UnzerPayment
                     if ($this->areCardsEqual($currentPaymentType, $savedPayment)) {
                         return true;
                     }
-                    continue;
                 }
                 if (
                     ($currentPaymentType instanceof Paypal) &&

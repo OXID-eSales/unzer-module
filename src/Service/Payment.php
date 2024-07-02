@@ -38,6 +38,7 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 class Payment
 {
     public const STATUS_OK = "OK";
+    public const STATUS_CANCELED = "CANCELED";
     public const STATUS_NOT_FINISHED = "NOT_FINISHED";
     public const STATUS_ERROR = "ERROR";
 
@@ -178,6 +179,10 @@ class Payment
 
         if (is_null($sessionUnzerPayment)) {
             return $result;
+        }
+
+        if ($sessionUnzerPayment->getState() === \UnzerSDK\Constants\PaymentState::STATE_CANCELED) {
+            return self::STATUS_CANCELED;
         }
 
         $transaction = $sessionUnzerPayment->getInitialTransaction();

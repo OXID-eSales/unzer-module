@@ -134,14 +134,12 @@ class TmpOrder extends BaseModel
             ->select('*')
             ->from('oscunzertmporder')
             ->where('oxorderid = :oxorderid')
-            ->andWhere('status = "NOT_FINISHED"')
             ->orderBy('timestamp', 'ASC')
             ->setParameters(
                 ['oxorderid' => $oxSessionOrderId]
             );
         /** @var Result $blocksData */
-        $blocksData = $queryBuilder->execute();
-        $result = is_a($blocksData, Result::class) ? $blocksData->fetchAssociative() : false;
+        $result = $queryBuilder->execute()->fetchAssociative();
 
         if (is_array($result) && isset($result['TMPORDER']) && is_string($result['TMPORDER'])) {
             $tmpOrder = $result['TMPORDER'];
