@@ -6,7 +6,6 @@
  */
 
 declare(strict_types=1);
-declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
@@ -24,6 +23,7 @@ use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Interfaces\UnzerParentInterface;
 use UnzerSDK\Resources\Basket as UnzerResourceBasket;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
@@ -91,7 +91,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     /**
      * @return BasePaymentType
      */
-    abstract public function getUnzerPaymentTypeObject(): BasePaymentType;
+    abstract public function getUnzerPaymentTypeObject(): UnzerParentInterface;
 
     /**
      *
@@ -112,7 +112,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $session = Registry::getSession();
         $paymentType = $this->getUnzerPaymentTypeObject();
         //payment type here is saved payment
-        if ($paymentType instanceof Paypal) {
+        if ($paymentType instanceof UnzerSDKPaymentTypePaypal) {
             $this->setPaypalPaymentDataId($request, $paymentType);
             $session->setVariable('oscunzersavepayment_paypal', true);
         }
@@ -148,7 +148,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $userModel->save();
         }
 
-        if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal) {
+        if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof UnzerSDKPaymentTypePaypal) {
             $savePayment = $request->getRequestParameter('oscunzersavepayment');
             if ($savePayment && $this->existsInSavedPaymentsList($userModel)) {
                 $savePayment = false;
@@ -322,7 +322,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
                     }
                 }
                 if (
-                    ($currentPaymentType instanceof Paypal) &&
+                    ($currentPaymentType instanceof UnzerSDKPaymentTypePaypal) &&
                     $this->arePayPalAccountsEqual($currentPaymentType, $savedPayment)
                 ) {
                     return true;
@@ -347,7 +347,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         return false;
     }
 
-    private function arePayPalAccountsEqual(Paypal $currentPaymentType, array $savedPayment): bool
+    private function arePayPalAccountsEqual(UnzerSDKPaymentTypePaypal $currentPaymentType, array $savedPayment): bool
     {
         foreach ($savedPayment as $paypalAccount) {
             if ($currentPaymentType->getEmail() === $paypalAccount['email']) {
@@ -389,7 +389,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         Customer $customer,
         UnzerResourceBasket $uzrBasket
     ): AbstractTransactionType {
-        if ($paymentType instanceof Paypal) {
+        if ($paymentType instanceof UnzerSDKPaymentTypePaypal) {
             return $paymentType->{$paymentProcedure}(
                 $price,
                 $basketModel->getBasketCurrency()->name,

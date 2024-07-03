@@ -139,7 +139,7 @@ class Transaction extends BaseModel
      */
     private function getRawField(string $sFieldName): ?string
     {
-        $sLongFieldName = $this->_getFieldLongName($sFieldName);
+        $sLongFieldName = $this->getFieldLongName($sFieldName);
 
         if (isset($this->{$sLongFieldName})) {
             $fieldData = $this->{$sLongFieldName};

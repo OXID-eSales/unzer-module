@@ -20,10 +20,10 @@ class PayPal extends UnzerPayment
     protected bool $needPending = true;
 
     /**
-     * @return BasePaymentType
+     * @return \UnzerSDK\Interfaces\UnzerParentInterface
      * @throws UnzerApiException
      */
-    public function getUnzerPaymentTypeObject(): BasePaymentType
+    public function getUnzerPaymentTypeObject(): \UnzerSDK\Interfaces\UnzerParentInterface
     {
         return $this->unzerSDK->createPaymentType(
             new UnzerPaypal()

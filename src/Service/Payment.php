@@ -11,6 +11,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrderModel;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -110,7 +111,7 @@ class Payment
             );
 
             $oOrder = oxNew(Order::class);
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var UnzerOrderModel $oOrder */
             $oOrder->createTmpOrder($basket, $user, $paymentExtension->getUnzerOrderId());
 
             $paymentExtension->execute(
@@ -223,7 +224,7 @@ class Payment
     public function getUnzerOrderId(): string
     {
         $result = '';
-        $sessionUnzerPayment = $this->getSessionUnzerPayment();
+        $sessionUnzerPayment = $this->getSessionUnzerPayment(true);
         if ($sessionUnzerPayment) {
             $transaction = $sessionUnzerPayment->getInitialTransaction();
             if ($transaction) {
@@ -251,10 +252,10 @@ class Payment
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getSessionUnzerPayment(bool $noCache = false): ?UnzerPayment
+    public function getSessionUnzerPayment(bool $cache): ?UnzerPayment
     {
         $result = null;
-        if ($noCache === false) {
+        if ($cache === true) {
             if ($this->sessionUnzerPayment instanceof UnzerPayment) {
                 return $this->sessionUnzerPayment;
             }
@@ -354,18 +355,11 @@ class Payment
     }
 
     /**
-     * @param Order $oOrder
-     * @param string $unzerid
-     * @param string $chargeid
-     * @param float $amount
-     * @param string $reason
-     * @return UnzerApiException|bool
-     *
      * @throws \Exception
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function doUnzerCancel(
-        Order $oOrder,
+        UnzerOrderModel $oOrder,
         string $unzerid,
         string $chargeid,
         float $amount,
@@ -399,7 +393,7 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param UnzerOrderModel|null $oOrder
      * @param string $unzerid
      * @param float $amount
      * @return \Exception|bool|\UnzerSDK\Exceptions\UnzerApiException
@@ -448,7 +442,7 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param UnzerOrderModel|null $oOrder
      * @param string $unzerid
      * @param float $amount
      * @return UnzerApiException|bool
@@ -480,7 +474,7 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param UnzerOrderModel|null $oOrder
      * @param string $sPaymentId
      * @return UnzerApiException|bool
      *

@@ -203,8 +203,6 @@ class Transaction
 
     protected function saveTransaction(array $params, Order $oOrder): bool
     {
-        $result = false;
-
         $transaction = $this->getNewTransactionObject();
 
         //check if metadata exists
