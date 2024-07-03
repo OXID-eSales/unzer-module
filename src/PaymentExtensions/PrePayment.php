@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -13,9 +15,9 @@ use UnzerSDK\Resources\PaymentTypes\Prepayment as UnzerPrepayment;
 
 class PrePayment extends UnzerPayment
 {
-    protected $paymentMethod = 'prepayment';
+    protected string $paymentMethod = 'prepayment';
 
-    protected $allowedCurrencies = ['EUR'];
+    protected array $allowedCurrencies = ['EUR'];
 
     /**
      * @return BasePaymentType

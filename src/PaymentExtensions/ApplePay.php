@@ -5,20 +5,21 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class ApplePay extends UnzerPayment
 {
-    protected $paymentMethod = 'applepay';
+    protected string $paymentMethod = 'applepay';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
-    protected $ajaxResponse = true;
+    protected bool $ajaxResponse = true;
 
     /**
-     * @return BasePaymentType
      * @throws \Exception
      */
     public function getUnzerPaymentTypeObject(): BasePaymentType

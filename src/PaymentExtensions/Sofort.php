@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -13,11 +15,11 @@ use UnzerSDK\Resources\PaymentTypes\Sofort as UnzerSofort;
 
 class Sofort extends UnzerPayment
 {
-    protected $paymentMethod = 'sofort';
+    protected string $paymentMethod = 'sofort';
 
-    protected $allowedCurrencies = ['EUR'];
+    protected array $allowedCurrencies = ['EUR'];
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

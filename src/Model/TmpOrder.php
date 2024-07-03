@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use Doctrine\DBAL\Driver\Exception as DBALException;

@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -17,9 +19,9 @@ use OxidEsales\Eshop\Core\Registry;
 
 class Invoice extends UnzerPayment
 {
-    protected $paymentMethod = 'paylater-invoice';
+    protected string $paymentMethod = 'paylater-invoice';
 
-    protected $allowedCurrencies = ['EUR', 'CHF'];
+    protected array $allowedCurrencies = ['EUR', 'CHF'];
 
     /**
      * @return BasePaymentType

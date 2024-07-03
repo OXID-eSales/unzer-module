@@ -5,6 +5,7 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -12,9 +13,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Ideal extends UnzerPayment
 {
-    protected $paymentMethod = 'ideal';
+    protected string $paymentMethod = 'ideal';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

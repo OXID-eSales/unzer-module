@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -13,10 +15,8 @@ use UnzerSDK\Resources\PaymentTypes\Invoice;
 
 class InvoiceOld extends UnzerPayment
 {
-    protected $paymentMethod = 'invoice';
-
-    protected $allowedCurrencies = ['EUR', 'CHF'];
-
+    protected string $paymentMethod = 'invoice';
+    protected array $allowedCurrencies = ['EUR', 'CHF'];
     /**
      * @return BasePaymentType
      * @throws UnzerApiException

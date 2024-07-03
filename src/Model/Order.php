@@ -360,7 +360,7 @@ class Order extends Order_parent
      */
     public function setFieldData($fieldName, $value, $dataType = Field::T_TEXT)
     {
-        return parent::_setFieldData($fieldName, $value, $dataType);
+        return parent::setFieldData($fieldName, $value, $dataType);
     }
 
     private function setTmpOrderStatus(string $unzerOrderId, string $status): void
