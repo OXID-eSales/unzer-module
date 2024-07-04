@@ -445,7 +445,7 @@ class Transaction
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public function getPaymentIdByOrderId(string $orderid)
+    public function getPaymentIdByOrderId(string $orderid): string
     {
         $result = '';
 
@@ -453,6 +453,23 @@ class Transaction
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
                 WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback', 'canceled')",
+                [$orderid]
+            );
+
+            $result = $rows[0]['TYPEID'];
+        }
+
+        return $result;
+    }
+
+    public function getPaymentIdByOrderIdForAdmin(string $orderid): string
+    {
+        $result = '';
+
+        if ($orderid) {
+            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
+                "SELECT DISTINCT TYPEID FROM oscunzertransaction
+                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback')",
                 [$orderid]
             );
 

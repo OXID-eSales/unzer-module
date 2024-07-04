@@ -85,8 +85,8 @@ class AdminOrderController extends AdminDetailsController
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             $orderId = $this->getEditObjectId();
-            $paymentId = $transactionService->getPaymentIdByOrderId($orderId); //somthesing like s-chg-XXXX
-            $this->sTypeId = $paymentId; /** may@throws \TypeError if $paymentId due to wrong payment cancellation */
+            $paymentId = $transactionService->getPaymentIdByOrderIdForAdmin($orderId); //somthesing like s-chg-XXXX
+            $this->sTypeId = $paymentId;
             $this->_aViewData['sTypeId'] = $this->sTypeId;
             if ($this->sTypeId) {
                 $this->getUnzerViewData($sPaymentId, $this->sTypeId);
@@ -374,8 +374,15 @@ class AdminOrderController extends AdminDetailsController
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
         /** @var string $chargeid */
         $chargeid = Registry::getRequest()->getRequestParameter('chargeid');
-        /** @var float $amount */
-        $amount = Registry::getRequest()->getRequestParameter('amount');
+        $amountMixed = Registry::getRequest()->getRequestParameter('amount');
+
+        if (is_string($amountMixed)) {
+            $amount = $this->normalizeNumber($amountMixed);
+        } elseif (is_float($amountMixed)) {
+            $amount = $amountMixed;
+        } else {
+            return; //should be an error shown/logged to the admin frontend?
+        }
         /** @var float $fCharged */
         $fCharged = Registry::getRequest()->getRequestParameter('chargedamount');
         /** @var string $reason */
@@ -539,5 +546,24 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $fCancelled;
+    }
+
+    private function normalizeNumber(string $input): float
+    {
+        $input = str_replace(' ', '', $input);
+        $lastCommaPos = strrpos($input, ',');
+
+        if ($lastCommaPos !== false) {
+            if (strpos($input, '.', $lastCommaPos) !== false) {
+                $number = str_replace(',', '', $input);
+            } else {
+                $number = substr_replace($input, '.', $lastCommaPos, 1);
+                $number = str_replace(',', '', $number);
+            }
+        } else {
+            $number = $input;
+        }
+
+        return (float)$number;
     }
 }
