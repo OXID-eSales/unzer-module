@@ -21,7 +21,7 @@ final class WeChatPayCest extends BaseCest
 {
     private $wechatpayPaymentLabel = "//label[@for='payment_oscunzer_wechatpay']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_wechatpay'];
     }
@@ -30,10 +30,10 @@ final class WeChatPayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group WechatpayPaymentTest
      */
-    private function _prepareWechatpayTest(AcceptanceTester $I)
+    private function prepareWechatpayTest(AcceptanceTester $I)
     {
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->wechatpayPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->wechatpayPaymentLabel);
         $orderPage->submitOrder();
     }
 
@@ -41,9 +41,9 @@ final class WeChatPayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group WechatpayPaymentTest
      */
-    private function _checkWechatpayPayment(int $methodNumber)
+    private function checkWechatpayPayment(int $methodNumber)
     {
-        $price = str_replace(',', '.', $this->_getPrice());
+        $price = str_replace(',', '.', $this->getPrice());
         $wechatpayClientData = Fixtures::get('wechatpay_client');
         $WechatpayPage = new LocalPaymentMethodsSimulatorPage($this->I);
 
@@ -51,7 +51,7 @@ final class WeChatPayCest extends BaseCest
         $WechatpayPage->choosePaymentMethod($methodNumber);
         $WechatpayPage->paymentSuccessful($price);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 
     /**
@@ -61,8 +61,8 @@ final class WeChatPayCest extends BaseCest
     public function checkWalletBalancePaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test WeChatPay Wallet Balance payment works');
-        $this->_prepareWechatpayTest($I);
-        $this->_checkWechatpayPayment(1);
+        $this->prepareWechatpayTest($I);
+        $this->checkWechatpayPayment(1);
     }
 
     /**
@@ -72,8 +72,8 @@ final class WeChatPayCest extends BaseCest
     public function checkSomeLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test WeChatPay Some LPM payment works');
-        $this->_prepareWechatpayTest($I);
-        $this->_checkWechatpayPayment(2);
+        $this->prepareWechatpayTest($I);
+        $this->checkWechatpayPayment(2);
     }
 
     /**
@@ -83,8 +83,8 @@ final class WeChatPayCest extends BaseCest
     public function checkAnotherLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test WeChatPay Another LPM Wechatpay payment works');
-        $this->_prepareWechatpayTest($I);
-        $this->_checkWechatpayPayment(3);
+        $this->prepareWechatpayTest($I);
+        $this->checkWechatpayPayment(3);
     }
 
     /**
@@ -94,7 +94,7 @@ final class WeChatPayCest extends BaseCest
     public function checkOneMoreLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test WeChatPay One more LPM Wechatpay payment works');
-        $this->_prepareWechatpayTest($I);
-        $this->_checkWechatpayPayment(4);
+        $this->prepareWechatpayTest($I);
+        $this->checkWechatpayPayment(4);
     }
 }

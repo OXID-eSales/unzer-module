@@ -18,10 +18,10 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class SEPADirectDebitSecuredCest extends BaseCest
 {
-    private $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa-secured']";
-    private $IBANInput = "//input[contains(@id, 'unzer-iban-input')]";
+    private string $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa-secured']";
+    private string $IBANInput = "//input[contains(@id, 'unzer-iban-input')]";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_sepa-secured'];
     }
@@ -31,11 +31,11 @@ final class SEPADirectDebitSecuredCest extends BaseCest
      * @param AcceptanceTester $I
      * @group SEPADirectSecuredPaymentTest
      */
-    public function _checkPaymentWorks(AcceptanceTester $I)
+    public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test SEPA Direct Debit payment works');
-        $this->_initializeSecuredTest();
-        $orderPage = $this->_choosePayment($this->sepaPaymentLabel);
+        $this->initializeSecuredTest();
+        $orderPage = $this->choosePayment($this->sepaPaymentLabel);
 
         $payment = Fixtures::get('sepa_payment');
         $I->fillField($this->IBANInput, $payment['IBAN']);
@@ -44,6 +44,6 @@ final class SEPADirectDebitSecuredCest extends BaseCest
 
         $orderPage->submitOrder();
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

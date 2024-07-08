@@ -18,17 +18,17 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class PISCest extends BaseCest
 {
-    private $pisLabel = "//label[@for='payment_oscunzer_pis']";
-    private $countrySelect = "//select[@id='XS2A-country_id']";
-    private $banknameInput = "//input[@id='XS2A-bank_code']";
-    private $banknameOptionDiv = "//div[@class='xs2a-completion-result']";
-    private $continueButton = "//button[@class='xs2a-submit']";
-    private $usernameInput = "//input[@id='XS2A-USER_NAME']";
-    private $userpinInput = "//input[@id='XS2A-USER_PIN']";
-    private $usertanInput = "//input[@id='XS2A-TAN']";
-    private $finishButton = "//a[@class='ui blue button back-btn']";
+    private string $pisLabel = "//label[@for='payment_oscunzer_pis']";
+    private string $countrySelect = "//select[@id='XS2A-country_id']";
+    private string $banknameInput = "//input[@id='XS2A-bank_code']";
+    private string $banknameOptionDiv = "//div[@class='xs2a-completion-result']";
+    private string $continueButton = "//button[@class='xs2a-submit']";
+    private string $usernameInput = "//input[@id='XS2A-USER_NAME']";
+    private string $userpinInput = "//input[@id='XS2A-USER_PIN']";
+    private string $usertanInput = "//input[@id='XS2A-TAN']";
+    private string $finishButton = "//a[@class='ui blue button back-btn']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_pis'];
     }
@@ -43,18 +43,18 @@ final class PISCest extends BaseCest
      * @param AcceptanceTester $I
      * @group PisPaymentTest
      */
-    public function _checkPaymentWorks(AcceptanceTester $I)
+    public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test PIS payment works');
 
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->pisLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->pisLabel);
         $orderPage->submitOrder();
 
         $pisPaymentData = Fixtures::get('pis_payment');
 
         // first page : choose bank
-        $I->waitForText($this->_getPrice());
+        $I->waitForText($this->getPrice());
         $I->waitForElement($this->countrySelect);
         $I->selectOption($this->countrySelect, "DE");
         $I->waitForElement($this->banknameInput);
@@ -80,6 +80,6 @@ final class PISCest extends BaseCest
         $I->waitForElement($this->finishButton);
         $I->click($this->finishButton);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

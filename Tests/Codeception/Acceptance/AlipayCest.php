@@ -20,12 +20,12 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimula
  */
 final class AlipayCest extends BaseCest
 {
-    private $alipayPaymentLabel = "//label[@for='payment_oscunzer_alipay']";
+    private string $alipayPaymentLabel = "//label[@for='payment_oscunzer_alipay']";
 
     /**
      * @return string
      */
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_alipay'];
     }
@@ -34,10 +34,10 @@ final class AlipayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group AlipayPaymentTest
      */
-    private function _prepareAlipayTest(AcceptanceTester $I)
+    private function prepareAlipayTest(AcceptanceTester $I)
     {
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->alipayPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->alipayPaymentLabel);
         $orderPage->submitOrder();
     }
 
@@ -45,9 +45,9 @@ final class AlipayCest extends BaseCest
      * @param AcceptanceTester $I
      * @group AlipayPaymentTest
      */
-    private function _checkAlipayPayment(int $methodNumber)
+    private function checkAlipayPayment(int $methodNumber)
     {
-        $price = str_replace(',', '.', $this->_getPrice());
+        $price = str_replace(',', '.', $this->getPrice());
         $alipayClientData = Fixtures::get('alipay_client');
         $alipayPage = new LocalPaymentMethodsSimulatorPage($this->I);
 
@@ -55,7 +55,7 @@ final class AlipayCest extends BaseCest
         $alipayPage->choosePaymentMethod($methodNumber);
         $alipayPage->paymentSuccessful($price);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 
     /**
@@ -65,8 +65,8 @@ final class AlipayCest extends BaseCest
     public function checkWalletBalancePaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Alipay Wallet Balance payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(1);
+        $this->prepareAlipayTest($I);
+        $this->checkAlipayPayment(1);
     }
 
     /**
@@ -76,8 +76,8 @@ final class AlipayCest extends BaseCest
     public function checkSomeLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Alipay Some LPM payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(2);
+        $this->prepareAlipayTest($I);
+        $this->checkAlipayPayment(2);
     }
 
     /**
@@ -87,8 +87,8 @@ final class AlipayCest extends BaseCest
     public function checkAnotherLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Alipay Another LPM Alipay payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(3);
+        $this->prepareAlipayTest($I);
+        $this->checkAlipayPayment(3);
     }
 
     /**
@@ -98,7 +98,7 @@ final class AlipayCest extends BaseCest
     public function checkOneMoreLPMPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Alipay One more LPM Alipay payment works');
-        $this->_prepareAlipayTest($I);
-        $this->_checkAlipayPayment(4);
+        $this->prepareAlipayTest($I);
+        $this->checkAlipayPayment(4);
     }
 }
