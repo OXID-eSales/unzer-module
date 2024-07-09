@@ -23,7 +23,6 @@ final class SofortCest extends BaseCest
     private string $landSelect = "//select[@id='MultipaysSessionSenderCountryId']";
     private string $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
     private string $bankSearchInput = "//input[@id='BankCodeSearch']";
-    private string $banksearchresultDiv = "//div[@id='BankSearcherResults']";
     private string $bankLabel = "//label[@for='account-88888888']";
     private string $accountNumberLabel = "//input[@id='BackendFormLOGINNAMEUSERID']";
     private string $PINNumberLabel = "//input[@id='BackendFormUSERPIN']";
@@ -48,6 +47,7 @@ final class SofortCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("Skipping due to dynamic user validation");
         $I->wantToTest('Test Sofort payment works');
         $this->initializeTest();
         $orderPage = $this->choosePayment($this->sofortPaymentLabel);

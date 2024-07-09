@@ -33,6 +33,7 @@ final class SEPADirectDebitSecuredCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped('Skipping this test - payment removed');
         $I->wantToTest('Test SEPA Direct Debit payment works');
         $this->initializeSecuredTest();
         $orderPage = $this->choosePayment($this->sepaPaymentLabel);

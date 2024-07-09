@@ -34,6 +34,7 @@ final class InvoiceCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("This payment method is deprecated and will be removed in the future");
         $I->wantToTest('Test Invoice (old) payment works');
         $this->initializeTest();
         $orderPage = $this->choosePayment($this->invoicePaymentLabel);

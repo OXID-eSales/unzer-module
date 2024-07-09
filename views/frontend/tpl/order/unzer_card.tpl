@@ -114,8 +114,6 @@
     if (savedCardsTableElement.length) {
         cardsCount = parseInt($('input[name=savedCardsCount]').attr('value'), 10);
     }
-    console.log(cardsCount);
-    console.log(savedCardsTableElement);
     if (newCardCheckbox.length === 0 || cardsCount === 0) {
          let hiddenInput4 = $(document.createElement('input'))
                         .attr('type', 'hidden')
@@ -193,7 +191,6 @@
                         .val(1);
 
         $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput4);
-        console.log( $('#orderConfirmAgbBottom').find(".hidden"));
         $('#orderConfirmAgbBottom' ).addClass("submitable");
         $('#orderConfirmAgbBottom').submit();
     });
