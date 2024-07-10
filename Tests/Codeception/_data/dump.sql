@@ -41,10 +41,10 @@ REPLACE INTO `oxuser` SET
 
 REPLACE INTO `oxcounters` SET
     OXIDENT = 'oxOrder',
-    OXCOUNT = 747,
+    OXCOUNT = 10001,
     OXTIMESTAMP = '2024-05-13 12:04:58';
 
 REPLACE INTO `oxcounters` SET
     OXIDENT = 'oxUnzerOrder',
-    OXCOUNT = 420,
+    OXCOUNT = 5001,
     OXTIMESTAMP = '2024-05-13 12:04:58';

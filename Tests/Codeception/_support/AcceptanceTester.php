@@ -50,4 +50,24 @@ class AcceptanceTester extends \Codeception\Actor
 
         return $homePage;
     }
+
+    public function retryClick($link, $context = null)
+    {
+        $I = $this;
+        $retryNum = 3; // Number of retries
+        $retryInterval = 1000; // Interval in milliseconds
+
+        for ($i = 0; $i < $retryNum; $i++) {
+            try {
+                $I->waitForElementClickable($link, $context);
+                $I->click($link, $context);
+                return;
+            } catch (\Exception $e) {
+                if ($i == $retryNum - 1) {
+                    throw $e;
+                }
+                usleep($retryInterval * 1000); // Convert to microseconds
+            }
+        }
+    }
 }
