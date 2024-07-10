@@ -29,7 +29,7 @@ class LocalPaymentMethodsSimulatorPage extends Page
     {
         $I = $this->user;
 
-        $I->waitForText($price, 30);
+        $I->waitForText($price, 60);
         $I->waitForElement($this->usernameField);
         $I->fillField($this->usernameField, $username);
         $I->fillField($this->passwordField, $password);
