@@ -127,7 +127,7 @@ final class SavePaymentCCPPCest extends BaseCest
         }
 
         // login page
-        $I->waitForDocumentReadyState();
+        $I->wait(30);
         $I->waitForElement($this->loginInput);
         $I->fillField($this->loginInput, $paypalPaymentData['username']);
         $I->fillField($this->passwordInput, $paypalPaymentData['password']);
@@ -135,11 +135,11 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->click($this->loginButton);
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
 
-        $I->waitForDocumentReadyState();
+        $I->wait(30);
         $I->waitForText($this->getPrice());
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
-        $I->waitForDocumentReadyState();
+        $I->wait(30);
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
         $I->wait(10);
 
@@ -185,11 +185,11 @@ final class SavePaymentCCPPCest extends BaseCest
         }
 
         // login page
-        $I->waitForDocumentReadyState();
+        $I->wait(30);
         $I->waitForElement($this->loginInput);
         $I->fillField($this->loginInput, $paypalPaymentData['username']);
         $I->fillField($this->passwordInput, $paypalPaymentData['password']);
-        $I->waitForDocumentReadyState();
+        $I->wait(30);
         $I->click($this->loginButton);
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
 
@@ -197,7 +197,7 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->waitForText($this->getPrice());
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
-        $I->waitForDocumentReadyState();
+        $I->wait(30);
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
         $I->wait(10);
 

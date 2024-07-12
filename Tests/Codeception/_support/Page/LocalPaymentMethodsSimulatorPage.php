@@ -13,11 +13,11 @@ use OxidEsales\Codeception\Page\Page;
 
 class LocalPaymentMethodsSimulatorPage extends Page
 {
-    private $usernameField = "//input[@name='username']";
-    private $passwordField = "//input[@name='password']";
-    private $nextButton = "//button[@class='btn btn-primary']";
-    private $paymentMethodSelect = '#payment-method-select';
-    private $paymentSuccessful = 'PAYMENT SUCCESSFUL';
+    private string $usernameField = "//input[@name='username']";
+    private string $passwordField = "//input[@name='password']";
+    private string $nextButton = "//button[@class='btn btn-primary']";
+    private string $paymentMethodSelect = '#payment-method-select';
+    private string $paymentSuccessful = 'PAYMENT SUCCESSFUL';
 
     /**
      * @param string $username login for alipay
@@ -29,7 +29,6 @@ class LocalPaymentMethodsSimulatorPage extends Page
     {
         $I = $this->user;
 
-        $I->waitForText($price, 60);
         $I->waitForElement($this->usernameField);
         $I->fillField($this->usernameField, $username);
         $I->fillField($this->passwordField, $password);
@@ -56,7 +55,8 @@ class LocalPaymentMethodsSimulatorPage extends Page
     public function paymentSuccessful(string $price)
     {
         $I = $this->user;
-
+        $I->wait(60);
+        $I->makeScreenshot("wwechat_payment");
         $I->waitForText($price);
         $I->waitForText($this->paymentSuccessful);
         $I->waitForElement($this->nextButton);

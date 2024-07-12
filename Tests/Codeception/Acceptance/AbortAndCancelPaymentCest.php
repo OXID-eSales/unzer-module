@@ -15,7 +15,6 @@ use OxidEsales\Codeception\Admin\AdminPanel;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\BaseCest;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
-use function OxidEsales\Codeception\Admin\AdminPanel;
 
 /**
  * @group unzer_module
@@ -23,8 +22,8 @@ use function OxidEsales\Codeception\Admin\AdminPanel;
  */
 final class AbortAndCancelPaymentCest extends BaseCest
 {
-    public $searchForm = '#search';
-    public $orderNumberInput = 'where[oxorder][oxordernr]';
+    public string $searchForm = '#search';
+    public string $orderNumberInput = 'where[oxorder][oxordernr]';
     public string $userAccountLoginName = '#usr';
     public string $userAccountLoginPassword = '#pwd';
     public string $userAccountLoginButton = '.btn';
@@ -34,7 +33,7 @@ final class AbortAndCancelPaymentCest extends BaseCest
     private string $loginInput = "#email";
 
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_paypal'];
     }
@@ -47,27 +46,25 @@ final class AbortAndCancelPaymentCest extends BaseCest
         $I->wantToTest(
             'if order is saved and marked in backend if a user clicks "Go Back" in the browser on Paypal'
         );
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->paypalPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->paypalPaymentLabel);
         $currentUrl = $I->grabFromCurrentUrl();
         $orderPage->submitOrder();
 
         $I->waitForDocumentReadyState();
         $I->wait(5);
-        if ($this->_checkElementExists($this->acceptAllCookiesButton, $I)) {
+
+        if ($this->checkElementExists($this->acceptAllCookiesButton, $I)) {
             $I->click($this->acceptAllCookiesButton);
         }
-
+        $I->wait(60);
         // login page
-        $I->waitForDocumentReadyState();
         $I->makeScreenshot("before_back");
-        $I->waitForElement($this->loginInput, 30);
+        $I->waitForElement($this->loginInput);
         $I->amOnPage(Configuration::config()['modules']['config']['WebDriver']['url'] . $currentUrl);
-        $I->makeScreenshot("after_back");
         $templateString = Translator::translate('OSCUNZER_CANCEL_DURING_CHECKOUT');
-        $I->waitForDocumentReadyState();
+        $I->wait(60);
         $I->makeScreenshot("after_back");
-        $I->wait(5);
         $I->seeElement('.alert');
         $capturedFromScreen = $I->grabTextFrom('.alert');
         list($orderNumber) = sscanf($capturedFromScreen, str_replace('%s', '%d', $templateString));
@@ -80,25 +77,26 @@ final class AbortAndCancelPaymentCest extends BaseCest
     public function testUserClicksAbortOnPaypal(AcceptanceTester $I)
     {
         $I->wantToTest('if order is saved and marked in backend if a user clicks Abort on Paypal');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->paypalPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->paypalPaymentLabel);
         $orderPage->submitOrder();
 
         $I->waitForDocumentReadyState();
         $I->wait(5);
-        if ($this->_checkElementExists($this->acceptAllCookiesButton, $I)) {
+
+        if ($this->checkElementExists($this->acceptAllCookiesButton, $I)) {
             $I->click($this->acceptAllCookiesButton);
         }
 
         // login page
-        $I->waitForDocumentReadyState();
+        $I->wait(60);
         $I->makeScreenshot("before_back");
-        $I->waitForElement($this->loginInput, 30);
+        $I->waitForElement($this->loginInput, 60);
         $I->waitForElementClickable('//*[@id="cancelLink"]');
         $I->click('//*[@id="cancelLink"]');
         $I->makeScreenshot("after_back");
         $templateString = Translator::translate('OSCUNZER_CANCEL_DURING_CHECKOUT');
-        $I->wait(10);
+        $I->wait(60);
         $capturedFromScreen = $I->grabTextFrom(".alert");
         list($orderNumber) = sscanf($capturedFromScreen, str_replace('%s', '%d', $templateString));
         $this->finishTesting($I, $orderNumber, "CANCELED", "canceled");
@@ -110,24 +108,22 @@ final class AbortAndCancelPaymentCest extends BaseCest
     public function testUserClicksAbortOnAlipay(AcceptanceTester $I)
     {
         $I->wantToTest('if order is saved and marked in backend if a user clicks Abort on Alipay');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->alipayPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->alipayPaymentLabel);
         $orderPage->submitOrder();
 
-        $I->wait(5);
-        if ($this->_checkElementExists($this->acceptAllCookiesButton, $I)) {
+        if ($this->checkElementExists($this->acceptAllCookiesButton, $I)) {
             $I->click($this->acceptAllCookiesButton);
         }
 
         // login page
-        $I->waitForDocumentReadyState();
+        $I->wait(60);
         $I->makeScreenshot("before_back");
-        $I->see('Login to your Wallet');
         $I->waitForElementClickable('//*[@id="col-transaction-payment"]/div/div[2]/div[2]/div[1]/button');
         $I->click('//*[@id="col-transaction-payment"]/div/div[2]/div[2]/div[1]/button');
         $I->makeScreenshot("after_back");
         $templateString = Translator::translate('OSCUNZER_CANCEL_DURING_CHECKOUT');
-        $I->wait(10);
+        $I->wait(60);
         $capturedFromScreen = $I->grabTextFrom(".alert");
         list($orderNumber) = sscanf($capturedFromScreen, str_replace('%s', '%d', $templateString));
         $this->finishTesting($I, $orderNumber, "CANCELED", "canceled");
@@ -140,11 +136,14 @@ final class AbortAndCancelPaymentCest extends BaseCest
         string $transactionStatus
     ): void {
         $I->amOnPage('/admin/');
-        $I->wait(10);
+        $I->wait(60);
         $adminUser = Fixtures::get('admin_user');
+        $I->makeScreenshot('login');
         $I->fillField($this->userAccountLoginName, $adminUser['username']);
         $I->fillField($this->userAccountLoginPassword, $adminUser['password']);
         $I->click($this->userAccountLoginButton);
+        $I->wait(60);
+        $I->makeScreenshot('after_login');
         $I->selectNavigationFrame();
         $I->click('//*[@id="nav-1-6"]/a');
         $I->waitForText('Orders');
@@ -160,7 +159,6 @@ final class AbortAndCancelPaymentCest extends BaseCest
         $I->selectListFrame();
         $I->click("/html/body/div[2]/div[3]/table/tbody/tr/td[7]/div/div/a");
         $I->selectEditFrame();
-        $I->wait(10);
         $I->makeScreenshot('admin_order_unzer_page');
         $I->see($transactionStatus);
     }

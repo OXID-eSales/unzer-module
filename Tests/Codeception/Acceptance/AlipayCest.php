@@ -50,7 +50,8 @@ final class AlipayCest extends BaseCest
         $price = str_replace(',', '.', $this->getPrice());
         $alipayClientData = Fixtures::get('alipay_client');
         $alipayPage = new LocalPaymentMethodsSimulatorPage($this->I);
-
+        $this->I->wait(60);
+        $this->I->makeScreenshot("sc33");
         $alipayPage->login($alipayClientData['username'], $alipayClientData['password'], $price);
         $alipayPage->choosePaymentMethod($methodNumber);
         $alipayPage->paymentSuccessful($price);

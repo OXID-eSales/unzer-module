@@ -15,7 +15,6 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\Page\LocalPaymentMethodsSimula
 
 /**
  * @group unzer_module
- * @group SecondGroup
  */
 final class WeChatPayCest extends BaseCest
 {
@@ -45,9 +44,8 @@ final class WeChatPayCest extends BaseCest
     {
         $price = str_replace(',', '.', $this->getPrice());
         $weChatPayClientData = Fixtures::get('wechatpay_client');
+        $this->I->wait(30);
         $weChatPayPage = new LocalPaymentMethodsSimulatorPage($this->I);
-        $this->I->makeScreenshot("sc33");
-
         $weChatPayPage->login($weChatPayClientData['username'], $weChatPayClientData['password'], $price);
         $weChatPayPage->choosePaymentMethod($methodNumber);
         $weChatPayPage->paymentSuccessful($price);
