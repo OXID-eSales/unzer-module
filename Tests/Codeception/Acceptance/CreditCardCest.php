@@ -93,13 +93,11 @@ final class CreditCardCest extends BaseCest
         $this->_updateArticleStockAndFlag(15, 1);
         $this->_prepareCreditCardTest($I);
 
-        $this->_submitCreditCardPaymentAndSavePayment('mastercard_payment');
+        $this->_submitCreditCardPayment('mastercard_payment');
         $this->_checkCreditCardPayment();
     }
 
     /**
-     * @param AcceptanceTester $I
-     * @return void
      * @group CreditCardPaymentTest1
      */
     public function checkPaymentUsingMastercardWithLastStockItemWorks(AcceptanceTester $I)
@@ -129,7 +127,7 @@ final class CreditCardCest extends BaseCest
     /**
      * @param AcceptanceTester $I
      * @return void
-     * @group CreditCardPaymentTest
+     * @group CreditCardPaymentTest1
      */
     public function checkPaymentUsingVisaWithLastStockItemWorks(AcceptanceTester $I)
     {

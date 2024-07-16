@@ -147,9 +147,7 @@ class Payment
             );
         } catch (Exception $e) {
             throw new RedirectWithMessage(
-                $this->unzerService->prepareOrderRedirectUrl(
-                    $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
-                ),
+                $this->unzerService->prepareOrderRedirectUrl(false),
                 $e->getMessage()
             );
         }
