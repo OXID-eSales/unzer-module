@@ -142,8 +142,7 @@ class Unzer
         $oxmobfon = $oUser->getFieldData('oxmobfon');
         $customer->setMobile($oxmobfon);
 
-        /** @var string $customerId */
-        $customerId = $oUser->getFieldData('oxcustnr');
+        $customerId = (string)$oUser->getFieldData('oxcustnr');
         $customer->setCustomerId($customerId);
 
         $billingAddress = $customer->getBillingAddress();

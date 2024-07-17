@@ -345,13 +345,6 @@ class Payment
             if ($tmpOrder !== null) {
                 $paymentType = $tmpOrder->getFieldData('oxpaymenttype');
             }
-            try {
-                $result = $this->unzerSDKLoader->getUnzerSDK($customerType, $currency)->fetchPayment($paymentId);
-            } catch (UnzerApiException $e) {
-                Registry::getLogger()->warning(
-                    'Payment not found with key: ' . $paymentId
-                );
-            }
         }
 
         if (is_string($paymentType)) {

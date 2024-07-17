@@ -161,11 +161,6 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         return true;
     }
 
-    public function getUnzerOrderId(): string
-    {
-        return $this->unzerOrderId;
-    }
-
     /**
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
