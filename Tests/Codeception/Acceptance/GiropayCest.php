@@ -18,19 +18,19 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class GiropayCest extends BaseCest
 {
-    private $giropayPaymentLabel = "//label[@for='payment_oscunzer_giropay']";
-    private $banknameInput = "//input[@name='bic']";
-    private $banknameA = "//ul[@class='ui-menu ui-widget ui-widget-content ui-autocomplete ui-front']";
-    private $continueButton = "//button[@class='btn btn-primary']";
-    private $accountLabel = "//input[@name='userLogin']";
-    private $PINLabel = "//input[@name='userPIN']";
-    private $payNowButton = "//input[@value='Jetzt bezahlen']";
-    private $chooseTANLabel = "//input[@id='TV5']";
-    private $nextStepButton = "//input[@name='weiterButton' and @type='submit']";
-    private $TANLabel = "//input[@name='tan']";
-    private $yesButton = "//button[@id='yes']";
+    private string $giropayPaymentLabel = "//label[@for='payment_oscunzer_giropay']";
+    private string $banknameInput = "//input[@name='bic']";
+    private string $banknameA = "//ul[@class='ui-menu ui-widget ui-widget-content ui-autocomplete ui-front']";
+    private string $continueButton = "//button[@class='btn btn-primary']";
+    private string $accountLabel = "//input[@name='userLogin']";
+    private string $PINLabel = "//input[@name='userPIN']";
+    private string $payNowButton = "//input[@value='Jetzt bezahlen']";
+    private string $chooseTANLabel = "//input[@id='TV5']";
+    private string $nextStepButton = "//input[@name='weiterButton' and @type='submit']";
+    private string $TANLabel = "//input[@name='tan']";
+    private string $yesButton = "//button[@id='yes']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_giropay'];
     }
@@ -42,8 +42,8 @@ final class GiropayCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Giropay payment works');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->giropayPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->giropayPaymentLabel);
         $orderPage->submitOrder();
 
         $giropayPaymentData = Fixtures::get('giropay_payment');
@@ -64,12 +64,12 @@ final class GiropayCest extends BaseCest
 
         $I->waitForElement($this->continueButton);
         $I->click($this->continueButton);
-        $I->waitForText(str_replace(',', '.', $this->_getPrice()));
+        $I->waitForText(str_replace(',', '.', $this->getPrice()));
         $I->waitForElementClickable($this->continueButton);
         $I->wait(5);
         $I->click($this->continueButton);
         $I->wait(5);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

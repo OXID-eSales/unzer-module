@@ -22,8 +22,8 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class PaylaterInstallmentCest extends BaseCest
 {
-    private $paymentLabel = "//label[@for='payment_oscunzer_installment_paylater']";
-    protected function _getOXID(): array
+    private string $paymentLabel = "//label[@for='payment_oscunzer_installment_paylater']";
+    protected function getOXID(): array
     {
         return ['oscunzer_installment'];
     }
@@ -41,7 +41,7 @@ final class PaylaterInstallmentCest extends BaseCest
             ['oxcompany' => 'ACME'],
             ['oxid' => 'unzeruser']
         );
-        $this->_initializeTest();
+        $this->initializeTest();
 
         $I->cantSee($this->paymentLabel);
     }
@@ -59,7 +59,7 @@ final class PaylaterInstallmentCest extends BaseCest
             ['oxcompany' => ''],
             ['oxid' => 'unzeruser']
         );
-        $this->_initializeTest();
+        $this->initializeTest();
 
         $I->seeElement($this->paymentLabel);
     }

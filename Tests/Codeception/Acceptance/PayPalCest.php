@@ -11,6 +11,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
+use OxidEsales\Codeception\Step\Basket as BasketSteps;
 
 /**
  * @group unzer_module
@@ -18,28 +19,29 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class PayPalCest extends BaseCest
 {
-    private $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
-    private $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
-    private $loginInput = "#email";
-    private $passwordInput = "#password";
-    private $loginButton = "#btnLogin";
-    private $submitButton = "#payment-submit-btn";
-    private $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
+    private string $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
+    private string $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
+    private string $loginInput = "#email";
+    private string $passwordInput = "#password";
+    private string $loginButton = "#btnLogin";
+    private string $submitButton = "#payment-submit-btn";
+    private string $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_paypal'];
     }
 
     /**
-     * @param AcceptanceTester $I
+     * @group unzer_module
+     * @group SecondGroup
      * @group PaypalPaymentTest
      */
-    public function checkPaymentWorks(AcceptanceTester $I)
+    public function testPaymentWorksWithoutSaving(AcceptanceTester $I)
     {
         $I->wantToTest('Test PayPal payment works');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->paypalPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->paypalPaymentLabel);
         $orderPage->submitOrder();
 
         $paypalPaymentData = Fixtures::get('paypal_payment');
@@ -47,7 +49,7 @@ final class PayPalCest extends BaseCest
         // accept cookies
         $I->waitForDocumentReadyState();
         $I->wait(5);
-        if ($this->_checkElementExists($this->acceptAllCookiesButton, $I)) {
+        if ($this->checkElementExists($this->acceptAllCookiesButton, $I)) {
             $I->click($this->acceptAllCookiesButton);
         }
 
@@ -60,15 +62,15 @@ final class PayPalCest extends BaseCest
         $I->click($this->loginButton);
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
 
-        // card choose page
+        // paypal choose page
         $I->waitForDocumentReadyState();
-        $I->waitForText($this->_getPrice());
+        $I->waitForText($this->getPrice());
         $I->waitForElement($this->submitButton);
         $I->executeJS("document.getElementById('payment-submit-btn').click();");
         $I->waitForDocumentReadyState();
         $I->waitForElementNotVisible($this->globalSpinnerDiv, 60);
         $I->wait(10);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

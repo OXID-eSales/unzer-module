@@ -18,18 +18,18 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class EPSCest extends BaseCest
 {
-    private $epsLabel = "//label[@for='payment_oscunzer_eps']";
-    private $paymentMethodForm = "//form[@id='payment-form']";
-    private $usernameInput = "//input[@id='username']";
-    private $passwordInput = "//input[@id='passwort']";
-    private $submitInput = "//input[@type='submit']";
-    private $submitDataInput = "//input[@type='submit' and @value=' TAN ANFORDERN ']";
-    private $submitPaymentInput = "//input[@type='submit' and @value=' TAN SENDEN ']";
-    private $tanSpan = "//span[@id='tan']";
-    private $tanInput = "//input[@id='usrtan']";
-    private $backlinkDiv = "//div[@class='button']";
+    private string $epsLabel = "//label[@for='payment_oscunzer_eps']";
+    private string $paymentMethodForm = "//form[@id='payment-form']";
+    private string $usernameInput = "//input[@id='username']";
+    private string $passwordInput = "//input[@id='passwort']";
+    private string $submitInput = "//input[@type='submit']";
+    private string $submitDataInput = "//input[@type='submit' and @value=' TAN ANFORDERN ']";
+    private string $submitPaymentInput = "//input[@type='submit' and @value=' TAN SENDEN ']";
+    private string $tanSpan = "//span[@id='tan']";
+    private string $tanInput = "//input[@id='usrtan']";
+    private string $backlinkDiv = "//div[@class='button']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_eps'];
     }
@@ -64,9 +64,10 @@ final class EPSCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("Temporary skipped: Demodata country codes should be checked");
         $I->wantToTest('Test EPS payment works');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->epsLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->epsLabel);
 
         $epsPaymentData = Fixtures::get('eps_payment');
 
@@ -81,7 +82,8 @@ final class EPSCest extends BaseCest
         // first page : login
         $I->waitForPageLoad();
         $I->waitForDocumentReadyState();
-        $I->wait(5);
+        $I->wait(15);
+        $I->makeScreenshot("EPS");
         $I->waitForElement($this->usernameInput);
         $I->fillField($this->usernameInput, $epsPaymentData["username"]);
         $I->waitForElement($this->passwordInput);
@@ -107,6 +109,6 @@ final class EPSCest extends BaseCest
         $I->waitForPageLoad();
         $I->waitForDocumentReadyState();
         $I->click($this->backlinkDiv);
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

@@ -19,6 +19,14 @@ REPLACE INTO `oxuser` SET
     OXCREATE = '2021-02-05 14:42:42',
     OXREGISTER = '2021-02-05 14:42:42';
 
+UPDATE oxuser
+SET
+    oxcountryid = 'a7c40f631fc920687.20179984',
+    oxusername = 'admin@myoxideshop.com',
+    oxpassword = '6cb4a34e1b66d3445108cd91b67f98b9',
+    oxpasssalt = '6631386565336161636139613634663766383538633566623662613036636539'
+WHERE OXUSERNAME='admin';
+
 REPLACE INTO `oxuser` SET
     OXID = 'unzersecureuser',
     OXACTIVE = 1,
@@ -41,10 +49,10 @@ REPLACE INTO `oxuser` SET
 
 REPLACE INTO `oxcounters` SET
     OXIDENT = 'oxOrder',
-    OXCOUNT = 747,
+    OXCOUNT = 10001,
     OXTIMESTAMP = '2024-05-13 12:04:58';
 
 REPLACE INTO `oxcounters` SET
     OXIDENT = 'oxUnzerOrder',
-    OXCOUNT = 420,
+    OXCOUNT = 5001,
     OXTIMESTAMP = '2024-05-13 12:04:58';

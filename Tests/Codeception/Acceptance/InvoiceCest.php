@@ -18,9 +18,9 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class InvoiceCest extends BaseCest
 {
-    private $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice_old']";
+    private string $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice_old']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_invoice_old'];
     }
@@ -32,18 +32,19 @@ final class InvoiceCest extends BaseCest
      * @param AcceptanceTester $I
      * @group InvoicePaymentTest
      */
-    public function _checkPaymentWorks(AcceptanceTester $I)
+    public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("This payment method is deprecated and will be removed in the future");
         $I->wantToTest('Test Invoice (old) payment works');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->invoicePaymentLabel);
         $orderPage->submitOrder();
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
         $I->waitForText(rtrim(strip_tags(sprintf(
             Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->_getPrice(),
-            $this->_getCurrency()
+            $this->getPrice(),
+            $this->getCurrency()
         ))));
     }
 }

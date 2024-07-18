@@ -15,6 +15,7 @@ modules:
         restart: true
         capabilities:
             acceptInsecureCerts: true
+
     - Db:
         dsn: 'mysql:host=%DB_HOST%;dbname=%DB_NAME%;charset=utf8'
         user: '%DB_USERNAME%'
@@ -43,4 +44,4 @@ modules:
         depends: Db
     - \OxidEsales\Codeception\Module\Translation\TranslationsModule:
         shop_path: '%SHOP_SOURCE_PATH%'
-        paths: 'Application/views/flow,modules/osc/unzer/translations'
+        paths: 'Application/views/admin,Application/views/flow,modules/osc/unzer/translations'
