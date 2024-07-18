@@ -154,18 +154,9 @@ class OrderController extends OrderController_parent
 
             if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
-                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
 
                 if ($this->isPaymentCancelled($paymentService)) {
                     $this->cleanUpCancelledPayments();
-                }
-
-                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
-                    $paymentService->doUnzerCollect(
-                        $oOrder,
-                        $unzerPaymentId,
-                        (float)$oOrder->getTotalOrderSum()
-                    );
                 }
 
                 Registry::getSession()->deleteVariable('oscunzersavepayment');
