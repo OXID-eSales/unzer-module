@@ -27,140 +27,54 @@ final class CreditCardCest extends BaseCest
     private string $CVCInput = "//input[@id='card-ccv']";
     private string $toCompleteAuthentication = "Click here to complete authentication.";
     private string $confirmSavePayment = "#oscunzersavepayment";
-    private mixed $fixtures;
-
-    protected function _getOXID(): array
-    {
-        return ['oscunzer_card'];
-    }
+    private string $useSavedCardForPayment = '//*[@id="payment-saved-cards"]/table/tbody/tr/td[3]/input';
 
     /**
-     * @param AcceptanceTester $I
-     * @return void
+     * @group CreditCardPaymentTest
      */
-    private function _prepareCreditCardTest(AcceptanceTester $I)
-    {
-        $this->_initializeTest();
-    }
-
-    /**
-     * @param string $name Fixtures name
-     * @return void
-     */
-    private function _submitCreditCardPayment(string $name)
-    {
-        $orderPage = $this->_choosePayment($this->cardPaymentLabel);
-
-        $this->I->waitForPageLoad();
-        $this->finishCardSubmit($name);
-
-        $orderPage->submitOrder();
-    }
-
-    /**
-     * @return void
-     */
-    private function _checkCreditCardPayment()
-    {
-        $this->I->waitForText($this->toCompleteAuthentication, 60);
-        $this->I->click($this->toCompleteAuthentication);
-
-        $this->_checkSuccessfulPayment();
-    }
-
-    /**
-     * @param $stock int is oxarticles->OXSTOCK
-     * @param $flag int is oxarticles->OXSTOCKFLAG
-     * @return void
-     */
-    private function _updateArticleStockAndFlag($stock, $flag)
-    {
-        $article = Fixtures::get('product');
-        $this->I->updateInDatabase(
-            'oxarticles',
-            ['OXSTOCK' => $stock, 'OXSTOCKFLAG' => $flag],
-            ['OXID' => $article['id']]
-        );
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     * @group CreditCardPaymentTest1
-     */
-    public function checkPaymentUsingMastercardWorks(AcceptanceTester $I)
+    public function testPaymentUsingMastercardWorks(AcceptanceTester $I): void
     {
         $I->wantToTest('Test Credit Card payment using Mastercard works');
-        $this->_updateArticleStockAndFlag(15, 1);
-        $this->_prepareCreditCardTest($I);
-
-        $this->_submitCreditCardPayment('mastercard_payment');
-        $this->_checkCreditCardPayment();
+        $this->updateArticleStockAndFlag(15, 1);
+        $this->initializeTest();
+        $this->submitCreditCardPayment('mastercard_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**
-     * @group CreditCardPaymentTest1
-     */
-    public function checkPaymentUsingMastercardWithLastStockItemWorks(AcceptanceTester $I)
-    {
-        $I->wantToTest('Test Credit Card payment using Mastercard with last stock item works');
-        $this->_updateArticleStockAndFlag(1, 3);
-        $this->_prepareCreditCardTest($I);
-
-        $this->_submitCreditCardPayment('mastercard_payment');
-        $this->_checkCreditCardPayment();
-    }
-
-    /**
-     * @param AcceptanceTester $I
      * @group CreditCardPaymentTest
      */
-    public function checkPaymentUsingVisaWorks(AcceptanceTester $I)
+    public function testPaymentUsingMastercardWithLastStockItemWorks(AcceptanceTester $I): void
     {
-        $I->wantToTest('Test Credit Card payment using Visa works');
-        $this->_updateArticleStockAndFlag(15, 1);
-        $this->_prepareCreditCardTest($I);
-
-        $this->_submitCreditCardPayment('visa_payment');
-        $this->_checkCreditCardPayment();
+        $I->wantToTest('Credit Card payment using Mastercard with last stock item works');
+        $this->updateArticleStockAndFlag(1, 3);
+        $this->initializeTest();
+        $this->submitCreditCardPayment('mastercard_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**
-     * @param AcceptanceTester $I
-     * @return void
-     * @group CreditCardPaymentTest1
-     */
-    public function checkPaymentUsingVisaWithLastStockItemWorks(AcceptanceTester $I)
-    {
-        $I->wantToTest('Test Credit Card payment using Visa with last stock item works');
-        $this->_updateArticleStockAndFlag(1, 3);
-        $this->_prepareCreditCardTest($I);
-
-        $this->_submitCreditCardPayment('visa_payment');
-        $this->_checkCreditCardPayment();
-    }
-
-    /**
-     * @param AcceptanceTester $I
      * @group CreditCardPaymentTest
      */
-    public function checkPaymentUsingMaestroWorks(AcceptanceTester $I)
+    public function testPaymentUsingVisaWorks(AcceptanceTester $I): void
     {
-        $I->wantToTest('Test Credit Card payment using Maestro works');
+        $I->wantToTest('Credit Card payment using Visa works');
+        $this->updateArticleStockAndFlag(15, 1);
+        $this->initializeTest();
+        $this->submitCreditCardPayment('visa_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**
-     * @throws \Exception
+     * @group CreditCardPaymentTest
      */
-    private function _submitCreditCardPaymentAndSavePayment(string $string)
+    public function testPaymentUsingVisaWithLastStockItemWorks(AcceptanceTester $I): void
     {
-        $orderPage = $this->_choosePayment($this->cardPaymentLabel);
-
-        $this->I->waitForPageLoad();
-        $this->I->waitForElementClickable($this->confirmSavePayment);
-        $this->I->click($this->confirmSavePayment);
-        $this->finishCardSubmit($string);
-
-        $orderPage->submitOrder();
+        $I->wantToTest('Credit Card payment using Visa with last stock item works');
+        $this->updateArticleStockAndFlag(1, 3);
+        $this->initializeTest();
+        $this->submitCreditCardPayment('visa_payment');
+        $this->checkCreditCardPayment();
     }
 
     /**
@@ -180,5 +94,45 @@ final class CreditCardCest extends BaseCest
         $this->I->switchToIFrame($this->CVCIframe);
         $this->I->fillField($this->CVCInput, $fixtures['CVC']);
         $this->I->switchToFrame(null);
+    }
+
+    protected function getOXID(): array
+    {
+        return ['oscunzer_card'];
+    }
+
+    private function submitCreditCardPayment(string $name): void
+    {
+        $orderPage = $this->choosePayment($this->cardPaymentLabel);
+        $this->I->waitForPageLoad();
+        $this->finishCardSubmit($name);
+        $orderPage->submitOrder();
+    }
+
+    private function useSavedCardToPay(): void
+    {
+        $orderPage = $this->choosePayment($this->cardPaymentLabel);
+
+        $this->I->waitForPageLoad();
+        $this->I->click($this->useSavedCardForPayment);
+
+        $orderPage->submitOrder();
+    }
+
+    private function checkCreditCardPayment(): void
+    {
+        $this->I->waitForText($this->toCompleteAuthentication, 60);
+        $this->I->click($this->toCompleteAuthentication);
+        $this->checkSuccessfulPayment();
+    }
+
+    private function updateArticleStockAndFlag(int $stock, int $flag): void
+    {
+        $article = Fixtures::get('product');
+        $this->I->updateInDatabase(
+            'oxarticles',
+            ['OXSTOCK' => $stock, 'OXSTOCKFLAG' => $flag],
+            ['OXID' => $article['id']]
+        );
     }
 }

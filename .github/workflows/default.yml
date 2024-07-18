@@ -235,6 +235,7 @@ jobs:
             'FirstGroup',
             'SecondGroup',
             'ThirdGroup',
+            'WechatpayPaymentTest'
           ]
     needs: [ install_shop_with_module ]
     runs-on: ubuntu-latest

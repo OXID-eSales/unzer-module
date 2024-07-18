@@ -27,7 +27,7 @@
                         <input type="hidden" name="cl" value="unzer_saved_payments">
                         <input type="hidden" name="fnc" value="deletePayment">
                         <input type="hidden" name="paymenttypeid" value="[{$paymenttypeid}]">
-                        <button type="submit" class="btn btn-danger">[{oxmultilang ident="DD_DELETE"}]</button>
+                        <button type="submit" class="btn btn-danger" name="deletePayment">[{oxmultilang ident="DD_DELETE"}]</button>
                     </form>
                 </td>
             </tr>
@@ -108,8 +108,3 @@
     [{include file="page/account/inc/account_menu.tpl"}]
     [{/capture}]
 [{include file="layout/page.tpl" sidebar="Left"}]
-
-
-
-
-

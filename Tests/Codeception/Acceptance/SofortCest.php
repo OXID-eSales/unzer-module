@@ -19,19 +19,18 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class SofortCest extends BaseCest
 {
-    private $sofortPaymentLabel = "//label[@for='payment_oscunzer_sofort']";
-    private $landSelect = "//select[@id='MultipaysSessionSenderCountryId']";
-    private $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
-    private $bankSearchInput = "//input[@id='BankCodeSearch']";
-    private $banksearchresultDiv = "//div[@id='BankSearcherResults']";
-    private $bankLabel = "//label[@for='account-88888888']";
-    private $accountNumberLabel = "//input[@id='BackendFormLOGINNAMEUSERID']";
-    private $PINNumberLabel = "//input[@id='BackendFormUSERPIN']";
-    private $continueButton = "//button[@class='button-right primary has-indicator']";
-    private $kontoOptionInput = "//input[@id='account-1']";
-    private $TANInput = "//input[@id='BackendFormTan']";
+    private string $sofortPaymentLabel = "//label[@for='payment_oscunzer_sofort']";
+    private string $landSelect = "//select[@id='MultipaysSessionSenderCountryId']";
+    private string $cookiesAcceptButton = "//button[@class='cookie-modal-accept-all button-primary']";
+    private string $bankSearchInput = "//input[@id='BankCodeSearch']";
+    private string $bankLabel = "//label[@for='account-88888888']";
+    private string $accountNumberLabel = "//input[@id='BackendFormLOGINNAMEUSERID']";
+    private string $PINNumberLabel = "//input[@id='BackendFormUSERPIN']";
+    private string $continueButton = "//button[@class='button-right primary has-indicator']";
+    private string $kontoOptionInput = "//input[@id='account-1']";
+    private string $TANInput = "//input[@id='BackendFormTan']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_sofort'];
     }
@@ -48,9 +47,10 @@ final class SofortCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("Skipping due to dynamic user validation");
         $I->wantToTest('Test Sofort payment works');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->sofortPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->sofortPaymentLabel);
         $orderPage->submitOrder();
 
         $sofortPaymentData = Fixtures::get('sofort_payment');
@@ -70,7 +70,7 @@ final class SofortCest extends BaseCest
             $I->makeScreenshot('waitForPageLoad');
         }
 
-        $I->waitForText($this->_getPrice() . ' ' . $this->_getCurrency());
+        $I->waitForText($this->getPrice() . ' ' . $this->getCurrency());
         $I->selectOption($this->landSelect, 'DE');
         $I->waitForElement($this->bankSearchInput);
         $I->fillField($this->bankSearchInput, "Demo Bank");
@@ -95,6 +95,6 @@ final class SofortCest extends BaseCest
         $I->fillField($this->TANInput, $sofortPaymentData['USER_TAN']);
         $I->click($this->continueButton);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

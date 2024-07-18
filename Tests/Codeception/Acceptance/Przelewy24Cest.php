@@ -19,11 +19,11 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class Przelewy24Cest extends BaseCest
 {
-    private $przelewy24PaymentLabel = "//label[@for='payment_oscunzer_przelewy24']";
-    private $bankLink = "//div[@data-for='MBANK_-_MTRANSFER-0-0-tip']";
-    private $submitButton = "#user_account_pbl_correct";
+    private string $przelewy24PaymentLabel = "//label[@for='payment_oscunzer_przelewy24']";
+    private string $bankLink = "//div[@data-for='MBANK_-_MTRANSFER-0-0-tip']";
+    private string $submitButton = "#user_account_pbl_correct";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_przelewy24'];
     }
@@ -80,9 +80,9 @@ final class Przelewy24Cest extends BaseCest
     {
         $I->wantToTest('Test Przelewy24 payment works');
 
-        $this->_initializeTest();
+        $this->initializeTest();
 
-        $orderPage = $this->_choosePayment($this->przelewy24PaymentLabel);
+        $orderPage = $this->choosePayment($this->przelewy24PaymentLabel);
         $orderPage->submitOrder();
 
         // first page : choose bank
@@ -101,6 +101,6 @@ final class Przelewy24Cest extends BaseCest
         $I->waitForDocumentReadyState();
         $I->waitForJS("return !!window.jQuery", 60);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

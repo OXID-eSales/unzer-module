@@ -20,7 +20,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class PaymentsAvailableCest extends BaseCest
 {
-    private $paymentMethods = [
+    private array $paymentMethods = [
         'OSCUNZER_PAYMENT_METHOD_ALIPAY',
         //'OSCUNZER_PAYMENT_METHOD_APPLEPAY',
         'OSCUNZER_PAYMENT_METHOD_BANCONTACT', // BE only
@@ -36,7 +36,7 @@ final class PaymentsAvailableCest extends BaseCest
         'OSCUNZER_PAYMENT_METHOD_SOFORT',
         'OSCUNZER_PAYMENT_METHOD_WECHATPAY',
     ];
-    private $paymentMethodsByCountry = [
+    private array $paymentMethodsByCountry = [
         'DE' => [
             'OSCUNZER_PAYMENT_METHOD_ALIPAY',
             'OSCUNZER_PAYMENT_METHOD_CARD',
@@ -61,14 +61,14 @@ final class PaymentsAvailableCest extends BaseCest
             'OSCUNZER_PAYMENT_METHOD_IDEAL', // NL only
         ],
     ];
-    private $country2Id = [
+    private array $country2Id = [
         'DE' => 'a7c40f631fc920687.20179984',
         'AT' => 'a7c40f6320aeb2ec2.72885259',
         'BE' => 'a7c40f632e04633c9.47194042',
         'PL' => '8f241f1109624d3f8.50953605',
         'NL' => 'a7c40f632cdd63c52.64272623',
     ];
-    private $country2Currency = [
+    private array $country2Currency = [
         'DE' => 'EUR',
         'AT' => 'EUR',
         'BE' => 'EUR',
@@ -135,7 +135,7 @@ final class PaymentsAvailableCest extends BaseCest
         }
     }
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return [
             'oscunzer_alipay',
@@ -160,7 +160,7 @@ final class PaymentsAvailableCest extends BaseCest
     public function checkPaymentsAvailable(AcceptanceTester $I)
     {
         $I->wantToTest('Test payment methods are available');
-        $this->_initializeTest();
+        $this->initializeTest();
 
         foreach ($this->paymentMethodsByCountry as $country => $paymentMethods) {
             $this->switchCountry($I, $country);
