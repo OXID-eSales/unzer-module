@@ -197,7 +197,7 @@ class Payment
                     if ($pdfLink) {
                         $this->pdfLink = $pdfLink;
                     }
-                    $result = self::STATUS_OK;
+                    $result = self::STATUS_NOT_FINISHED;
                 }
             } elseif ($transaction->isPending()) {
                 $result = self::STATUS_NOT_FINISHED;
