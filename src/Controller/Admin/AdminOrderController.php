@@ -85,7 +85,7 @@ class AdminOrderController extends AdminDetailsController
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             $orderId = $this->getEditObjectId();
-            $paymentId = $transactionService->getPaymentIdByOrderIdForAdmin($orderId); //somthesing like s-chg-XXXX
+            $paymentId = $transactionService->getPaymentIdByOrderId($orderId, true); //somthesing like s-chg-XXXX
             $this->sTypeId = $paymentId;
             $this->_aViewData['sTypeId'] = $this->sTypeId;
             if ($this->sTypeId) {
