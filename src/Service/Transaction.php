@@ -468,6 +468,7 @@ class Transaction
                 WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql($withoutCancel) . ")",
                 [$orderid]
             );
+            $result = is_string($result) ? $result : '';
         }
 
         return $result;
@@ -490,6 +491,7 @@ class Transaction
                 ORDER BY OXTIMESTAMP DESC LIMIT 1",
                 [$orderid]
             );
+            $result = is_string($result) ? $result : '';
         }
 
         return $result;
