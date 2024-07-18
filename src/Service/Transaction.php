@@ -463,13 +463,11 @@ class Transaction
     {
         $result = '';
         if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
+            $result = DatabaseProvider::getDb()->getOne(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
                 WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql($withoutCancel) . ")",
                 [$orderid]
             );
-
-            $result = $rows[0]['TYPEID'];
         }
 
         return $result;
@@ -486,14 +484,12 @@ class Transaction
         $result = '';
 
         if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
+            $rows = DatabaseProvider::getDb()->getOne(
                 "SELECT OXID FROM oscunzertransaction
                 WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql() . ")
                 ORDER BY OXTIMESTAMP DESC LIMIT 1",
                 [$orderid]
             );
-
-            $result = $rows[0]['OXID'];
         }
 
         return $result;
@@ -558,7 +554,7 @@ class Transaction
             $result = $oDB->getAll(
                 "SELECT ot.OXID, ot.PAYMENTTYPEID, ot.CURRENCY, ot.CUSTOMERTYPE, o.OXPAYMENTTYPE
                         from oscunzertransaction as ot
-                        left join oxorder as o ON (ot.oxorderid = o.OXID) 
+                        left join oxorder as o ON (ot.oxorderid = o.OXID)
             where ot.OXUSERID = :oxuserid AND ot.PAYMENTTYPEID IS NOT NULL
             GROUP BY ot.PAYMENTTYPEID ",
                 [':oxuserid' => $userId]
