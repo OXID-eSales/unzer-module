@@ -101,8 +101,8 @@ $aLang = [
     'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPrivateKey' => 'Sandbox Private-Key for Invoice B2C-purchases in EUR',
     'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPublicKey' => 'Sandbox Public-Key for Invoice B2C-purchases in EUR',
     // sandbox Paylater Invoice B2B EUR
-    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPrivateKey' => 'Sandbox Private-Key for Invoice B2C-purchases in EUR',
-    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPublicKey' => 'Sandbox Public-Key for Invoice B2C-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPrivateKey' => 'Sandbox Private-Key for Invoice B2B-purchases in EUR',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPublicKey' => 'Sandbox Public-Key for Invoice B2B-purchases in EUR',
     // sandbox Paylater Invoice B2C CHF
     'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CCHFPrivateKey' => 'Sandbox Private-Key for Invoice B2C-purchases in CHF',
     'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CCHFPublicKey' => 'Sandbox Public-Key for Invoice B2C-purchases in CHF',
