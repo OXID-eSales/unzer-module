@@ -84,6 +84,7 @@
     <script>
 [{/if}]
 [{capture assign="unzerCardJS"}]
+
     $('input[name="newccard"]').on('change', function() {
         if ($(this).prop('checked')) {
             $('#orderConfirmAgbBottom').addClass('new-card-selected');
@@ -96,11 +97,9 @@
 
         if ($(this).hasClass('new-card-selected') && !$(this).hasClass("submitable")) {
             event.preventDefault();
-
             $("#payment-form-card").submit();
         } else if (!$(this).hasClass("submitable")) {
             event.preventDefault();
-
             $("#payment-saved-cards").submit();
         }
         $('#orderConfirmAgbBottom').removeClass('new-card-selected');
@@ -141,7 +140,6 @@
         });
     }
 
-
     $( "#payment-form-card" ).submit(function( event ) {
         event.preventDefault();
         if (Card) {
@@ -166,10 +164,10 @@
                     $('html, body').animate({
                         scrollTop: $("#orderPayment").offset().top - 150
                     }, 350);
-                    let errorBox = $('#card-element-id-number .unzerUI.compact.error.message');
-                    errorBox.show().text(error.message);
+                    $('#orderConfirmAgbBottom').addClass('new-card-selected');
                 })
         }
+        $('#orderConfirmAgbBottom').addClass('new-card-selected');
     });
     $( "#payment-saved-cards" ).submit(function( event ) {
         event.preventDefault();
@@ -216,7 +214,6 @@
         $('#card-element-id-number').empty();
         $('#card-element-id-expiry').empty();
         $('#card-element-id-cvc').empty();
-
     }
     function addPaymentElements(Card) {
         // Clear the contents of the Card-Element containers
