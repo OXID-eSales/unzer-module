@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
+use Exception;
 use JsonException;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
@@ -90,7 +91,7 @@ class Transaction
      * @param Payment|null $unzerPayment
      * @param Shipment|null $unzerShipment
      * @return bool
-     * @throws \Exception
+     * @throws Exception
     */
     public function writeTransactionToDB(
         string $orderid,
@@ -160,9 +161,9 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param \UnzerSDK\Resources\TransactionTypes\Cancellation|null $unzerCancel
+     * @param Cancellation|null $unzerCancel
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function writeCancellationToDB(
         string $orderid,
@@ -193,8 +194,8 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param \UnzerSDK\Resources\TransactionTypes\Charge|null $unzerCharge
-     * @throws \Exception
+     * @param Charge|null $unzerCharge
+     * @throws Exception
      * @return bool
      */
     public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge, Order $oOrder): bool
@@ -456,6 +457,7 @@ class Transaction
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function getPaymentIdByOrderId(string $orderid, bool $withoutCancel = false): string
     {
@@ -645,6 +647,9 @@ class Transaction
         return $result;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     private function prepareTransActionConstForSql(bool $withoutCancel = false): string
     {
         $transActionConst = $this->transActionConst;
