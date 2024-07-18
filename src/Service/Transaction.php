@@ -484,7 +484,7 @@ class Transaction
         $result = '';
 
         if ($orderid) {
-            $rows = DatabaseProvider::getDb()->getOne(
+            $result = DatabaseProvider::getDb()->getOne(
                 "SELECT OXID FROM oscunzertransaction
                 WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql() . ")
                 ORDER BY OXTIMESTAMP DESC LIMIT 1",

@@ -110,11 +110,13 @@ class Order extends Order_parent
 
         $this->_setOrderStatus($unzerPaymentStatus);
 
-        if ($unzerPaymentStatus === 'OK') {
+        if ($unzerPaymentStatus === PaymentService::STATUS_OK) {
             $this->markUnzerOrderAsPaid();
             $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
         } else {
-            Registry::getSession()->setVariable('orderCancellationProcessed', true);
+            if ($unzerPaymentStatus !== PaymentService::STATUS_NOT_FINISHED) {
+                Registry::getSession()->setVariable('orderCancellationProcessed', true);
+            }
             $this->_setOrderStatus($unzerPaymentStatus); //ERROR if paypal
             $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
         }
@@ -186,7 +188,7 @@ class Order extends Order_parent
         // marking vouchers as used and sets them to $this->_aVoucherList (will be used in order email)
         $this->_markVouchers($oBasket, $oUser);
 
-        $this->_setOrderStatus('NOT_FINISHED');
+        $this->_setOrderStatus(PaymentService::STATUS_NOT_FINISHED);
         $tmpOrder = oxNew(TmpOrder::class);
         $tmpOrder->saveTmpOrder($this);
 
@@ -308,11 +310,11 @@ class Order extends Order_parent
         $this->markUnzerOrderAsPaid();
 
         if ($error === true) {
-            $this->_setOrderStatus('ERROR');
+            $this->_setOrderStatus(PaymentService::STATUS_ERROR);
         } else {
             switch ($unzerPayment->getState()) {
                 case PaymentState::STATE_PENDING:
-                    $this->_setOrderStatus('NOT_FINISHED');
+                    $this->_setOrderStatus(PaymentService::STATUS_NOT_FINISHED);
                     break;
                 case PaymentState::STATE_CANCELED:
                     $this->cancelOrder();
