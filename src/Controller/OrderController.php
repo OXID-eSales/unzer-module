@@ -329,6 +329,7 @@ class OrderController extends OrderController_parent
 
         if (!$this->_validateTermsAndConditions()) {
             $this->_blConfirmAGBError = true;
+            Registry::getUtilsView()->addErrorToDisplay('READ_AND_CONFIRM_TERMS');
             return null;
         }
 

@@ -8,6 +8,10 @@
 declare(strict_types=1);
 
 return [
+    'admin_user' => [
+        'username' => 'admin@myoxideshop.com',
+        'password' => 'admin0303'
+    ],
     // This product is available in ce|pe|ee demodata
     'product' => [
         'id' => 'dc5ffdf380e15674b56dd562a7cb6aec',

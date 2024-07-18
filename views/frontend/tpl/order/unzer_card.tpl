@@ -3,7 +3,9 @@
     <div class="savedpayment">
         [{foreach from=$unzerPaymentType item="setting" key="type"}]
             [{if $type != 'paypal' && $type != 'sepa'}]
+                [{assign var="savedCardsCount" value=$setting|@count}]
                 <form id="payment-saved-cards" class="unzerUI form" novalidate>
+                    <input type="hidden" name="savedCardsCount" value="[{$savedCardsCount}]">
                     <table class="table">
                         <thead>
                         <tr>
@@ -33,9 +35,10 @@
         [{/foreach}]
     </div>
 [{/if}]
+
 [{if $unzerPaymentType != false }]
 <br>
-    <label>
+    <label id="addNewCardCheckboxLabel">
         <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox">[{oxmultilang ident="OSCUNZER_NEW_CARD"}]
     </label>
 [{/if}]
@@ -81,6 +84,7 @@
     <script>
 [{/if}]
 [{capture assign="unzerCardJS"}]
+
     $('input[name="newccard"]').on('change', function() {
         if ($(this).prop('checked')) {
             $('#orderConfirmAgbBottom').addClass('new-card-selected');
@@ -93,26 +97,32 @@
 
         if ($(this).hasClass('new-card-selected') && !$(this).hasClass("submitable")) {
             event.preventDefault();
-
             $("#payment-form-card").submit();
         } else if (!$(this).hasClass("submitable")) {
             event.preventDefault();
-
             $("#payment-saved-cards").submit();
         }
         $('#orderConfirmAgbBottom').removeClass('new-card-selected');
     });
+
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
-
-    if ($('input[name="newccard"]').length === 0) {
+    let newCardCheckbox = $('input[name="newccard"]');
+    let savedCardsTableElement = $('#payment-saved-cards');
+    let cardsCount = 0;
+    if (savedCardsTableElement.length) {
+        cardsCount = parseInt($('input[name=savedCardsCount]').attr('value'), 10);
+    }
+    if (newCardCheckbox.length === 0 || cardsCount === 0) {
          let hiddenInput4 = $(document.createElement('input'))
                         .attr('type', 'hidden')
                         .attr('name', 'is_saved_payment_in_action')
                         .val(0);
         $('#orderConfirmAgbBottom').addClass('new-card-selected');
         $('#newcc').show();
-
+        if (cardsCount === 0) {
+            $('#addNewCardCheckboxLabel').hide();
+        }
         Card = unzerInstance.Card();
         addPaymentElements(Card);
     } else {
@@ -130,10 +140,8 @@
         });
     }
 
-
     $( "#payment-form-card" ).submit(function( event ) {
         event.preventDefault();
-        debugger
         if (Card) {
             Card.createResource()
                 .then(function(result) {
@@ -156,10 +164,10 @@
                     $('html, body').animate({
                         scrollTop: $("#orderPayment").offset().top - 150
                     }, 350);
-                    let errorBox = $('#card-element-id-number .unzerUI.compact.error.message');
-                    errorBox.show().text(error.message);
+                    $('#orderConfirmAgbBottom').addClass('new-card-selected');
                 })
         }
+        $('#orderConfirmAgbBottom').addClass('new-card-selected');
     });
     $( "#payment-saved-cards" ).submit(function( event ) {
         event.preventDefault();
@@ -181,7 +189,6 @@
                         .val(1);
 
         $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput4);
-        console.log( $('#orderConfirmAgbBottom').find(".hidden"));
         $('#orderConfirmAgbBottom' ).addClass("submitable");
         $('#orderConfirmAgbBottom').submit();
     });
@@ -207,7 +214,6 @@
         $('#card-element-id-number').empty();
         $('#card-element-id-expiry').empty();
         $('#card-element-id-cvc').empty();
-
     }
     function addPaymentElements(Card) {
         // Clear the contents of the Card-Element containers
