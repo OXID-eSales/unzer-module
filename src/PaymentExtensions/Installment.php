@@ -13,6 +13,8 @@ class Installment extends UnzerPayment
 {
     protected $paymentMethod = 'installment-secured';
 
+    protected $needPending = true;
+
     /**
      * @return BasePaymentType
      * @throws \UnzerSDK\Exceptions\UnzerApiException

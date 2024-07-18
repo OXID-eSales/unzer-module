@@ -18,13 +18,13 @@ use OxidEsales\Codeception\Module\Translation\Translator;
 
 abstract class BaseCest
 {
-    private int $amount = 1;
+    public int $amount = 1;
     public AcceptanceTester $I;
     private Page $paymentSelection;
 
     public function _before(AcceptanceTester $I): void
     {
-        foreach ($this->_getOXID() as $payment) {
+        foreach ($this->getOXID() as $payment) {
             $I->updateInDatabase(
                 'oxpayments',
                 ['OXACTIVE' => 1],
@@ -120,7 +120,7 @@ abstract class BaseCest
     /**
      * @return void
      */
-    protected function _initializeTest()
+    protected function initializeTest()
     {
         $this->I->openShop();
 
@@ -138,7 +138,7 @@ abstract class BaseCest
     /**
      * @return void
      */
-    protected function _initializeSecuredTest()
+    protected function initializeSecuredTest()
     {
         $this->I->openShop();
 
@@ -157,7 +157,7 @@ abstract class BaseCest
      * @param string $label
      * @return Page
      */
-    protected function _choosePayment(string $label): Page
+    protected function choosePayment(string $label): Page
     {
         $this->I->waitForElement($label);
         $this->I->wait(3);
@@ -169,7 +169,7 @@ abstract class BaseCest
     /**
      * @return void
      */
-    protected function _checkSuccessfulPayment(int $longWait = 0)
+    protected function checkSuccessfulPayment(int $longWait = 0)
     {
         $this->I->wait(10);
         $this->I->waitForDocumentReadyState();
@@ -183,7 +183,7 @@ abstract class BaseCest
      * @param AcceptanceTester $I
      * @return void
      */
-    protected function _setAcceptance(AcceptanceTester $I)
+    protected function setAcceptance(AcceptanceTester $I)
     {
         $this->I = $I;
     }
@@ -191,7 +191,7 @@ abstract class BaseCest
     /**
      * @return string price of order
      */
-    protected function _getPrice(): string
+    protected function getPrice(): string
     {
         $basketItem = Fixtures::get('product');
         return Registry::getLang()->formatCurrency(
@@ -202,20 +202,20 @@ abstract class BaseCest
     /**
      * @return string currency
      */
-    protected function _getCurrency(): string
+    protected function getCurrency(): string
     {
         $basketItem = Fixtures::get('product');
         return $basketItem['currency'];
     }
 
-    abstract protected function _getOXID(): array;
+    abstract protected function getOXID(): array;
 
     /**
      * If element is found return the text, if not return false
      * @param $element
      * @return bool
      */
-    protected function _grabTextFromElementWhenPresent($element, $I)
+    protected function grabTextFromElementWhenPresent($element, $I)
     {
         try {
             $I->seeElement($element);
@@ -230,7 +230,7 @@ abstract class BaseCest
      * @param $element
      * @return bool
      */
-    protected function _checkElementExists($element, $I)
+    protected function checkElementExists($element, $I)
     {
         try {
             $isFound = $I->seeElement($element);

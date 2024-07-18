@@ -154,18 +154,9 @@ class OrderController extends OrderController_parent
 
             if (stripos($nextStep, 'thankyou') !== false) {
                 $oDB->commitTransaction();
-                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
 
                 if ($this->isPaymentCancelled($paymentService)) {
                     $this->cleanUpCancelledPayments();
-                }
-
-                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
-                    $paymentService->doUnzerCollect(
-                        $oOrder,
-                        $unzerPaymentId,
-                        (float)$oOrder->getTotalOrderSum()
-                    );
                 }
 
                 Registry::getSession()->deleteVariable('oscunzersavepayment');
@@ -338,6 +329,7 @@ class OrderController extends OrderController_parent
 
         if (!$this->_validateTermsAndConditions()) {
             $this->_blConfirmAGBError = true;
+            Registry::getUtilsView()->addErrorToDisplay('READ_AND_CONFIRM_TERMS');
             return null;
         }
 
@@ -429,16 +421,6 @@ class OrderController extends OrderController_parent
             serialize($basketSummery) .
             serialize($basketContents)
         );
-    }
-
-    private function getUnzerPaymentIdFromSession(): string
-    {
-        $paymentId = Registry::getSession()->getVariable('UnzerPaymentId');
-        if (is_string($paymentId)) {
-            return $paymentId;
-        }
-
-        return '';
     }
 
     /**
