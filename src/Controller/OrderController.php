@@ -423,16 +423,6 @@ class OrderController extends OrderController_parent
         );
     }
 
-    private function getUnzerPaymentIdFromSession(): string
-    {
-        $paymentId = Registry::getSession()->getVariable('UnzerPaymentId');
-        if (is_string($paymentId)) {
-            return $paymentId;
-        }
-
-        return '';
-    }
-
     /**
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
