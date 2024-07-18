@@ -18,9 +18,9 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class PrepaymentCest extends BaseCest
 {
-    private $prePaymentLabel = "//label[@for='payment_oscunzer_prepayment']";
+    private string $prePaymentLabel = "//label[@for='payment_oscunzer_prepayment']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_prepayment'];
     }
@@ -32,20 +32,10 @@ final class PrepaymentCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Prepayment payment works');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->prePaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->prePaymentLabel);
         $orderPage->submitOrder();
 
-        $this->_checkSuccessfulPayment();
-
-        // This text doesn't appear on Thankye page for some reason, only in the email
-        // possible ToDo: check the thank you page
-        /*
-        $I->waitForText(rtrim(strip_tags(sprintf(
-            Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->_getPrice(),
-            $this->_getCurrency()
-        ))));
-        */
+        $this->checkSuccessfulPayment();
     }
 }

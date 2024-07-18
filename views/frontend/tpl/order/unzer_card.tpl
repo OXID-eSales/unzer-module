@@ -3,7 +3,9 @@
     <div class="savedpayment">
         [{foreach from=$unzerPaymentType item="setting" key="type"}]
             [{if $type != 'paypal' && $type != 'sepa'}]
+                [{assign var="savedCardsCount" value=$setting|@count}]
                 <form id="payment-saved-cards" class="unzerUI form" novalidate>
+                    <input type="hidden" name="savedCardsCount" value="[{$savedCardsCount}]">
                     <table class="table">
                         <thead>
                         <tr>
@@ -33,9 +35,10 @@
         [{/foreach}]
     </div>
 [{/if}]
+
 [{if $unzerPaymentType != false }]
 <br>
-    <label>
+    <label id="addNewCardCheckboxLabel">
         <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox">[{oxmultilang ident="OSCUNZER_NEW_CARD"}]
     </label>
 [{/if}]
@@ -101,17 +104,25 @@
         }
         $('#orderConfirmAgbBottom').removeClass('new-card-selected');
     });
+
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
-
-    if ($('input[name="newccard"]').length === 0) {
+    let newCardCheckbox = $('input[name="newccard"]');
+    let savedCardsTableElement = $('#payment-saved-cards');
+    let cardsCount = 0;
+    if (savedCardsTableElement.length) {
+        cardsCount = parseInt($('input[name=savedCardsCount]').attr('value'), 10);
+    }
+    if (newCardCheckbox.length === 0 || cardsCount === 0) {
          let hiddenInput4 = $(document.createElement('input'))
                         .attr('type', 'hidden')
                         .attr('name', 'is_saved_payment_in_action')
                         .val(0);
         $('#orderConfirmAgbBottom').addClass('new-card-selected');
         $('#newcc').show();
-
+        if (cardsCount === 0) {
+            $('#addNewCardCheckboxLabel').hide();
+        }
         Card = unzerInstance.Card();
         addPaymentElements(Card);
     } else {

@@ -27,10 +27,12 @@
                 <th>[{oxmultilang ident="SHOP_MODULE_webhook_context"}]</th>
             </tr>
         [{foreach from=$webhookConfiguration item="webhookConfig"}]
+            [{if isset($webhookConfig.id)}]
             <tr>
                 <td>[{$webhookConfig.id}]</td>
                 <td>[{$webhookConfig.context}]</td>
             </tr>
+            [{/if}]
         [{/foreach}]
         </table>
         [{/if}]

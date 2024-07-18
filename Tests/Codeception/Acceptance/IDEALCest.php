@@ -18,13 +18,13 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class IDEALCest extends BaseCest
 {
-    private $idealPaymentLabel = "//label[@for='payment_oscunzer_ideal']";
-    private $paymentMethodForm = "//form[@id='payment-form']";
-    private $BICInput = "//input[@name='bic']";
-    private $nextButton = "//button[@class='btn btn-primary']";
-    private $usernameInput = "//input[@name='userLogin']";
-    private $usePINInput = "//input[@name='userPIN']";
-    private $tanInput = "//input[@name='tan']";
+    private string $idealPaymentLabel = "//label[@for='payment_oscunzer_ideal']";
+    private string $paymentMethodForm = "//form[@id='payment-form']";
+    private string $BICInput = "//input[@name='bic']";
+    private string $nextButton = "//button[@class='btn btn-primary']";
+    private string $usernameInput = "//input[@name='userLogin']";
+    private string $usePINInput = "//input[@name='userPIN']";
+    private string $tanInput = "//input[@name='tan']";
 
     public function _before(AcceptanceTester $I): void
     {
@@ -49,7 +49,7 @@ final class IDEALCest extends BaseCest
         );
     }
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_ideal'];
     }
@@ -61,11 +61,11 @@ final class IDEALCest extends BaseCest
     public function checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test iDEAL payment works');
-        $this->_initializeTest();
-        $orderPage = $this->_choosePayment($this->idealPaymentLabel);
+        $this->initializeTest();
+        $orderPage = $this->choosePayment($this->idealPaymentLabel);
 
         $idealPaymentData = Fixtures::get('ideal_payment');
-        $price = str_replace(',', '.', $this->_getPrice());
+        $price = str_replace(',', '.', $this->getPrice());
 
         $I->waitForElement($this->paymentMethodForm);
         $I->click($this->paymentMethodForm);
@@ -95,6 +95,6 @@ final class IDEALCest extends BaseCest
         $I->waitForElement($this->nextButton);
         $I->click($this->nextButton);
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
     }
 }

@@ -18,9 +18,9 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class InvoiceSecuredCest extends BaseCest
 {
-    private $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice-secured']";
+    private string $invoicePaymentLabel = "//label[@for='payment_oscunzer_invoice-secured']";
 
-    protected function _getOXID(): array
+    protected function getOXID(): array
     {
         return ['oscunzer_invoice-secured'];
     }
@@ -32,15 +32,15 @@ final class InvoiceSecuredCest extends BaseCest
     public function _checkPaymentWorks(AcceptanceTester $I)
     {
         $I->wantToTest('Test Invoice payment works');
-        $this->_initializeSecuredTest();
-        $orderPage = $this->_choosePayment($this->invoicePaymentLabel);
+        $this->initializeSecuredTest();
+        $orderPage = $this->choosePayment($this->invoicePaymentLabel);
         $orderPage->submitOrder();
 
-        $this->_checkSuccessfulPayment();
+        $this->checkSuccessfulPayment();
         $I->waitForText(rtrim(strip_tags(sprintf(
             Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
-            $this->_getPrice(),
-            $this->_getCurrency()
+            $this->getPrice(),
+            $this->getCurrency()
         ))));
     }
 }

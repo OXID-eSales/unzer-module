@@ -8,6 +8,8 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\Result;
+use Exception;
+use JsonException;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order;
@@ -26,6 +28,7 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
@@ -63,6 +66,13 @@ class Transaction
         'sdd' => 'sepa'
     ];
 
+    private array $transActionConst = [
+        PaymentState::STATE_NAME_COMPLETED,
+        PaymentState::STATE_NAME_CANCELED,
+        PaymentState::STATE_NAME_CHARGEBACK,
+        PaymentState::STATE_NAME_PENDING
+    ];
+
     /**
      * @param Context $context
      * @param UtilsDate $utilsDate
@@ -81,7 +91,7 @@ class Transaction
      * @param Payment|null $unzerPayment
      * @param Shipment|null $unzerShipment
      * @return bool
-     * @throws \Exception
+     * @throws Exception
     */
     public function writeTransactionToDB(
         string $orderid,
@@ -151,9 +161,9 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param \UnzerSDK\Resources\TransactionTypes\Cancellation|null $unzerCancel
+     * @param Cancellation|null $unzerCancel
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function writeCancellationToDB(
         string $orderid,
@@ -184,8 +194,8 @@ class Transaction
     /**
      * @param string $orderid
      * @param string $userId
-     * @param \UnzerSDK\Resources\TransactionTypes\Charge|null $unzerCharge
-     * @throws \Exception
+     * @param Charge|null $unzerCharge
+     * @throws Exception
      * @return bool
      */
     public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge, Order $oOrder): bool
@@ -207,18 +217,20 @@ class Transaction
     /**
      * @param array $params
      * @return string
+     * @throws JsonException
      */
     protected function prepareTransactionOxid(array $params): string
     {
-        unset($params['oxactiondate']);
-        unset($params['serialized_basket']);
-        unset($params['customertype']);
+        unset($params['oxactiondate'], $params['serialized_basket'], $params['customertype']);
 
         /** @var string $jsonEncode */
-        $jsonEncode = json_encode($params);
+        $jsonEncode = json_encode($params, JSON_THROW_ON_ERROR);
         return md5($jsonEncode);
     }
 
+    /**
+     * @throws JsonException
+     */
     protected function saveTransaction(array $params, Order $oOrder): bool
     {
         $result = false;
@@ -247,6 +259,7 @@ class Transaction
     /**
      * @param array $params
      * @return string
+     * @throws JsonException
      */
     protected function getInitOrderOxid(array $params): string
     {
@@ -444,15 +457,15 @@ class Transaction
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function getPaymentIdByOrderId(string $orderid)
+    public function getPaymentIdByOrderId(string $orderid, bool $withoutCancel = false): string
     {
         $result = '';
-
         if ($orderid) {
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback', 'canceled')",
+                WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql($withoutCancel) . ")",
                 [$orderid]
             );
 
@@ -475,7 +488,7 @@ class Transaction
         if ($orderid) {
             $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
                 "SELECT OXID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'canceled', 'chargeback')
+                WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql() . ")
                 ORDER BY OXTIMESTAMP DESC LIMIT 1",
                 [$orderid]
             );
@@ -632,5 +645,17 @@ class Transaction
             }
         }
         return $result;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
+    private function prepareTransActionConstForSql(bool $withoutCancel = false): string
+    {
+        $transActionConst = $this->transActionConst;
+        if ($withoutCancel) {
+            $transActionConst = array_diff($transActionConst, [PaymentState::STATE_NAME_CANCELED]);
+        }
+        return implode(',', DatabaseProvider::getDb()->quoteArray($transActionConst));
     }
 }
