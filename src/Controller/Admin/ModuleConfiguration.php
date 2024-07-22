@@ -59,6 +59,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $this->_aViewData['applePayNetworks'] = $this->moduleSettings->getApplePayNetworks();
                 $this->_aViewData['applePayMerchantCert'] = $this->moduleSettings->getApplePayMerchantCert();
                 $this->_aViewData['applePayMerchantCertKey'] = $this->moduleSettings->getApplePayMerchantCertKey();
+                $this->_aViewData['applePayPaymentProcessingCert'] = $this->moduleSettings->getApplePayPaymentCertificateId();
+                $this->_aViewData['applePayPaymentProcessingCertKey'] = $this->moduleSettings->getApplePayPaymentKeyId();
                 $this->_aViewData['systemMode'] = $this->moduleSettings->getSystemMode();
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
