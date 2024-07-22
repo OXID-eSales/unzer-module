@@ -118,7 +118,7 @@
                                 <b>[{oxmultilang ident="OSCUNZER_REMAING_AMOUNT" suffix="COLON"}]</b>[{$AuthAmountRemaining|string_format:"%.2f"}] [{$AuthCur}]<br>
                                 <b>[{oxmultilang ident="OSCUNZER_ORDER_AMOUNT" suffix="COLON"}]</b>[{$AuthAmount|string_format:"%.2f"}] [{$AuthCur}]<br>
                             </td>
-                            <td><input type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
+                            <td><input id="uzr_collect_amount" type="text" name="amount" value="[{$AuthAmountRemaining|string_format:"%.2f"}]"> [{$AuthCur}]</td>
                             <td><button type="submit">[{oxmultilang ident="OSCUNZER_CHARGE_COLLECT"}]</button></td>
                         </tr>
                         </tbody>
@@ -348,6 +348,44 @@
 
 [{/capture}]
 [{oxscript add=$cancelConfirm}]
+
+[{capture assign="collectConfirm"}]
+    [{if false }]<script>[{/if}]
+
+    let handleUnzerCollect = function(formElement) {
+        if(formElement.id.indexOf('uzr_collect') === 0) {
+            let paymentId = formElement.id.slice(4);
+            let inAmount = document.getElementById('uzr_collect_amount');
+            if (null !== inAmount.value) {
+                let alertMsg = '[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]'
+                    + ' ' + inAmount.value + ' [{$uzrCurrency}]';
+                if (window.confirm(alertMsg)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        // if it is not a form we want to process, let it proceed
+        return true;
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let forms = document.querySelectorAll('form[id^="uzr_collect"]');
+        for(var i = 0; i < forms.length; i++) {
+            forms[i].addEventListener('submit', function(event) {
+                let returnValue = handleUnzerCollect(this);
+                if (!returnValue) {
+                    event.preventDefault();
+                }
+                return returnValue;
+            });
+        }
+    }, false);
+
+    [{if false }]</script>[{/if}]
+
+[{/capture}]
+[{oxscript add=$collectConfirm}]
 
 [{capture assign="cancelAuthConfirm"}]
 let handleUnzerAuthForm = function(formElement) {
