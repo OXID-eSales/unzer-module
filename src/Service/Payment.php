@@ -455,14 +455,15 @@ class Payment
             $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
             $unzerPayment = $sdk->fetchPayment($unzerid);
             $cancellation = new Cancellation($amount);
-            $sdk->cancelAuthorizedPayment($unzerPayment, $cancellation);
+            $cancelTransaction = $sdk->cancelAuthorizedPayment($unzerPayment, $cancellation);
 
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
-            $this->transactionService->writeTransactionToDB(
+            $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $unzerPayment
+                $cancelTransaction,
+                $oOrder
             );
         } catch (UnzerApiException $e) {
             return $e;

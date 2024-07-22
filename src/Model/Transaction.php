@@ -101,6 +101,10 @@ class Transaction extends BaseModel
             return $this->getRawField('REMAINING');
         }
 
+        if ($this->getUnzerState() === 'canceled') {
+            return $this->getUnzerAmount();
+        }
+
         return $this->getUnzerAmount();
     }
 
