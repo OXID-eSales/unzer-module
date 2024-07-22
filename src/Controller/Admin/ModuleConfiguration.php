@@ -188,7 +188,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 ->requestApplePayPaymentKey($keyId);
 
             if (!$response) {
-                $this->addErrorTransmittingKey();
                 return false;
             }
 
