@@ -323,6 +323,10 @@ class OrderController extends OrderController_parent
      */
     public function executeoscunzer(): ?string
     {
+        if (!$this->isOrderPayable()) {
+            return parent::execute();
+        }
+
         if (!$this->isSepaConfirmed()) {
             return null;
         }
@@ -542,5 +546,23 @@ class OrderController extends OrderController_parent
                 $session->setVariable('oscunzersavepayment', $savePayment);
             }
         }
+    }
+
+    private function isOrderPayable(): bool
+    {
+        $oBasket = Registry::getSession()->getBasket();
+        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
+        $payment = $this->getPayment();
+        $brutto = $oBasket->getBruttoSum();
+        $minimalPayment = $payment->getFieldData('oxpayments__oxfromamount');
+        if ($brutto < $minimalPayment) {
+            return false;
+        }
+
+        if ($brutto < CoreUnzerDefinitions::MINIMAL_PAYABLE_AMOUNT) {
+            return false;
+        }
+
+        return true;
     }
 }
