@@ -79,6 +79,7 @@ class UnzerTest extends TestCase
 
     /**
      * @dataProvider getPaymentProcedureDataProvider
+     * @covers \OxidSolutionCatalysts\Unzer\Service\Unzer::getPaymentProcedure
      */
     public function testGetPaymentProcedure($paymentId, $expectedProcedure)
     {
@@ -96,7 +97,10 @@ class UnzerTest extends TestCase
         return [
             ['paypal', 'special'],
             ['card', 'special'],
-            ['installment-secured', 'special'],
+            ['applepay', 'special'],
+            ['installment-secured', 'authorize'],
+            ['paylater-installment', 'authorize'],
+            ['paylater-invoice', 'authorize'],
             ['other', ModuleSettings::PAYMENT_CHARGE],
         ];
     }
