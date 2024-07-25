@@ -103,7 +103,7 @@
                 <dt>
                         <textarea class="txt"
                                   style="width: 250px; height: 200px;"
-                                  name="applePayPaymentProcessingCert">[{$applePayPaymentProcessingCert}]</textarea>
+                                  name="[{$systemMode}]-applePayPaymentProcessingCert">[{$applePayPaymentProcessingCert}]</textarea>
                 </dt>
                 <dd>
                     [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT" args=$systemModeTrans}]
@@ -114,7 +114,7 @@
                 <dt>
                         <textarea class="txt"
                                   style="width: 250px; height: 200px;"
-                                  name="applePayPaymentProcessingCertKey">[{$applePayPaymentProcessingCertKey}]</textarea>
+                                  name="[{$systemMode}]-applePayPaymentProcessingCertKey">[{$applePayPaymentProcessingCertKey}]</textarea>
                 </dt>
                 <dd>
                     [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT_KEY" args=$systemModeTrans}]
