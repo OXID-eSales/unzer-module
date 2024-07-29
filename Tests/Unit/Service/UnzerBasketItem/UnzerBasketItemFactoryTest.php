@@ -39,9 +39,6 @@ class UnzerBasketItemFactoryTest extends TestCase
         $this->assertEquals('DISCOUNT', $result->getTitle());
         $this->assertEquals(1, $result->getQuantity());
         $this->assertEquals(BasketItemTypes::VOUCHER, $result->getType());
-        $this->assertEquals($voucherItemAmount, $result->getAmountNet());
-        $this->assertEquals($voucherItemAmount, $result->getAmountPerUnit());
-        $this->assertEquals($voucherItemAmount, $result->getAmountGross());
         $this->assertEquals(0, $result->getVat());
         $this->assertEquals(0.0, $result->getAmountPerUnitGross());
         $this->assertEquals($voucherItemAmount, $result->getAmountDiscountPerUnitGross());

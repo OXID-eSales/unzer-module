@@ -4,6 +4,7 @@ namespace OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem;
 
 use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
+use OxidEsales\Eshop\Core\Registry;
 
 class UnzerBasketItemFactory
 {
@@ -20,12 +21,9 @@ class UnzerBasketItemFactory
         $unzerBasketItem->setTitle($this->unzerBasketItemTitleService->getTitle($voucherItemAmount))
             ->setQuantity(1)
             ->setType(BasketItemTypes::VOUCHER)
-            ->setAmountNet($voucherItemAmount)
-            ->setAmountPerUnit($voucherItemAmount)
-            ->setAmountGross($voucherItemAmount)
             ->setVat(0)
             ->setAmountPerUnitGross(0.)
-            ->setAmountDiscountPerUnitGross($voucherItemAmount);
+            ->setAmountDiscountPerUnitGross(Registry::getUtils()->fRound($voucherItemAmount));
 
         return $unzerBasketItem;
     }
