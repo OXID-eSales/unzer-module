@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -32,6 +33,7 @@ use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaymentTypePaypal;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
+use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
 
 /**
@@ -141,6 +143,11 @@ abstract class UnzerPayment implements UnzerPaymentInterface
 //first_transaction
         $transaction = $this->doTransactions($basketModel, $customer, $userModel, $paymentType);
         $this->unzerService->setSessionVars($transaction);
+
+        if ($transaction instanceof Charge) {
+            $prePaymentBankAccountService = $this->getServiceFromContainer(PrePaymentBankAccountService::class);
+            $prePaymentBankAccountService->persistBankAccountInfo($transaction);
+        }
 
         if ($request->getRequestParameter('birthdate')) {
             $userModel->save();

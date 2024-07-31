@@ -1,0 +1,19 @@
+{% extends "page/checkout/thankyou.html.twig" %}
+
+{% block checkout_thankyou_info %}
+    {{ parent() }}
+    {% set orderNumber = order.oxorder__oxunzerordernr.value %}
+    {% if oViewConf.getPrePaymentIban(orderNumber) %}
+        <strong>{{ translate({ ident: 'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_HEADLINE' }) }}:</strong><br/>
+        {{ translate({ ident: 'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_IBAN' }) }}: {{ oViewConf.getPrePaymentIban(orderNumber) }}<br/>
+    {% endif %}
+    {% if oViewConf.getPrePaymentBic(orderNumber) %}
+        {{ translate({ ident: 'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BIC'  }) }}: {{ oViewConf.getPrePaymentBic(orderNumber) }}<br/>
+    {% endif %}
+    {% if oViewConf.getPrePaymentHolder(orderNumber) %}
+        {{ translate({ ident: 'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_HOLDER'  }) }}: {{ oViewConf.getPrePaymentHolder(orderNumber) }}<br/>
+    {% endif %}
+    {% if oViewConf.getPrePaymentIban(orderNumber) %}
+        <br/>
+    {% endif %}
+{% endblock %}

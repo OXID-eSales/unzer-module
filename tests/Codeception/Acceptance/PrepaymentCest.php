@@ -40,12 +40,12 @@ final class PrepaymentCest extends BaseCest
 
         // This text doesn't appear on Thankye page for some reason, only in the email
         // possible ToDo: check the thank you page
-        /*
+
         $I->waitForText(rtrim(strip_tags(sprintf(
             Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
             $this->getPrice(),
             $this->getCurrency()
         ))));
-        */
+
     }
 }

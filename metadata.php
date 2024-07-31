@@ -105,7 +105,6 @@ $aModule = [
         '@osc-unzer/frontend/tpl/payment/applepay_availibility_check.tpl'  => 'views/smarty/frontend/tpl/payment/applepay_availibility_check.tpl',
         '@osc-unzer/frontend/tpl/payment/payment_unzer.tpl'                => 'views/smarty/frontend/tpl/payment/payment_unzer.tpl',
         '@osc-unzer/frontend/tpl/order/applepay_button.tpl'                => 'views/smarty/frontend/tpl/order/applepay_button.tpl',
-
     ],
     'blocks'      => [
         //frontend
@@ -140,6 +139,11 @@ $aModule = [
             'template' => 'page/account/inc/account_menu.tpl',
             'block'    => 'account_menu',
             'file'     => 'views/smarty/frontend/blocks/page/account/inc/account_menu.tpl'
+        ],
+        [
+            'template' => 'page/checkout/thankyou.tpl',
+            'block' => 'checkout_thankyou_info',
+            'file' => 'views/smarty/frontend/blocks/page/checkout/thankyou_prepayment_info.tpl'
         ],
         //admin
         [
