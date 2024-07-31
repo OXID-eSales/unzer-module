@@ -248,8 +248,6 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $moduleId = $request->getRequestEscapedParameter('oxid');
         if ($moduleId === Module::MODULE_ID) {
-            $systemMode = $this->moduleSettings->getSystemMode();
-            $this->moduleSettings->setSystemMode($systemMode);
             // get translated systemmode
             $systemMode = $this->moduleSettings->getSystemMode();
 
