@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
+use OxidSolutionCatalysts\Unzer\Service\ModuleConfiguration\ApplePaymentProcessingCertificate;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ApiClient;
@@ -59,6 +60,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $this->_aViewData['applePayNetworks'] = $this->moduleSettings->getApplePayNetworks();
                 $this->_aViewData['applePayMerchantCert'] = $this->moduleSettings->getApplePayMerchantCert();
                 $this->_aViewData['applePayMerchantCertKey'] = $this->moduleSettings->getApplePayMerchantCertKey();
+                $this->_aViewData['applePayPaymentProcessingCert'] = $this->moduleSettings->getApplePayPaymentCert();
+                $this->_aViewData['applePayPaymentProcessingCertKey'] = $this->moduleSettings->getApplePayPaymentPrivateKey();
                 $this->_aViewData['systemMode'] = $this->moduleSettings->getSystemMode();
             } catch (Throwable $loggerException) {
                 Registry::getUtilsView()->addErrorToDisplay(
@@ -107,15 +110,27 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function transferApplePayPaymentProcessingData(): void
     {
+        $systemMode = $this->moduleSettings->getSystemMode();
+        $keyReqName = $systemMode . '-' . 'applePayPaymentProcessingCertKey';
         /** @var string $key */
-        $key = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCertKey');
+        $key = Registry::getRequest()->getRequestEscapedParameter($keyReqName);
         /** @var string $cert */
-        $cert = Registry::getRequest()->getRequestEscapedParameter('applePayPaymentProcessingCert');
+        $certReqName = $systemMode . '-' . 'applePayPaymentProcessingCert';
+        $cert = Registry::getRequest()->getRequestEscapedParameter($certReqName);
         $errorMessage = !$key || !$cert ? 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_SET_CERT' : null;
 
         $apiClient = $this->getServiceFromContainer(ApiClient::class);
         $applePayKeyId = null;
         $applePayCertId = null;
+
+        // save Apple Pay processing cert and key
+        if (is_null($errorMessage)) {
+            $applePaymentProcessingCertificateService = $this->getServiceFromContainer(
+                ApplePaymentProcessingCertificate::class
+            );
+            $applePaymentProcessingCertificateService->saveCertificate($cert);
+            $applePaymentProcessingCertificateService->saveCertificateKey($key);
+        }
 
         // Upload Key
         if (is_null($errorMessage)) {
@@ -156,8 +171,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 if (!$response || $response->getStatusCode() !== 200) {
                     $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
                 } else {
-                    $this->moduleSettings->saveApplePayPaymentKeyId($applePayKeyId);
                     $this->moduleSettings->saveApplePayPaymentCertificateId($applePayCertId);
+                    $this->moduleSettings->saveApplePayPaymentKeyId($applePayKeyId);
                 }
             } catch (Throwable $loggerException) {
                 $errorMessage = 'OSCUNZER_ERROR_ACTIVATE_APPLEPAY_PAYMENT_CERT';
@@ -184,15 +199,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         $keyId = $this->moduleSettings->getApplePayPaymentKeyId();
         if ($this->moduleSettings->getApplePayMerchantCertKey() && $keyId) {
-            $response = $this->getServiceFromContainer(ApiClient::class)
-                ->requestApplePayPaymentKey($keyId);
-
-            if (!$response) {
+            try {
+                $response = $this->getServiceFromContainer(ApiClient::class)
+                    ->requestApplePayPaymentKey($keyId);
+                if (!$response) {
+                    return false;
+                }
+                return $response->getStatusCode() === 200;
+            } catch (GuzzleException | JsonException $guzzleException) {
                 $this->addErrorTransmittingKey();
-                return false;
             }
-
-            return $response->getStatusCode() === 200;
         }
         return false;
     }
@@ -232,10 +248,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $moduleId = $request->getRequestEscapedParameter('oxid');
         if ($moduleId === Module::MODULE_ID) {
-            /** @var array $confselects */
-            $confselects = $request->getRequestEscapedParameter('confselects');
-            /** @var string $systemMode */
-            $systemMode = $confselects['UnzerSystemMode'];
+            $systemMode = $this->moduleSettings->getSystemMode();
             $this->moduleSettings->setSystemMode($systemMode);
             // get translated systemmode
             $systemMode = $this->moduleSettings->getSystemMode();
@@ -260,6 +273,15 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             file_put_contents(
                 $this->moduleSettings->getApplePayMerchantCertKeyFilePath(),
                 $applePayMerchCertKey
+            );
+
+            $applePaymentProcessingCertificateService = $this->getServiceFromContainer(ApplePaymentProcessingCertificate::class);
+            $applePaymentProcessingCertificateService->saveCertificate(
+                $request->getRequestEscapedParameter($systemMode . '-' . 'applePayPaymentProcessingCert')
+            );
+
+            $applePaymentProcessingCertificateService->saveCertificateKey(
+                $request->getRequestEscapedParameter($systemMode . '-' . 'applePayPaymentProcessingCertKey')
             );
 
             $this->moduleSettings->saveWebhookConfiguration([]);
@@ -290,5 +312,13 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 )
             )
         );
+    }
+
+    private function getSystemMode($request): string
+    {
+        /** @var array $confselects */
+        $confselects = $request->getRequestEscapedParameter('confselects');
+        /** @var string $systemMode */
+        return $confselects['UnzerSystemMode'];
     }
 }
