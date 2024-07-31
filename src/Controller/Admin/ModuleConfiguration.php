@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
+use OxidSolutionCatalysts\Unzer\Service\ModuleConfiguration\ApplePaymentProcessingCertificate;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;
 use OxidSolutionCatalysts\Unzer\Service\ApiClient;
@@ -121,6 +122,15 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         $apiClient = $this->getServiceFromContainer(ApiClient::class);
         $applePayKeyId = null;
         $applePayCertId = null;
+
+        // save Apple Pay processing cert and key
+        if (is_null($errorMessage)) {
+            $applePaymentProcessingCertificateService = $this->getServiceFromContainer(
+                ApplePaymentProcessingCertificate::class
+            );
+            $applePaymentProcessingCertificateService->saveCertificate($cert);
+            $applePaymentProcessingCertificateService->saveCertificateKey($key);
+        }
 
         // Upload Key
         if (is_null($errorMessage)) {
@@ -265,18 +275,13 @@ class ModuleConfiguration extends ModuleConfiguration_parent
                 $applePayMerchCertKey
             );
 
-            $applePayPaymentCertReqName = $systemMode . '-' . 'applePayPaymentProcessingCert';
-            $applePayPaymentCert = $request->getRequestEscapedParameter($applePayPaymentCertReqName);
-            file_put_contents(
-                $this->moduleSettings->getApplePayPaymentCertFilePath(),
-                $applePayPaymentCert
+            $applePaymentProcessingCertificateService = $this->getServiceFromContainer(ApplePaymentProcessingCertificate::class);
+            $applePaymentProcessingCertificateService->saveCertificate(
+                $request->getRequestEscapedParameter($systemMode . '-' . 'applePayPaymentProcessingCert')
             );
 
-            $applePayPaymentPrivateKeyReqName = $systemMode . '-' . 'applePayPaymentProcessingCertKey';
-            $applePayPaymentPrivateKey = $request->getRequestEscapedParameter($applePayPaymentPrivateKeyReqName);
-            file_put_contents(
-                $this->moduleSettings->getApplePayPaymentPrivateKeyFilePath(),
-                $applePayPaymentPrivateKey
+            $applePaymentProcessingCertificateService->saveCertificateKey(
+                $request->getRequestEscapedParameter($systemMode . '-' . 'applePayPaymentProcessingCertKey')
             );
 
             $this->moduleSettings->saveWebhookConfiguration([]);
