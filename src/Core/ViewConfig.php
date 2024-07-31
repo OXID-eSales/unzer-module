@@ -8,6 +8,7 @@
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
@@ -222,5 +223,31 @@ class ViewConfig extends ViewConfig_parent
         $basket = Registry::getSession()->getBasket();
         $currencyName = $basket->getBasketCurrency()->name;
         return $currencyName;
+    }
+
+    public function getPrePaymentIban(string $unzerOrderNumber): ?string
+    {
+        $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
+
+        return $prePaymentBankAccountService->getIban($unzerOrderNumber);
+    }
+
+    public function getPrePaymentBic(string $unzerOrderNumber): ?string
+    {
+        $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
+
+        return $prePaymentBankAccountService->getBic($unzerOrderNumber);
+    }
+
+    public function getPrePaymentHolder(string $unzerOrderNumber): ?string
+    {
+        $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
+
+        return $prePaymentBankAccountService->getHolder($unzerOrderNumber);
+    }
+
+    private function getPrePaymentBankAccountService(): PrePaymentBankAccountService
+    {
+        return $this->getServiceFromContainer(PrePaymentBankAccountService::class);
     }
 }
