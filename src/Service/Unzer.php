@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use DateTime;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Exception;
+use JsonException;
 use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Basket as BasketModel;
 use OxidEsales\Eshop\Application\Model\Country;
@@ -58,6 +59,7 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 class Unzer
 {
     use ServiceContainer;
+    use \OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
 
     protected Session $session;
 
@@ -76,14 +78,12 @@ class Unzer
         Translator $translator,
         Context $context,
         ModuleSettings $moduleSettings,
-        Request $request,
         UnzerVoucherBasketItems $unzerVoucherBasketItemsService
     ) {
         $this->session = $session;
         $this->translator = $translator;
         $this->context = $context;
         $this->moduleSettings = $moduleSettings;
-        $this->request = $request;
         $this->unzerVoucherBasketItemsService = $unzerVoucherBasketItemsService;
     }
 
@@ -108,10 +108,8 @@ class Unzer
             $oxlname
         );
 
-        $birthdate = Registry::getRequest()->getRequestParameter('birthdate');
-        if (is_string($birthdate)) {
-            $oUser->assign(['oxuser__oxbirthdate' => $birthdate]);
-        }
+        $birthdate = $this->getUnzerStringRequestParameter('birthdate');
+        $oUser->assign(['oxuser__oxbirthdate' => $birthdate]);
 
         /** @var string $birthdate */
         $birthdate = $oUser->getFieldData('oxbirthdate');
@@ -660,11 +658,12 @@ class Unzer
         return '';
     }
 
+    /**
+     * @throws JsonException
+     */
     private function getPaymentDataArrayFromRequest(): array
     {
-        /** @var string $jsonPaymentData */
-        $jsonPaymentData = $this->request->getRequestParameter('paymentData');
-
-        return $jsonPaymentData ? (array) json_decode($jsonPaymentData, true) : [];
+        $jsonPaymentData = $this->getUnzerStringRequestParameter('paymentData');
+        return $jsonPaymentData ? (array)json_decode($jsonPaymentData, true, 512, JSON_THROW_ON_ERROR) : [];
     }
 }

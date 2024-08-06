@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
@@ -38,6 +39,7 @@ use DateTimeZone;
 class AdminOrderController extends AdminDetailsController
 {
     use ServiceContainer;
+    use Request;
 
     /**
      * Active order object
@@ -322,8 +324,7 @@ class AdminOrderController extends AdminDetailsController
      */
     public function sendShipmentNotification(): void
     {
-        /** @var string $unzerid */
-        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
+        $unzerid = $this->getUnzerStringRequestParameter('unzerid');
         $translator = $this->getServiceFromContainer(Translator::class);
 
         if ($unzerid) {
@@ -347,10 +348,8 @@ class AdminOrderController extends AdminDetailsController
     public function doUnzerCollect(): void
     {
         $this->forceReloadListFrame();
-        /** @var string $unzerid */
-        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        /** @var float $amount */
-        $amount = Registry::getRequest()->getRequestParameter('amount');
+        $unzerid = $this->getUnzerStringRequestParameter('unzerid');
+        $amount = $this->getUnzerFloatRequestParameter('amount');
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
@@ -370,23 +369,16 @@ class AdminOrderController extends AdminDetailsController
     public function doUnzerCancel()
     {
         $this->forceReloadListFrame();
-        /** @var string $unzerid */
-        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        /** @var string $chargeid */
-        $chargeid = Registry::getRequest()->getRequestParameter('chargeid');
-        $amountMixed = Registry::getRequest()->getRequestParameter('amount');
+        $unzerid = $this->getUnzerStringRequestParameter('unzerid');
+        $chargeid = $this->getUnzerStringRequestParameter('chargeid');
+        $amount = $this->getUnzerFloatRequestParameter('amount');
 
-        if (is_string($amountMixed)) {
-            $amount = $this->normalizeNumber($amountMixed);
-        } elseif (is_float($amountMixed)) {
-            $amount = $amountMixed;
-        } else {
+        if (!$amount) {
             return; //should be an error shown/logged to the admin frontend?
         }
-        /** @var float $fCharged */
-        $fCharged = Registry::getRequest()->getRequestParameter('chargedamount');
-        /** @var string $reason */
-        $reason = Registry::getRequest()->getRequestParameter('reason');
+
+        $fCharged = $this->getUnzerFloatRequestParameter('chargedamount');
+        $reason = $this->getUnzerStringRequestParameter('reason');
 
         $translator = $this->getServiceFromContainer(Translator::class);
         if ($reason === "NONE" && $this->isUnzerOrder() && $this->isCancelReasonRequired()) {
@@ -399,7 +391,7 @@ class AdminOrderController extends AdminDetailsController
             $reason = null;
         }
 
-        if ($amount > $fCharged || $amount === 0.0) {
+        if ($amount > $fCharged) {
             $this->_aViewData['errCancel'] = $chargeid . ": "
                 . $translator->translate('OSCUNZER_CANCEL_ERR_AMOUNT') . " " . $amount;
             return;
@@ -419,11 +411,8 @@ class AdminOrderController extends AdminDetailsController
     public function doUnzerAuthorizationCancel()
     {
         $this->forceReloadListFrame();
-        /** @var string $unzerid */
-        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        /** @var string $sAmount */
-        $sAmount = Registry::getRequest()->getRequestParameter('amount');
-        $amount = floatval($sAmount);
+        $unzerid = $this->getUnzerStringRequestParameter('unzerid');
+        $amount = $this->getUnzerFloatRequestParameter('amount');
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
@@ -546,24 +535,5 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $fCancelled;
-    }
-
-    private function normalizeNumber(string $input): float
-    {
-        $input = str_replace(' ', '', $input);
-        $lastCommaPos = strrpos($input, ',');
-
-        if ($lastCommaPos !== false) {
-            if (strpos($input, '.', $lastCommaPos) !== false) {
-                $number = str_replace(',', '', $input);
-            } else {
-                $number = substr_replace($input, '.', $lastCommaPos, 1);
-                $number = str_replace(',', '', $number);
-            }
-        } else {
-            $number = $input;
-        }
-
-        return (float)$number;
     }
 }
