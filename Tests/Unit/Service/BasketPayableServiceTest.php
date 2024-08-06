@@ -6,6 +6,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidEsales\Eshop\Application\Model\Basket;
+use OxidSolutionCatalysts\Unzer\Service\BasketPayableService;
 use PHPUnit\Framework\TestCase;
 
 class BasketPayableServiceTest extends TestCase
