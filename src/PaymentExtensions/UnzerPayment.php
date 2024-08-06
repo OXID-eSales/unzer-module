@@ -209,7 +209,13 @@ abstract class UnzerPayment
                     $sdkPaymentID,
                     $currency->name
                 );
-                $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, $this->unzerService->getShopMetadata($this->paymentMethod), $uzrBasket);
+                $transaction = $UnzerSdk->performAuthorization(
+                    $auth,
+                    $paymentType,
+                    $customer,
+                    $this->unzerService->getShopMetadata($this->paymentMethod),
+                    $uzrBasket
+                );
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }
