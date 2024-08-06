@@ -324,7 +324,9 @@ class OrderController extends OrderController_parent
      */
     public function executeoscunzer(): ?string
     {
-        if (!$this->getServiceFromContainer(BasketPayableService::class)->basketIsPayable($this->getPayment())) {
+        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
+        $payment = $this->getPayment();
+        if (!$payment instanceof Payment || !$this->getServiceFromContainer(BasketPayableService::class)->basketIsPayable($payment)) {
             return parent::execute();
         }
 
@@ -353,8 +355,6 @@ class OrderController extends OrderController_parent
         }
 
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
-        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
-        $payment = $this->getPayment();
         $paymentOk = $paymentService->executeUnzerPayment($payment);
 
         // all orders without redirect would be finalized now
