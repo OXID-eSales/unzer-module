@@ -326,7 +326,10 @@ class OrderController extends OrderController_parent
     {
         /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
         $payment = $this->getPayment();
-        if (!$payment instanceof Payment || !$this->getServiceFromContainer(BasketPayableService::class)->basketIsPayable($payment)) {
+        if (
+            !$payment instanceof Payment
+            || !$this->getServiceFromContainer(BasketPayableService::class)->basketIsPayable($payment)
+        ) {
             return parent::execute();
         }
 
