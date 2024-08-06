@@ -347,6 +347,13 @@ class UnzerTest extends TestCase
         $translatorMock->expects($this->any())
             ->method('translate')
             ->willReturn('Shipping costs');
+        $voucherBasketItemsMock = $this->getMockBuilder(UnzerVoucherBasketItems::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $voucherBasketItemsMock->expects($this->any())
+            ->method('getVoucherBasketItems')
+            ->willReturn([]);
+
         return new Unzer(
             $this->createPartialMock(Session::class, []),
             $translatorMock,
@@ -355,7 +362,7 @@ class UnzerTest extends TestCase
                 $this->createPartialMock(ModuleSettings::class, []),
             $settings[Request::class] ?:
                 $this->createPartialMock(Request::class, []),
-            $this->createPartialMock(UnzerVoucherBasketItems::class, [])
+            $voucherBasketItemsMock
         );
     }
 }
