@@ -22,6 +22,7 @@ use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
+use OxidSolutionCatalysts\Unzer\Service\BasketPayableService;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
@@ -323,7 +324,7 @@ class OrderController extends OrderController_parent
      */
     public function executeoscunzer(): ?string
     {
-        if (!$this->isOrderPayable()) {
+        if (!$this->getServiceFromContainer(BasketPayableService::class)->basketIsPayable($this->getPayment())) {
             return parent::execute();
         }
 
@@ -546,23 +547,5 @@ class OrderController extends OrderController_parent
                 $session->setVariable('oscunzersavepayment', $savePayment);
             }
         }
-    }
-
-    private function isOrderPayable(): bool
-    {
-        $oBasket = Registry::getSession()->getBasket();
-        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
-        $payment = $this->getPayment();
-        $brutto = $oBasket->getBruttoSum();
-        $minimalPayment = $payment->getFieldData('oxpayments__oxfromamount');
-        if ($brutto < $minimalPayment) {
-            return false;
-        }
-
-        if ($brutto < CoreUnzerDefinitions::MINIMAL_PAYABLE_AMOUNT) {
-            return false;
-        }
-
-        return true;
     }
 }
