@@ -353,7 +353,7 @@
     [{if false }]<script>[{/if}]
 
     let handleUnzerCollect = function(formElement) {
-        if(formElement.id.indexOf('uzr_collect') === 0) {
+        if (formElement.id.indexOf('uzr_collect') === 0) {
             let paymentId = formElement.id.slice(4);
             let inAmount = document.getElementById('uzr_collect_amount');
             if (null !== inAmount.value) {
@@ -371,11 +371,13 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         let forms = document.querySelectorAll('form[id^="uzr_collect"]');
-        for(var i = 0; i < forms.length; i++) {
+        for (var i = 0; i < forms.length; i++) {
             forms[i].addEventListener('submit', function(event) {
                 let returnValue = handleUnzerCollect(this);
                 if (!returnValue) {
                     event.preventDefault();
+                } else {
+                    event.target.querySelector('button[type="submit"]').disabled = true;
                 }
                 return returnValue;
             });
