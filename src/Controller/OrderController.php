@@ -16,6 +16,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -48,6 +49,7 @@ use UnzerSDK\Resources\PaymentTypes\Paypal;
 class OrderController extends OrderController_parent
 {
     use ServiceContainer;
+    use Request;
 
     /**
      * @var bool $blSepaMandateConfirmError
@@ -206,18 +208,16 @@ class OrderController extends OrderController_parent
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isSepaConfirmed(): ?bool
+    public function isSepaConfirmed(): bool
     {
+        $result = true;
         if ($this->isSepaPayment()) {
-            $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
-            if (!$blSepaMandateConfirm) {
-                $this->blSepaMandateConfirmError = true;
-                return false;
-            }
+            $result = $this->getUnzerBoolRequestParameter('sepaConfirmation');
+            $this->blSepaMandateConfirmError = !$result;
         }
-        return true;
+        return $result;
     }
 
     /**

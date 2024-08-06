@@ -63,6 +63,7 @@ $aLang = [
     'OSCUNZER_CANCELLATIONS' => 'Stornierungen',
     'OSCUNZER_CANCEL_MISSINGREASON' => 'Für die Zahlungsart muss ein Rückzahlungs-Grund angegeben werden',
     'OSCUNZER_CANCEL_ALERT' => 'Zurückgebuchte Beträge können nicht wieder eingezogen werden! Wollen Sie wirklich den gewählten Betrag zurückerstatten? Gewählter Betrag: ',
+    'OSCUNZER_COLLECT_ALERT' => 'Wollen Sie wirklich den gewählten Betrag eingezogen haben? Gewählter Betrag: ',
     'OSCUNZER_SHIP_ID' => 'Shipping-Id',
     'OSCUNZER_REASON_NONE' => 'keine Begründung',
     'OSCUNZER_REASON_CANCEL' => 'Bestellung widerrufen',

@@ -130,6 +130,11 @@ $aModule = [
             'block' => 'account_menu',
             'file' => 'views/frontend/blocks/page/account/inc/account_menu.tpl'
         ],
+        [
+            'template' => 'page/checkout/thankyou.tpl',
+            'block' => 'checkout_thankyou_info',
+            'file' => 'views/frontend/blocks/page/checkout/thank_you_info.tpl'
+        ],
         //admin
         [
             'template' => 'module_config.tpl',

@@ -147,8 +147,9 @@ class ModuleSettings
     public function getPaymentProcedureSetting(string $paymentMethod): string
     {
         if (
-            $paymentMethod === 'installment-secured' || $paymentMethod === 'paylater-installment' ||
-            $this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)
+            $paymentMethod === 'installment-secured'
+            || $paymentMethod === 'paylater-installment'
+            || $this->getSettingValue('UnzerOption_oscunzer_' . $paymentMethod)
         ) {
             return self::PAYMENT_AUTHORIZE;
         }
@@ -271,6 +272,38 @@ class ModuleSettings
      * @return string
      * @throws FileException
      */
+    public function getApplePayPaymentCert(): string
+    {
+        $path = $this->getApplePayPaymentCertFilePath();
+        if (file_exists($path)) {
+            /** @var string $fileContest */
+            $fileContest = file_get_contents($path);
+            return $fileContest;
+        }
+
+        return '';
+    }
+
+    /**
+     * @return string
+     * @throws FileException
+     */
+    public function getApplePayPaymentPrivateKey(): string
+    {
+        $path = $this->getApplePayPaymentPrivateKeyFilePath();
+        if (file_exists($path)) {
+            /** @var string $fileContest */
+            $fileContest = file_get_contents($path);
+            return $fileContest;
+        }
+
+        return '';
+    }
+
+    /**
+     * @return string
+     * @throws FileException
+     */
     public function getApplePayMerchantCertKey(): string
     {
         $path = $this->getApplePayMerchantCertKeyFilePath();
@@ -313,6 +346,32 @@ class ModuleSettings
     {
         return $this->getFilesPath()
             . '/.applepay_merchant_cert_key.'
+            . $this->getSystemMode()
+            . '.'
+            . $this->config->getShopId();
+    }
+
+    /**
+     * @return string
+     * @throws FileException
+     */
+    public function getApplePayPaymentCertFilePath(): string
+    {
+        return $this->getFilesPath()
+            . '/.applepay_payment_cert.'
+            . $this->getSystemMode()
+            . '.'
+            . $this->config->getShopId();
+    }
+
+    /**
+     * @return string
+     * @throws FileException
+     */
+    public function getApplePayPaymentPrivateKeyFilePath(): string
+    {
+        return $this->getFilesPath()
+            . '/.applepay_payment_key.'
             . $this->getSystemMode()
             . '.'
             . $this->config->getShopId();
