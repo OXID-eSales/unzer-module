@@ -6,10 +6,13 @@ use UnzerSDK\Constants\BasketItemTypes;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use OxidEsales\Eshop\Core\Registry;
 
+/**
+ * TODO: Fix all the suppressed warnings
+ * @SuppressWarnings(PHPMD.LongVariable)
+ */
 class UnzerBasketItemFactory
 {
-    /** @var UnzerBasketItemTitle */
-    private $unzerBasketItemTitleService;
+    private UnzerBasketItemTitle $unzerBasketItemTitleService;
 
     public function __construct(UnzerBasketItemTitle $unzerBasketItemTitleService)
     {
@@ -23,7 +26,7 @@ class UnzerBasketItemFactory
             ->setType(BasketItemTypes::VOUCHER)
             ->setVat(0)
             ->setAmountPerUnitGross(0.)
-            ->setAmountDiscountPerUnitGross(Registry::getUtils()->fRound($voucherItemAmount));
+            ->setAmountDiscountPerUnitGross(Registry::getUtils()->fRound((string)$voucherItemAmount));
 
         return $unzerBasketItem;
     }

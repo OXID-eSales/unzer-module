@@ -5,9 +5,12 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
 
 class OrderList extends OrderList_parent
 {
+    use Request;
+
     /**
      * Adding folder check
     * bi *
@@ -31,7 +34,7 @@ class OrderList extends OrderList_parent
         $query = parent::_prepareWhereQuery($whereQuery, $fullQuery);
         $config = $this->getConfig();
         $folders = $config->getConfigParam('aOrderfolder');
-        $folder = Registry::getConfig()->getRequestParameter('folder');
+        $folder = $this->getUnzerStringRequestParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder !== '-1') {
             $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";

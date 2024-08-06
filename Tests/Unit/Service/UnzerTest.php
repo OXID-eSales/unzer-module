@@ -24,6 +24,7 @@ use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Service\UnzerVoucherBasketItems;
 use PHPUnit\Framework\TestCase;
 
 class UnzerTest extends TestCase
@@ -316,21 +317,20 @@ class UnzerTest extends TestCase
 
     public function testGetUnzerPaymentIdFromRequest(): void
     {
-        $requestStub = $this->createPartialMock(Request::class, ['getRequestParameter']);
-        $requestStub->method('getRequestParameter')->with('paymentData')->willReturn(
+        $sut = $this->createMock(Unzer::class);
+        $sut->method('getUnzerStringRequestParameter')->with('paymentData')->willReturn(
             json_encode(['id' => 'someId'])
         );
-
-        $sut = $this->getSut([
-            Request::class => $requestStub
-        ]);
 
         $this->assertSame('someId', $sut->getUnzerPaymentIdFromRequest());
     }
 
     public function testGetUnzerPaymentIdFromRequestFailure(): void
     {
-        $sut = $this->getSut();
+        $sut = $this->createMock(Unzer::class);
+        $sut->method('getUnzerStringRequestParameter')->with('paymentData')->willReturn(
+            'wrong'
+        );
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('oscunzer_WRONGPAYMENTID');
@@ -346,14 +346,20 @@ class UnzerTest extends TestCase
         $translatorMock->expects($this->any())
             ->method('translate')
             ->willReturn('Shipping costs');
+        $voucherBasketItemsMock = $this->getMockBuilder(UnzerVoucherBasketItems::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $voucherBasketItemsMock->expects($this->any())
+            ->method('getVoucherBasketItems')
+            ->willReturn([]);
+
         return new Unzer(
             $this->createPartialMock(Session::class, []),
             $translatorMock,
             $this->createPartialMock(Context::class, []),
             $settings[ModuleSettings::class] ?:
                 $this->createPartialMock(ModuleSettings::class, []),
-            $settings[Request::class] ?:
-                $this->createPartialMock(Request::class, []),
+            $voucherBasketItemsMock
         );
     }
 }

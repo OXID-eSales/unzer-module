@@ -23,7 +23,7 @@ class ApplePaymentProcessingCertificate
             $certificate
         );
     }
-    public function saveCertificateKey(?string $certificateKey)
+    public function saveCertificateKey(?string $certificateKey): bool
     {
         if (is_null($certificateKey)) {
             return false;

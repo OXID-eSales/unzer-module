@@ -6,6 +6,7 @@
  */
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
+
 use OxidSolutionCatalysts\Unzer\Service\UnzerVoucherBasketItems;
 use OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemConverter;
 use OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemFactory;
@@ -49,8 +50,12 @@ class UnzerVoucherBasketItemsTest extends TestCase
         $basket->method('getDiscounts')->willReturn($discounts);
         $basket->method('getVouchers')->willReturn($vouchers);
 
-        $this->unzerBasketItemConverterService->method('convertDiscountsToVoucherAmounts')->with($discounts)->willReturn($convertedDiscounts);
-        $this->unzerBasketItemConverterService->method('convertVouchersToVoucherAmounts')->with($vouchers)->willReturn($convertedVouchers);
+        $this->unzerBasketItemConverterService->method('convertDiscountsToVoucherAmounts')
+            ->with($discounts)
+            ->willReturn($convertedDiscounts);
+        $this->unzerBasketItemConverterService->method('convertVouchersToVoucherAmounts')
+            ->with($vouchers)
+            ->willReturn($convertedVouchers);
 
         $this->unzerBasketItemFactoryService->method('create')->willReturnMap([
             [5.00, $basketItemDiscount],
@@ -75,8 +80,12 @@ class UnzerVoucherBasketItemsTest extends TestCase
         $basket->method('getDiscounts')->willReturn($discounts);
         $basket->method('getVouchers')->willReturn($vouchers);
 
-        $this->unzerBasketItemConverterService->method('convertDiscountsToVoucherAmounts')->with($discounts)->willReturn($convertedDiscounts);
-        $this->unzerBasketItemConverterService->method('convertVouchersToVoucherAmounts')->with($vouchers)->willReturn($convertedVouchers);
+        $this->unzerBasketItemConverterService->method('convertDiscountsToVoucherAmounts')
+            ->with($discounts)
+            ->willReturn($convertedDiscounts);
+        $this->unzerBasketItemConverterService->method('convertVouchersToVoucherAmounts')
+            ->with($vouchers)
+            ->willReturn($convertedVouchers);
 
         $result = $this->unzerVoucherBasketItems->getVoucherBasketItems($basket);
 

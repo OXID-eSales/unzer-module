@@ -25,7 +25,7 @@ class UnzerBasketItemFactoryTest extends TestCase
     }
 
     /**
-     * @covers UnzerBasketItemFactory::create
+     * @covers \OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemFactory::create
      */
     public function testCreate()
     {
