@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.2.0] - unreleased - 2024-??-??
+- add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
 
 ### NEW
 - New Paymentmethod Unzer installment (Paylater)
