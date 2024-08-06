@@ -51,6 +51,7 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
  * TODO: Fix all the suppressed warnings
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
@@ -58,33 +59,32 @@ class Unzer
 {
     use ServiceContainer;
 
-    /** @var \OxidEsales\Eshop\Core\Session $session */
-    protected $session;
+    protected Session $session;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\Translator $translator */
-    protected $translator;
+    protected Translator $translator;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\Context $context */
-    protected $context;
+    protected Context $context;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\ModuleSettings $moduleSettings */
-    protected $moduleSettings;
+    protected ModuleSettings $moduleSettings;
 
-    /** @var \OxidEsales\Eshop\Core\Request $request */
-    protected $request;
+    protected Request $request;
+
+    protected UnzerVoucherBasketItems $unzerVoucherBasketItemsService;
 
     public function __construct(
         Session $session,
         Translator $translator,
         Context $context,
         ModuleSettings $moduleSettings,
-        Request $request
+        Request $request,
+        UnzerVoucherBasketItems $unzerVoucherBasketItemsService
     ) {
         $this->session = $session;
         $this->translator = $translator;
         $this->context = $context;
         $this->moduleSettings = $moduleSettings;
         $this->request = $request;
+        $this->unzerVoucherBasketItemsService = $unzerVoucherBasketItemsService;
     }
 
     /**
@@ -337,8 +337,6 @@ class Unzer
             ->setCurrencyCode($basketModel->getBasketCurrency()->name);
 
         $priceForPayment = $basketModel->getPriceForPayment();
-        $discountAmount = $basketModel->getTotalDiscount()->getPrice();
-        $voucherAmount = $basketModel->getVoucherDiscount()->getPrice();
 
         $shopBasketContents = $basketModel->getContents();
 
@@ -381,34 +379,9 @@ class Unzer
         }
 
         // Add Vouchers
-        $totalVoucherAmount = $voucherAmount + $discountAmount;
-        if ($totalVoucherAmount > 0.) {
-            $unzerBasketItem = new BasketItem();
-            $unzerBasketItem->setTitle($this->translator->translate('DISCOUNT'))
-                ->setQuantity(1)
-                ->setType(BasketItemTypes::VOUCHER)
-                ->setAmountNet($totalVoucherAmount)
-                ->setAmountPerUnit($totalVoucherAmount)
-                ->setAmountGross($totalVoucherAmount)
-                ->setVat(0)
-                ->setAmountPerUnitGross(0.)
-                ->setAmountDiscountPerUnitGross($totalVoucherAmount);
-
-            $unzerBasketItems[] = $unzerBasketItem;
-        } elseif ($totalVoucherAmount < 0.) {
-            $totalVoucherAmount *= -1.;
-            $unzerBasketItem = new BasketItem();
-            $unzerBasketItem->setTitle($this->translator->translate('SURCHARGE'))
-                ->setQuantity(1)
-                ->setType(BasketItemTypes::GOODS)
-                ->setAmountNet($totalVoucherAmount)
-                ->setAmountPerUnit($totalVoucherAmount)
-                ->setAmountGross($totalVoucherAmount)
-                ->setVat(0)
-                ->setAmountPerUnitGross($totalVoucherAmount)
-                ->setAmountDiscountPerUnitGross(0.);
-
-            $unzerBasketItems[] = $unzerBasketItem;
+        $voucherBasketItems = $this->unzerVoucherBasketItemsService->getVoucherBasketItems($basketModel);
+        if (count($voucherBasketItems)) {
+            $unzerBasketItems = array_merge($unzerBasketItems, $voucherBasketItems);
         }
 
         $basket->setBasketItems($unzerBasketItems);

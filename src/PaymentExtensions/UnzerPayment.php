@@ -160,7 +160,9 @@ abstract class UnzerPayment
         if ($this->isSafePaymentClickedByUserInRequest($paymentType)) {
             $session->setVariable(
                 'oscunzersavepayment',
-                $this->existsInSavedPaymentsList($userModel) ? $request->getRequestParameter('oscunzersavepayment') : false
+                $this->existsInSavedPaymentsList($userModel) ?
+                    $request->getRequestParameter('oscunzersavepayment') :
+                    false
             );
         }
 
@@ -433,7 +435,8 @@ abstract class UnzerPayment
         );
     }
 
-    private function isSafePaymentClickedByUserInRequest(BasePaymentType $paymentType) {
+    private function isSafePaymentClickedByUserInRequest(BasePaymentType $paymentType): bool
+    {
         return ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal)
             && Registry::getRequest()->getRequestParameter('oscunzersavepayment');
     }
