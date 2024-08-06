@@ -24,6 +24,7 @@ use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Service\UnzerVoucherBasketItems;
 use PHPUnit\Framework\TestCase;
 
 class UnzerTest extends TestCase
@@ -354,6 +355,7 @@ class UnzerTest extends TestCase
                 $this->createPartialMock(ModuleSettings::class, []),
             $settings[Request::class] ?:
                 $this->createPartialMock(Request::class, []),
+            $this->createPartialMock(UnzerVoucherBasketItems::class, [])
         );
     }
 }

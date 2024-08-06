@@ -16,9 +16,9 @@ class UnzerBasketItemConverterTest extends TestCase
     }
 
     /**
-     * @covers UnzerBasketItemConverter::convertDiscountsToVoucherAmounts
+     * @covers \OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemConverter::convertDiscountsToVoucherAmounts
      */
-    public function testConvertDiscountsToVoucherAmounts()
+    public function testConvertDiscountsToVoucherAmounts(): void
     {
         $discountItems = [
             (object)['dDiscount' => 5.00],
@@ -35,9 +35,9 @@ class UnzerBasketItemConverterTest extends TestCase
     }
 
     /**
-     * @covers UnzerBasketItemConverter::convertVouchersToVoucherAmounts
+     * @covers \OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemConverter::convertVouchersToVoucherAmounts
      */
-    public function testConvertVouchersToVoucherAmounts()
+    public function testConvertVouchersToVoucherAmounts(): void
     {
         $voucherItems = [
             (object)['dVoucherdiscount' => 20.00],

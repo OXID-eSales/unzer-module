@@ -23,7 +23,7 @@ class UnzerBasketItemTitleTest extends TestCase
     }
 
     /**
-     * @covers UnzerBasketItemTitle::getTitle
+     * @covers \OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemTitle::getTitle
      */
     public function testGetTitleReturnsDiscountForPositiveAmount()
     {
@@ -37,7 +37,7 @@ class UnzerBasketItemTitleTest extends TestCase
     }
 
     /**
-     * @covers UnzerBasketItemTitle::getTitle
+     * @covers \OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemTitle::getTitle
      */
     public function testGetTitleReturnsSurchargeForNegativeAmount()
     {
