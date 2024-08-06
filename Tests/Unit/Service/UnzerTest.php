@@ -317,21 +317,20 @@ class UnzerTest extends TestCase
 
     public function testGetUnzerPaymentIdFromRequest(): void
     {
-        $requestStub = $this->createPartialMock(Request::class, ['getRequestParameter']);
-        $requestStub->method('getRequestParameter')->with('paymentData')->willReturn(
+        $sut = $this->createMock(Unzer::class);
+        $sut->method('getUnzerStringRequestParameter')->with('paymentData')->willReturn(
             json_encode(['id' => 'someId'])
         );
-
-        $sut = $this->getSut([
-            Request::class => $requestStub
-        ]);
 
         $this->assertSame('someId', $sut->getUnzerPaymentIdFromRequest());
     }
 
     public function testGetUnzerPaymentIdFromRequestFailure(): void
     {
-        $sut = $this->getSut();
+        $sut = $this->createMock(Unzer::class);
+        $sut->method('getUnzerStringRequestParameter')->with('paymentData')->willReturn(
+            'wrong'
+        );
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('oscunzer_WRONGPAYMENTID');
@@ -360,8 +359,6 @@ class UnzerTest extends TestCase
             $this->createPartialMock(Context::class, []),
             $settings[ModuleSettings::class] ?:
                 $this->createPartialMock(ModuleSettings::class, []),
-            $settings[Request::class] ?:
-                $this->createPartialMock(Request::class, []),
             $voucherBasketItemsMock
         );
     }

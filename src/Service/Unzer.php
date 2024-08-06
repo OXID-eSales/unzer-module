@@ -78,14 +78,12 @@ class Unzer
         Translator $translator,
         Context $context,
         ModuleSettings $moduleSettings,
-        Request $request,
         UnzerVoucherBasketItems $unzerVoucherBasketItemsService
     ) {
         $this->session = $session;
         $this->translator = $translator;
         $this->context = $context;
         $this->moduleSettings = $moduleSettings;
-        $this->request = $request;
         $this->unzerVoucherBasketItemsService = $unzerVoucherBasketItemsService;
     }
 
