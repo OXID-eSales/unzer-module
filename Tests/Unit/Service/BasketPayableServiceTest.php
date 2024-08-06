@@ -1,8 +1,6 @@
 <?php
 
-namespace OxidEsales\EshopCommunity\modules\osc\unzer\Tests\Unit\Service;
-
-namespace OxidSolutionCatalysts\Unzer\Service;
+namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
