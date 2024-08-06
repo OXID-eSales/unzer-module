@@ -13,49 +13,53 @@ trait Request
 {
     protected function getUnzerStringRequestEscapedParameter(string $varName, string $defaultValue = ''): string
     {
+        /** @phpstan-ignore argument.type */
         $value = Registry::getRequest()->getRequestEscapedParameter($varName, $defaultValue);
         return is_string($value) ? $value : '';
     }
 
     protected function getUnzerStringRequestParameter(string $varName, string $defaultValue = ''): string
     {
+        /** @phpstan-ignore argument.type */
         $value = Registry::getRequest()->getRequestParameter($varName, $defaultValue);
         return is_string($value) ? $value : '';
     }
 
     protected function getUnzerArrayRequestParameter(string $varName, array $defaultValue = []): array
     {
+        /** @phpstan-ignore argument.type */
         $value = Registry::getRequest()->getRequestParameter($varName, $defaultValue);
         return is_array($value) ? $value : [];
     }
 
     protected function getUnzerFloatRequestParameter(string $varName, float $defaultValue = 0.0): float
     {
+        /** @phpstan-ignore argument.type */
         $value = Registry::getRequest()->getRequestParameter($varName, $defaultValue);
         $value = is_string($value) ? $this->normalizeNumber($value) : $value;
         return is_numeric($value) ? (float) $value : 0.0;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     protected function getUnzerBoolRequestParameter(string $varName, bool $defaultValue = false): bool
     {
+        /** @phpstan-ignore argument.type */
         $value = Registry::getRequest()->getRequestParameter($varName, $defaultValue);
-        return $value ?: false;
+        return (bool)$value;
     }
 
     private function normalizeNumber(string $input): float
     {
         $input = str_replace(' ', '', $input);
         $lastCommaPos = strrpos($input, ',');
-
+        $number = $input;
         if ($lastCommaPos !== false) {
-            if (strpos($input, '.', $lastCommaPos) !== false) {
-                $number = str_replace(',', '', $input);
-            } else {
+            if (strpos($number, '.', $lastCommaPos) === false) {
                 $number = substr_replace($input, '.', $lastCommaPos, 1);
-                $number = str_replace(',', '', $number);
             }
-        } else {
-            $number = $input;
+            $number = str_replace(',', '', $number);
         }
 
         return (float)$number;

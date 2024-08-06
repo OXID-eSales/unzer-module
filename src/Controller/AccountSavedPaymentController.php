@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use Exception;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
@@ -21,6 +22,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 class AccountSavedPaymentController extends AccountController
 {
     use ServiceContainer;
+    use Request;
 
     public function render()
     {
@@ -90,8 +92,7 @@ class AccountSavedPaymentController extends AccountController
      */
     public function deletePayment(): void
     {
-        $paymentTypeId = Registry::getRequest()->getRequestParameter('paymenttypeid', '');
-        $paymentTypeId = is_string($paymentTypeId) ? $paymentTypeId : '';
+        $paymentTypeId = $this->getUnzerStringRequestParameter('paymenttypeid');
         /** @var \OxidSolutionCatalysts\Unzer\Model\Transaction $transaction */
         $transaction = oxNew(\OxidSolutionCatalysts\Unzer\Model\Transaction::class);
         $transaction->load($paymentTypeId);
