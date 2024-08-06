@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -31,14 +32,17 @@ use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\Paypal;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
+use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Unzer;
 
 /**
  *  TODO: Decrease count of dependencies to 13
+ *  TODO: Decrease overall complexity below 50
+ *  TODO: Fix all the suppressed warnings
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.NumberOfChildren)
- *  TODO: Decrease overall complexity below 50
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 abstract class UnzerPayment
 {
@@ -152,6 +156,11 @@ abstract class UnzerPayment
 
         $transaction = $this->doTransactions($basketModel, $customer, $userModel, $paymentType);
         $this->unzerService->setSessionVars($transaction);
+
+        if ($transaction instanceof Charge) {
+            $prePaymentBankAccountService = $this->getServiceFromContainer(PrePaymentBankAccountService::class);
+            $prePaymentBankAccountService->persistBankAccountInfo($transaction);
+        }
 
         if ($this->getUnzerStringRequestParameter('birthdate')) {
             $userModel->save();
