@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.2.0] - unreleased - 2024-??-??
 - add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
+- UNZER-456: add the requirement not to sending the payment to unzer, if the minimum payment amount is not reached
 
 ### NEW
 - New Paymentmethod Unzer installment (Paylater)
