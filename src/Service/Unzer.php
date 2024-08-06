@@ -51,6 +51,7 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
  * TODO: Fix all the suppressed warnings
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.LongVariable)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
@@ -58,23 +59,17 @@ class Unzer
 {
     use ServiceContainer;
 
-    /** @var \OxidEsales\Eshop\Core\Session $session */
-    protected $session;
+    protected Session $session;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\Translator $translator */
-    protected $translator;
+    protected Translator $translator;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\Context $context */
-    protected $context;
+    protected Context $context;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\ModuleSettings $moduleSettings */
-    protected $moduleSettings;
+    protected ModuleSettings $moduleSettings;
 
-    /** @var \OxidEsales\Eshop\Core\Request $request */
-    protected $request;
+    protected Request $request;
 
-    /** @var UnzerVoucherBasketItems $unzerVoucherBasketItemsService */
-    protected $unzerVoucherBasketItemsService;
+    protected UnzerVoucherBasketItems $unzerVoucherBasketItemsService;
 
     public function __construct(
         Session $session,

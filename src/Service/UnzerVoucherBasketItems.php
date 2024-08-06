@@ -6,13 +6,14 @@ use OxidEsales\EshopCommunity\Application\Model\Basket;
 use OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemConverter;
 use OxidSolutionCatalysts\Unzer\Service\UnzerBasketItem\UnzerBasketItemFactory;
 
+/**
+ * TODO: Fix all the suppressed warnings
+ * @SuppressWarnings(PHPMD.LongVariable)
+ */
 class UnzerVoucherBasketItems
 {
-    /** @var UnzerBasketItemFactory $unzerBasketItemFactoryService */
-    private $unzerBasketItemFactoryService;
-
-    /** @var UnzerBasketItemConverter $unzerBasketItemConverter */
-    private $unzerBasketItemConverterService;
+    private UnzerBasketItemFactory $unzerBasketItemFactoryService;
+    private UnzerBasketItemConverter $unzerBasketItemConverterService;
 
     public function __construct(
         UnzerBasketItemFactory $unzerBasketItemFactoryService,
@@ -48,7 +49,7 @@ class UnzerVoucherBasketItems
         );
     }
 
-    private function createUnzerVoucherBasketItems($voucherItems)
+    private function createUnzerVoucherBasketItems(array $voucherItems): ?array
     {
         $unzerBasketItems = [];
         if (count($voucherItems)) {
