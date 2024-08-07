@@ -34,6 +34,8 @@ final class UnzerDefinitions
     public const WECHATPAY_UNZER_PAYMENT_ID = 'oscunzer_wechatpay';
     public const APPLEPAY_UNZER_PAYMENT_ID = 'oscunzer_applepay';
 
+    public const MINIMAL_PAYABLE_AMOUNT = 0.75;
+
     private const PAYMENT_CONSTRAINTS = [
         'oxfromamount' => 0,
         'oxtoamount' => 10000,
