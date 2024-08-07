@@ -37,15 +37,17 @@ use UnzerSDK\Unzer;
 
 /**
  *  TODO: Decrease count of dependencies to 13
+ *  TODO: Decrease overall complexity below 50
+ *  TODO: Fix all the suppressed warnings
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.NumberOfChildren)
- *  TODO: Decrease overall complexity below 50
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 abstract class UnzerPayment
 {
     use ServiceContainer;
-    use \OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
+    use \OxidSolutionCatalysts\Unzer\Traits\Request;
 
     /** @var Unzer */
     protected $unzerSDK;

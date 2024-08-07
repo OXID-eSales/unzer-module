@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.2.0] - unreleased - 2024-??-??
 - add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
+- UNZER-456: add the requirement not to sending the payment to unzer, if the minimum payment amount is not reached
 
 ### NEW
 - New Paymentmethod Unzer installment (Paylater)
@@ -27,6 +28,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
 - Inform the customer in frontend, if the payment was cancelled by customer during checkout
 - fix system crashes sporadically [not always replicatable] on card payment on return from the 3d-auth page with this in log
+- fix show prePayment-BankInformations on Thankyou-Page
+- save ApplePay-Certificates in any case of change ModuleConfiguration
+- fix provide ShopMetadata for UnzerPayment
+- fix show multiple vouchers separately
 
 ## [1.1.3] - 2023-11-14
 
