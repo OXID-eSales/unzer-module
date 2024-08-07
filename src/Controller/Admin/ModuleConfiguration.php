@@ -6,7 +6,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
-use OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Service\ModuleConfiguration\ApplePaymentProcessingCertificate;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Module;

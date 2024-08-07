@@ -10,7 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller;
 use Exception;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;

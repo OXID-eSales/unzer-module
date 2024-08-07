@@ -59,7 +59,7 @@ use UnzerSDK\Resources\TransactionTypes\Charge;
 class Unzer
 {
     use ServiceContainer;
-    use \OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
+    use \OxidSolutionCatalysts\Unzer\Traits\Request;
 
     protected Session $session;
 
