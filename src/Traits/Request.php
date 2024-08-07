@@ -5,7 +5,7 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits;
+namespace OxidSolutionCatalysts\Unzer\Traits;
 
 use OxidEsales\EshopCommunity\Core\Registry;
 

@@ -47,7 +47,7 @@ use UnzerSDK\Unzer;
 abstract class UnzerPayment
 {
     use ServiceContainer;
-    use \OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
+    use \OxidSolutionCatalysts\Unzer\Traits\Request;
 
     /** @var Unzer */
     protected $unzerSDK;

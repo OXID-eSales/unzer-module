@@ -5,7 +5,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\modules\osc\unzer\src\Traits\Request;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 
 class OrderList extends OrderList_parent
 {
