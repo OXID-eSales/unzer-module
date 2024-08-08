@@ -5,12 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.2.0] - unreleased - 2024-??-??
-- add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
-- UNZER-456: add the requirement not to sending the payment to unzer, if the minimum payment amount is not reached
 
 ### NEW
 - New Paymentmethod Unzer installment (Paylater)
 - If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup  temporary order
+- add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
+- UNZER-456: add the requirement not to sending the payment to unzer, if the minimum payment amount is not reached
 
 ### FIXED
 - refactor of the correct use of the appropriate credentials depending on the payment method used
