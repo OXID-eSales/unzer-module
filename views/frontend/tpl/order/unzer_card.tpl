@@ -85,40 +85,39 @@
 [{/if}]
 [{capture assign="unzerCardJS"}]
 
-    $('input[name="newccard"]').on('change', function() {
+    let newCardCheckbox = $('input[name="newccard"]');
+    let savedCardsTableEl = $('#payment-saved-cards');
+    let paymentFormCardEl = $('#payment-form-card');
+    let cardsCount = 0;
+    let orderConfirmAgbBottom = $('#orderConfirmAgbBottom');
+
+    newCardCheckbox.on('change', function() {
         if ($(this).prop('checked')) {
-            $('#orderConfirmAgbBottom').addClass('new-card-selected');
+            orderConfirmAgbBottom.addClass('new-card-selected');
         } else {
-            $('#orderConfirmAgbBottom').removeClass('new-card-selected');
+            orderConfirmAgbBottom.removeClass('new-card-selected');
         }
     });
 
-    $('#orderConfirmAgbBottom').submit(function(event) {
+    orderConfirmAgbBottom.submit(function(event) {
 
         if ($(this).hasClass('new-card-selected') && !$(this).hasClass("submitable")) {
             event.preventDefault();
-            $("#payment-form-card").submit();
+            paymentFormCardEl.submit();
         } else if (!$(this).hasClass("submitable")) {
             event.preventDefault();
-            $("#payment-saved-cards").submit();
+            savedCardsTableEl.submit();
         }
-        $('#orderConfirmAgbBottom').removeClass('new-card-selected');
+        orderConfirmAgbBottom.removeClass('new-card-selected');
     });
 
     // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
-    let newCardCheckbox = $('input[name="newccard"]');
-    let savedCardsTableElement = $('#payment-saved-cards');
-    let cardsCount = 0;
-    if (savedCardsTableElement.length) {
+    if (savedCardsTableEl.length) {
         cardsCount = parseInt($('input[name=savedCardsCount]').attr('value'), 10);
     }
     if (newCardCheckbox.length === 0 || cardsCount === 0) {
-         let hiddenInput4 = $(document.createElement('input'))
-                        .attr('type', 'hidden')
-                        .attr('name', 'is_saved_payment_in_action')
-                        .val(0);
-        $('#orderConfirmAgbBottom').addClass('new-card-selected');
+        orderConfirmAgbBottom.addClass('new-card-selected');
         $('#newcc').show();
         if (cardsCount === 0) {
             $('#addNewCardCheckboxLabel').hide();
@@ -126,7 +125,7 @@
         Card = unzerInstance.Card();
         addPaymentElements(Card);
     } else {
-        $('input[name="newccard"]').on('change', function() {
+        newCardCheckbox.on('change', function() {
             Card = unzerInstance.Card();
             if ($(this).prop('checked')) {
                 // Create a Card instance and render the input fields
@@ -140,7 +139,7 @@
         });
     }
 
-    $( "#payment-form-card" ).submit(function( event ) {
+    paymentFormCardEl.submit(function( event ) {
         event.preventDefault();
         if (Card) {
             Card.createResource()
@@ -154,22 +153,22 @@
                         .attr('name', 'oscunzersavepayment')
                         .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
 
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
-                    $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
-
-                    $('#orderConfirmAgbBottom' ).addClass("submitable");
-                    $('#orderConfirmAgbBottom').submit();
+                    orderConfirmAgbBottom.find(".hidden")
+                        .append(hiddenInput2)
+                        .append(hiddenInput);
+                    orderConfirmAgbBottom.addClass("submitable")
+                        .submit();
                 })
                 .catch(function(error) {
                     $('html, body').animate({
                         scrollTop: $("#orderPayment").offset().top - 150
                     }, 350);
-                    $('#orderConfirmAgbBottom').addClass('new-card-selected');
+                    orderConfirmAgbBottom.addClass('new-card-selected');
                 })
         }
-        $('#orderConfirmAgbBottom').addClass('new-card-selected');
+        orderConfirmAgbBottom.addClass('new-card-selected');
     });
-    $( "#payment-saved-cards" ).submit(function( event ) {
+    savedCardsTableEl.submit(function( event ) {
         event.preventDefault();
         let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
         let paymentData = {
@@ -181,19 +180,17 @@
             .attr('type', 'hidden')
             .attr('name', 'paymentData')
             .val(paymentDataString);
-        $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput3);
-
         let hiddenInput4 = $(document.createElement('input'))
                         .attr('type', 'hidden')
                         .attr('name', 'is_saved_payment_in_action')
                         .val(1);
-
-        $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput4);
-        $('#orderConfirmAgbBottom' ).addClass("submitable");
-        $('#orderConfirmAgbBottom').submit();
+        orderConfirmAgbBottom.find(".hidden").append(hiddenInput3)
+            .append(hiddenInput4);
+        orderConfirmAgbBottom.addClass("submitable")
+            .submit();
     });
 
-    $('input[name="newccard"]').on('change', function() {
+    newCardCheckbox.on('change', function() {
         if ($(this).prop('checked')) {
             // Hide saved payment methods and deselect radio buttons
             $('.savedpayment').fadeOut();
