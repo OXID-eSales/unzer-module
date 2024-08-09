@@ -134,9 +134,11 @@ class Transaction
         if ($this->saveTransaction($params, $oOrder)) {
             $this->deleteInitOrder($params);
 
-            // Fallback: set ShortID as OXTRANSID
-            $shortId = $params['shortid'] ?? '';
-            $oOrder->setUnzerTransId($shortId);
+            if ($oOrder->isLoaded()) {
+                // Fallback: set ShortID as OXTRANSID
+                $shortId = $params['shortid'] ?? '';
+                $oOrder->setUnzerTransId($shortId);
+            }
 
             return true;
         }
