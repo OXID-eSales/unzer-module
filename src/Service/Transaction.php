@@ -7,38 +7,27 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Doctrine\DBAL\Driver\Result;
 use Exception;
 use JsonException;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use PDO;
-use Doctrine\DBAL\Query\QueryBuilder;
-use OxidEsales\Eshop\Application\Model\Basket;
-use OxidEsales\Eshop\Application\Model\Order as EshopModelOrder;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerResourceCard;
-use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerResourcePaypal;
-use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -109,6 +98,8 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'customertype' => '',
+            'paymentTypeId' => $unzerPayment && $unzerPayment->getPaymentType()
+                ? $unzerPayment->getPaymentType()->getId() : '',
         ];
 
         if ($unzerPayment) {
@@ -556,11 +547,16 @@ class Transaction
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         if ($oDB) {
             $result = $oDB->getAll(
-                "SELECT ot.OXID, ot.PAYMENTTYPEID, ot.CURRENCY, ot.CUSTOMERTYPE, o.OXPAYMENTTYPE
-                        from oscunzertransaction as ot
-                        left join oxorder as o ON (ot.oxorderid = o.OXID)
-            where ot.OXUSERID = :oxuserid AND ot.PAYMENTTYPEID IS NOT NULL
-            GROUP BY ot.PAYMENTTYPEID ",
+                "SELECT transaction.OXID, transaction.PAYMENTTYPEID, transaction.CURRENCY, transaction.CUSTOMERTYPE, oxorder.OXPAYMENTTYPE, transaction.OXACTIONDATE
+                FROM oscunzertransaction AS transaction
+                LEFT JOIN oxorder ON transaction.oxorderid = oxorder.OXID
+                INNER JOIN (
+                    SELECT PAYMENTTYPEID, MAX(OXACTIONDATE) AS LatestActionDate
+                    FROM oscunzertransaction
+                    WHERE OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL
+                    GROUP BY PAYMENTTYPEID
+                ) AS latest_transaction ON transaction.PAYMENTTYPEID = latest_transaction.PAYMENTTYPEID AND transaction.OXACTIONDATE = latest_transaction.LatestActionDate
+                WHERE transaction.OXUSERID = :oxuserid;",
                 [':oxuserid' => $userId]
             );
         }
