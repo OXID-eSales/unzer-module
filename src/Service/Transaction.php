@@ -12,6 +12,7 @@ use JsonException;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -42,6 +43,7 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 class Transaction
 {
     use ServiceContainer;
+    use Request;
 
     protected Context $context;
 
@@ -100,6 +102,7 @@ class Transaction
             'customertype' => '',
             'paymentTypeId' => $unzerPayment && $unzerPayment->getPaymentType()
                 ? $unzerPayment->getPaymentType()->getId() : '',
+            'savepayment' => $this->isSavePaymentSelectedByUserInRequest($unzerPayment->getPaymentType()) ? 1 : 0,
         ];
 
         if ($unzerPayment) {

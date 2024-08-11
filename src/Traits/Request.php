@@ -8,6 +8,9 @@
 namespace OxidSolutionCatalysts\Unzer\Traits;
 
 use OxidEsales\EshopCommunity\Core\Registry;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
+use UnzerSDK\Resources\PaymentTypes\Paypal;
 
 trait Request
 {
@@ -63,5 +66,11 @@ trait Request
         }
 
         return (float)$number;
+    }
+
+    protected function isSavePaymentSelectedByUserInRequest(BasePaymentType $paymentType): bool
+    {
+        return ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal)
+            && $this->getUnzerStringRequestParameter('oscunzersavepayment');
     }
 }

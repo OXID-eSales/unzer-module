@@ -166,7 +166,7 @@ abstract class UnzerPayment
             $userModel->save();
         }
 
-        if ($this->isSafePaymentClickedByUserInRequest($paymentType)) {
+        if ($this->isSavePaymentSelectedByUserInRequest($paymentType)) {
             $session->setVariable(
                 'oscunzersavepayment',
                 $this->existsInSavedPaymentsList($userModel) ?
@@ -406,7 +406,7 @@ abstract class UnzerPayment
             null,
             null,
             null,
-            $this->isSafePaymentClickedByUserInRequest($paymentType) ? RecurrenceTypes::ONE_CLICK : null
+            $this->isSavePaymentSelectedByUserInRequest($paymentType) ? RecurrenceTypes::ONE_CLICK : null
         );
     }
 
@@ -447,11 +447,5 @@ abstract class UnzerPayment
             null,
             RecurrenceTypes::ONE_CLICK
         );
-    }
-
-    private function isSafePaymentClickedByUserInRequest(BasePaymentType $paymentType): bool
-    {
-        return ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal)
-            && $this->getUnzerStringRequestParameter('oscunzersavepayment');
     }
 }
