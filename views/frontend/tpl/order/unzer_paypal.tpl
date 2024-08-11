@@ -5,24 +5,25 @@
         <form id="payment-saved-cards" class="unzerUI form" novalidate>
             [{if $oView->getPaymentSaveSetting() and $lastSavedPayPalPaymentType}]
 
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">[{oxmultilang ident="EMAIL"}]</th>
-                    <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                 <tr>
-                    <th scope="row">[{$lastSavedPayPalPaymentType.email}]</th>
-                    <td>[{oxmultilang ident="OSCUNZER_PAYMENT_METHOD_PAYPAL"}]</td>
-                    <td>
-                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$lastSavedPayPalPaymentType.id}]" style="-webkit-appearance: radio">
-                    </td>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">[{oxmultilang ident="EMAIL"}]</th>
+                        <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
+                        <th scope="col"></th>
                     </tr>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                     <tr>
+                        <th scope="row">[{$lastSavedPayPalPaymentType.email}]</th>
+                        <td>[{oxmultilang ident="OSCUNZER_PAYMENT_METHOD_PAYPAL"}]</td>
+                        <td>
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$lastSavedPayPalPaymentType.id}]" style="-webkit-appearance: radio">
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>
+            [{/if}]
 
             [{if $oView->getPaymentSaveSetting()}]
             <div id="payment-sepa-confirm">
@@ -33,7 +34,6 @@
                     </label>
                 </div>
             </div>
-            [{/if}]
             [{/if}]
         </form>
     </div>
