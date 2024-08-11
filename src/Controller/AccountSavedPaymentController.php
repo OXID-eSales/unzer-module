@@ -40,7 +40,7 @@ class AccountSavedPaymentController extends AccountController
     protected function setPaymentListsToView(): void
     {
         $transactionService = $this->getServiceFromContainer(Transaction::class);
-        $ids = $transactionService->getTrancactionIds($this->getUser());
+        $ids = $transactionService->getTransactionIds($this->getUser());
         $paymentTypes = false;
         foreach ($ids as $typeData) {
             $paymentTypeId = $typeData['PAYMENTTYPEID'];

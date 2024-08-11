@@ -16,6 +16,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Service\View\SavedPaymentViewService;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -404,14 +405,19 @@ class OrderController extends OrderController_parent
             return;
         }
 
-        $transactionService = $this->getServiceFromContainer(Transaction::class);
-        $ids = $transactionService->getTrancactionIds($user);
-        $paymentTypes = [];
-        if ($ids) {
-            $paymentTypes = $transactionService->getSavedPaymentsForUser($user, $ids, true);
-        }
+        if ($sPaymentId === CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID) {
+            $this->getServiceFromContainer(SavedPaymentViewService::class)
+                ->setSavedPayPalPaymentsViewData($user, $this->_aViewData);
+        } else {
+            $transactionService = $this->getServiceFromContainer(Transaction::class);
+            $ids = $transactionService->getTransactionIds($user);
+            $paymentTypes = [];
+            if ($ids) {
+                $paymentTypes = $transactionService->getSavedPaymentsForUser($user, $ids, true);
+            }
 
-        $this->_aViewData['unzerPaymentType'] = $paymentTypes;
+            $this->_aViewData['unzerPaymentType'] = $paymentTypes;
+        }
     }
 
     protected function getBasketHash(): string

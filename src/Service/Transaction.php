@@ -532,7 +532,7 @@ class Transaction
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getTrancactionIds(?User $user = null): array
+    public function getTransactionIds(?User $user = null): array
     {
         $result = [];
 
@@ -607,6 +607,11 @@ class Transaction
 
         $this->paymentTypes = $result;
         return $this->paymentTypes;
+    }
+
+    public function getOxidPaymentMethodId(string $unzerPaymentMethodId): ?string
+    {
+        return $this->transPaymentTypeIds[$unzerPaymentMethodId] ?? null;
     }
 
     private function setPaymentTypes(

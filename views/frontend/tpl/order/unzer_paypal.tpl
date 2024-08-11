@@ -3,10 +3,7 @@
 
     <div class="savedpayment">
         <form id="payment-saved-cards" class="unzerUI form" novalidate>
-            [{if $oView->getPaymentSaveSetting()}]
-            [{foreach from=$unzerPaymentType item="setting" key="type"}]
-            [{if $unzerPaymentType != false}]
-            [{if $type == 'paypal'}]
+            [{if $oView->getPaymentSaveSetting() and $lastSavedPayPalPaymentType}]
 
             <table class="table">
                 <thead>
@@ -17,23 +14,16 @@
                 </tr>
                 </thead>
                 <tbody>
-                [{assign var="counter" value=0}]
-
-                [{foreach from=$setting item="paymentType" key=paymenttypeid }]
-                    <tr>
-                        <th scope="row">[{$paymentType.email}]</th>
-                        <td>[{$type}]</td>
-                        <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymenttypeid}]" style="-webkit-appearance: radio">
-                        </td>
+                 <tr>
+                    <th scope="row">[{$lastSavedPayPalPaymentType.email}]</th>
+                    <td>[{oxmultilang ident="OSCUNZER_PAYMENT_METHOD_PAYPAL"}]</td>
+                    <td>
+                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$lastSavedPayPalPaymentType.id}]" style="-webkit-appearance: radio">
+                    </td>
                     </tr>
-                    [{/foreach}]
                 </tbody>
             </table>
-            [{/if}]
 
-            [{/if}]
-            [{/foreach}]
             [{if $oView->getPaymentSaveSetting()}]
             <div id="payment-sepa-confirm">
                 <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">

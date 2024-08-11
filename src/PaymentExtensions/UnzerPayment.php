@@ -328,7 +328,7 @@ abstract class UnzerPayment
     {
         /** @var TransactionService $transactionService */
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
-        $ids = $transactionService->getTrancactionIds($user);
+        $ids = $transactionService->getTransactionIds($user);
         $savedUserPayments = [];
         if ($ids) {
             $savedUserPayments = $transactionService->getSavedPaymentsForUser($user, $ids, true);
