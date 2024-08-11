@@ -42,6 +42,7 @@ final class SavePaymentCCPPCest extends BaseCest
     private string $savePaypalPayment = "#oscunzersavepayment";
     private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[2]/input";
     private string $savedPaymentsLocator = "//*[@id='account_menu']/ul/li[1]/a";
+    private string $savePayPalAccountInNextStepInputSelector = "//*[@id='oscunzersavepayment']";
 
     /**
      * @group unzer_module
@@ -104,7 +105,7 @@ final class SavePaymentCCPPCest extends BaseCest
 
         $I->openShop()->openAccountPage();
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
-        $I->see("paypal-buyer@unzer.com");
+        $I->see($clientData['username']);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($this->I);
@@ -113,8 +114,8 @@ final class SavePaymentCCPPCest extends BaseCest
         $orderPage = $this->choosePayment($this->paypalPaymentLabel);
         $I->waitForElementClickable($this->firstSavedPaypalPayment);
         $I->wantTo('use saved payment to pay');
-        $I->seeAndClick('//*[@id="payment-saved-cards"]/table/tbody/tr/td[2]/input');
-        $I->wait(15);
+        $I->seeAndClick($this->savePayPalAccountInNextStepInputSelector);
+        $I->wait(2);
         $orderPage->submitOrder();
 
         $paypalPaymentData = Fixtures::get('paypal_payment');
