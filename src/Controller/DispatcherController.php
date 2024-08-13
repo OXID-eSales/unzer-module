@@ -235,13 +235,13 @@ class DispatcherController extends FrontendController
 
     private function markUnzerOrderAsPaid(Order $order): void
     {
-        $order->assign(['oxtransstatus' => 'Paid']);
+        $order->assign(['oxtransstatus' => 'OK']);
         $order->save();
     }
 
     private function cancelOrder(Order $order): void
     {
-        $order->assign(['oxtransstatus' => 'Cancelled']);
+        $order->assign(['oxtransstatus' => 'NOT_FINISHED']);
         $order->save();
     }
 }
