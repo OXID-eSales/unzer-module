@@ -248,9 +248,6 @@ class Transaction
         if (!$transaction->load($oxid)) {
             $transaction->assign($params);
             $transaction->setId($oxid);
-            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
-                $transaction->setTransStatus('aborted');
-            }
             $transaction->save();
 
             $result = true;
