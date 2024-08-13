@@ -314,7 +314,7 @@ abstract class UnzerPayment
             ->getSessionUnzerPayment();
         try {
             $transactionService->writeTransactionToDB(
-                Registry::getSession()->getSessionChallengeToken(),
+                Registry::getSession()->getVariable('sess_challenge'),
                 $user->getId(),
                 $payment
             );
