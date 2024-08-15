@@ -94,22 +94,10 @@ class Transaction
         $oOrder = oxNew(Order::class);
         $oOrder->load($orderid);
 
-        $params = [
-            'oxorderid' => $orderid,
-            'oxshopid' => $this->context->getCurrentShopId(),
-            'oxuserid' => $userId,
-            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-            'customertype' => '',
-            'paymentTypeId' => $unzerPayment && $unzerPayment->getPaymentType()
-                ? $unzerPayment->getPaymentType()->getId() : '',
-            'savepayment' => $this->isSavePaymentSelectedByUserInRequest($unzerPayment->getPaymentType()) ? 1 : 0,
-        ];
+        $params = $this->getBasicSaveParemeters($orderid, $userId, $unzerPayment);
 
         if ($unzerPayment) {
-            $unzerPaymentData = $unzerShipment !== null ?
-                $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
-                $this->getUnzerPaymentData($unzerPayment);
-            $params = array_merge($params, $unzerPaymentData);
+            $this->extendSaveParameters($params, $unzerPayment, $unzerShipment);
 
             // for PaylaterInvoice, store the customer type
             if (
@@ -550,7 +538,9 @@ class Transaction
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         if ($oDB) {
             $result = $oDB->getAll(
-                "SELECT transaction.OXID, transaction.PAYMENTTYPEID, transaction.CURRENCY, transaction.CUSTOMERTYPE, oxorder.OXPAYMENTTYPE, transaction.OXACTIONDATE
+                "SELECT transaction.OXID, transaction.PAYMENTTYPEID,
+                    transaction.CURRENCY, transaction.CUSTOMERTYPE,
+                    oxorder.OXPAYMENTTYPE, transaction.OXACTIONDATE
                 FROM oscunzertransaction AS transaction
                 LEFT JOIN oxorder ON transaction.oxorderid = oxorder.OXID
                 INNER JOIN (
@@ -558,7 +548,9 @@ class Transaction
                     FROM oscunzertransaction
                     WHERE OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL
                     GROUP BY PAYMENTTYPEID
-                ) AS latest_transaction ON transaction.PAYMENTTYPEID = latest_transaction.PAYMENTTYPEID AND transaction.OXACTIONDATE = latest_transaction.LatestActionDate
+                ) AS latest_transaction 
+                    ON transaction.PAYMENTTYPEID = latest_transaction.PAYMENTTYPEID 
+                        AND transaction.OXACTIONDATE = latest_transaction.LatestActionDate
                 WHERE transaction.OXUSERID = :oxuserid;",
                 [':oxuserid' => $userId]
             );
@@ -661,5 +653,35 @@ class Transaction
             $transActionConst = array_diff($transActionConst, [PaymentState::STATE_NAME_CANCELED]);
         }
         return implode(',', DatabaseProvider::getDb()->quoteArray($transActionConst));
+    }
+
+    private function getBasicSaveParemeters(string $orderId, string $userId, ?Payment $payment): array
+    {
+        return [
+            'oxorderid' => $orderId,
+            'oxshopid' => $this->context->getCurrentShopId(),
+            'oxuserid' => $userId,
+            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+            'customertype' => '',
+            'paymentTypeId' => $payment && $payment->getPaymentType()
+                ? $payment->getPaymentType()->getId() : '',
+        ];
+    }
+
+    private function extendSaveParameters(
+        array &$parameters,
+        Payment $unzerPayment,
+        ?Shipment $unzerShipment = null
+    ): void {
+        $unzerPaymentData = !is_null($unzerShipment) ?
+            $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
+            $this->getUnzerPaymentData($unzerPayment);
+        $parameters = array_merge($parameters, $unzerPaymentData);
+
+        $parameters = array_merge(
+            $parameters,
+            $this->getServiceFromContainer(SavedPaymentSaveService::class)
+                ->getTransactionParameters($unzerPayment)
+        );
     }
 }

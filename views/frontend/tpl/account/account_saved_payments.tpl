@@ -16,17 +16,17 @@
         <tbody>
         [{assign var="counter" value=0}]
 
-        [{foreach from=$setting item="paymentType" key=paymenttypeid }]
+        [{foreach from=$setting item="paymentType" key=savedPaymentUserId }]
             <tr>
                 <th scope="row">[{$paymentType.number}]</th>
                 <td>[{$paymentType.expiryDate}]</td>
                 <td>[{if $type == 'invalid_payment_method'}][{oxmultilang ident="OSCUNZER_INVALID_PAYMENT_METHOD"}][{else}][{$type}][{/if}]</td>
 
-                <td>
+                <td style="text-align: right;">
                     <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                         <input type="hidden" name="cl" value="unzer_saved_payments">
                         <input type="hidden" name="fnc" value="deletePayment">
-                        <input type="hidden" name="paymenttypeid" value="[{$paymenttypeid}]">
+                        <input type="hidden" name="savedPaymentUserId" value="[{$savedPaymentUserId}]">
                         <button type="submit" class="btn btn-danger" name="deletePayment">[{oxmultilang ident="DD_DELETE"}]</button>
                     </form>
                 </td>
@@ -49,15 +49,15 @@
         <tbody>
         [{assign var="counter" value=0}]
 
-        [{foreach from=$setting item="paymentType" key=paymenttypeid }]
+        [{foreach from=$setting item="paymentType" key=savedPaymentUserId }]
             <tr>
                 <th scope="row">[{$paymentType.email}]</th>
                 <td>[{$type}]</td>
-                <td>
+                <td style="text-align: right;">
                     <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                         <input type="hidden" name="cl" value="unzer_saved_payments">
                         <input type="hidden" name="fnc" value="deletePayment">
-                        <input type="hidden" name="paymenttypeid" value="[{$paymenttypeid}]">
+                        <input type="hidden" name="savedPaymentUserId" value="[{$savedPaymentUserId}]">
                         <button type="submit" class="btn btn-danger">[{oxmultilang ident="DD_DELETE"}]</button>
                     </form>
                 </td>
@@ -79,15 +79,15 @@
         </thead>
         <tbody>
 
-        [{foreach from=$setting item="paymentType" key=paymenttypeid }]
+        [{foreach from=$setting item="paymentType" key=savedPaymentUserId }]
             <tr>
                 <th scope="row">[{$paymentType.holder}]</th>
                 <td>[{$paymentType.iban}]</td>
-                <td>
+                <td style="text-align: right;">
                     <form name="uzr" id="uzr_collect" action="[{$oViewConf->getSelfLink()}]" method="post">
                         <input type="hidden" name="cl" value="unzer_saved_payments">
                         <input type="hidden" name="fnc" value="deletePayment">
-                        <input type="hidden" name="paymenttypeid" value="[{$paymenttypeid}]">
+                        <input type="hidden" name="savedPaymentUserId" value="[{$savedPaymentUserId}]">
                         <button type="submit" class="btn btn-danger">[{oxmultilang ident="DD_DELETE"}]</button>
                     </form>
                 </td>

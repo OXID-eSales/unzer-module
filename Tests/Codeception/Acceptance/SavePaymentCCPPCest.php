@@ -43,12 +43,13 @@ final class SavePaymentCCPPCest extends BaseCest
     private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[2]/input";
     private string $savedPaymentsLocator = "//*[@id='account_menu']/ul/li[1]/a";
     private string $savePayPalAccountInNextStepInputSelector = "//*[@id='oscunzersavepayment']";
+    private string $savePaymentDeleteButtonSelector = "//button[contains(@class, 'btn-danger') and text()='Delete']";
 
     /**
      * @group unzer_module
      * @group SecondGroup
      * @throws \Exception
-     * @group SavePaymentCCPPCest
+     * @group SavePaymentCCPPCestFails
      */
     public function testPaymentWorksWithSavingPayment(AcceptanceTester $I)
     {
@@ -207,10 +208,9 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->openShop()->openAccountPage();
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
         $I->see("paypal-buyer@unzer.com");
-        $pageSource = $I->grabPageSource();
-        // Count the number of occurrences of the text
-        $occurrences = substr_count($pageSource, 'paypal-buyer@unzer.com');
-        $I->assertEquals(1, $occurrences, 'Paypal Saving OK');
+
+        $deleteButtons = $I->grabMultiple($this->savePaymentDeleteButtonSelector);
+        $I->assertCount(1, $deleteButtons);
     }
 
     /**

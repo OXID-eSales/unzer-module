@@ -3,36 +3,72 @@
 namespace OxidSolutionCatalysts\Unzer\Service\View;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidSolutionCatalysts\Unzer\Service\SavedPaymentService;
-use OxidSolutionCatalysts\Unzer\Service\Transaction;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentFetchPaymentTypeService;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentMapper;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentMethodValidator;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentPayPalMapper;
+use OxidSolutionCatalysts\Unzer\Service\SavedPaymentLoadService;
+use InvalidArgumentException;
 
 class SavedPaymentViewService
 {
-    private SavedPaymentService $savedPaymentService;
-    private Transaction $transactionService;
+    /** @var SavedPaymentLoadService $loadService */
+    private $loadService;
 
-    public function __construct(SavedPaymentService $savedPaymentService, Transaction $transactionService)
-    {
-        $this->savedPaymentService = $savedPaymentService;
-        $this->transactionService = $transactionService;
+    /** @var SavedPaymentMapper $mapper */
+    private $mapper;
+
+    /** @var SavedPaymentFetchPaymentTypeService $fetchService */
+    private $fetchService;
+
+    /** @var SavedPaymentMethodValidator $methodValidator */
+    private $methodValidator;
+
+    public function __construct(
+        SavedPaymentLoadService $loadService,
+        SavedPaymentMapper $mapper,
+        SavedPaymentFetchPaymentTypeService $fetchService,
+        SavedPaymentMethodValidator $methodValidator
+    ) {
+        $this->loadService = $loadService;
+        $this->mapper = $mapper;
+        $this->fetchService = $fetchService;
+        $this->methodValidator = $methodValidator;
     }
 
-    public function setSavedPayPalPaymentsViewData(User $user, array &$viewData): void
+    /**
+     * @param string $savedPaymentMethod the parameter $savedPaymentMethod is one of the constants
+     *      SavedPaymentService::SAVED_PAYMENT_PAYPAL, SavedPaymentService::SAVED_PAYMENT_CREDIT_CARD or
+     *      SavedPaymentService::SAVED_PAYMENT_BOTH
+     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getSavedPayments(User $user, string $savedPaymentMethod): ?array
     {
-        $transaction = $this->savedPaymentService->getLastSavedPaymentTransaction(
+        $this->validateSavePaymentMethod($savedPaymentMethod);
+
+        $transactions = $this->loadService->getSavedPaymentTransactions(
             $user->getId(),
-            SavedPaymentService::SAVED_PAYMENT_PAYPAL
+            $savedPaymentMethod
         );
 
-        if (!$transaction) {
-            return;
+        if (!$transactions) {
+            return null;
         }
 
-        $paymentTypes = $this->transactionService->getSavedPaymentsForUser($user, [$transaction], true);
-        $oxidPayPalPaymentMethodId = $this->transactionService->getOxidPaymentMethodId(SavedPaymentService::SAVED_PAYMENT_PAYPAL);
+        $paymentTypes = $this->fetchService->fetchPaymentTypes($transactions);
 
-        if (isset($paymentTypes[$oxidPayPalPaymentMethodId])) {
-            $viewData['lastSavedPayPalPaymentType'] = reset($paymentTypes[$oxidPayPalPaymentMethodId]);
+        return $this->mapper->groupPaymentTypes($paymentTypes);
+    }
+
+    private function validateSavePaymentMethod(string $savedPaymentMethod): void
+    {
+        if (!$this->methodValidator->validate($savedPaymentMethod)) {
+            throw new InvalidArgumentException(
+                "Invalid savedPaymentMethod SavedPaymentViewService::getSavedPayPalPaymentsViewData"
+                . ": $savedPaymentMethod"
+            );
         }
     }
 }

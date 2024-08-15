@@ -3,28 +3,37 @@
 
     <div class="savedpayment">
         <form id="payment-saved-cards" class="unzerUI form" novalidate>
-            [{if $oView->getPaymentSaveSetting() and $lastSavedPayPalPaymentType}]
+            [{if $oView->getPaymentSaveSetting()}]
+            [{foreach from=$savedPaymentTypes item="setting" key="type"}]
+            [{if $savedPaymentTypes != false}]
+            [{if $type == 'paypal'}]
 
-                <table class="table">
-                    <thead>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">[{oxmultilang ident="EMAIL"}]</th>
+                    <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                [{assign var="counter" value=0}]
+
+                [{foreach from=$setting item="paymentType" key=paymenttypeid }]
                     <tr>
-                        <th scope="col">[{oxmultilang ident="EMAIL"}]</th>
-                        <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
-                        <th scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                     <tr>
-                        <th scope="row">[{$lastSavedPayPalPaymentType.email}]</th>
-                        <td>[{oxmultilang ident="OSCUNZER_PAYMENT_METHOD_PAYPAL"}]</td>
+                        <th scope="row">[{$paymentType.email}]</th>
+                        <td>[{$type}]</td>
                         <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$lastSavedPayPalPaymentType.id}]" style="-webkit-appearance: radio">
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymenttypeid}]" style="-webkit-appearance: radio">
                         </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    </tr>
+                    [{/foreach}]
+                </tbody>
+            </table>
             [{/if}]
 
+            [{/if}]
+            [{/foreach}]
             [{if $oView->getPaymentSaveSetting()}]
             <div id="payment-sepa-confirm">
                 <div class="oscunzersavepayment" id="oscunzersavepayment_unzer">
@@ -34,6 +43,7 @@
                     </label>
                 </div>
             </div>
+            [{/if}]
             [{/if}]
         </form>
     </div>

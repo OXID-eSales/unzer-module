@@ -1,7 +1,7 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
-[{if $unzerPaymentType}]
+[{if $savedPaymentTypes}]
     <div class="savedpayment">
-        [{foreach from=$unzerPaymentType item="setting" key="type"}]
+        [{foreach from=$savedPaymentTypes item="setting" key="type"}]
             [{if $type != 'paypal' && $type != 'sepa'}]
                 [{assign var="savedCardsCount" value=$setting|@count}]
                 <form id="payment-saved-cards" class="unzerUI form" novalidate>
@@ -36,7 +36,7 @@
     </div>
 [{/if}]
 
-[{if $unzerPaymentType != false }]
+[{if $savedPaymentTypes != false }]
 <br>
     <label id="addNewCardCheckboxLabel">
         <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox">[{oxmultilang ident="OSCUNZER_NEW_CARD"}]

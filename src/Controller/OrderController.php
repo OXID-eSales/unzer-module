@@ -16,6 +16,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Service\SavedPaymentLoadService;
 use OxidSolutionCatalysts\Unzer\Service\View\SavedPaymentViewService;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
@@ -397,7 +398,8 @@ class OrderController extends OrderController_parent
                 $sPaymentId,
                 [
                 CoreUnzerDefinitions::CARD_UNZER_PAYMENT_ID,
-                CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID
+                CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID,
+                CoreUnzerDefinitions::SEPA_UNZER_PAYMENT_ID
                 ],
                 true
             )
@@ -405,19 +407,29 @@ class OrderController extends OrderController_parent
             return;
         }
 
-        if ($sPaymentId === CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID) {
-            $this->getServiceFromContainer(SavedPaymentViewService::class)
-                ->setSavedPayPalPaymentsViewData($user, $this->_aViewData);
-        } else {
-            $transactionService = $this->getServiceFromContainer(Transaction::class);
-            $ids = $transactionService->getTransactionIds($user);
-            $paymentTypes = [];
-            if ($ids) {
-                $paymentTypes = $transactionService->getSavedPaymentsForUser($user, $ids, true);
-            }
-
-            $this->_aViewData['unzerPaymentType'] = $paymentTypes;
+        switch ($sPaymentId) {
+            case CoreUnzerDefinitions::CARD_UNZER_PAYMENT_ID:
+                $savedPaymentMethod = SavedPaymentLoadService::SAVED_PAYMENT_CREDIT_CARD;
+                break;
+            case CoreUnzerDefinitions::PAYPAL_UNZER_PAYMENT_ID:
+                $savedPaymentMethod = SavedPaymentLoadService::SAVED_PAYMENT_PAYPAL;
+                break;
+            case CoreUnzerDefinitions::SEPA_UNZER_PAYMENT_ID:
+                $savedPaymentMethod = SavedPaymentLoadService::SAVED_PAYMENT_SEPA_DIRECT_DEBIT;
+                break;
+            default:
+                throw new \InvalidArgumentException(
+                    "invalid sPaymentId at OxidSolutionCatalysts\Unzer\Controller\OrderController::execute()"
+                );
         }
+
+        $this->_aViewData['savedPaymentTypes'] = $this->getServiceFromContainer(
+            SavedPaymentViewService::class
+        )
+            ->getSavedPayments(
+                $user,
+                $savedPaymentMethod
+            );
     }
 
     protected function getBasketHash(): string

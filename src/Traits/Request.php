@@ -11,6 +11,7 @@ use OxidEsales\EshopCommunity\Core\Registry;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
 use UnzerSDK\Resources\PaymentTypes\Paypal;
+use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 
 trait Request
 {
@@ -70,7 +71,11 @@ trait Request
 
     protected function isSavePaymentSelectedByUserInRequest(BasePaymentType $paymentType): bool
     {
-        return ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal)
+        return (
+                $paymentType instanceof UnzerSDKPaymentTypeCard
+                || $paymentType instanceof Paypal
+                || $paymentType instanceof SepaDirectDebit
+            )
             && $this->getUnzerStringRequestParameter('oscunzersavepayment');
     }
 }
