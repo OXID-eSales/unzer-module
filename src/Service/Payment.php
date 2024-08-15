@@ -452,7 +452,9 @@ class Payment
             $this->transactionService->writeTransactionToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $unzerPayment
+                $unzerPayment,
+                null,
+                $cancellation
             );
         } catch (UnzerApiException $e) {
             return $e;

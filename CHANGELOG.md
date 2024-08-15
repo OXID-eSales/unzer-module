@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - fix provide ShopMetadata for UnzerPayment
 - fix show multiple vouchers separately
 - fix: only OK, NOT_FINISHED or CANCEL in oxorder->oxtranstatus allowed
+- fix showing correct amount when cancelling in admin
 
 ## [1.1.3] - 2023-11-14
 

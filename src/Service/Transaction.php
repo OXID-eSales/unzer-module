@@ -97,7 +97,8 @@ class Transaction
         string $orderid,
         string $userId,
         ?Payment $unzerPayment,
-        ?Shipment $unzerShipment = null
+        ?Shipment $unzerShipment = null,
+        ?AbstractTransactionType $transaction = null
     ): bool {
 
         $oOrder = oxNew(Order::class);
@@ -114,7 +115,7 @@ class Transaction
         if ($unzerPayment) {
             $unzerPaymentData = $unzerShipment !== null ?
                 $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
-                $this->getUnzerPaymentData($unzerPayment);
+                $this->getUnzerPaymentData($unzerPayment, $transaction);
             $params = array_merge($params, $unzerPaymentData);
 
             // for PaylaterInvoice, store the customer type
@@ -266,20 +267,20 @@ class Transaction
     }
 
     /**
-     * @param Payment $unzerPayment
-     * @return array
      * @throws UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function getUnzerPaymentData(Payment $unzerPayment): array
-    {
+    protected function getUnzerPaymentData(
+        Payment $unzerPayment,
+        ?AbstractTransactionType $transaction = null
+    ): array {
         $oxaction = preg_replace(
             '/[^a-z]/',
             '',
             strtolower($unzerPayment->getStateName())
         );
         $params = [
-            'amount'    => $unzerPayment->getAmount()->getTotal(),
+            'amount'    => $this->getTransactionAmount($unzerPayment, $transaction),
             'remaining' => $unzerPayment->getAmount()->getRemaining(),
             'currency'  => $unzerPayment->getCurrency(),
             'typeid'    => $unzerPayment->getId(),
@@ -653,5 +654,13 @@ class Transaction
             $transActionConst = array_diff($transActionConst, [PaymentState::STATE_NAME_CANCELED]);
         }
         return implode(',', DatabaseProvider::getDb()->quoteArray($transActionConst));
+    }
+
+    private function getTransactionAmount(
+        Payment $unzerPayment,
+        ?AbstractTransactionType $transaction = null
+    ): ?float {
+        return $transaction instanceof Cancellation ?
+            $transaction->getAmount() : $unzerPayment->getAmount()->getTotal();
     }
 }
