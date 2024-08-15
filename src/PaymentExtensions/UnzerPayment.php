@@ -313,8 +313,10 @@ abstract class UnzerPayment
         $payment = $this->getServiceFromContainer(PaymentService::class)
             ->getSessionUnzerPayment();
         try {
+            /** @var string $orderId */
+            $orderId = Registry::getSession()->getVariable('sess_challenge');
             $transactionService->writeTransactionToDB(
-                Registry::getSession()->getSessionChallengeToken(),
+                $orderId,
                 $user->getId(),
                 $payment
             );

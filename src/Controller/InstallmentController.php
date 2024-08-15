@@ -199,8 +199,7 @@ class InstallmentController extends FrontendController
             $transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $charge,
-                $oOrder
+                $charge
             );
             /** @var Payment $payment */
             $payment = $charge->getPayment();

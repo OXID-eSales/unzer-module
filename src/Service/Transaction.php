@@ -132,12 +132,14 @@ class Transaction
             }
         }
 
-        if ($this->saveTransaction($params, $oOrder)) {
+        if ($this->saveTransaction($params)) {
             $this->deleteInitOrder($params);
 
-            // Fallback: set ShortID as OXTRANSID
-            $shortId = $params['shortid'] ?? '';
-            $oOrder->setUnzerTransId($shortId);
+            if ($oOrder->isLoaded()) {
+                // Fallback: set ShortID as OXTRANSID
+                $shortId = $params['shortid'] ?? '';
+                $oOrder->setUnzerTransId($shortId);
+            }
 
             return true;
         }
@@ -169,8 +171,7 @@ class Transaction
     public function writeCancellationToDB(
         string $orderid,
         string $userId,
-        ?Cancellation $unzerCancel,
-        Order $oOrder
+        ?Cancellation $unzerCancel
     ): bool {
         $unzerCancelReason = '';
         if ($unzerCancel !== null) {
@@ -189,7 +190,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
         }
 
-        return $this->saveTransaction($params, $oOrder);
+        return $this->saveTransaction($params);
     }
 
     /**
@@ -199,7 +200,7 @@ class Transaction
      * @throws Exception
      * @return bool
      */
-    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge, Order $oOrder): bool
+    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
     {
         $params = [
             'oxorderid' => $orderid,
@@ -212,7 +213,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
         }
 
-        return $this->saveTransaction($params, $oOrder);
+        return $this->saveTransaction($params);
     }
 
     /**
@@ -232,7 +233,7 @@ class Transaction
     /**
      * @throws JsonException
      */
-    protected function saveTransaction(array $params, Order $oOrder): bool
+    protected function saveTransaction(array $params): bool
     {
         $result = false;
 
@@ -247,9 +248,6 @@ class Transaction
         if (!$transaction->load($oxid)) {
             $transaction->assign($params);
             $transaction->setId($oxid);
-            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
-                $transaction->setTransStatus('aborted');
-            }
             $transaction->save();
 
             $result = true;

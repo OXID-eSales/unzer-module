@@ -375,8 +375,7 @@ class Payment
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $cancellation,
-                $oOrder
+                $cancellation
             );
         } catch (UnzerApiException $e) {
             return $e;
@@ -402,7 +401,7 @@ class Payment
 
             /** @var Authorization $authorization */
             $authorization = $unzerPayment->getAuthorization();
-            if (null == $authorization) {
+            if (null === $authorization) {
                 return false;
             }
             $charge = $authorization->charge($amount);
@@ -412,8 +411,7 @@ class Payment
             $this->transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $charge,
-                $oOrder
+                $charge
             );
             $payment = $charge->getPayment();
             if (
