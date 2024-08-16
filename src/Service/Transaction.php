@@ -88,7 +88,8 @@ class Transaction
         string $orderid,
         string $userId,
         ?Payment $unzerPayment,
-        ?Shipment $unzerShipment = null
+        ?Shipment $unzerShipment = null,
+        ?AbstractTransactionType $transaction = null
     ): bool {
 
         $oOrder = oxNew(Order::class);
@@ -113,7 +114,7 @@ class Transaction
             }
         }
 
-        if ($this->saveTransaction($params, $oOrder)) {
+        if ($this->saveTransaction($params)) {
             $this->deleteInitOrder($params);
 
             if ($oOrder->isLoaded()) {
@@ -152,8 +153,7 @@ class Transaction
     public function writeCancellationToDB(
         string $orderid,
         string $userId,
-        ?Cancellation $unzerCancel,
-        Order $oOrder
+        ?Cancellation $unzerCancel
     ): bool {
         $unzerCancelReason = '';
         if ($unzerCancel !== null) {
@@ -172,7 +172,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
         }
 
-        return $this->saveTransaction($params, $oOrder);
+        return $this->saveTransaction($params);
     }
 
     /**
@@ -182,7 +182,7 @@ class Transaction
      * @throws Exception
      * @return bool
      */
-    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge, Order $oOrder): bool
+    public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
     {
         $params = [
             'oxorderid' => $orderid,
@@ -195,7 +195,7 @@ class Transaction
             $params = array_merge($params, $this->getUnzerChargeData($unzerCharge));
         }
 
-        return $this->saveTransaction($params, $oOrder);
+        return $this->saveTransaction($params);
     }
 
     /**
@@ -215,7 +215,7 @@ class Transaction
     /**
      * @throws JsonException
      */
-    protected function saveTransaction(array $params, Order $oOrder): bool
+    protected function saveTransaction(array $params): bool
     {
         $result = false;
 
@@ -230,9 +230,6 @@ class Transaction
         if (!$transaction->load($oxid)) {
             $transaction->assign($params);
             $transaction->setId($oxid);
-            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
-                $transaction->setTransStatus('aborted');
-            }
             $transaction->save();
 
             $result = true;
@@ -252,20 +249,20 @@ class Transaction
     }
 
     /**
-     * @param Payment $unzerPayment
-     * @return array
      * @throws UnzerApiException
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function getUnzerPaymentData(Payment $unzerPayment): array
-    {
+    protected function getUnzerPaymentData(
+        Payment $unzerPayment,
+        ?AbstractTransactionType $transaction = null
+    ): array {
         $oxaction = preg_replace(
             '/[^a-z]/',
             '',
             strtolower($unzerPayment->getStateName())
         );
         $params = [
-            'amount'    => $unzerPayment->getAmount()->getTotal(),
+            'amount'    => $this->getTransactionAmount($unzerPayment, $transaction),
             'remaining' => $unzerPayment->getAmount()->getRemaining(),
             'currency'  => $unzerPayment->getCurrency(),
             'typeid'    => $unzerPayment->getId(),
@@ -653,6 +650,14 @@ class Transaction
             $transActionConst = array_diff($transActionConst, [PaymentState::STATE_NAME_CANCELED]);
         }
         return implode(',', DatabaseProvider::getDb()->quoteArray($transActionConst));
+    }
+
+    private function getTransactionAmount(
+        Payment $unzerPayment,
+        ?AbstractTransactionType $transaction = null
+    ): ?float {
+        return $transaction instanceof Cancellation ?
+            $transaction->getAmount() : $unzerPayment->getAmount()->getTotal();
     }
 
     private function getBasicSaveParemeters(string $orderId, string $userId, ?Payment $payment): array
