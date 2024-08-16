@@ -19,12 +19,12 @@
                 <tbody>
                 [{assign var="counter" value=0}]
 
-                [{foreach from=$setting item="paymentType" key=paymenttypeid }]
+                [{foreach from=$setting item="paymentType" }]
                     <tr>
                         <th scope="row">[{$paymentType.email}]</th>
                         <td>[{$type}]</td>
                         <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymenttypeid}]" style="-webkit-appearance: radio">
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymentType.id}]" style="-webkit-appearance: radio">
                         </td>
                     </tr>
                     [{/foreach}]

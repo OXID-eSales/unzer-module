@@ -14,7 +14,7 @@
             </thead>
             <tbody>
 
-            [{foreach from=$setting item="paymentType" key=paymenttypeid }]
+            [{foreach from=$setting item="paymentType" }]
                 <tr>
                     <th scope="row">[{$paymentType.holder}]</th>
                     <td>[{$paymentType.iban}]</td>

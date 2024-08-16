@@ -3,11 +3,9 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Connection;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\UserIdService;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
-use UnzerSDK\Resources\PaymentTypes\Card;
-use UnzerSDK\Resources\PaymentTypes\Paypal;
 use UnzerSDK\Resources\Payment;
-use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 
 class SavedPaymentSaveService
 {
@@ -16,27 +14,24 @@ class SavedPaymentSaveService
     /** @var Connection $connection */
     protected $connection;
 
-    public function __construct(Connection $connection)
+    /** @var UserIdService $userIdService */
+    private $userIdService;
+
+    public function __construct(Connection $connection, UserIdService $userIdService)
     {
         $this->connection = $connection;
+        $this->userIdService = $userIdService;
     }
 
     public function getTransactionParameters(Payment $payment): array
     {
         $paymentType = $payment->getPaymentType();
-        $parameters = [];
-        if ($paymentType instanceof Paypal) {
-            $parameters['savepaymentuserid'] = $paymentType->getEmail();
-        } elseif ($paymentType instanceof Card) {
-            $parameters['savepaymentuserid'] = $paymentType->getNumber();
-        } elseif ($paymentType instanceof SepaDirectDebit) {
-            $parameters['savepaymentuserid'] = $paymentType->getIban();
-        }
 
-        $parameters['savepayment'] = $paymentType
-            && $this->isSavePaymentSelectedByUserInRequest($paymentType);
-
-        return $parameters;
+        return [
+            'savepaymentuserid' => $this->userIdService->getUserIdByPaymentType($paymentType),
+            'savepayment' => $paymentType
+                && $this->isSavePaymentSelectedByUserInRequest($paymentType),
+        ];
     }
 
     public function unsetSavedPayments(array $transactionIds): bool

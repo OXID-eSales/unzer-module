@@ -14,7 +14,7 @@ class SavedPaymentMapper
     private $methodValidator;
 
     private const GROUPING_KEY_PAYPAL = 'email';
-    private const GROUPING_KEY_CARD = 'number';
+    private const GROUPING_KEY_CARD = 'number|expiryDate';
     private const GROUPING_KEY_SEPA = 'iban';
 
     public function __construct(SavedPaymentMethodValidator $methodValidator)
@@ -38,9 +38,9 @@ class SavedPaymentMapper
     {
         $groupedPaymentTypes = [];
         foreach ($paymentTypes as $paymentType) {
-            $groupingKeyBy = $this->getGroupingKeyByChecking($paymentType);
+            $groupingKeyBy = $this->getGroupingKey($paymentType);
             if ($this->paymentTypeMatchesGroupingKey($paymentType, $groupingKeyBy)) {
-                $groupedPaymentTypes[$paymentType[$groupingKeyBy]] = $paymentType;
+                $groupedPaymentTypes[$this->getGroupingValue($paymentType)] = $paymentType;
             }
         }
 
@@ -49,6 +49,11 @@ class SavedPaymentMapper
 
     private function paymentTypeMatchesGroupingKey(array $paymentType, ?string $groupingKey): bool
     {
+        if (stripos($groupingKey, '|')) {
+            $paymentTypeKeys = explode('|', $groupingKey);
+
+            return $this->areKeysDefined($paymentTypeKeys, $paymentType);
+        }
         return isset($paymentType[$groupingKey]);
     }
 
@@ -56,9 +61,9 @@ class SavedPaymentMapper
      * the order of if statements is important because email is defined in all paymentypes number only for credit card
      * and iban only for sepa payments
      */
-    private function getGroupingKeyByChecking(array $paymentType): string
+    private function getGroupingKey(array $paymentType): string
     {
-        if (isset($paymentType[self::GROUPING_KEY_CARD])) {
+        if ($this->paymentTypeMatchesGroupingKey($paymentType, self::GROUPING_KEY_CARD)) {
             return self::GROUPING_KEY_CARD;
         } elseif (isset($paymentType[self::GROUPING_KEY_SEPA])) {
             return self::GROUPING_KEY_SEPA;
@@ -69,5 +74,23 @@ class SavedPaymentMapper
         throw new InvalidArgumentException(
             'cant determine grouping key in ' . __CLASS__ . '::' . __METHOD__
         );
+    }
+
+    private function getGroupingValue(array $paymentType): string
+    {
+        if ($this->paymentTypeMatchesGroupingKey($paymentType, self::GROUPING_KEY_CARD)) {
+            $paymentTypeKeys = explode('|', self::GROUPING_KEY_CARD);
+            return $paymentType[$paymentTypeKeys[0]] . '|' . $paymentType[$paymentTypeKeys[1]];
+        }
+
+        return $paymentType[$this->getGroupingKey($paymentType)];
+    }
+
+    private function areKeysDefined(array $requiredKeys, array $array): bool
+    {
+        $arrayKeys = array_keys($array);
+        $missingKeys = array_diff($requiredKeys, $arrayKeys);
+
+        return empty($missingKeys);
     }
 }

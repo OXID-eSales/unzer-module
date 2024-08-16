@@ -16,7 +16,8 @@ class LoadQueries
               AND transactionAfterOrder.PAYMENTTYPEID IS NOT NULL 
               AND transactionBeforeOrder.SAVEPAYMENT = 1';
 
-    public const LOAD_TRANSACTIONS_BY_USER_ID_SQL = "SELECT transactionBeforeOrder.OXID FROM oscunzertransaction as transactionBeforeOrder 
+    public const LOAD_TRANSACTIONS_BY_USER_ID_SQL = "SELECT transactionBeforeOrder.OXID 
+            FROM oscunzertransaction as transactionBeforeOrder 
             INNER JOIN oscunzertransaction as transactionAfterOrder
                 ON transactionBeforeOrder.PAYMENTTYPEID = transactionAfterOrder.PAYMENTTYPEID
             WHERE transactionAfterOrder.SAVEPAYMENTUSERID = :savedPaymentUserId

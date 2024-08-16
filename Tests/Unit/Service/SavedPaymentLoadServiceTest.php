@@ -74,7 +74,7 @@ class SavedPaymentLoadServiceTest extends TestCase
             ->willReturn("transactionAfterOrder.PAYMENTTYPEID LIKE 's-crd%'");
 
         $sql = LoadQueries::LOAD_TRANSACTIONS_SQL
-            .' AND (transactionAfterOrder.PAYMENTTYPEID LIKE \'s-crd%\') ORDER BY transactionAfterOrder.OXACTIONDATE';
+            . ' AND (transactionAfterOrder.PAYMENTTYPEID LIKE \'s-crd%\') ORDER BY transactionAfterOrder.OXACTIONDATE';
 
         $statement = $this->createMock(Result::class);
         $statement->expects($this->once())->method('fetchAllAssociative')->willReturn([
