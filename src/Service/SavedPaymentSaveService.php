@@ -9,18 +9,23 @@ use UnzerSDK\Resources\Payment;
 
 class SavedPaymentSaveService
 {
-    use Request;
-
     /** @var Connection $connection */
     protected $connection;
 
     /** @var UserIdService $userIdService */
     private $userIdService;
 
-    public function __construct(Connection $connection, UserIdService $userIdService)
-    {
+    /** @var RequestService $requestService */
+    private $requestService;
+
+    public function __construct(
+        Connection $connection,
+        UserIdService $userIdService,
+        RequestService $requestService
+    ) {
         $this->connection = $connection;
         $this->userIdService = $userIdService;
+        $this->requestService = $requestService;
     }
 
     public function getTransactionParameters(Payment $payment): array
@@ -30,7 +35,7 @@ class SavedPaymentSaveService
         return [
             'savepaymentuserid' => $paymentType ? $this->userIdService->getUserIdByPaymentType($paymentType) : '',
             'savepayment' => $paymentType
-                && $this->isSavePaymentSelectedByUserInRequest($paymentType),
+                && $this->requestService->isSavePaymentSelectedByUserInRequest($paymentType),
         ];
     }
 

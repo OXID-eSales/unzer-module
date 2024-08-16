@@ -31,7 +31,8 @@ class TransactionTest extends TestCase
             'oxshopid' => 5,
             'oxactiondate' => '2021-12-10 16:44:54',
             'customertype' => '',
-            'metadata' => '""'
+            'metadata' => '""',
+            'paymentTypeId' => '',
         ]);
 
         $sut->writeTransactionToDB("orderId", "userId", null);
@@ -73,7 +74,10 @@ class TransactionTest extends TestCase
             'metadata' => 'metadataJson',
             'customerid' => 'unzerCustomerId',
             'customertype' => '',
-            'remaining' => 0.0
+            'remaining' => 0.0,
+            'paymentTypeId' => '',
+            'savepaymentuserid' => '',
+            'savepayment' => false
         ]);
 
         $this->assertTrue($sut->writeTransactionToDB("orderId", "userId", $payment));

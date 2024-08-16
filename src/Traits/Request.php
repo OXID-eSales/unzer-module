@@ -68,14 +68,4 @@ trait Request
 
         return (float)$number;
     }
-
-    protected function isSavePaymentSelectedByUserInRequest(BasePaymentType $paymentType): bool
-    {
-        return (
-                $paymentType instanceof UnzerSDKPaymentTypeCard
-                || $paymentType instanceof Paypal
-                || $paymentType instanceof SepaDirectDebit
-            )
-            && $this->getUnzerStringRequestParameter('oscunzersavepayment');
-    }
 }

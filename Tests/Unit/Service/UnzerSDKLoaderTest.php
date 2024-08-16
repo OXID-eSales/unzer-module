@@ -32,7 +32,6 @@ class UnzerSDKLoaderTest extends TestCase
     public function testSimpleSDKLoadingWithWrongKey(): void
     {
         $sut = $this->getSut([
-            'getUnzerPrivateKey' => 'someWrongKey',
             'isDebugMode' => false
         ]);
 
