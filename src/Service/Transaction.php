@@ -29,6 +29,7 @@ use UnzerSDK\Resources\PaymentTypes\Card as UnzerResourceCard;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerResourcePaypal;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -98,7 +99,12 @@ class Transaction
         $params = $this->getBasicSaveParemeters($orderid, $userId, $unzerPayment);
 
         if ($unzerPayment) {
-            $this->extendSaveParameters($params, $unzerPayment, $unzerShipment);
+            $this->extendSaveParameters(
+                $params,
+                $unzerPayment,
+                $unzerShipment,
+                $transaction
+            );
 
             // for PaylaterInvoice, store the customer type
             if (
@@ -676,11 +682,12 @@ class Transaction
     private function extendSaveParameters(
         array &$parameters,
         Payment $unzerPayment,
-        ?Shipment $unzerShipment = null
+        ?Shipment $unzerShipment = null,
+        ?AbstractTransactionType $transaction = null
     ): void {
         $unzerPaymentData = !is_null($unzerShipment) ?
             $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
-            $this->getUnzerPaymentData($unzerPayment);
+            $this->getUnzerPaymentData($unzerPayment, $transaction);
         $parameters = array_merge($parameters, $unzerPaymentData);
 
         $parameters = array_merge(
