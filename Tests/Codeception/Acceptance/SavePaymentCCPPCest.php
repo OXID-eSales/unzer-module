@@ -291,10 +291,9 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->openShop()->openAccountPage();
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
         $I->see("545301******9543");
-        $pageSource = $I->grabPageSource();
-        // Count the number of occurrences of the text
-        $occurrences = substr_count($pageSource, '545301******9543');
-        $I->assertEquals(1, $occurrences, 'CC Saving OK');
+
+        $deleteButtons = $I->grabMultiple($this->savePaymentDeleteButtonSelector);
+        $I->assertCount(1, $deleteButtons, 'CC Saving OK');
     }
 
     /**
