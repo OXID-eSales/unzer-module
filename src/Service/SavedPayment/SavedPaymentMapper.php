@@ -10,17 +10,9 @@ use InvalidArgumentException;
  */
 class SavedPaymentMapper
 {
-    /** @var SavedPaymentMethodValidator $methodValidator */
-    private $methodValidator;
-
     private const GROUPING_KEY_PAYPAL = 'email';
     private const GROUPING_KEY_CARD = 'number|expiryDate';
     private const GROUPING_KEY_SEPA = 'iban';
-
-    public function __construct(SavedPaymentMethodValidator $methodValidator)
-    {
-        $this->methodValidator = $methodValidator;
-    }
 
     public function groupPaymentTypes(array $paymentTypes): array
     {
@@ -47,7 +39,7 @@ class SavedPaymentMapper
         return $groupedPaymentTypes;
     }
 
-    private function paymentTypeMatchesGroupingKey(array $paymentType, ?string $groupingKey): bool
+    private function paymentTypeMatchesGroupingKey(array $paymentType, string $groupingKey): bool
     {
         if (stripos($groupingKey, '|')) {
             $paymentTypeKeys = explode('|', $groupingKey);

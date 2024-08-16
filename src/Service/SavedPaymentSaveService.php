@@ -28,7 +28,7 @@ class SavedPaymentSaveService
         $paymentType = $payment->getPaymentType();
 
         return [
-            'savepaymentuserid' => $this->userIdService->getUserIdByPaymentType($paymentType),
+            'savepaymentuserid' => $paymentType ? $this->userIdService->getUserIdByPaymentType($paymentType) : '',
             'savepayment' => $paymentType
                 && $this->isSavePaymentSelectedByUserInRequest($paymentType),
         ];
