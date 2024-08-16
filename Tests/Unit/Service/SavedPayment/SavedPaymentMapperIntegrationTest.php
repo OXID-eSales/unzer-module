@@ -55,8 +55,16 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user2@example.com' => ['email' => 'user2@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
-                    '8765432187654321|03/40' => ['number' => '8765432187654321', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
+                    '8765432187654321|03/40' => [
+                        'number' => '8765432187654321',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],
@@ -69,8 +77,16 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user2@example.com' => ['email' => 'user2@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
-                    '8765432187654321|03/40' => ['number' => '8765432187654321', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
+                    '8765432187654321|03/40' => [
+                        'number' => '8765432187654321',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],
@@ -89,8 +105,16 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user1@example.com' => ['email' => 'user1@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
-                    '8765432187654321|03/40' => ['number' => '8765432187654321', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
+                    '8765432187654321|03/40' => [
+                        'number' => '8765432187654321',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],
@@ -102,8 +126,16 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user1@example.com' => ['email' => 'user1@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
-                    '8765432187654321|03/40' => ['number' => '8765432187654321', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
+                    '8765432187654321|03/40' => [
+                        'number' => '8765432187654321',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],
@@ -122,8 +154,16 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user2@example.com' => ['email' => 'user2@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],
@@ -136,7 +176,11 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user2@example.com' => ['email' => 'user2@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],
@@ -155,8 +199,16 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user2@example.com' => ['email' => 'user2@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
-                    '8765432187654321|03/40' => ['number' => '8765432187654321', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
+                    '8765432187654321|03/40' => [
+                        'number' => '8765432187654321',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],
@@ -169,8 +221,16 @@ class SavedPaymentMapperIntegrationTest extends TestCase
                     'user2@example.com' => ['email' => 'user2@example.com', 'other' => 'data'],
                 ],
                 'card' => [
-                    '1234567812345678|03/40' => ['number' => '1234567812345678', 'expiryDate' => '03/40', 'other' => 'data'],
-                    '8765432187654321|03/40' => ['number' => '8765432187654321', 'expiryDate' => '03/40', 'other' => 'data'],
+                    '1234567812345678|03/40' => [
+                        'number' => '1234567812345678',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
+                    '8765432187654321|03/40' => [
+                        'number' => '8765432187654321',
+                        'expiryDate' => '03/40',
+                        'other' => 'data'
+                    ],
                 ],
                 'sepa' => [
                     'DE89370400440532013000' => ['iban' => 'DE89370400440532013000', 'other' => 'data'],

@@ -12,15 +12,16 @@ use JsonException;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
+use OxidSolutionCatalysts\Unzer\Service\RequestService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\RecurrenceTypes;
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -47,7 +48,7 @@ use UnzerSDK\Unzer;
 abstract class UnzerPayment
 {
     use ServiceContainer;
-    use \OxidSolutionCatalysts\Unzer\Traits\Request;
+    use Request;
 
     /** @var Unzer */
     protected $unzerSDK;
@@ -70,7 +71,11 @@ abstract class UnzerPayment
     /** @var array */
     protected $allowedCurrencies = [];
 
-    private DebugHandler $logger;
+    /** @var DebugHandler $logger */
+    private $logger;
+
+    /** @var RequestService $requestService */
+    private $requestService;
 
     /**
      * @throws Exception
@@ -87,6 +92,7 @@ abstract class UnzerPayment
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
         $this->logger = $logger;
+        $this->requestService = $this->getServiceFromContainer(RequestService::class);
     }
 
     /**
@@ -166,7 +172,7 @@ abstract class UnzerPayment
             $userModel->save();
         }
 
-        if ($this->isSavePaymentSelectedByUserInRequest($paymentType)) {
+        if ($this->requestService->isSavePaymentSelectedByUserInRequest($paymentType)) {
             $session->setVariable(
                 'oscunzersavepayment',
                 $this->existsInSavedPaymentsList($userModel) ?
@@ -408,7 +414,8 @@ abstract class UnzerPayment
             null,
             null,
             null,
-            $this->isSavePaymentSelectedByUserInRequest($paymentType) ? RecurrenceTypes::ONE_CLICK : null
+            $this->requestService->isSavePaymentSelectedByUserInRequest($paymentType)
+                ? RecurrenceTypes::ONE_CLICK : null
         );
     }
 

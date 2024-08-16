@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
-
 use OxidSolutionCatalysts\Unzer\Service\RequestService;
 use OxidSolutionCatalysts\Unzer\Service\SavedPaymentSaveService;
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\UserIdService;
