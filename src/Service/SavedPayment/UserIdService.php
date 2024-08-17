@@ -20,8 +20,6 @@ class UserIdService
             return $paymentType->getIban() ?? '';
         }
 
-        throw new InvalidArgumentException(
-            'Payment type must be an instance of Paypal, Card, SepaDirectDebit'
-        );
+        return '';
     }
 }

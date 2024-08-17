@@ -68,14 +68,12 @@ class UserIdServiceTest extends TestCase
         $this->assertSame('', $result);
     }
 
-    public function testInvalidPaymentTypeThrowsException()
+    public function testInvalidPaymentTypeReturnsEmptyString()
     {
         $invalidPaymentType = $this->createMock(BasePaymentType::class);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Payment type must be an instance of Paypal, Card, SepaDirectDebit');
-
         $userIdService = new UserIdService();
-        $userIdService->getUserIdByPaymentType($invalidPaymentType);
+
+        $this->assertEmpty($userIdService->getUserIdByPaymentType($invalidPaymentType));
     }
 }
