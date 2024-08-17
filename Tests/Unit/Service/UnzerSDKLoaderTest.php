@@ -36,7 +36,9 @@ class UnzerSDKLoaderTest extends TestCase
             'isDebugMode' => false
         ]);
 
-        $this->expectExceptionMessage('Try to get the SDK with the Key "" defined by paymentId "", currency "", customerType ""');
+        $this->expectExceptionMessage(
+            'Try to get the SDK with the Key "" defined by paymentId "", currency "", customerType ""'
+        );
         $this->assertInstanceOf(Unzer::class, $sut->getUnzerSDK());
     }
 
