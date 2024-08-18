@@ -22,7 +22,7 @@ class GetPaymentType
         $this->session = $session;
     }
 
-    public function getUnzerPaymentStatus(string $unzerPaymentId, string $orderId)
+    public function getUnzerPaymentStatus(string $unzerPaymentId, string $orderId): string
     {
         $this->session->setVariable('UnzerPaymentId', $unzerPaymentId);
         $this->session->setVariable('sess_challenge', $orderId);

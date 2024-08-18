@@ -185,7 +185,9 @@ class Transaction
             'customertype' => '',
         ];
 
-        $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
+        if ($unzerCancel) {
+            $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
+        }
 
         return $this->saveTransaction($params, $oOrder);
     }
@@ -352,6 +354,7 @@ class Transaction
     {
         $currency = '';
         $customerId = '';
+        $metadata = null;
         $payment = $unzerCancel->getPayment();
         if (is_object($payment)) {
             $currency = $payment->getCurrency();
@@ -359,9 +362,9 @@ class Transaction
             if (is_object($customer)) {
                 $customerId = $customer->getId();
             }
+            $metadata = $payment->getMetadata();
         }
 
-        $metadata = $unzerCancel->getPayment()->getMetadata();
         $metadataJson = '';
         if ($metadata instanceof Metadata) {
             $metadataJson = $metadata->jsonSerialize();

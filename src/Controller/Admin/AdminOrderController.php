@@ -446,7 +446,6 @@ class AdminOrderController extends AdminDetailsController
             $oOrder->setFieldData('oxorder__oxtransstatus', UnzerPaymentService::STATUS_CANCELED);
             $oOrder->save();
         }
-
     }
 
     /**
