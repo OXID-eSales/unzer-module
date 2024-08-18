@@ -445,7 +445,7 @@ class Payment
             $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
             $unzerPayment = $sdk->fetchPayment($unzerid);
             $cancellation = new Cancellation($amount);
-            $cancelTransaction = $sdk->cancelAuthorizedPayment($unzerPayment, $cancellation);
+            $sdk->cancelAuthorizedPayment($unzerPayment, $cancellation);
 
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
