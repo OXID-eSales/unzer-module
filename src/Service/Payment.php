@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
@@ -41,37 +42,31 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
  */
 class Payment
 {
+    use Request;
+
     public const STATUS_OK = "OK";
     public const STATUS_CANCELED = "CANCELED";
     public const STATUS_NOT_FINISHED = "NOT_FINISHED";
     public const STATUS_ERROR = "ERROR";
 
-    /** @var \OxidEsales\Eshop\Core\Session $session */
-    protected $session;
+    protected Session $session;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader $paymentExtLoader */
-    protected $paymentExtLoader;
+    protected PaymentExtensionLoader $paymentExtLoader;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\Translator $translator */
-    protected $translator;
+    protected Translator $translator;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\Unzer $unzerService */
-    protected $unzerService;
+    protected Unzer $unzerService;
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader $unzerSDKLoader */
-    protected $unzerSDKLoader;
+    protected UnzerSDKLoader $unzerSDKLoader;
 
-    /** @var \UnzerSDK\Resources\Payment|null $sessionUnzerPayment */
-    protected $sessionUnzerPayment = null;
+    protected ?UnzerPayment $sessionUnzerPayment = null;
 
-    /** @var string $redirectUrl */
-    protected $redirectUrl = '';
 
-    /** @var string|null $pdfLink */
-    protected $pdfLink = '';
+    protected string $redirectUrl = '';
 
-    /** @var \OxidSolutionCatalysts\Unzer\Service\Transaction $transactionService */
-    protected $transactionService;
+    protected string $pdfLink = '';
+
+    protected Transaction $transactionService;
 
     /**
      * @param Session $session
@@ -105,8 +100,7 @@ class Payment
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         $paymentExtension = null;
-        /** @var string $customerType */
-        $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
+        $customerType = $this->getUnzerStringRequestParameter('unzer_customer_type');
         $user = $this->session->getUser();
         $basket = $this->session->getBasket();
         $currency = $basket->getBasketCurrency()->name;
@@ -298,12 +292,10 @@ class Payment
     {
         $customerType = 'B2C';
 
-        if ($currency !== null) {
-            if ($this->isPaylaterInvoice($paymentType)) {
-                $customerInRequest = Registry::getRequest()->getRequestParameter('unzer_customer_type');#
-                if ($customerInRequest !== 'B2C') {
-                    $customerType = 'B2B';
-                }
+        if (($currency !== null) && $this->isPaylaterInvoice($paymentType)) {
+            $customerInRequest = $this->getUnzerStringRequestParameter('unzer_customer_type');
+            if ($customerInRequest !== 'B2C') {
+                $customerType = 'B2B';
             }
         }
         return $customerType;
@@ -383,8 +375,7 @@ class Payment
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $cancellation,
-                $oOrder
+                $cancellation
             );
         } catch (UnzerApiException $e) {
             return $e;
@@ -410,7 +401,7 @@ class Payment
 
             /** @var Authorization $authorization */
             $authorization = $unzerPayment->getAuthorization();
-            if (null == $authorization) {
+            if (null === $authorization) {
                 return false;
             }
             $charge = $authorization->charge($amount);
@@ -420,8 +411,7 @@ class Payment
             $this->transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $charge,
-                $oOrder
+                $charge
             );
             $payment = $charge->getPayment();
             if (
@@ -462,6 +452,9 @@ class Payment
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
+                $unzerPayment,
+                null,
+                $cancellation,
                 $cancelTransaction,
                 $oOrder
             );
@@ -579,6 +572,6 @@ class Payment
      */
     public function isPdfSession(): bool
     {
-        return (bool) Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
+        return $this->getUnzerBoolRequestParameter('pdfConfirm');
     }
 }

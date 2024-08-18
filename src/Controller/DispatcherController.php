@@ -11,6 +11,7 @@ use JsonException;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -23,6 +24,7 @@ use UnzerSDK\Resources\Payment;
 class DispatcherController extends FrontendController
 {
     use ServiceContainer;
+    use Request;
 
     /** @var \OxidSolutionCatalysts\Unzer\Service\Transaction $transaction */
     private $transaction;
@@ -144,8 +146,7 @@ class DispatcherController extends FrontendController
 
     private function getContext(): string
     {
-        $context = Registry::getRequest()->getRequestParameter('context', 'shop');
-        return is_string($context) ? $context : 'shop';
+        return $this->getUnzerStringRequestParameter('context', 'shop');
     }
 
     private function updateOrder(Order $order, Payment $unzerPayment, string $paymentId): string
@@ -234,13 +235,13 @@ class DispatcherController extends FrontendController
 
     private function markUnzerOrderAsPaid(Order $order): void
     {
-        $order->assign(['oxtransstatus' => 'Paid']);
+        $order->assign(['oxtransstatus' => 'OK']);
         $order->save();
     }
 
     private function cancelOrder(Order $order): void
     {
-        $order->assign(['oxtransstatus' => 'Cancelled']);
+        $order->assign(['oxtransstatus' => 'NOT_FINISHED']);
         $order->save();
     }
 }

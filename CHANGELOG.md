@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### NEW
 - New Paymentmethod Unzer installment (Paylater)
 - If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup  temporary order
+- add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
+- UNZER-456: add the requirement not to sending the payment to unzer, if the minimum payment amount is not reached
 
 ### FIXED
 - refactor of the correct use of the appropriate credentials depending on the payment method used
@@ -26,6 +28,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
 - Inform the customer in frontend, if the payment was cancelled by customer during checkout
 - fix system crashes sporadically [not always replicatable] on card payment on return from the 3d-auth page with this in log
+- fix show prePayment-BankInformations on Thankyou-Page
+- save ApplePay-Certificates in any case of change ModuleConfiguration
+- fix provide ShopMetadata for UnzerPayment
+- fix show multiple vouchers separately
+- fix: only OK, NOT_FINISHED or CANCEL in oxorder->oxtranstatus allowed
+- fix showing correct amount when cancelling in admin
 
 ## [1.1.3] - 2023-11-14
 

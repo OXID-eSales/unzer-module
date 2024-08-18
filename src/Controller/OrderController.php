@@ -16,11 +16,13 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
+use OxidSolutionCatalysts\Unzer\Service\BasketPayableService;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
@@ -48,6 +50,7 @@ use UnzerSDK\Resources\PaymentTypes\Paypal;
 class OrderController extends OrderController_parent
 {
     use ServiceContainer;
+    use Request;
 
     /**
      * @var bool $blSepaMandateConfirmError
@@ -206,18 +209,16 @@ class OrderController extends OrderController_parent
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function isSepaConfirmed(): ?bool
+    public function isSepaConfirmed(): bool
     {
+        $result = true;
         if ($this->isSepaPayment()) {
-            $blSepaMandateConfirm = Registry::getRequest()->getRequestParameter('sepaConfirmation');
-            if (!$blSepaMandateConfirm) {
-                $this->blSepaMandateConfirmError = true;
-                return false;
-            }
+            $result = $this->getUnzerBoolRequestParameter('sepaConfirmation');
+            $this->blSepaMandateConfirmError = !$result;
         }
-        return true;
+        return $result;
     }
 
     /**
@@ -323,6 +324,15 @@ class OrderController extends OrderController_parent
      */
     public function executeoscunzer(): ?string
     {
+        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
+        $payment = $this->getPayment();
+        if (
+            !$payment instanceof Payment
+            || !$this->getServiceFromContainer(BasketPayableService::class)->basketIsPayable($payment)
+        ) {
+            return parent::execute();
+        }
+
         if (!$this->isSepaConfirmed()) {
             return null;
         }
@@ -348,8 +358,6 @@ class OrderController extends OrderController_parent
         }
 
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
-        /** @var \OxidEsales\Eshop\Application\Model\Payment $payment */
-        $payment = $this->getPayment();
         $paymentOk = $paymentService->executeUnzerPayment($payment);
 
         // all orders without redirect would be finalized now

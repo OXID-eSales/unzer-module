@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice as UnzerPaylaterInvoice;
@@ -17,6 +18,8 @@ use OxidEsales\Eshop\Core\Registry;
 
 class Invoice extends UnzerPayment
 {
+    use Request;
+
     protected $paymentMethod = 'paylater-invoice';
 
     protected $allowedCurrencies = ['EUR', 'CHF'];
@@ -43,9 +46,7 @@ class Invoice extends UnzerPayment
         User $userModel,
         Basket $basketModel
     ): bool {
-        $request = Registry::getRequest();
-        /** @var string $companyType */
-        $companyType = $request->getRequestParameter('unzer_company_form', '');
+        $companyType = $this->getUnzerStringRequestParameter('unzer_company_form');
 
         $customerObj = $this->unzerService->getUnzerCustomer(
             $userModel,
@@ -58,8 +59,7 @@ class Invoice extends UnzerPayment
         );
 
         // resource from frontend
-        /** @var string $typeId */
-        $typeId = $request->getRequestParameter('unzer_type_id');
+        $typeId = $this->getUnzerStringRequestParameter('unzer_type_id');
         // first try to fetch customer, secondly create anew if not found in unzer
         try {
             $customerObj = $this->unzerSDK->fetchCustomer($customerObj);
@@ -101,7 +101,7 @@ class Invoice extends UnzerPayment
 
         $this->unzerService->setSessionVars($transaction);
 
-        if ($request->getRequestParameter('birthdate')) {
+        if ($this->getUnzerBoolRequestParameter('birthdate')) {
             $userModel->save();
         }
 

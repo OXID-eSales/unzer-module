@@ -158,11 +158,6 @@ class Transaction extends BaseModel
         return null;
     }
 
-    public function setTransStatus(string $status): void
-    {
-        $this->_setFieldData('OXTRANSSTATUS', $status);
-    }
-
     public function setPaymentTypeId(?string $status): void
     {
         $status = $status ?: '';
