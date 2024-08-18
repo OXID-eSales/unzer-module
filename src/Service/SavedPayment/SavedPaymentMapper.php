@@ -2,8 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service\SavedPayment;
 
-use InvalidArgumentException;
-
 /**
  * This service is used to filter out those PaymentTypes from the amount of the given PaymentTypes,
  * so that only one PaymentType per PayPal account or credit card remains.
@@ -31,8 +29,8 @@ class SavedPaymentMapper
         $groupedPaymentTypes = [];
         foreach ($paymentTypes as $paymentType) {
             $groupingKeyBy = $this->getGroupingKey($paymentType);
-            if ($this->paymentTypeMatchesGroupingKey($paymentType, $groupingKeyBy)) {
-                $groupedPaymentTypes[$this->getGroupingValue($paymentType)] = $paymentType;
+            if ($groupingKeyBy && $this->paymentTypeMatchesGroupingKey($paymentType, $groupingKeyBy)) {
+                $groupedPaymentTypes[$this->getGroupingValue($paymentType, $groupingKeyBy)] = $paymentType;
             }
         }
 
@@ -50,10 +48,10 @@ class SavedPaymentMapper
     }
 
     /**
-     * the order of if statements is important because email is defined in all paymentypes number only for credit card
-     * and iban only for sepa payments
+     * the order of if statements is important because email is defined in all payment types, number only for
+     * credit card and iban only for sepa payments
      */
-    private function getGroupingKey(array $paymentType): string
+    private function getGroupingKey(array $paymentType): ?string
     {
         if ($this->paymentTypeMatchesGroupingKey($paymentType, self::GROUPING_KEY_CARD)) {
             return self::GROUPING_KEY_CARD;
@@ -63,19 +61,17 @@ class SavedPaymentMapper
             return self::GROUPING_KEY_PAYPAL;
         }
 
-        throw new InvalidArgumentException(
-            'cant determine grouping key in ' . __CLASS__ . '::' . __METHOD__
-        );
+        return null;
     }
 
-    private function getGroupingValue(array $paymentType): string
+    private function getGroupingValue(array $paymentType, string $groupingKeyBy): string
     {
         if ($this->paymentTypeMatchesGroupingKey($paymentType, self::GROUPING_KEY_CARD)) {
             $paymentTypeKeys = explode('|', self::GROUPING_KEY_CARD);
             return $paymentType[$paymentTypeKeys[0]] . '|' . $paymentType[$paymentTypeKeys[1]];
         }
 
-        return $paymentType[$this->getGroupingKey($paymentType)];
+        return $paymentType[$groupingKeyBy];
     }
 
     private function areKeysDefined(array $requiredKeys, array $array): bool
