@@ -27,6 +27,7 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 use UnzerSDK\Unzer;
 use DateTime;
 use DateTimeZone;
+use OxidSolutionCatalysts\Unzer\Service\Payment\GetPaymentType;
 
 /**
  * Order class wrapper for Unzer module
@@ -437,8 +438,15 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
         }
 
-        $oOrder->setFieldData('oxorder__oxtransstatus', UnzerPaymentService::STATUS_CANCELED);
-        $oOrder->save();
+        // prove payment is canceled at unzer side, there could be an error during cancel transaction
+        $paymentStatus = $this->getServiceFromContainer(GetPaymentType::class)
+            ->getUnzerPaymentStatus($unzerid, $oOrder->getId());
+
+        if (UnzerPaymentService::STATUS_CANCELED === $paymentStatus) {
+            $oOrder->setFieldData('oxorder__oxtransstatus', UnzerPaymentService::STATUS_CANCELED);
+            $oOrder->save();
+        }
+
     }
 
     /**
