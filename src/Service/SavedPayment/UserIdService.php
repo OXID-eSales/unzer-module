@@ -2,7 +2,6 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service\SavedPayment;
 
-use InvalidArgumentException;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\PaymentTypes\Paypal;
