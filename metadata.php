@@ -19,6 +19,7 @@ use OxidSolutionCatalysts\Unzer\Controller\DispatcherController;
 use OxidSolutionCatalysts\Unzer\Controller\InstallmentController;
 use OxidSolutionCatalysts\Unzer\Controller\OrderController;
 use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
+use OxidSolutionCatalysts\Unzer\Controller\ThankYouController;
 use OxidSolutionCatalysts\Unzer\Core\Config;
 use OxidSolutionCatalysts\Unzer\Core\ShopControl;
 use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
@@ -57,17 +58,22 @@ $aModule = [
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
     'extend' => [
-        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
+        // Core
         \OxidEsales\Eshop\Core\Config::class => Config::class,
-        \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
-        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
-        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
         \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
+        // Controller
+        \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
+        \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
+        \OxidEsales\Eshop\Application\Controller\ThankYouController::class => ThankYouController::class,
+        // Controller Admin
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
-        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderList::class => OrderList::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => OrderMain::class,
+        // Models
         \OxidEsales\Eshop\Application\Model\Article::class => Article::class,
+        \OxidEsales\Eshop\Application\Model\Order::class => Order::class,
+        \OxidEsales\Eshop\Application\Model\Payment::class => Payment::class,
     ],
     'controllers' => [
         'unzer_admin_order' => AdminOrderController::class,

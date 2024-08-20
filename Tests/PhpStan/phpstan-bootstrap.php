@@ -23,6 +23,11 @@ class_alias(
 );
 
 class_alias(
+    \OxidEsales\Eshop\Application\Controller\ThankYouController::class,
+    \OxidSolutionCatalysts\Unzer\Controller\ThankYouController_parent::class
+);
+
+class_alias(
     \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class,
     \OxidSolutionCatalysts\Unzer\Controller\Admin\AdminDetailsController_parent::class
 );
