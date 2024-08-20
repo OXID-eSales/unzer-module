@@ -276,11 +276,13 @@
                         <td>[{$oUnzerCancel.cancelDate|escape}]</td>
                         <td>[{$oUnzerCancel.cancellationId|escape}]</td>
                         <td>[{$oUnzerCancel.cancelledAmount|escape|string_format:"%.2f"}] [{$uzrCurrency}]</td>
-                        [{if $blCancelReasonReq && $oUnzerCancel.cancelReason != ''}]
-                            [{assign var="escaped_reason" value=$oUnzerCancel.cancelReason|escape}]
-                            [{assign var="translate_ident" value='OSCUNZER_REASON_'|cat:$escaped_reason|cat:''}]
-                            <td>[{oxmultilang ident=$translate_ident}]</td>
-                        [{/if}]
+                        <td>
+                            [{if $oUnzerCancel.cancelReason != ''}]
+                                [{assign var="escaped_reason" value=$oUnzerCancel.cancelReason|escape}]
+                                [{assign var="translate_ident" value='OSCUNZER_REASON_'|cat:$escaped_reason|cat:''}]
+                                [{oxmultilang ident=$translate_ident}]
+                            [{/if}]
+                        </td>
                     </tr>
                 [{/foreach}]
             </table>
