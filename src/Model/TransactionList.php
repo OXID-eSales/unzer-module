@@ -48,4 +48,22 @@ class TransactionList extends ListModel
 
         $this->selectString($query, $params);
     }
+
+    public function getTransactionListByTraceId(string $traceId): void
+    {
+        $oListObject = $this->getBaseObject();
+        $sFieldList = $oListObject->getSelectFields();
+
+        $shopId = Registry::getConfig()->getShopId();
+
+        $params = [':shopid' => $shopId, ':traceid' => $traceId];
+
+        $query = "select $sFieldList from " . $oListObject->getViewName() . "
+            where oxshopid = :shopid 
+                and traceid = :traceid 
+                and oxaction = 'canceled'
+            order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
+
+        $this->selectString($query, $params);
+    }
 }

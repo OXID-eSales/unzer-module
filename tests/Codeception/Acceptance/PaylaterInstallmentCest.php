@@ -31,7 +31,6 @@ final class PaylaterInstallmentCest extends BaseCest
     /**
      * @param AcceptanceTester $I
      * @group checkPaymentUnavailableForB2B
-     * @group ThirdGroup
      */
     public function checkInstallmentUnavailableForB2B(AcceptanceTester $I)
     {

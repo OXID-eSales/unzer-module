@@ -88,7 +88,7 @@ class AdminOrderController extends AdminDetailsController
 
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             $orderId = $this->getEditObjectId();
-            $paymentId = $transactionService->getPaymentIdByOrderId($orderId); //somthesing like s-chg-XXXX
+            $paymentId = $transactionService->getPaymentIdByOrderId($orderId, true); //somthesing like s-chg-XXXX
             $this->sTypeId = $paymentId; /** may@throws \TypeError if $paymentId due to wrong payment cancellation */
             $this->_aViewData['sTypeId'] = $this->sTypeId;
             if ($this->sTypeId) {
@@ -375,14 +375,14 @@ class AdminOrderController extends AdminDetailsController
         $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        /** @var string $chargeid */
-        $chargeid = Registry::getRequest()->getRequestParameter('chargeid');
+
+        $chargeid = Registry::getRequest()->getRequestParameter('chargeid') ?? '';
         /** @var float $amount */
         $amount = Registry::getRequest()->getRequestParameter('amount');
         /** @var float $fCharged */
         $fCharged = Registry::getRequest()->getRequestParameter('chargedamount');
         /** @var string $reason */
-        $reason = Registry::getRequest()->getRequestParameter('reason');
+        $reason = Registry::getRequest()->getRequestParameter('reason') ?? '';
 
         $translator = $this->getServiceFromContainer(Translator::class);
         if ($reason === "NONE" && $this->isUnzerOrder() && $this->isCancelReasonRequired()) {
@@ -392,7 +392,7 @@ class AdminOrderController extends AdminDetailsController
         }
 
         if ($reason === "NONE") {
-            $reason = null;
+            $reason = '';
         }
 
         if ($amount > $fCharged || $amount === 0.0) {
@@ -403,7 +403,7 @@ class AdminOrderController extends AdminDetailsController
         $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
-        $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, floatval($amount), (string)$reason);
+        $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, floatval($amount), $reason);
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errCancel'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
         }

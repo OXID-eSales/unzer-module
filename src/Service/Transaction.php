@@ -19,6 +19,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
+use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
@@ -51,6 +52,13 @@ class Transaction
         'crd' => 'card',
         'ppl' => 'paypal',
         'sdd' => 'sepa'
+    ];
+
+    private array $transActionConst = [
+        PaymentState::STATE_NAME_COMPLETED,
+        PaymentState::STATE_NAME_CANCELED,
+        PaymentState::STATE_NAME_CHARGEBACK,
+        PaymentState::STATE_NAME_PENDING
     ];
 
     /**
@@ -412,18 +420,16 @@ class Transaction
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public function getPaymentIdByOrderId(string $orderid)
+    public function getPaymentIdByOrderId(string $orderid, bool $withoutCancel = false): string
     {
         $result = '';
-
         if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
+            $result = DatabaseProvider::getDb()->getOne(
                 "SELECT DISTINCT TYPEID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'chargeback', 'canceled')",
+                WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql($withoutCancel) . ")",
                 [$orderid]
             );
-
-            $result = $rows[0]['TYPEID'];
+            $result = is_string($result) ? $result : '';
         }
 
         return $result;
@@ -599,5 +605,14 @@ class Transaction
             }
         }
         return $result;
+    }
+
+    private function prepareTransActionConstForSql(bool $withoutCancel = false): string
+    {
+        $transActionConst = $this->transActionConst;
+        if ($withoutCancel) {
+            $transActionConst = array_diff($transActionConst, [PaymentState::STATE_NAME_CANCELED]);
+        }
+        return implode(',', DatabaseProvider::getDb()->quoteArray($transActionConst));
     }
 }
