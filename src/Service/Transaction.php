@@ -184,9 +184,10 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'cancelreason' => $unzerCancelReason,
+            'customertype' => '',
         ];
 
-        if ($unzerCancel instanceof Cancellation) {
+        if ($unzerCancel) {
             $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
         }
 
@@ -352,6 +353,7 @@ class Transaction
     {
         $currency = '';
         $customerId = '';
+        $metadata = null;
         $payment = $unzerCancel->getPayment();
         if (is_object($payment)) {
             $currency = $payment->getCurrency();
@@ -359,7 +361,14 @@ class Transaction
             if (is_object($customer)) {
                 $customerId = $customer->getId();
             }
+            $metadata = $payment->getMetadata();
         }
+
+        $metadataJson = '';
+        if ($metadata instanceof Metadata) {
+            $metadataJson = $metadata->jsonSerialize();
+        }
+
         return [
             'amount'     => $unzerCancel->getAmount(),
             'currency'   => $currency,
@@ -369,6 +378,7 @@ class Transaction
             'traceid'    => $unzerCancel->getTraceId(),
             'shortid'    => $unzerCancel->getShortId(),
             'status'     => $this->getUzrStatus($unzerCancel),
+            'metadata'   => $metadataJson,
         ];
     }
 

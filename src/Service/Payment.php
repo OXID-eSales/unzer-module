@@ -449,11 +449,9 @@ class Payment
 
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
-            $this->transactionService->writeTransactionToDB(
+            $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $unzerPayment,
-                null,
                 $cancellation
             );
         } catch (UnzerApiException $e) {

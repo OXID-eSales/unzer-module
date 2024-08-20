@@ -14,6 +14,7 @@ use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
+use OxidSolutionCatalysts\Unzer\Service\Payment as UnzerPaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -27,6 +28,7 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 use UnzerSDK\Unzer;
 use DateTime;
 use DateTimeZone;
+use OxidSolutionCatalysts\Unzer\Service\Payment\GetPaymentType;
 
 /**
  * Order class wrapper for Unzer module
@@ -328,7 +330,7 @@ class AdminOrderController extends AdminDetailsController
         $translator = $this->getServiceFromContainer(Translator::class);
 
         if ($unzerid) {
-            $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+            $paymentService = $this->getServiceFromContainer(UnzerPaymentService::class);
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder = $this->getEditObject();
             $oStatus = $paymentService->sendShipmentNotification($oOrder, $unzerid);
@@ -353,7 +355,7 @@ class AdminOrderController extends AdminDetailsController
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
-        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $paymentService = $this->getServiceFromContainer(UnzerPaymentService::class);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerCollect($oOrder, $unzerid, $amount);
@@ -396,7 +398,7 @@ class AdminOrderController extends AdminDetailsController
                 . $translator->translate('OSCUNZER_CANCEL_ERR_AMOUNT') . " " . $amount;
             return;
         }
-        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $paymentService = $this->getServiceFromContainer(UnzerPaymentService::class);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, (string)$reason);
@@ -416,13 +418,22 @@ class AdminOrderController extends AdminDetailsController
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
-        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $paymentService = $this->getServiceFromContainer(UnzerPaymentService::class);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerAuthorizationCancel($oOrder, $unzerid, $amount);
 
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errAuth'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
+        }
+
+        // prove payment is canceled at unzer side, there could be an error during cancel transaction
+        $paymentStatus = $this->getServiceFromContainer(GetPaymentType::class)
+            ->getUnzerPaymentStatus($unzerid, $oOrder->getId());
+
+        if (UnzerPaymentService::STATUS_CANCELED === $paymentStatus) {
+            $oOrder->setFieldData('oxorder__oxtransstatus', UnzerPaymentService::STATUS_CANCELED);
+            $oOrder->save();
         }
     }
 
