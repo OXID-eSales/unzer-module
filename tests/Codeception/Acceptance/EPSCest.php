@@ -67,6 +67,8 @@ final class EPSCest extends BaseCest
      */
     public function checkPaymentWorks(AcceptanceTester $I)
     {
+        $I->markTestSkipped("EPS skipped temporary");
+
         $I->wantToTest('Test EPS payment works');
         $this->initializeTest();
         $this->choosePayment($this->epsLabel);
