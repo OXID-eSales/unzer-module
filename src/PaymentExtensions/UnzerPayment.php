@@ -172,13 +172,12 @@ abstract class UnzerPayment
             $userModel->save();
         }
 
-        if ($this->requestService->isSavePaymentSelectedByUserInRequest($paymentType)) {
-            $session->setVariable(
-                'oscunzersavepayment',
-                $this->existsInSavedPaymentsList($userModel) ?
-                    $this->getUnzerStringRequestParameter('oscunzersavepayment') :
-                    false
-            );
+        if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal) {
+            $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+            if (!$savePayment || $this->existsInSavedPaymentsList($userModel)) {
+                $savePayment = true;
+            }
+            $session->setVariable('oscunzersavepayment', $savePayment);
         }
 
         if ($userModel->getId()) {
