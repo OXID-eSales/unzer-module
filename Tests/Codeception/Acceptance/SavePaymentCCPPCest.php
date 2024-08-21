@@ -40,7 +40,7 @@ final class SavePaymentCCPPCest extends BaseCest
     private string $submitButton = "#payment-submit-btn";
     private string $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
     private string $savePaypalPayment = "#oscunzersavepayment";
-    private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[2]/input";
+    private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[3]/input";
     private string $savedPaymentsLocator = "//*[@id='account_menu']/ul/li[1]/a";
     private string $savePayPalAccountInNextStepInputSelector = "//*[@id='oscunzersavepayment']";
     private string $savePaymentDeleteButtonSelector = "//button[contains(@class, 'btn-danger') and text()='Delete']";

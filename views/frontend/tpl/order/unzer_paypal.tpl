@@ -21,7 +21,7 @@
 
                 [{foreach from=$setting item="paymentType" }]
                     <tr>
-                        <th scope="row">[{$paymentType.email}]</th>
+                        <td scope="row">[{$paymentType.email}]</td>
                         <td>[{$type}]</td>
                         <td>
                             <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymentType.id}]" style="-webkit-appearance: radio">
