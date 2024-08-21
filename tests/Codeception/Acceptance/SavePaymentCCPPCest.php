@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
+use OxidEsales\Codeception\Module\Context;
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Page;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\BaseCest;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
@@ -54,7 +56,9 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->wantToTest('if PayPal payment works and save payment flag is clickable');
         $this->initializeTest();
         $this->choosePayment($this->paypalPaymentLabel);
-        $I->waitForElementClickable($this->savePaypalPayment);
+        $I->scrollTo($this->savePaypalPayment);
+        $I->waitForElementClickable($this->savePaypalPayment, 15);
+        $I->wait(10);
         $I->click($this->savePaypalPayment);
         $this->submitOrder();
 
@@ -100,21 +104,33 @@ final class SavePaymentCCPPCest extends BaseCest
 
         $homePage = $this->I->openShop();
         $clientData = Fixtures::get('client');
-        $homePage->loginUser($clientData['username'], $clientData['password']);
+
+        $homePage->openAccountMenu();
+        $I->waitForText(Translator::translate('FORGOT_PASSWORD'));
+        $I->waitForElementVisible($homePage->userLoginName);
+        $I->fillField($homePage->userLoginName, $clientData['username']);
+        $I->fillField($homePage->userLoginPassword, $clientData['password']);
+        $I->click($homePage->userLoginButton);
+        $I->waitForPageLoad();
+        Context::setActiveUser($clientData['username']);
 
         $I->openShop()->openAccountPage();
-        $I->click("//*[@id='account_menu']/ul/li[1]/a");
+        $I->click("//*[@id='wrapper']/div/div/div[2]/div[1]/div/div/a");
         $I->see("paypal-buyer@unzer.com");
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($this->I);
         $basketSteps->addProductToBasket($basketItem['id'], $this->amount);
-        $I->openShop()->openMiniBasket()->openCheckout();
+        $I->openShop()->openMiniBasket();
+        $I->waitForText(Translator::translate('CHECKOUT'));
+        $I->click(Translator::translate('CHECKOUT'));
+        $I->waitForPageLoad();
         $this->choosePayment($this->paypalPaymentLabel);
         $I->waitForElementClickable($this->firstSavedPaypalPayment);
         $I->wantTo('use saved payment to pay');
-        $I->seeAndClick('//*[@id="payment-saved-cards"]/table/tbody/tr/td[2]/input');
-        $I->wait(15);
+        $I->scrollTo('//*[@id="payment-saved-cards"]/table/tbody/tr/td[2]/input');
+        $I->wait(5);
+        $I->click('#payment-saved-cards > table > tbody > tr > td:nth-child(3) > input');
         $this->submitOrder();
 
         $paypalPaymentData = Fixtures::get('paypal_payment');
@@ -127,7 +143,7 @@ final class SavePaymentCCPPCest extends BaseCest
         }
 
         // login page
-        $I->wait(30);
+        $I->wait(20);
         $I->waitForElement($this->loginInput);
         $I->fillField($this->loginInput, $paypalPaymentData['username']);
         $I->fillField($this->passwordInput, $paypalPaymentData['password']);
@@ -158,7 +174,15 @@ final class SavePaymentCCPPCest extends BaseCest
 
         $homePage = $this->I->openShop();
         $clientData = Fixtures::get('client');
-        $homePage->loginUser($clientData['username'], $clientData['password']);
+
+        $homePage->openAccountMenu();
+        $I->waitForText(Translator::translate('FORGOT_PASSWORD'));
+        $I->waitForElementVisible($homePage->userLoginName);
+        $I->fillField($homePage->userLoginName, $clientData['username']);
+        $I->fillField($homePage->userLoginPassword, $clientData['password']);
+        $I->click($homePage->userLoginButton);
+        $I->waitForPageLoad();
+        Context::setActiveUser($clientData['username']);
 
         $I->openShop()->openAccountPage();
         $I->click("//*[@id='account_menu']/ul/li[1]/a");

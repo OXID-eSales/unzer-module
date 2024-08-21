@@ -119,6 +119,7 @@ $aLang = [
     'OSCUNZER_PAYMENT_METHOD_WECHATPAY' => 'WeChat Pay',
     'OSCUNZER_SAVED_PAYMENTS' => 'Saved Payments',
     'OSCUNZER_SAVE_PAYMENT' => 'Save Payment',
+    'OSCUNZER_SAVE_PAYPAL' => 'New PayPal account',
     'OSCUNZER_SAVE_PAYMENT_PAYPAL' => 'Save PayPal access in the next step',
     'OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS' => 'No saved Payments',
     'OSCUNZER_BRAND' => 'Brand',
