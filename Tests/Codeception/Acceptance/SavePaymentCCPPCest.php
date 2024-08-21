@@ -49,7 +49,7 @@ final class SavePaymentCCPPCest extends BaseCest
      * @group unzer_module
      * @group SecondGroup
      * @throws \Exception
-     * @group SavePaymentCCPPCestFails
+     * @group SavePaymentCCPPCest
      */
     public function testPaymentWorksWithSavingPayment(AcceptanceTester $I)
     {
