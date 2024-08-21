@@ -85,7 +85,7 @@ final class BancontactCest extends BaseCest
 
         $this->getAcceptance()->waitForPageLoad();
         $this->getAcceptance()->waitForText($price);
-        $this->getAcceptance()->waitForElement($this->continueButton);
+        $this->getAcceptance()->waitForElement($this->continueButton, 30);
         $this->getAcceptance()->click($this->continueButton);
     }
 
