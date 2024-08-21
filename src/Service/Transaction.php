@@ -604,11 +604,6 @@ class Transaction
         return $this->paymentTypes;
     }
 
-    public function getOxidPaymentMethodId(string $unzerPaymentMethodId): ?string
-    {
-        return $this->transPaymentTypeIds[$unzerPaymentMethodId] ?? null;
-    }
-
     private function setPaymentTypes(
         ?User $user,
         string $paymentId,
@@ -674,8 +669,6 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'customertype' => '',
-            'paymentTypeId' => $payment && $payment->getPaymentType()
-                ? $payment->getPaymentType()->getId() : '',
         ];
     }
 
