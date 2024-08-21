@@ -16,7 +16,7 @@
     <td valign="top" class="[{$listclass}] payment_date" height="15"><div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('[{$listitem->oxorder__oxid->value}]');" class="[{$listclass}]">[{$listitem->oxorder__oxpaid|oxformdate}]</a></div></td>
     <td valign="top" class="[{$listclass}] order_no" height="15">
         <div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('[{$listitem->oxorder__oxid->value}]');" class="[{$listclass}]">
-            [{$listitem->oxorder__oxordernr->value}] ([{oxmultilang ident='OSCUNZER_TRANSACTION_ORDERNR' suffix='COLON'}] [{$listitem->oxorder__oxunzerordernr->value}])
+            [{$listitem->oxorder__oxordernr->value}] [{if $listitem->oxorder__oxunzerordernr->value}] ([{oxmultilang ident='OSCUNZER_TRANSACTION_ORDERNR' suffix='COLON'}] [{$listitem->oxorder__oxunzerordernr->value}]) [{/if}]
         </a></div>
     </td>
     <td valign="top" class="[{$listclass}] first_name" height="15"><div class="listitemfloating"><a href="Javascript:top.oxid.admin.editThis('[{$listitem->oxorder__oxid->value}]');" class="[{$listclass}]">[{$listitem->oxorder__oxbillfname->value}]</a></div></td>

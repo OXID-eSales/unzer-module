@@ -27,10 +27,12 @@
                 <th>[{oxmultilang ident="SHOP_MODULE_webhook_context"}]</th>
             </tr>
         [{foreach from=$webhookConfiguration item="webhookConfig"}]
+            [{if isset($webhookConfig.id)}]
             <tr>
                 <td>[{$webhookConfig.id}]</td>
                 <td>[{$webhookConfig.context}]</td>
             </tr>
+            [{/if}]
         [{/foreach}]
         </table>
         [{/if}]
@@ -97,11 +99,11 @@
             [{if $oView->getApplePayPaymentProcessingCertExists() && $oView->getApplePayPaymentProcessingKeyExists()}]
                 [{assign var="hidePaymentProcessingTextareas" value=true}]
             [{/if}]
-            <dl class="js-payment-cert-list" [{if $hidePaymentProcessingTextareas}]style="display: none"[{/if}]>
+            <dl class="js-payment-cert-list">
                 <dt>
                         <textarea class="txt"
                                   style="width: 250px; height: 200px;"
-                                  name="applePayPaymentProcessingCert"></textarea>
+                                  name="[{$systemMode}]-applePayPaymentProcessingCert">[{$applePayPaymentProcessingCert}]</textarea>
                 </dt>
                 <dd>
                     [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT" args=$systemModeTrans}]
@@ -112,7 +114,7 @@
                 <dt>
                         <textarea class="txt"
                                   style="width: 250px; height: 200px;"
-                                  name="applePayPaymentProcessingCertKey"></textarea>
+                                  name="[{$systemMode}]-applePayPaymentProcessingCertKey">[{$applePayPaymentProcessingCertKey}]</textarea>
                 </dt>
                 <dd>
                     [{oxmultilang ident="SHOP_MODULE_APPLE_PAY_PAYMENT_PROCESSING_CERT_KEY" args=$systemModeTrans}]
@@ -137,16 +139,6 @@
                 </dt>
                 <div class="spacer"></div>
             </dl>
-            <script>
-                document.querySelector('.js-show-payment-certs').addEventListener('click', e => {
-                    e.preventDefault();
-
-                    document.querySelectorAll('.js-payment-cert-list').forEach(el => {
-                        el.style.display = '';
-                    })
-                    document.querySelector('.js-show-payment-cert-list').style.display = 'none';
-                })
-            </script>
             <dl>
                 <dt>
                     <input type=text  class="txt" style="width: 250px;" name="confstrs[[{$module_var}]]" value="[{$confstrs.$module_var}]" [{$readonly}]>
