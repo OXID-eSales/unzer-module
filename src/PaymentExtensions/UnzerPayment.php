@@ -12,6 +12,7 @@ use JsonException;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
@@ -172,13 +173,7 @@ abstract class UnzerPayment
             $userModel->save();
         }
 
-        if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal) {
-            $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-            if (!$savePayment || $this->existsInSavedPaymentsList($userModel)) {
-                $savePayment = true;
-            }
-            $session->setVariable('oscunzersavepayment', $savePayment);
-        }
+        $this->setSavedPaymentSessionVariable($paymentType, $userModel, $session);
 
         if ($userModel->getId()) {
             $this->savePayment($userModel);
@@ -455,5 +450,19 @@ abstract class UnzerPayment
             null,
             RecurrenceTypes::ONE_CLICK
         );
+    }
+
+    private function setSavedPaymentSessionVariable(
+        BasePaymentType $paymentType,
+        User $user,
+        Session $session
+    ) {
+        if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal) {
+            $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
+            if (!$savePayment || $this->existsInSavedPaymentsList($user)) {
+                $savePayment = true;
+            }
+            $session->setVariable('oscunzersavepayment', $savePayment);
+        }
     }
 }

@@ -96,7 +96,7 @@ class Transaction
         $oOrder = oxNew(Order::class);
         $oOrder->load($orderid);
 
-        $params = $this->getBasicSaveParemeters($orderid, $userId, $unzerPayment);
+        $params = $this->getBasicSaveParameters($orderid, $userId);
 
         if ($unzerPayment) {
             $this->extendSaveParameters(
@@ -661,7 +661,7 @@ class Transaction
             $transaction->getAmount() : $unzerPayment->getAmount()->getTotal();
     }
 
-    private function getBasicSaveParemeters(string $orderId, string $userId, ?Payment $payment): array
+    private function getBasicSaveParameters(string $orderId, string $userId): array
     {
         return [
             'oxorderid' => $orderId,
