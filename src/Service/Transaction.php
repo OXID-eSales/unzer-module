@@ -419,6 +419,7 @@ class Transaction
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function getPaymentIdByOrderId(string $orderid, bool $withoutCancel = false): string
     {
@@ -607,6 +608,10 @@ class Transaction
         return $result;
     }
 
+    /**
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     private function prepareTransActionConstForSql(bool $withoutCancel = false): string
     {
         $transActionConst = $this->transActionConst;

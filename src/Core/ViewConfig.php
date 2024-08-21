@@ -73,11 +73,9 @@ class ViewConfig extends ViewConfig_parent
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
             return $this->moduleSettings->getInvoicePublicKey();
         }
+
         if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
             return $this->moduleSettings->getInstallmentPublicKey();
-        }
-        if (Registry::getSession()->getBasket()->getPaymentId() === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return $this->moduleSettings->getShopPublicKeyInstallment();
         }
 
         return $this->moduleSettings->getStandardPublicKey();
@@ -96,9 +94,6 @@ class ViewConfig extends ViewConfig_parent
         }
         if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
             return $this->moduleSettings->getInstallmentPrivateKey();
-        }
-        if (Registry::getSession()->getBasket()->getPaymentId() === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return $this->moduleSettings->getShopPrivateKeyInstallment();
         }
 
         return $this->moduleSettings->getStandardPrivateKey();

@@ -376,7 +376,10 @@ class AdminOrderController extends AdminDetailsController
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
 
-        $chargeid = Registry::getRequest()->getRequestParameter('chargeid') ?? '';
+        $chargeid = Registry::getRequest()->getRequestParameter('chargeid');
+        if (!is_string($chargeid)) {
+            $chargeid = '';  // default to an empty string if it's not a scalar value
+        }
         /** @var float $amount */
         $amount = Registry::getRequest()->getRequestParameter('amount');
         /** @var float $fCharged */

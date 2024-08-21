@@ -29,7 +29,5 @@ class UnzerPaymentDataError
         $this->processing = new UnzerPaymentDataErrorProcessing(
             $arrayPaymentData['processing'] ?? []
         );
-
-        return $unzerPaymentData;
     }
 }

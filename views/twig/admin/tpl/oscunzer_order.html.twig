@@ -173,7 +173,8 @@
                     <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_CANCELAMOUNT" }) }}</td>
                     <td class="listheader"> </td>
                 </tr>
-                {% for oUnzerCharge in aCharges %}
+                {% if canRefundPartially %}
+                    {% for oUnzerCharge in aCharges %}
                     <tr>
                         <td>
                         <form name="uzr" id="uzr_{{ oUnzerCharge.chargeId }}" action="{{ oViewConf.getSelfLink() }}" method="post">
@@ -189,7 +190,15 @@
                             <td>{{ oUnzerCharge.chargeId|escape }}</td>
                             <td>{{ oUnzerCharge.chargedAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
                             <td>{{ oUnzerCharge.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
-
+                            {% if blCancelReasonReq %}
+                                <td>
+                                    <select name="reason" id="reason_{{ oUnzerCharge.chargeId }}">
+                                        <option value="CANCEL">{{ translate({ ident: "OSCUNZER_REASON_CANCEL" }) }}</option>
+                                        <option value="RETURN">{{ translate({ ident: "OSCUNZER_REASON_RETURN" }) }}</option>
+                                        <option value="CREDIT">{{ translate({ ident: "OSCUNZER_REASON_CREDIT" }) }}</option>
+                                    </select>
+                                </td>
+                            {% endif %}
                             <td>
                                 {% if canRefundPartially %}
                                     <input type="text"
@@ -213,7 +222,8 @@
                         </form>
                     </tr>
                 {% endfor %}
-                {% if canCancelAmount > 0 %}
+                {% endif %}
+                {% if canRefundFully and canCancelAmount > 0 %}
                     <tr>
                         <form name="uzr" id="uzr_s-chg_payout" action="{{ oViewConf.getSelfLink() }}" method="post">
                             {{ oViewConf.getHiddenSid()|raw }}
