@@ -456,7 +456,7 @@ abstract class UnzerPayment
         BasePaymentType $paymentType,
         User $user,
         Session $session
-    ) {
+    ): void {
         if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal) {
             $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
             if (!$savePayment || $this->existsInSavedPaymentsList($user)) {
