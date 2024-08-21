@@ -32,7 +32,6 @@ class TransactionTest extends TestCase
             'oxactiondate' => '2021-12-10 16:44:54',
             'customertype' => '',
             'metadata' => '""',
-            'paymentTypeId' => '',
         ]);
 
         $sut->writeTransactionToDB("orderId", "userId", null);
@@ -75,7 +74,6 @@ class TransactionTest extends TestCase
             'customerid' => 'unzerCustomerId',
             'customertype' => '',
             'remaining' => 0.0,
-            'paymentTypeId' => '',
             'savepaymentuserid' => '',
             'savepayment' => false
         ]);
