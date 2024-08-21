@@ -33,6 +33,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions as CoreUnzerDefinitions;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\Card;
 use UnzerSDK\Resources\PaymentTypes\Paypal;
 
 /**
@@ -46,16 +47,9 @@ class OrderController extends OrderController_parent
 {
     use ServiceContainer;
 
-    /**
-     * @var bool $blSepaMandateConfirmError
-     */
-    protected $blSepaMandateConfirmError = null;
-
-    /** @var Order $actualOrder */
-    protected $actualOrder = null;
-
-    /** @var array $companyTypes */
-    protected $companyTypes = null;
+    protected ?bool $blSepaMandateConfirmError = null;
+    protected ?Order $actualOrder = null;
+    protected ?array $companyTypes = null;
 
     /**
      * @inerhitDoc
@@ -501,16 +495,19 @@ class OrderController extends OrderController_parent
     private function setSavePaymentFlag(User $oUser, PaymentService $paymentService): void
     {
         $unzerSessionPayment = $paymentService->getSessionUnzerPayment(true);
-        if ($unzerSessionPayment && $unzerSessionPayment->getPaymentType() instanceof Paypal) {
-            $session = Registry::getSession();
-            /** @var Payment $paymentModel */
-            $paymentModel = $this->getPayment();
-            $paymentExtension = $this->getServiceFromContainer(PaymentExtensionLoader::class)
-                ->getPaymentExtension($paymentModel);
-            $savePayment = $session->getVariable('oscunzersavepayment');
-            $exists = $paymentExtension->existsInSavedPaymentsList($oUser);
-            $savePayment = $savePayment && $exists ? false : $savePayment;
-            $session->setVariable('oscunzersavepayment', $savePayment);
+        if ($unzerSessionPayment) {
+            $currentPayment = $unzerSessionPayment->getPaymentType();
+            if ($currentPayment instanceof Paypal || $currentPayment instanceof Card) {
+                $session = Registry::getSession();
+                /** @var Payment $paymentModel */
+                $paymentModel = $this->getPayment();
+                $paymentExtension = $this->getServiceFromContainer(PaymentExtensionLoader::class)
+                    ->getPaymentExtension($paymentModel);
+                $savePayment = $session->getVariable('oscunzersavepayment');
+                $exists = $paymentExtension->existsInSavedPaymentsList($oUser);
+                $savePayment = $savePayment && $exists ? false : $savePayment;
+                $session->setVariable('oscunzersavepayment', $savePayment);
+            }
         }
     }
 

@@ -19,9 +19,9 @@ use OxidEsales\Codeception\Module\Translation\Translator;
 
 abstract class BaseCest
 {
-    private int $amount = 1;
-    private AcceptanceTester $I;
-    private Page $paymentSelection;
+    protected int $amount = 1;
+    protected AcceptanceTester $I;
+    protected Page $paymentSelection;
 
     public function _before(AcceptanceTester $I): void
     {
