@@ -254,7 +254,23 @@
 {% if false %}</script>{% endif %}
 {% endcapture %}
 
-{{ script({ add: unzerPaymentJS, dynamic: __oxid_include_dynamic }) }}
+{{ script({ add: unzerPaymentJS,  dynamic: __oxid_include_dynamic }) }}
+
+{% capture assign = "preventMultipleClicksJS" %}
+    {% if false %}<script>{% endif %}
+    document.getElementById("submitOrder").addEventListener("click", function(event) {
+        var button = event.currentTarget;
+        if (button.disabled) {
+            console.log("click is prevented");
+            event.preventDefault();
+        } else {
+            button.disabled = true;
+        }
+    });
+    {% if false %}</script>{% endif %}
+{% endcapture %}
+
+{{ script({ add: preventMultipleClicksJS,  dynamic: __oxid_include_dynamic }) }}
 
 {% set template_title = "REVIEW_YOUR_ORDER"|translate %}
 {% include "layout/page.html.twig" with {title: template_title, location: template_title, active_step: 3} %}
