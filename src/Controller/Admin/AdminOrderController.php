@@ -353,7 +353,13 @@ class AdminOrderController extends AdminDetailsController
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
 
-        $amount = floatval(Registry::getRequest()->getRequestParameter('amount'));
+        $amountParam = Registry::getRequest()->getRequestParameter('amount');
+
+        if (is_numeric($amountParam)) {
+            $amount = floatval($amountParam);
+        } else {
+            $amount = 0.0;
+        }
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
@@ -381,8 +387,19 @@ class AdminOrderController extends AdminDetailsController
             $chargeid = '';  // default to an empty string if it's not a scalar value
         }
 
-        $amount = floatval(Registry::getRequest()->getRequestParameter('amount'));
-        $fCharged = floatval(Registry::getRequest()->getRequestParameter('chargedamount'));
+        $cancelAmountParam = Registry::getRequest()->getRequestParameter('amount');
+        if (is_numeric($cancelAmountParam)) {
+            $amount = floatval($cancelAmountParam);
+        } else {
+            $amount = 0.0;
+        }
+
+        $fChargedParam = Registry::getRequest()->getRequestParameter('chargedamount');
+        if (is_numeric($fChargedParam)) {
+            $fCharged = floatval($fChargedParam);
+        } else {
+            $fCharged = 0.0;
+        }
 
         /** @var string $reason */
         $reason = Registry::getRequest()->getRequestParameter('reason') ?? '';
