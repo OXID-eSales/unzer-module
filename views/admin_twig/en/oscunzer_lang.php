@@ -41,6 +41,7 @@ $aLang = [
     'OSCUNZER_AUTHORIZE_CANCEL_POSSIBLE' => 'As long as no amount has been collected, the authorization can be cancelled.',
     'OSCUNZER_AUTHORIZE_CANCEL' => 'Cancel authorization',
     'OSCUNZER_AUTHORIZE_CANCEL_ALERT' => 'Do you really want to cancel the authorization of the selected amount? chosen amount: ',
+    'OSCUNZER_COLLECT_ALERT' => 'Do you really want to collect the amount chosen? chosen amount: ',
     'OSCUNZER_CHARGES' => 'Charges',
     'OSCUNZER_CHARGED_AMOUNT' => 'amount collected',
     'OSCUNZER_CHARGED_CANCELLED' => 'refunded amount',

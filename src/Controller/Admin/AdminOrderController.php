@@ -352,8 +352,8 @@ class AdminOrderController extends AdminDetailsController
         $this->forceReloadListFrame();
         /** @var string $unzerid */
         $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        /** @var float $amount */
-        $amount = Registry::getRequest()->getRequestParameter('amount');
+
+        $amount = floatval(Registry::getRequest()->getRequestParameter('amount'));
 
         $translator = $this->getServiceFromContainer(Translator::class);
 
@@ -380,10 +380,10 @@ class AdminOrderController extends AdminDetailsController
         if (!is_string($chargeid)) {
             $chargeid = '';  // default to an empty string if it's not a scalar value
         }
-        /** @var float $amount */
-        $amount = Registry::getRequest()->getRequestParameter('amount');
-        /** @var float $fCharged */
-        $fCharged = Registry::getRequest()->getRequestParameter('chargedamount');
+
+        $amount = floatval(Registry::getRequest()->getRequestParameter('amount'));
+        $fCharged = floatval(Registry::getRequest()->getRequestParameter('chargedamount'));
+
         /** @var string $reason */
         $reason = Registry::getRequest()->getRequestParameter('reason') ?? '';
 
