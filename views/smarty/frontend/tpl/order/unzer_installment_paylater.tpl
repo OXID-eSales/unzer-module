@@ -63,7 +63,6 @@
                     .attr('type', 'hidden')
                     .attr('name', 'paymentData')
                     .val(JSON.stringify(data));
-                console.log(data);
                 $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
                 let hiddenCustomerType = $(document.createElement('input'))
                     .attr('type', 'hidden')
@@ -75,7 +74,6 @@
                 $( "#orderConfirmAgbBottom" ).submit();
             })
             .catch(function(error) {
-                console.log('here1')
                 $('#error-holder').html(error.message);
                 $('html, body').animate({
                     scrollTop: $("#orderPayment").offset().top - 150

@@ -108,8 +108,3 @@
     [{include file="page/account/inc/account_menu.tpl"}]
     [{/capture}]
 [{include file="layout/page.tpl" sidebar="Left"}]
-
-
-
-
-
