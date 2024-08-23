@@ -88,9 +88,6 @@
                 .val(1);
 
             $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput4);
-
-            console.log(hiddenInput4);
-
             $('#orderConfirmAgbBottom').addClass("submitable");
             $("#orderConfirmAgbBottom").submit();
         });

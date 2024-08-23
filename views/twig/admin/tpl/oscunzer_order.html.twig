@@ -370,7 +370,6 @@
                 if (form) {
                     let amountInput = form.querySelector('input[name="amount"]');
                     let amount = amountInput ? amountInput.value : 0;
-                    console.log("payoutNoticeJS" + amount);
                     let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
                     if (!confirmed) {
                         event.preventDefault();
@@ -389,7 +388,6 @@
             form.addEventListener('submit', function(event) {
                 let amountInput = form.querySelector('input[name="amount"]');
                 let amount = amountInput ? amountInput.value : 0;
-                console.log("last block" + amount);
                 let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
                 if (!confirmed) {
                     event.preventDefault();

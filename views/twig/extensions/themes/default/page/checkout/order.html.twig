@@ -261,7 +261,6 @@
     document.getElementById("submitOrder").addEventListener("click", function(event) {
         var button = event.currentTarget;
         if (button.disabled) {
-            console.log("click is prevented");
             event.preventDefault();
         } else {
             button.disabled = true;
