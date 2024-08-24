@@ -29,6 +29,7 @@ use UnzerSDK\Resources\PaymentTypes\Card as UnzerResourceCard;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerResourcePaypal;
+use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit as UnzerResourceSepa;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -275,19 +276,22 @@ class Transaction
             'oxaction'  => $oxaction,
             'traceid'   => $unzerPayment->getTraceId()
         ];
-        $savePayment = Registry::getSession()->getVariable('oscunzersavepayment');
 
         $paymentType = $unzerPayment->getPaymentType();
-        $firstPaypalCall = Registry::getSession()->getVariable('oscunzersavepayment_paypal');
+        $savePayment = $this->getServiceFromContainer(RequestService::class)
+            ->isSavePaymentSelectedByUserInRequest();
 
         if (
-             ($savePayment && ($paymentType instanceof UnzerResourcePaypal && !$firstPaypalCall))
-            || ($savePayment && $paymentType instanceof UnzerResourceCard)
+            $savePayment
+            && (
+                $paymentType instanceof UnzerResourcePaypal
+                || $paymentType instanceof UnzerResourceCard
+                || $paymentType instanceof UnzerResourceSepa
+            )
         ) {
             $typeId = $paymentType->getId();
             $params['paymenttypeid'] = $typeId;
         }
-        Registry::getSession()->setVariable('oscunzersavepayment_paypal', false);
 
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?

@@ -2,23 +2,24 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use OxidSolutionCatalysts\Unzer\Traits\Request;
-use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
-use UnzerSDK\Resources\PaymentTypes\Card;
-use UnzerSDK\Resources\PaymentTypes\Paypal;
-use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
+use OxidEsales\Eshop\Core\Request;
 
 class RequestService
 {
-    use Request;
+    /** @var Request $oxidRequest */
+    private $oxidRequest;
 
-    public function isSavePaymentSelectedByUserInRequest(BasePaymentType $paymentType): bool
+    public function __construct(Request $oxidRequest)
     {
-        return (
-                $paymentType instanceof Card
-                || $paymentType instanceof Paypal
-                || $paymentType instanceof SepaDirectDebit
-            )
-            && $this->getUnzerStringRequestParameter('oscunzersavepayment');
+        $this->oxidRequest = $oxidRequest;
+    }
+    public function isSavePaymentSelectedByUserInRequest(): bool
+    {
+        return $this->getUnzerBoolRequestParameter('oscunzersavepayment');
+    }
+
+    private function getUnzerBoolRequestParameter(string $varName): bool
+    {
+        return (bool) $this->oxidRequest->getRequestParameter($varName);
     }
 }

@@ -120,17 +120,19 @@ abstract class BaseCest
     /**
      * @return void
      */
-    protected function initializeTest()
+    protected function initializeTest($withLogin = true)
     {
-        $this->I->openShop();
+        $homePage = $this->I->openShop();
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($this->I);
         $basketSteps->addProductToBasket($basketItem['id'], $this->amount);
 
-        $homePage = $this->I->openShop();
-        $clientData = Fixtures::get('client');
-        $homePage->loginUser($clientData['username'], $clientData['password']);
+        if ($withLogin) {
+            $this->I->openShop();
+            $clientData = Fixtures::get('client');
+            $homePage->loginUser($clientData['username'], $clientData['password']);
+        }
 
         $this->paymentSelection = $homePage->openMiniBasket()->openCheckout();
     }

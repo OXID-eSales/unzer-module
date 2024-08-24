@@ -2,113 +2,87 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
-use OxidSolutionCatalysts\Unzer\Service\RequestService;
-use OxidSolutionCatalysts\Unzer\Service\SavedPaymentSaveService;
-use OxidSolutionCatalysts\Unzer\Service\SavedPayment\UserIdService;
 use Doctrine\DBAL\Connection;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\UserIdService;
+use OxidSolutionCatalysts\Unzer\Service\SavedPaymentSaveService;
 use PHPUnit\Framework\TestCase;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
-use UnzerSDK\Resources\PaymentTypes\Paypal;
 
 class SavedPaymentSaveServiceTest extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject  */
     private $connectionMock;
-
-    /** @var UserIdService|\PHPUnit\Framework\MockObject\MockObject  */
     private $userIdServiceMock;
-
-    /** @var RequestService|\PHPUnit\Framework\MockObject\MockObject  */
-    private $requestServiceMock;
+    private $sessionServiceMock;
     private $savedPaymentSaveService;
 
     protected function setUp(): void
     {
-        // Mock the dependencies
         $this->connectionMock = $this->createMock(Connection::class);
         $this->userIdServiceMock = $this->createMock(UserIdService::class);
-        $this->requestServiceMock = $this->createMock(RequestService::class);
+        $this->sessionServiceMock = $this->createMock(SavedPaymentSessionService::class);
 
-        // Instantiate the service with mocked dependencies
         $this->savedPaymentSaveService = new SavedPaymentSaveService(
             $this->connectionMock,
             $this->userIdServiceMock,
-            $this->requestServiceMock
+            $this->sessionServiceMock
         );
     }
 
     /**
      * @covers \OxidSolutionCatalysts\Unzer\Service\SavedPaymentSaveService::getTransactionParameters
      */
-    public function testGetTransactionParametersWithPaymentType()
+    public function testGetTransactionParametersWhenSavedPaymentIsTrue()
     {
-        $paymentType = new Paypal();
         $paymentMock = $this->createMock(Payment::class);
+        $paymentTypeMock = $this->createMock(BasePaymentType::class);
 
-        // Mock the behavior of getPaymentType()
-        $paymentMock->method('getPaymentType')->willReturn($paymentType);
+        $this->sessionServiceMock->method('isSavedPayment')->willReturn(true);
+        $paymentMock->method('getPaymentType')->willReturn($paymentTypeMock);
+        $this->userIdServiceMock->method('getUserIdByPaymentType')->with($paymentTypeMock)->willReturn('user123');
 
-        // Mock the behavior of getUserIdByPaymentType()
-        $this->userIdServiceMock->method('getUserIdByPaymentType')
-            ->with($paymentType)
-            ->willReturn('test-user-id');
-
-        // Assuming isSavePaymentSelectedByUserInRequest() returns true
-        $this->requestServiceMock->expects($this->once())
-            ->method('isSavePaymentSelectedByUserInRequest')
-            ->with($paymentType)
-            ->willReturn(true);
-
-        // Test getTransactionParameters
         $result = $this->savedPaymentSaveService->getTransactionParameters($paymentMock);
 
-        $expected = [
-            'savepaymentuserid' => 'test-user-id',
-            'savepayment' => true,
-        ];
-
-        $this->assertSame($expected, $result);
+        $this->assertSame(
+            [
+                'savepaymentuserid' => 'user123',
+                'savepayment' => $paymentTypeMock,
+            ],
+            $result
+        );
     }
 
     /**
      * @covers \OxidSolutionCatalysts\Unzer\Service\SavedPaymentSaveService::getTransactionParameters
      */
-    public function testGetTransactionParametersWithoutPaymentType()
+    public function testGetTransactionParametersWhenSavedPaymentIsFalse()
     {
         $paymentMock = $this->createMock(Payment::class);
 
-        // Mock the behavior of getPaymentType() to return null
-        $paymentMock->method('getPaymentType')->willReturn(null);
+        $this->sessionServiceMock->method('isSavedPayment')->willReturn(false);
 
-        // Test getTransactionParameters
         $result = $this->savedPaymentSaveService->getTransactionParameters($paymentMock);
 
-        $expected = [
-            'savepaymentuserid' => '',
-            'savepayment' => false,
-        ];
-
-        $this->assertSame($expected, $result);
+        $this->assertSame([], $result);
     }
 
     /**
      * @covers \OxidSolutionCatalysts\Unzer\Service\SavedPaymentSaveService::unsetSavedPayments
      */
-    public function testUnsetSavedPaymentsSuccess()
+    public function testUnsetSavedPayments()
     {
-        $transactionIds = ['trans1', 'trans2'];
+        $transactionIds = ['tx1', 'tx2', 'tx3'];
 
-        // Mock the executeStatement to return 2 (indicating 2 rows were affected)
-        $this->connectionMock->method('executeStatement')
+        $this->connectionMock->expects($this->once())
+            ->method('executeStatement')
             ->with(
-                'UPDATE oscunzertransaction SET SAVEPAYMENT = 0 WHERE OXID IN (:transactionIds)',
+                $this->stringContains('UPDATE oscunzertransaction SET SAVEPAYMENT = 0 WHERE OXID IN (:transactionIds)'),
                 ['transactionIds' => $transactionIds],
                 ['transactionIds' => Connection::PARAM_STR_ARRAY]
             )
-            ->willReturn(2);
+            ->willReturn(3); // Anzahl der aktualisierten Zeilen
 
-        // Test unsetSavedPayments
         $result = $this->savedPaymentSaveService->unsetSavedPayments($transactionIds);
 
         $this->assertTrue($result);
@@ -117,20 +91,14 @@ class SavedPaymentSaveServiceTest extends TestCase
     /**
      * @covers \OxidSolutionCatalysts\Unzer\Service\SavedPaymentSaveService::unsetSavedPayments
      */
-    public function testUnsetSavedPaymentsFailure()
+    public function testUnsetSavedPaymentsReturnsFalseWhenNoRowsAffected()
     {
-        $transactionIds = ['trans1', 'trans2'];
+        $transactionIds = ['tx1', 'tx2', 'tx3'];
 
-        // Mock the executeStatement to return 0 (indicating no rows were affected)
-        $this->connectionMock->method('executeStatement')
-            ->with(
-                'UPDATE oscunzertransaction SET SAVEPAYMENT = 0 WHERE OXID IN (:transactionIds)',
-                ['transactionIds' => $transactionIds],
-                ['transactionIds' => Connection::PARAM_STR_ARRAY]
-            )
-            ->willReturn(0);
+        $this->connectionMock->expects($this->once())
+            ->method('executeStatement')
+            ->willReturn(0); // Keine Zeilen aktualisiert
 
-        // Test unsetSavedPayments
         $result = $this->savedPaymentSaveService->unsetSavedPayments($transactionIds);
 
         $this->assertFalse($result);

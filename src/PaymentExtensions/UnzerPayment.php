@@ -12,11 +12,10 @@ use JsonException;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
-use OxidSolutionCatalysts\Unzer\Service\RequestService;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -75,8 +74,8 @@ abstract class UnzerPayment
     /** @var DebugHandler $logger */
     private $logger;
 
-    /** @var RequestService $requestService */
-    private $requestService;
+    /** @var SavedPaymentSessionService $savedPaymentSessionService */
+    private $savedPaymentSessionService;
 
     /**
      * @throws Exception
@@ -93,7 +92,7 @@ abstract class UnzerPayment
 
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
         $this->logger = $logger;
-        $this->requestService = $this->getServiceFromContainer(RequestService::class);
+        $this->savedPaymentSessionService = $this->getServiceFromContainer(SavedPaymentSessionService::class);
     }
 
     /**
@@ -130,12 +129,11 @@ abstract class UnzerPayment
         Basket $basketModel
     ): bool {
         $this->throwExceptionIfPaymentDataError();
-        $session = Registry::getSession();
+
         $paymentType = $this->getUnzerPaymentTypeObject();
         //payment type here is saved payment
         if ($paymentType instanceof Paypal) {
             $this->setPaypalPaymentDataId($paymentType);
-            $session->setVariable('oscunzersavepayment_paypal', true);
         }
         $companyType = $this->getUnzerStringRequestParameter('unzer_company_form', '');
 
@@ -172,8 +170,6 @@ abstract class UnzerPayment
         if ($this->getUnzerStringRequestParameter('birthdate')) {
             $userModel->save();
         }
-
-        $this->setSavedPaymentSessionVariable($paymentType, $userModel, $session);
 
         if ($userModel->getId()) {
             $this->savePayment($userModel);
@@ -408,7 +404,7 @@ abstract class UnzerPayment
             null,
             null,
             null,
-            $this->requestService->isSavePaymentSelectedByUserInRequest($paymentType)
+            $this->savedPaymentSessionService->isSavedPayment()
                 ? RecurrenceTypes::ONE_CLICK : null
         );
     }
@@ -450,19 +446,5 @@ abstract class UnzerPayment
             null,
             RecurrenceTypes::ONE_CLICK
         );
-    }
-
-    private function setSavedPaymentSessionVariable(
-        BasePaymentType $paymentType,
-        User $user,
-        Session $session
-    ): void {
-        if ($paymentType instanceof UnzerSDKPaymentTypeCard || $paymentType instanceof Paypal) {
-            $savePayment = Registry::getRequest()->getRequestParameter('oscunzersavepayment');
-            if (!$savePayment || $this->existsInSavedPaymentsList($user)) {
-                $savePayment = true;
-            }
-            $session->setVariable('oscunzersavepayment', $savePayment);
-        }
     }
 }

@@ -3,8 +3,8 @@
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Connection;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\UserIdService;
-use OxidSolutionCatalysts\Unzer\Traits\Request;
 use UnzerSDK\Resources\Payment;
 
 class SavedPaymentSaveService
@@ -15,28 +15,31 @@ class SavedPaymentSaveService
     /** @var UserIdService $userIdService */
     private $userIdService;
 
-    /** @var RequestService $requestService */
-    private $requestService;
+    /** @var SavedPaymentSessionService $sessionService */
+    private $sessionService;
 
     public function __construct(
         Connection $connection,
         UserIdService $userIdService,
-        RequestService $requestService
+        SavedPaymentSessionService $sessionService
     ) {
         $this->connection = $connection;
         $this->userIdService = $userIdService;
-        $this->requestService = $requestService;
+        $this->sessionService = $sessionService;
     }
 
     public function getTransactionParameters(Payment $payment): array
     {
         $paymentType = $payment->getPaymentType();
 
-        return [
-            'savepaymentuserid' => $paymentType ? $this->userIdService->getUserIdByPaymentType($paymentType) : '',
-            'savepayment' => $paymentType
-                && $this->requestService->isSavePaymentSelectedByUserInRequest($paymentType),
-        ];
+        if ($this->sessionService->isSavedPayment()) {
+            return [
+                'savepaymentuserid' => $paymentType ? $this->userIdService->getUserIdByPaymentType($paymentType) : '',
+                'savepayment' => $paymentType,
+            ];
+        }
+
+        return [];
     }
 
     public function unsetSavedPayments(array $transactionIds): bool
