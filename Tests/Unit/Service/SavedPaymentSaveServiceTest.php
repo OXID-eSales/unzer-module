@@ -47,7 +47,7 @@ class SavedPaymentSaveServiceTest extends TestCase
         $this->assertSame(
             [
                 'savepaymentuserid' => 'user123',
-                'savepayment' => $paymentTypeMock,
+                'savepayment' => '1',
             ],
             $result
         );

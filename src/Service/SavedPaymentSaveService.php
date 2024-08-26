@@ -35,7 +35,7 @@ class SavedPaymentSaveService
         if ($this->sessionService->isSavedPayment()) {
             return [
                 'savepaymentuserid' => $paymentType ? $this->userIdService->getUserIdByPaymentType($paymentType) : '',
-                'savepayment' => $paymentType,
+                'savepayment' => $paymentType ? '1' : '0',
             ];
         }
 
