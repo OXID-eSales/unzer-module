@@ -74,8 +74,6 @@ class TransactionTest extends TestCase
             'customerid' => 'unzerCustomerId',
             'customertype' => '',
             'remaining' => 0.0,
-            'savepaymentuserid' => '',
-            'savepayment' => false
         ]);
 
         $this->assertTrue($sut->writeTransactionToDB("orderId", "userId", $payment));
