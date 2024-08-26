@@ -13,6 +13,7 @@ use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Page;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\AbstractCreditCardCest;
+use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Helper\CreditCardCestHelper;
 
 /**
  * @group unzer_module
@@ -49,7 +50,9 @@ final class SavePaymentCreditCardCest extends AbstractCreditCardCest
         $this->I->waitForPageLoad();
         $this->I->click($this->useSavedCardForPayment);
         $orderPage->submitOrder();
-        $this->checkCreditCardPayment();
+
+        $standardCestHelper = new CreditCardCestHelper();
+        $standardCestHelper->checkCreditCardPayment($this->I);
     }
 
     protected function getOXID(): array
@@ -69,14 +72,26 @@ final class SavePaymentCreditCardCest extends AbstractCreditCardCest
         $this->I->waitForElementClickable($this->savePaymentCheckboxSelector);
         $this->I->click($this->savePaymentCheckboxSelector);
         $this->finishCardSubmit('visa_payment');
+
         $orderPage->submitOrder();
-        $this->checkCreditCardPayment();
+
+        $standardCestHelper = new CreditCardCestHelper();
+        $standardCestHelper->checkCreditCardPayment($this->I);
     }
 
     private function checkoutUntilConfirmation($withLogin = true): Page
     {
-        $this->initializeTest($withLogin);
-        return $this->choosePayment($this->cardPaymentLabel);
+        $standardCestHelper = new CreditCardCestHelper();
+        $homePage = $standardCestHelper->openShop($this->I);
+
+        if ($withLogin) {
+            $standardCestHelper->login($homePage);
+        }
+
+        $standardCestHelper->addProductToBasket($this->I);
+        $paymentCheckoutPage = $standardCestHelper->openCheckout($homePage);
+
+        return $standardCestHelper->choosePayment($this->cardPaymentLabel, $paymentCheckoutPage, $this->I);
     }
 
     private function assertSavedPaymentIsInAccount()
