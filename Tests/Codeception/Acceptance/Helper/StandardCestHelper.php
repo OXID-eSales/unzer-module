@@ -87,4 +87,9 @@ class StandardCestHelper
     {
         return Fixtures::get('client');
     }
+
+    public function getSepaPaymentFixtures(): array
+    {
+        return Fixtures::get('sepa_payment');
+    }
 }

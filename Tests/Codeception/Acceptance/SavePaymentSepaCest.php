@@ -12,6 +12,7 @@ namespace OxidEsales\EshopCommunity\modules\osc\unzer\Tests\Codeception\Acceptan
 use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\AbstractSepaCest;
+use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Helper\StandardCestHelper;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
@@ -41,8 +42,17 @@ final class SavePaymentSepaCest extends AbstractSepaCest
 
     private function makePayment($recurringPayment = false)
     {
-        $this->initializeTest(!$recurringPayment);
-        $orderPage = $this->choosePayment($this->sepaPaymentLabel);
+        $standardCestHelper = new StandardCestHelper();
+        $homePage = $standardCestHelper->openShop($this->I);
+
+        if (!$recurringPayment) {
+            $standardCestHelper->login($homePage);
+        }
+
+        $standardCestHelper->addProductToBasket($this->I);
+        $paymentCheckoutPage = $standardCestHelper->openCheckout($homePage);
+
+        $orderPage = $standardCestHelper->choosePayment($this->sepaPaymentLabel, $paymentCheckoutPage, $this->I);
 
         if ($recurringPayment) {
             $this->I->waitForElementClickable('#newccard');
@@ -52,7 +62,7 @@ final class SavePaymentSepaCest extends AbstractSepaCest
         $this->I->waitForElementClickable($this->savePaymentCheckboxSelector);
         $this->I->click($this->savePaymentCheckboxSelector);
 
-        $payment = Fixtures::get('sepa_payment');
+        $payment = $standardCestHelper->getSepaPaymentFixtures();
         $this->I->fillField($this->IBANInput, $payment['IBAN']);
 
         if (!$recurringPayment) {
@@ -64,7 +74,7 @@ final class SavePaymentSepaCest extends AbstractSepaCest
 
         $orderPage->submitOrder();
 
-        $this->checkSuccessfulPayment();
+        $standardCestHelper->checkSuccessfulPayment($this->I);
     }
 
     private function assertSavedPaymentIsInAccount()
