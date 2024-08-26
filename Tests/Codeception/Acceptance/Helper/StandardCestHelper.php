@@ -13,6 +13,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 class StandardCestHelper
 {
+    protected string $basketModalCloseButtonSelector = '#basketModal button.close';
     protected string $toCompleteAuthentication = "Click here to complete authentication.";
 
     public function openShop(AcceptanceTester $I): Home
@@ -39,6 +40,14 @@ class StandardCestHelper
         $basketItem = $this->getProductFixtures();
         $basketSteps = new BasketSteps($I);
         $basketSteps->addProductToBasket($basketItem['id'], $amount);
+    }
+
+    public function closeBasketModalIfVisible(AcceptanceTester $I)
+    {
+        $closeButtons = $I->grabMultiple($this->basketModalCloseButtonSelector);
+        if (count($closeButtons) > 0) {
+            $I->click($this->basketModalCloseButtonSelector);
+        }
     }
 
     /**

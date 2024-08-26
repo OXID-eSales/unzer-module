@@ -50,6 +50,9 @@ final class SavePaymentSepaCest extends AbstractSepaCest
         }
 
         $standardCestHelper->addProductToBasket($this->I);
+
+        $standardCestHelper->closeBasketModalIfVisible($this->I);
+
         $paymentCheckoutPage = $standardCestHelper->openCheckout($homePage);
 
         $orderPage = $standardCestHelper->choosePayment($this->sepaPaymentLabel, $paymentCheckoutPage, $this->I);

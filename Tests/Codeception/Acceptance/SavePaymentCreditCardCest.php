@@ -89,6 +89,9 @@ final class SavePaymentCreditCardCest extends AbstractCreditCardCest
         }
 
         $standardCestHelper->addProductToBasket($this->I);
+
+        $standardCestHelper->closeBasketModalIfVisible($this->I);
+
         $paymentCheckoutPage = $standardCestHelper->openCheckout($homePage);
 
         return $standardCestHelper->choosePayment($this->cardPaymentLabel, $paymentCheckoutPage, $this->I);
