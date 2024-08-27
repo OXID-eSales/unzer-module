@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Doctrine\DBAL\Driver\ResultStatement;
@@ -75,13 +77,6 @@ class Unzer
     /** @var Request */
     protected $request;
 
-    /**
-     * @param Session $session
-     * @param Translator $translator
-     * @param Context $context
-     * @param ModuleSettings $moduleSettings
-     * @param Request $request
-     */
     public function __construct(
         Session $session,
         Translator $translator,
@@ -147,8 +142,12 @@ class Unzer
         $oxmobfon = $oUser->getFieldData('oxmobfon');
         $customer->setMobile($oxmobfon);
 
-        /** @var string $customerId */
         $customerId = $oUser->getFieldData('oxcustnr');
+
+        if (!is_string($customerId)) {
+            $customerId = '';
+        }
+
         $customer->setCustomerId($customerId);
 
         $billingAddress = $customer->getBillingAddress();
@@ -542,6 +541,7 @@ class Unzer
     {
         $paymentData = $this->getPaymentDataArrayFromRequest();
 
+        //getting we the old payment ID
         if (array_key_exists('id', $paymentData)) {
             return $paymentData['id'];
         }

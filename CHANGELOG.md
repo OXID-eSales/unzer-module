@@ -9,15 +9,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### NEW
 - New Paymentmethod Unzer installment (Paylater)
-- provide content for smarty and twig
-- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup temporary order
-- Save Payment Data for registered Users
+- If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup  temporary order
+- add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
+- UNZER-456: add the requirement not to sending the payment to unzer, if the minimum payment amount is not reached
 
 ### FIXED
-- fix: PayPal sporadically fails on GHA CC Tests
-- [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
 - refactor of the correct use of the appropriate credentials depending on the payment method used
+- [0007553](https://bugs.oxid-esales.com/view.php?id=7553) revert this task because, it is possible to have different billing and delivery addresses for invoice purchases (Paylater)
+- [0007586](https://bugs.oxid-esales.com/view.php?id=7586) - Fix: Unable to finish the checkout process using the Apple Pay as the payment method
+- [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
+- Discounts with time restrictions may not be invalidated directly in the checkout...
+- provided additional Order-Number is searchable
+- increase line spacing for the error messages
+- Save Payment Data for registered Users
+- fix inconsistent data for Paylater payment methods
+- use Module-Logger also in UnzerPayment
+- Avoid checking AppleCert if ApplePay is off
+- Fix Save Module Config
 - Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
+- Inform the customer in frontend, if the payment was cancelled by customer during checkout
+- fix system crashes sporadically [not always replicatable] on card payment on return from the 3d-auth page with this in log
+- fix show prePayment-BankInformations on Thankyou-Page
+- save ApplePay-Certificates in any case of change ModuleConfiguration
+- fix provide ShopMetadata for UnzerPayment
+- fix show multiple vouchers separately
+- fix: only OK, NOT_FINISHED or CANCEL in oxorder->oxtranstatus allowed
+- fix showing correct amount when cancelling in admin
 
 ## [2.1.4] - 2023-11-23
 

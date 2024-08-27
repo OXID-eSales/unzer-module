@@ -5,10 +5,13 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Service;
 
 use Exception;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrderModel;
 use OxidSolutionCatalysts\Unzer\Model\TmpOrder;
 use OxidEsales\Eshop\Application\Model\Payment as PaymentModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -16,7 +19,6 @@ use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
-use OxidSolutionCatalysts\Unzer\Model\Order as UnzerOrder;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment as AbstractUnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use stdClass;
@@ -39,6 +41,7 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 class Payment
 {
     public const STATUS_OK = "OK";
+    public const STATUS_CANCELED = "CANCELED";
     public const STATUS_NOT_FINISHED = "NOT_FINISHED";
     public const STATUS_ERROR = "ERROR";
 
@@ -85,20 +88,22 @@ class Payment
     }
 
     /**
-     * @throws Redirect
-     * @throws RedirectWithMessage
+     * @throws \JsonException
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\Redirect
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
+     * @throws \UnzerSDK\Exceptions\UnzerApiException
      */
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         $paymentExtension = null;
-        try {
-            /** @var string $customerType */
-            $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
-            $user = $this->session->getUser();
-            $basket = $this->session->getBasket();
-            $currency = $basket->getBasketCurrency()->name;
+        /** @var string $customerType */
+        $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
+        $user = $this->session->getUser();
+        $basket = $this->session->getBasket();
+        $currency = $basket->getBasketCurrency()->name;
 
-            /** @var AbstractUnzerPayment $paymentExtension */
+        try {
             $paymentExtension = $this->paymentExtLoader->getPaymentExtensionByCustomerTypeAndCurrency(
                 $paymentModel,
                 $customerType,
@@ -106,7 +111,7 @@ class Payment
             );
 
             $oOrder = oxNew(Order::class);
-            /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+            /** @var UnzerOrderModel $oOrder */
             $oOrder->createTmpOrder($basket, $user, $paymentExtension->getUnzerOrderId());
 
             $paymentExtension->execute(
@@ -114,13 +119,13 @@ class Payment
                 $basket
             );
 
-            /** @var string $sess_challenge */
-            $sess_challenge = $this->session->getVariable('sess_challenge');
-            $this->transactionService->writeTransactionToDB(
-                $sess_challenge,
-                $this->session->getUser()->getId(),
-                $this->getSessionUnzerPayment(true)
-            );
+//     MAYBE WE DONT NEED IT HERE       /** @var string $sess_challenge */
+//            $sess_challenge = $this->session->getVariable('sess_challenge');
+//            $this->transactionService->writeTransactionToDB(
+//                $sess_challenge,
+//                $this->session->getUser()->getId(),
+//                $this->getSessionUnzerPayment(true)
+//            );
 
             $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
 
@@ -177,22 +182,25 @@ class Payment
             return $result;
         }
 
-        /** @var \UnzerSDK\Resources\Payment $sessionUnzerPayment */
+        if ($sessionUnzerPayment->getState() === \UnzerSDK\Constants\PaymentState::STATE_CANCELED) {
+            return self::STATUS_CANCELED;
+        }
+
         $transaction = $sessionUnzerPayment->getInitialTransaction();
 
         if ($sessionUnzerPayment->isCompleted()) {
             $result = self::STATUS_OK;
         } elseif ($sessionUnzerPayment->isPending() && $transaction) {
             if ($transaction->isSuccess()) {
+                $this->pdfLink = '';
                 if ($transaction instanceof Authorization) {
                     /** @var string $pdfLink */
                     $pdfLink = $transaction->getPDFLink();
-                    $this->pdfLink = $pdfLink ?: '';
+                    if ($pdfLink) {
+                        $this->pdfLink = $pdfLink;
+                    }
+                    $result = self::STATUS_OK;
                 }
-                if ($this->isPdfSession()) {
-                    $this->pdfLink = '';
-                }
-                $result = self::STATUS_OK;
             } elseif ($transaction->isPending()) {
                 $result = self::STATUS_NOT_FINISHED;
                 /** @var string $redirectUrl */
@@ -210,17 +218,17 @@ class Payment
     }
 
     /**
-     * @return int
+     * @return string
      * @throws UnzerApiException
      */
-    public function getUnzerOrderId(): int
+    public function getUnzerOrderId(): string
     {
-        $result = 0;
+        $result = '';
         $sessionUnzerPayment = $this->getSessionUnzerPayment(true);
         if ($sessionUnzerPayment) {
             $transaction = $sessionUnzerPayment->getInitialTransaction();
             if ($transaction) {
-                $result = (int)$transaction->getOrderId();
+                $result = (string) $transaction->getOrderId();
             }
         }
         return $result;
@@ -244,10 +252,10 @@ class Payment
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getSessionUnzerPayment(bool $cached): ?UnzerPayment
+    public function getSessionUnzerPayment(bool $cache): ?UnzerPayment
     {
         $result = null;
-        if ($cached === true) {
+        if ($cache === true) {
             if ($this->sessionUnzerPayment instanceof UnzerPayment) {
                 return $this->sessionUnzerPayment;
             }
@@ -282,8 +290,8 @@ class Payment
                     'Payment not found with key: ' . $uzrPaymentId
                 );
             }
+            $this->sessionUnzerPayment = $result;
         }
-        $this->sessionUnzerPayment = $result;
 
         return $result;
     }
@@ -347,18 +355,11 @@ class Payment
     }
 
     /**
-     * @param Order $oOrder
-     * @param string $unzerid
-     * @param string $chargeid
-     * @param float $amount
-     * @param string $reason
-     * @return \Exception|bool|\UnzerSDK\Exceptions\UnzerApiException
-     *
      * @throws \Exception
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function doUnzerCancel(
-        Order $oOrder,
+        UnzerOrderModel $oOrder,
         string $unzerid,
         string $chargeid,
         float $amount,
@@ -373,6 +374,7 @@ class Payment
             } else {
                 $payment = $sdk->fetchPayment($unzerid);
                 $cancellation = new Cancellation($amount);
+                $cancellation->setReasonCode($reason);
                 $cancellation = $sdk->cancelChargedPayment($payment, $cancellation);
             }
 
@@ -381,7 +383,8 @@ class Payment
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $cancellation
+                $cancellation,
+                $oOrder
             );
         } catch (UnzerApiException $e) {
             return $e;
@@ -390,14 +393,14 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param UnzerOrderModel|null $oOrder
      * @param string $unzerid
      * @param float $amount
      * @return \Exception|bool|\UnzerSDK\Exceptions\UnzerApiException
      * @throws \Exception
      */
     public function doUnzerCollect(
-        ?UnzerOrder $oOrder,
+        ?Order $oOrder,
         string $unzerid,
         float $amount
     ): Exception|bool|UnzerApiException {
@@ -420,13 +423,14 @@ class Payment
             $this->transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $charge
+                $charge,
+                $oOrder
             );
             $payment = $charge->getPayment();
             if (
+                !is_null($payment) &&
                 $charge->isSuccess() &&
-                ($payment instanceof UnzerPayment) &&
-                $payment->getAmount()->getRemaining() == 0
+                $payment->getAmount()->getRemaining() === 0.0
             ) {
                 $oOrder->markUnzerOrderAsPaid();
             }
@@ -438,7 +442,7 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param UnzerOrderModel|null $oOrder
      * @param string $unzerid
      * @param float $amount
      * @return UnzerApiException|bool
@@ -470,7 +474,7 @@ class Payment
     }
 
     /**
-     * @param \OxidSolutionCatalysts\Unzer\Model\Order|null $oOrder
+     * @param UnzerOrderModel|null $oOrder
      * @param string $sPaymentId
      * @return UnzerApiException|bool
      *
@@ -482,7 +486,7 @@ class Payment
             return false;
         }
 
-        $sPaymentId = $sPaymentId ?? $this->transactionService::getPaymentIdByOrderId($oOrder->getId());
+        $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
         $transactionDetails = $this->transactionService->getCustomerTypeAndCurrencyByOrderId($oOrder->getId());
 
         $blSuccess = false;

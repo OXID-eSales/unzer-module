@@ -37,3 +37,14 @@ REPLACE INTO `oxuser` SET
     OXBIRTHDATE = '1980-11-22',
     OXCREATE = '2021-02-05 14:42:42',
     OXREGISTER = '2021-02-05 14:42:42';
+
+
+REPLACE INTO `oxcounters` SET
+    OXIDENT = 'oxOrder',
+    OXCOUNT = 747,
+    OXTIMESTAMP = '2024-05-13 12:04:58';
+
+REPLACE INTO `oxcounters` SET
+    OXIDENT = 'oxUnzerOrder',
+    OXCOUNT = 420,
+    OXTIMESTAMP = '2024-05-13 12:04:58';

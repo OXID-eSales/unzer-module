@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Exception;
 
 use OxidEsales\Eshop\Core\Exception\StandardException;

@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -13,9 +15,9 @@ use UnzerSDK\Resources\PaymentTypes\Alipay as UnzerAlipay;
 
 class AliPay extends UnzerPayment
 {
-    protected $paymentMethod = 'alipay';
+    protected string $paymentMethod = 'alipay';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

@@ -32,8 +32,6 @@
                 </td>
             </tr>
             [{/foreach}]
-
-
         </tbody>
     </table>
     [{/if}]
@@ -62,9 +60,7 @@
                     </form>
                 </td>
             </tr>
-            [{/foreach}]
-
-
+        [{/foreach}]
         </tbody>
     </table>
     [{/if}]
@@ -92,7 +88,7 @@
                     </form>
                 </td>
             </tr>
-            [{/foreach}]
+        [{/foreach}]
 
 
         </tbody>
@@ -100,16 +96,12 @@
     [{/if}]
     [{/foreach}]
     [{else}]
-    <p>[{oxmultilang ident="OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS"}]</p>
-
+        <p>[{oxmultilang ident="OSCUNZER_SAVE_PAYMENT_NO_PAYMENTS"}]</p>
     [{/if}]
-    [{/capture}]
+[{/capture}]
+
 [{capture append="oxidBlock_sidebar"}]
     [{include file="page/account/inc/account_menu.tpl"}]
-    [{/capture}]
+[{/capture}]
+
 [{include file="layout/page.tpl" sidebar="Left"}]
-
-
-
-
-

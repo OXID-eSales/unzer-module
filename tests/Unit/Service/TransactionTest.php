@@ -29,7 +29,8 @@ class TransactionTest extends IntegrationTestCase
             'oxuserid' => 'userId',
             'oxshopid' => 5,
             'oxactiondate' => '2021-12-10 16:44:54',
-            'customertype' => ''
+            'customertype' => '',
+            'metadata' => '""'
         ];
 
         $model->expects($this->once())->method('assign')->with($params);

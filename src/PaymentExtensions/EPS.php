@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -12,9 +14,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class EPS extends UnzerPayment
 {
-    protected $paymentMethod = 'eps';
+    protected string $paymentMethod = 'eps';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

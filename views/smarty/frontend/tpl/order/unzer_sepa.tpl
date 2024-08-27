@@ -1,4 +1,4 @@
-[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets.tpl"}]
 [{if $unzerPaymentType != false }]
     <div class="savedpayment">
         [{foreach from=$unzerPaymentType item="setting" key="type"}]
@@ -83,23 +83,17 @@
 [{capture assign="unzerSepaDirectJS"}]
     $('input[name="newccard"]').on('change', function() {
         if ($(this).prop('checked')) {
-            console.log('checked new card');
             $('#orderConfirmAgbBottom').addClass('new-card-selected');
         } else {
-            console.log('not checked new card');
             $('#orderConfirmAgbBottom').removeClass('new-card-selected');
         }
     });
 
     $('#orderConfirmAgbBottom').submit(function(event) {
-
         if ($(this).hasClass('new-card-selected') && !$(this).hasClass("submitable")) {
-            console.log('submit new card form');
             event.preventDefault();
-
             $("#payment-form-sepa").submit();
         } else if (!$(this).hasClass("submitable")) {
-            console.log('submit saved cards form');
             event.preventDefault();
 
             $("#payment-saved-cards").submit();
@@ -128,7 +122,6 @@
                 });
             } else {
                 removeCardElements();
-                console.log('remove');
             }
         });
     }
@@ -159,7 +152,6 @@
                         .attr('name', 'sepaConfirmation')
                         .val($('.sepaagreement #oscunzersepaagreement').is(':checked') ? '1' : '0');
                     $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput1);
-                    console.log(hiddenInput1);
                     let hiddenInput2 = $(document.createElement('input'))
                         .attr('type', 'hidden')
                         .attr('name', 'oscunzersavepayment')
@@ -178,8 +170,6 @@
         }
     });
     $( "#payment-saved-cards" ).submit(function( event ) {
-        console.log('submit saved cards event');
-
         event.preventDefault();
         let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
         let paymentData = {

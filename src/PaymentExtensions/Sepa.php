@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -12,9 +14,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Sepa extends UnzerPayment
 {
-    protected $paymentMethod = 'sepa-direct-debit';
+    protected string $paymentMethod = 'sepa-direct-debit';
 
-    protected $allowedCurrencies = ['EUR'];
+    protected array $allowedCurrencies = ['EUR'];
 
     /**
      * @return BasePaymentType

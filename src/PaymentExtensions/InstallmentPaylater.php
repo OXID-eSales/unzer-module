@@ -5,13 +5,15 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class InstallmentPaylater extends UnzerPayment
 {
-    protected $paymentMethod = 'paylater-installment';
+    protected string $paymentMethod = 'paylater-installment';
 
     /**
      * @return BasePaymentType

@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -12,9 +14,9 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 
 class Card extends UnzerPayment
 {
-    protected $paymentMethod = 'card';
+    protected string $paymentMethod = 'card';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType
@@ -22,8 +24,8 @@ class Card extends UnzerPayment
      */
     public function getUnzerPaymentTypeObject(): BasePaymentType
     {
-        return $this->unzerSDK->fetchPaymentType(
-            $this->unzerService->getUnzerPaymentIdFromRequest()
-        );
+         return $this->unzerSDK->fetchPaymentType(
+             $this->unzerService->getUnzerPaymentIdFromRequest()
+         );
     }
 }

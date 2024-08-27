@@ -102,4 +102,5 @@ $aLang = [
     'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CEUR' => 'Live Private-Key for B2B-purchases in EUR',
     'SHOP_MODULE_production-UnzerPaylaterPublicKeyB2CCHF' => 'Live Public-Key for B2B-purchases in CHF',
     'SHOP_MODULE_production-UnzerPaylaterPrivateKeyB2CCHF' => 'Live Private-Key for B2B-purchases in CHF',
+    'SHOP_MODULE_UnzerSavePaymentsForUser' => 'Allow saving payment data of the customer',
 ];

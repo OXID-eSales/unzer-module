@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Core\Registry;
@@ -71,6 +73,7 @@ class ViewConfig extends ViewConfig_parent
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
             return $this->moduleSettings->getInvoicePublicKey();
         }
+
         if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
             return $this->moduleSettings->getInstallmentPublicKey();
         }
@@ -153,26 +156,26 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * Template variable getter. Check if is a Flow Theme Compatible Theme
+     * Template variable getter. Check if active theme is a Flow Theme Compatible Theme
      *
      * @return boolean
      */
-    public function isFlowCompatibleTheme()
+    public function isFlowCompatibleTheme() //phpcs:ignore no return type because extended class method doesn't have it
     {
-        if ($this->isFlowCompatibleTheme) {
+        if (is_null($this->isFlowCompatibleTheme)) {
             $this->isFlowCompatibleTheme = $this->isCompatibleTheme('flow');
         }
         return $this->isFlowCompatibleTheme;
     }
 
     /**
-     * Template variable getter. Check if is a Wave Theme Compatible Theme
+     * Template variable getter. Check if active theme is a Wave Theme Compatible Theme
      *
      * @return boolean
      */
-    public function isWaveCompatibleTheme()
+    public function isWaveCompatibleTheme() //phpcs:ignore no return type because extended class method doesn't have it
     {
-        if ($this->isWaveCompatibleTheme) {
+        if (is_null($this->isWaveCompatibleTheme)) {
             $this->isWaveCompatibleTheme = $this->isCompatibleTheme('wave');
         }
         return $this->isWaveCompatibleTheme;

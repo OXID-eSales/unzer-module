@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -13,9 +15,9 @@ use UnzerSDK\Resources\PaymentTypes\Bancontact as UnzerBancontact;
 
 class Bancontact extends UnzerPayment
 {
-    protected $paymentMethod = 'bancontact';
+    protected string $paymentMethod = 'bancontact';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

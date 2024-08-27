@@ -173,22 +173,71 @@
                     <td class="listheader">{{ translate({ ident: "OSCUNZER_CHARGE_CANCELAMOUNT" }) }}</td>
                     <td class="listheader"> </td>
                 </tr>
-                {% for oUnzerCharge in aCharges %}
+                {% if canRefundPartially %}
+                    {% for oUnzerCharge in aCharges %}
+                        <tr>
+                            <td>
+                            <form name="uzr" id="uzr_{{ oUnzerCharge.chargeId }}" action="{{ oViewConf.getSelfLink() }}" method="post">
+                                {{ oViewConf.getHiddenSid()|raw }}
+                                <input type="hidden" name="chargeid" value="{{ oUnzerCharge.chargeId }}">
+                                <input type="hidden" name="chargedamount" value="{{ oUnzerCharge.chargedAmount }}">
+                                <input type="hidden" name="unzerid" value="{{ sTypeId }}">
+                                <input type="hidden" name="cl" value="unzer_admin_order">
+                                <input type="hidden" name="fnc" value="doUnzerCancel">
+                                <input type="hidden" name="oxid" value="{{ oxid }}">
+
+                                {{ oUnzerCharge.chargeDate|escape }}</td>
+                                <td>{{ oUnzerCharge.chargeId|escape }}</td>
+                                <td>{{ oUnzerCharge.chargedAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
+                                <td>{{ oUnzerCharge.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
+                                {% if blCancelReasonReq %}
+                                    <td>
+                                        <select name="reason" id="reason_{{ oUnzerCharge.chargeId }}">
+                                            <option value="CANCEL">{{ translate({ ident: "OSCUNZER_REASON_CANCEL" }) }}</option>
+                                            <option value="RETURN">{{ translate({ ident: "OSCUNZER_REASON_RETURN" }) }}</option>
+                                            <option value="CREDIT">{{ translate({ ident: "OSCUNZER_REASON_CREDIT" }) }}</option>
+                                        </select>
+                                    </td>
+                                {% endif %}
+                                <td>
+                                    {% if canRefundPartially %}
+                                        <input type="text"
+                                               name="amount"
+                                               id="amount_{{ oUnzerCharge.chargeId }}"
+                                               value="{{ oUnzerCharge.chargedAmount - oUnzerCharge.cancelledAmount | format("%.2f") }}"
+                                               {% if not oUnzerCharge.cancellationPossible %}disabled{% endif %}>
+                                    {% else %}
+                                        {{ oUnzerCharge.chargedAmount - oUnzerCharge.cancelledAmount | format("%.2f") }}
+                                    {% endif %}
+                                    {{ uzrCurrency }}
+                                </td>
+                                <td>
+                                    {% if canRefundPartially %}
+                                        <input type="submit"
+                                               id="submit_{{ oUnzerCharge.chargeId }}"
+                                               {% if not oUnzerCharge.cancellationPossible %}disabled{% endif %}
+                                               value="{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}">
+                                    {% endif %}
+                                </td>
+                            </form>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                {% if canRefundFully and canCancelAmount > 0 %}
                     <tr>
-                        <form name="uzr" id="uzr_{{ oUnzerCharge.chargeId }}" action="{{ oViewConf.getSelfLink() }}" method="post">
+                        <form name="uzr" id="uzr_s-chg_payout" action="{{ oViewConf.getSelfLink() }}" method="post">
                             {{ oViewConf.getHiddenSid()|raw }}
-                            <input type="hidden" name="chargeid" value="{{ oUnzerCharge.chargeId }}">
-                            <input type="hidden" name="chargedamount" value="{{ oUnzerCharge.chargedAmount }}">
                             <input type="hidden" name="unzerid" value="{{ sTypeId }}">
+                            <input type="hidden" name="chargedamount" value="{{ canCancelAmount }}">
                             <input type="hidden" name="cl" value="unzer_admin_order">
                             <input type="hidden" name="fnc" value="doUnzerCancel">
                             <input type="hidden" name="oxid" value="{{ oxid }}">
+                                <td colspan="{% if blCancelReasonReq %}3{% else %}2{% endif %}" align="right">
+                                    {{ translate({ ident: "OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT" }) }}
+                                </td>
+                                <td>{{ totalAmountCharge|number_format(2, '.') }} {{ uzrCurrency }}</td>
 
-                            <td>{{ oUnzerCharge.chargeDate|escape }}</td>
-                            <td>{{ oUnzerCharge.chargeId|escape }}</td>
-                            <td>{{ oUnzerCharge.chargedAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
-                            <td>{{ oUnzerCharge.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
-                            {% if blCancelReasonReq %}
+                                {% if blCancelReasonReq %}
                                 <td>
                                     <select name="reason" id="reason_{{ oUnzerCharge.chargeId }}">
                                         <option value="CANCEL">{{ translate({ ident: "OSCUNZER_REASON_CANCEL" }) }}</option>
@@ -196,53 +245,18 @@
                                         <option value="CREDIT">{{ translate({ ident: "OSCUNZER_REASON_CREDIT" }) }}</option>
                                     </select>
                                 </td>
-                            {% endif %}
-                            <td>
-                                {% if canRefundPartially %}
-                                    <input type="text"
-                                           name="amount"
-                                           id="amount_{{ oUnzerCharge.chargeId }}"
-                                           value="{{ oUnzerCharge.chargedAmount - oUnzerCharge.cancelledAmount | format("%.2f") }}"
-                                           {% if not oUnzerCharge.cancellationPossible %}disabled{% endif %}>
-                                {% else %}
-                                    {{ oUnzerCharge.chargedAmount - oUnzerCharge.cancelledAmount | format("%.2f") }}
                                 {% endif %}
-                                {{ uzrCurrency }}
-                            </td>
-                            <td>
-                                {% if canRefundPartially %}
-                                    <input type="submit"
-                                           id="submit_{{ oUnzerCharge.chargeId }}"
-                                           {% if not oUnzerCharge.cancellationPossible %}disabled{% endif %}
-                                           value="{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}">
+
+                                {% if canRefundFully %}
+                                    <td><input type="text" id="amount_s-chg_payout"
+                                               name="amount" value="{{ canCancelAmount|number_format(2, '.', '') }}"> {{ uzrCurrency }}</td>
+                                    <td><button type="submit">{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}</button></td>
+                                {% else %}
+                                    <td>{{ canCancelAmount|number_format(2, '.') }} {{ uzrCurrency }}</td>
+                                    <td></td>
                                 {% endif %}
                         </form>
                     </tr>
-                {% endfor %}
-                {% if canCancelAmount > 0 %}
-                    <form name="uzr" id="uzr_s-chg_payout" action="{{ oViewConf.getSelfLink() }}" method="post">
-                        {{ oViewConf.getHiddenSid()|raw }}
-                        <input type="hidden" name="unzerid" value="{{ sTypeId }}">
-                        <input type="hidden" name="chargedamount" value="{{ canCancelAmount }}">
-                        <input type="hidden" name="cl" value="unzer_admin_order">
-                        <input type="hidden" name="fnc" value="doUnzerCancel">
-                        <input type="hidden" name="oxid" value="{{ oxid }}">
-                        <tr>
-                            <td colspan="{% if blCancelReasonReq %}3{% else %}2{% endif %}" align="right">
-                                {{ translate({ ident: "OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT" }) }}
-                            </td>
-                            <td>{{ totalAmountCharge|number_format(2, '.') }} {{ uzrCurrency }}</td>
-                            <td>{{ totalAmountCancel|number_format(2, '.') }} {{ uzrCurrency }}</td>
-                            {% if canRefundFully %}
-                                <td><input type="text" id="amount_s-chg_payout"
-                                           name="amount" value="{{ canCancelAmount|number_format(2, '.', '') }}"> {{ uzrCurrency }}</td>
-                                <td><button type="submit">{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}</button></td>
-                            {% else %}
-                                <td>{{ canCancelAmount|number_format(2, '.') }} {{ uzrCurrency }}</td>
-                                <td></td>
-                            {% endif %}
-                        </tr>
-                    </form>
                 {% endif %}
                 {% if errCancel %}
                     <tr>
@@ -275,8 +289,11 @@
                         <td>{{ oUnzerCancel.cancelDate|escape }}</td>
                         <td>{{ oUnzerCancel.cancellationId|escape }}</td>
                         <td>{{ oUnzerCancel.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
-                        {% if blCancelReasonReq %}
-                            <td>{{ oUnzerCancel.cancelReason|escape }}</td>
+                        reason = {{ oUnzerCancel.cancelReason }}
+                        {% if blCancelReasonReq and oUnzerCancel.cancelReason != '' %}
+                            {% set escaped_reason = oUnzerCancel.cancelReason|e %}
+                            {% set translate_ident = 'OSCUNZER_REASON_' ~ escaped_reason %}
+                            <td>{{ translate({ ident: translate_ident }) }}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
@@ -305,66 +322,82 @@
         {% endif %}
     {% endblock %}
 </div>
-{% capture assign = "cancelConfirm" %}
-    let handleUnzerForm = function(formElement) {
-        if(formElement.id.indexOf('uzr_') is same as(0) { // make absolutely sure to start with "uzr_")
-            let paymentId = formElement.id.slice(4);
-            let amountId = 'amount_' + paymentId; // f.e. "uzr_s-chg-1"
-            let inAmount = document.getElementById(amountId);
 
-            if (null !== inAmount) {
-                return window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + inAmount.value + ' {{ uzrCurrency }}');
-            }
-            return false;
-        }
-        // if it is not a form we want to process, let it proceed
-        return true;
-    };
-
+{% capture assign = "collectConfirm" %}
     document.addEventListener('DOMContentLoaded', function () {
-        let forms = document.querySelectorAll('form[id^="uzr_s-chg"]');
-        for(var i = 0; i < forms.length; i++) {
-            forms[i].addEventListener('submit', function(event) {
-                let returnValue = handleUnzerForm(this);
-                if (!returnValue) {
+        let collectForms = document.querySelectorAll('form[id^="uzr_collect"]');
+        collectForms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                let amountInput = form.querySelector('input[name="amount"]');
+                let amount = amountInput ? amountInput.value : 0;
+                let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_COLLECT_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
+                if (!confirmed) {
                     event.preventDefault();
                 }
-                return returnValue;
             });
-        }
-    }, false);
+        });
+    });
 {% endcapture %}
-{{ script({ add: cancelConfirm, dynamic: __oxid_include_dynamic }) }}
+{{ script({ add: collectConfirm, dynamic: __oxid_include_dynamic }) }}
+
+
+{% capture assign = "payoutConfirm" %}
+    document.addEventListener('DOMContentLoaded', function () {
+        let payoutForms = document.querySelectorAll('form[id^="uzr_s-chg_payout"]');
+        payoutForms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                let amountInput = document.querySelector('input[id^="amount_s-chg"]');
+                let amount = amountInput ? amountInput.value : 0;
+                let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
+                if (!confirmed) {
+                    event.preventDefault();
+                }
+            });
+        });
+    });
+{% endcapture %}
+{{ script({ add: payoutConfirm, dynamic: __oxid_include_dynamic }) }}
+
+{% capture assign = "payoutNoticeJS" %}
+    document.addEventListener('DOMContentLoaded', function () {
+        let payoutButtons = document.querySelectorAll('input[id^="submit_s-chg-"]');
+
+        payoutButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                let formId = button.form.id;
+                let form = document.getElementById(formId);
+
+                if (form) {
+                    let amountInput = form.querySelector('input[name="amount"]');
+                    let amount = amountInput ? amountInput.value : 0;
+                    let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
+                    if (!confirmed) {
+                        event.preventDefault();
+                    }
+                }
+            });
+        });
+    });
+{% endcapture %}
+{{ script({ add: payoutNoticeJS, dynamic: __oxid_include_dynamic }) }}
 
 {% capture assign = "cancelAuthConfirm" %}
-    let handleUnzerAuthForm = function(formElement) {
-        if(formElement.id.indexOf('uzr_authorize') is same as(0)) {
-            let paymentId = formElement.id.slice(4);
-            let amountId = 'amount_' + paymentId;
-            let inAmount = document.getElementById(amountId);
-
-            if (null !== inAmount) {
-                return window.confirm('{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL_ALERT" }) }}' + ' ' + inAmount.value + ' {{ uzrCurrency }}');
-            }
-            return false;
-        }
-        return true;
-    };
-
     document.addEventListener('DOMContentLoaded', function () {
-        let forms = document.querySelectorAll('form[id^="uzr_authorize"]');
-        for(var i = 0; i < forms.length; i++) {
-            forms[i].addEventListener('submit', function(event) {
-                let returnValue = handleUnzerAuthForm(this);
-                if (!returnValue) {
+        let cancelAuthForms = document.querySelectorAll('form[id^="uzr_authorize"]');
+        cancelAuthForms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                let amountInput = form.querySelector('input[name="amount"]');
+                let amount = amountInput ? amountInput.value : 0;
+                let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_AUTHORIZE_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
+                if (!confirmed) {
                     event.preventDefault();
                 }
-                return returnValue;
             });
-        }
-    }, false);
+        });
+    });
 {% endcapture %}
 {{ script({ add: cancelAuthConfirm, dynamic: __oxid_include_dynamic }) }}
+
 
 {% include "bottomnaviitem.html.twig" %}
 

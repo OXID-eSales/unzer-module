@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\PaymentExtensions;
 
 use UnzerSDK\Exceptions\UnzerApiException;
@@ -13,9 +15,9 @@ use UnzerSDK\Resources\PaymentTypes\Przelewy24 as UnzerPrzelewy24;
 
 class Przelewy24 extends UnzerPayment
 {
-    protected $paymentMethod = 'przelewy24';
+    protected string $paymentMethod = 'przelewy24';
 
-    protected $needPending = true;
+    protected bool $needPending = true;
 
     /**
      * @return BasePaymentType

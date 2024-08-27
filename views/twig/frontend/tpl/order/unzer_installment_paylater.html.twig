@@ -101,7 +101,6 @@
                 hiddenInput.setAttribute('type', 'hidden');
                 hiddenInput.setAttribute('name', 'paymentData');
                 hiddenInput.value = JSON.stringify(data);
-                console.log(data);
                 document.querySelector('#orderConfirmAgbBottom').appendChild(hiddenInput);
 
                 let hiddenCustomerType = document.createElement('input');

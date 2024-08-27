@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
@@ -199,7 +201,8 @@ class InstallmentController extends FrontendController
             $transactionService->writeChargeToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $charge
+                $charge,
+                $oOrder
             );
             /** @var Payment $payment */
             $payment = $charge->getPayment();

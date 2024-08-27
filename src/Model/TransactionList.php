@@ -5,6 +5,8 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidSolutionCatalysts\Unzer\Model;
 
 use OxidEsales\Eshop\Core\Model\ListModel;
@@ -43,6 +45,24 @@ class TransactionList extends ListModel
              and oxorderid = :orderid " .
             ($shortId ? " and shortid = :shortid " : "") . "
              order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
+
+        $this->selectString($query, $params);
+    }
+
+    public function getTransactionListByTraceId(string $traceId): void
+    {
+        $oListObject = $this->getBaseObject();
+        $sFieldList = $oListObject->getSelectFields();
+
+        $shopId = Registry::getConfig()->getShopId();
+
+        $params = [':shopid' => $shopId, ':traceid' => $traceId];
+
+        $query = "select $sFieldList from " . $oListObject->getViewName() . "
+            where oxshopid = :shopid 
+                and traceid = :traceid 
+                and oxaction = 'canceled'
+            order by {$oListObject->getViewName()}.OXTIMESTAMP asc";
 
         $this->selectString($query, $params);
     }
