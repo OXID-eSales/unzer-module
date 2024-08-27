@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - fix show multiple vouchers separately
 - fix: only OK, NOT_FINISHED or CANCEL in oxorder->oxtranstatus allowed
 - fix showing correct amount when cancelling in admin
+- default Amount for Unzer Payments between 1 Euro and 10.000 Euros
 
 ## [1.1.3] - 2023-11-14
 
