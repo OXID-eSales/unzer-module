@@ -1,4 +1,4 @@
-[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets.tpl"}]
 
 [{assign var="invadr" value=$oView->getInvoiceAddress()}]
 [{assign var="isCompany" value=false}]

@@ -1,4 +1,4 @@
-[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets.tpl"}]
 
 <form id="payment-form" class="unzerUI form" novalidate>
     <div id="unzer-eps" class="field"></div>

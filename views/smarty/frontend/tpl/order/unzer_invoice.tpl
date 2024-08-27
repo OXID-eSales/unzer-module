@@ -1,4 +1,4 @@
-[{include file="@osc-unzer/frontend/tpl/order/unzer_assets"}]
+[{include file="@osc-unzer/frontend/tpl/order/unzer_assets.tpl"}]
 <script type="text/javascript" async
         src="https://h.online-metrix.net/fp/tags.js?org_id=363t8kgq&session_id=[{$unzerThreatMetrixSessionID}]">
 </script>
