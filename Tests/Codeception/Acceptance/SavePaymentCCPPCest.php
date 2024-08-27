@@ -18,6 +18,7 @@ use OxidEsales\Codeception\Step\Basket as BasketSteps;
 /**
  * @group unzer_module
  * @group SecondGroup
+ * @group SavePayment
  */
 final class SavePaymentCCPPCest extends BaseCest
 {
@@ -43,7 +44,8 @@ final class SavePaymentCCPPCest extends BaseCest
     private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[3]/input";
     private string $savedPaymentsLocator = "//*[@id='account_menu']/ul/li[1]/a";
     private string $savePayPalAccountInNextStepInputSelector = "//*[@id='oscunzersavepayment']";
-    private string $savePaymentDeleteButtonSelector = "//button[contains(@class, 'btn-danger') and text()='Delete']";
+    private string $savePaymentDeletePayPalButtonSelector = "button.btn-danger.delete-paypal";
+    private string $savePaymentDeleteCreditCardButtonSelector = "button.btn-danger.delete-cc";
 
     /**
      * @group unzer_module
@@ -209,7 +211,7 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
         $I->see("paypal-buyer@unzer.com");
 
-        $deleteButtons = $I->grabMultiple($this->savePaymentDeleteButtonSelector);
+        $deleteButtons = $I->grabMultiple($this->savePaymentDeletePayPalButtonSelector);
         $I->assertCount(1, $deleteButtons);
     }
 
@@ -292,7 +294,7 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
         $I->see("545301******9543");
 
-        $deleteButtons = $I->grabMultiple($this->savePaymentDeleteButtonSelector);
+        $deleteButtons = $I->grabMultiple($this->savePaymentDeleteCreditCardButtonSelector);
         $I->assertCount(1, $deleteButtons, 'CC Saving OK');
     }
 

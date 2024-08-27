@@ -18,14 +18,14 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Helper\CreditCardCe
 /**
  * @group unzer_module
  * @group SecondGroup
+ * @group SavePayment
  * @group SavePaymentCreditCardCest
  */
 final class SavePaymentCreditCardCest extends AbstractCreditCardCest
 {
     private string $savePaymentCheckboxSelector = "#oscunzersavepayment";
     private string $accountLinkSelector = "//*[@id='account_menu']/ul/li[1]/a";
-    private string $savePaymentDeleteButtonSelector
-        = "//button[contains(@class, 'btn-danger') and text()='##delete_translated##']";
+    private string $savePaymentDeleteButtonSelector = "button.btn-danger.delete-cc";
 
     public function testCanPayWithSavingPayment()
     {
@@ -107,7 +107,7 @@ final class SavePaymentCreditCardCest extends AbstractCreditCardCest
         $fixtures = Fixtures::get('visa_payment');
         $cardNumber = $fixtures['cardnumber'];
 
-        $deleteButtons = $this->I->grabMultiple($this->translatedDeleteLinkSelector());
+        $deleteButtons = $this->I->grabMultiple($this->savePaymentDeleteButtonSelector);
         $this->I->assertCount(1, $deleteButtons);
         $savedCardElement = $this->I->grabMultiple(
             $this->getCreditCardAccountTableElementSelector($cardNumber)
@@ -120,15 +120,6 @@ final class SavePaymentCreditCardCest extends AbstractCreditCardCest
         $firstFiveNumbers = substr($cardNumber, 0, 6);
 
         return "//th[contains(text(), '{$firstFiveNumbers}')]";
-    }
-
-    private function translatedDeleteLinkSelector(): string
-    {
-        return str_replace(
-            '##delete_translated##',
-            Translator::translate('DD_DELETE'),
-            $this->savePaymentDeleteButtonSelector
-        );
     }
 
     private function translatedSavedPaymentsLinkSelector(): string

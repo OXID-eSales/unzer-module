@@ -18,15 +18,14 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 /**
  * @group unzer_module
  * @group SecondGroup
- * @group SavedPayment
+ * @group SavePayment
  * @group SavePaymentSepaCest
  */
 final class SavePaymentSepaCest extends AbstractSepaCest
 {
     private string $savePaymentCheckboxSelector = "#oscunzersavepayment";
     private string $accountLinkSelector = "//*[@id='account_menu']/ul/li[1]/a";
-    private string $savePaymentDeleteButtonSelector
-        = "//button[contains(@class, 'btn-danger') and text()='##delete_translated##']";
+    private string $savePaymentDeleteButtonSelector = "button.btn-danger.delete-sepa";
 
     public function checkPaymentWorks(AcceptanceTester $I)
     {
@@ -90,7 +89,7 @@ final class SavePaymentSepaCest extends AbstractSepaCest
         $fixtures = Fixtures::get('sepa_payment');
         $iban = $fixtures['IBAN'];
 
-        $deleteButtons = $this->I->grabMultiple($this->translatedDeleteLinkSelector());
+        $deleteButtons = $this->I->grabMultiple($this->savePaymentDeleteButtonSelector);
         $this->I->assertCount(1, $deleteButtons);
         $savedPaymentElement = $this->I->grabMultiple(
             $this->getIbanAccountTableElementSelector($iban)
@@ -101,15 +100,6 @@ final class SavePaymentSepaCest extends AbstractSepaCest
     private function getIbanAccountTableElementSelector(string $iban)
     {
         return "//td[contains(text(), '{$iban}')]";
-    }
-
-    private function translatedDeleteLinkSelector(): string
-    {
-        return str_replace(
-            '##delete_translated##',
-            Translator::translate('DD_DELETE'),
-            $this->savePaymentDeleteButtonSelector
-        );
     }
 
     private function translatedSavedPaymentsLinkSelector(): string
