@@ -18,6 +18,7 @@ use OxidEsales\Codeception\Step\Basket as BasketSteps;
 /**
  * @group unzer_module
  * @group SecondGroup
+ * @group SavePayment
  */
 final class SavePaymentCCPPCest extends BaseCest
 {
@@ -40,8 +41,11 @@ final class SavePaymentCCPPCest extends BaseCest
     private string $submitButton = "#payment-submit-btn";
     private string $globalSpinnerDiv = "//div[@data-testid='global-spinner']";
     private string $savePaypalPayment = "#oscunzersavepayment";
-    private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[2]/input";
+    private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[3]/input";
     private string $savedPaymentsLocator = "//*[@id='account_menu']/ul/li[1]/a";
+    private string $savePayPalAccountInNextStepInputSelector = "//*[@id='oscunzersavepayment']";
+    private string $savePaymentDeletePayPalButtonSelector = "button.btn-danger.delete-paypal";
+    private string $savePaymentDeleteCreditCardButtonSelector = "button.btn-danger.delete-cc";
 
     /**
      * @group unzer_module
@@ -104,7 +108,7 @@ final class SavePaymentCCPPCest extends BaseCest
 
         $I->openShop()->openAccountPage();
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
-        $I->see("paypal-buyer@unzer.com");
+        $I->see($clientData['username']);
 
         $basketItem = Fixtures::get('product');
         $basketSteps = new BasketSteps($this->I);
@@ -113,8 +117,8 @@ final class SavePaymentCCPPCest extends BaseCest
         $orderPage = $this->choosePayment($this->paypalPaymentLabel);
         $I->waitForElementClickable($this->firstSavedPaypalPayment);
         $I->wantTo('use saved payment to pay');
-        $I->seeAndClick('//*[@id="payment-saved-cards"]/table/tbody/tr/td[2]/input');
-        $I->wait(15);
+        $I->seeAndClick($this->savePayPalAccountInNextStepInputSelector);
+        $I->wait(2);
         $orderPage->submitOrder();
 
         $paypalPaymentData = Fixtures::get('paypal_payment');
@@ -206,10 +210,9 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->openShop()->openAccountPage();
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
         $I->see("paypal-buyer@unzer.com");
-        $pageSource = $I->grabPageSource();
-        // Count the number of occurrences of the text
-        $occurrences = substr_count($pageSource, 'paypal-buyer@unzer.com');
-        $I->assertEquals(1, $occurrences, 'Paypal Saving OK');
+
+        $deleteButtons = $I->grabMultiple($this->savePaymentDeletePayPalButtonSelector);
+        $I->assertCount(1, $deleteButtons);
     }
 
     /**
@@ -290,10 +293,9 @@ final class SavePaymentCCPPCest extends BaseCest
         $I->openShop()->openAccountPage();
         $I->click("//*[@id='account_menu']/ul/li[1]/a");
         $I->see("545301******9543");
-        $pageSource = $I->grabPageSource();
-        // Count the number of occurrences of the text
-        $occurrences = substr_count($pageSource, '545301******9543');
-        $I->assertEquals(1, $occurrences, 'CC Saving OK');
+
+        $deleteButtons = $I->grabMultiple($this->savePaymentDeleteCreditCardButtonSelector);
+        $I->assertCount(1, $deleteButtons, 'CC Saving OK');
     }
 
     /**

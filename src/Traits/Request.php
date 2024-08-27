@@ -8,6 +8,10 @@
 namespace OxidSolutionCatalysts\Unzer\Traits;
 
 use OxidEsales\EshopCommunity\Core\Registry;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
+use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
+use UnzerSDK\Resources\PaymentTypes\Paypal;
+use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit;
 
 trait Request
 {

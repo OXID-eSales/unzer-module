@@ -7,37 +7,29 @@
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use Doctrine\DBAL\Driver\Result;
 use Exception;
 use JsonException;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order;
-use OxidSolutionCatalysts\Unzer\PaymentExtensions\Card;
+use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use PDO;
-use Doctrine\DBAL\Query\QueryBuilder;
-use OxidEsales\Eshop\Application\Model\Basket;
-use OxidEsales\Eshop\Application\Model\Order as EshopModelOrder;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerResourceCard;
-use UnzerSDK\Resources\PaymentTypes\Invoice;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerResourcePaypal;
+use UnzerSDK\Resources\PaymentTypes\SepaDirectDebit as UnzerResourceSepa;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -53,6 +45,7 @@ use UnzerSDK\Resources\TransactionTypes\Shipment;
 class Transaction
 {
     use ServiceContainer;
+    use Request;
 
     protected Context $context;
 
@@ -104,19 +97,15 @@ class Transaction
         $oOrder = oxNew(Order::class);
         $oOrder->load($orderid);
 
-        $params = [
-            'oxorderid' => $orderid,
-            'oxshopid' => $this->context->getCurrentShopId(),
-            'oxuserid' => $userId,
-            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-            'customertype' => '',
-        ];
+        $params = $this->getBasicSaveParameters($orderid, $userId);
 
         if ($unzerPayment) {
-            $unzerPaymentData = $unzerShipment !== null ?
-                $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
-                $this->getUnzerPaymentData($unzerPayment, $transaction);
-            $params = array_merge($params, $unzerPaymentData);
+            $this->extendSaveParameters(
+                $params,
+                $unzerPayment,
+                $unzerShipment,
+                $transaction
+            );
 
             // for PaylaterInvoice, store the customer type
             if (
@@ -288,19 +277,22 @@ class Transaction
             'oxaction'  => $oxaction,
             'traceid'   => $unzerPayment->getTraceId()
         ];
-        $savePayment = Registry::getSession()->getVariable('oscunzersavepayment');
 
         $paymentType = $unzerPayment->getPaymentType();
-        $firstPaypalCall = Registry::getSession()->getVariable('oscunzersavepayment_paypal');
+        $savePayment = $this->getServiceFromContainer(RequestService::class)
+            ->isSavePaymentSelectedByUserInRequest();
 
         if (
-             ($savePayment && ($paymentType instanceof UnzerResourcePaypal && !$firstPaypalCall))
-            || ($savePayment && $paymentType instanceof UnzerResourceCard)
+            $savePayment
+            && (
+                $paymentType instanceof UnzerResourcePaypal
+                || $paymentType instanceof UnzerResourceCard
+                || $paymentType instanceof UnzerResourceSepa
+            )
         ) {
             $typeId = $paymentType->getId();
             $params['paymenttypeid'] = $typeId;
         }
-        Registry::getSession()->setVariable('oscunzersavepayment_paypal', false);
 
         $initialTransaction = $unzerPayment->getInitialTransaction();
         $params['shortid'] = !is_null($initialTransaction) && !is_null($initialTransaction->getShortId()) ?
@@ -545,7 +537,7 @@ class Transaction
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
-    public function getTrancactionIds(?User $user = null): array
+    public function getTransactionIds(?User $user = null): array
     {
         $result = [];
 
@@ -563,11 +555,20 @@ class Transaction
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         if ($oDB) {
             $result = $oDB->getAll(
-                "SELECT ot.OXID, ot.PAYMENTTYPEID, ot.CURRENCY, ot.CUSTOMERTYPE, o.OXPAYMENTTYPE
-                        from oscunzertransaction as ot
-                        left join oxorder as o ON (ot.oxorderid = o.OXID)
-            where ot.OXUSERID = :oxuserid AND ot.PAYMENTTYPEID IS NOT NULL
-            GROUP BY ot.PAYMENTTYPEID ",
+                "SELECT transaction.OXID, transaction.PAYMENTTYPEID,
+                    transaction.CURRENCY, transaction.CUSTOMERTYPE,
+                    oxorder.OXPAYMENTTYPE, transaction.OXACTIONDATE
+                FROM oscunzertransaction AS transaction
+                LEFT JOIN oxorder ON transaction.oxorderid = oxorder.OXID
+                INNER JOIN (
+                    SELECT PAYMENTTYPEID, MAX(OXACTIONDATE) AS LatestActionDate
+                    FROM oscunzertransaction
+                    WHERE OXUSERID = :oxuserid AND PAYMENTTYPEID IS NOT NULL
+                    GROUP BY PAYMENTTYPEID
+                ) AS latest_transaction 
+                    ON transaction.PAYMENTTYPEID = latest_transaction.PAYMENTTYPEID 
+                        AND transaction.OXACTIONDATE = latest_transaction.LatestActionDate
+                WHERE transaction.OXUSERID = :oxuserid;",
                 [':oxuserid' => $userId]
             );
         }
@@ -672,5 +673,34 @@ class Transaction
     ): ?float {
         return $transaction instanceof Cancellation ?
             $transaction->getAmount() : $unzerPayment->getAmount()->getTotal();
+    }
+
+    private function getBasicSaveParameters(string $orderId, string $userId): array
+    {
+        return [
+            'oxorderid' => $orderId,
+            'oxshopid' => $this->context->getCurrentShopId(),
+            'oxuserid' => $userId,
+            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+            'customertype' => '',
+        ];
+    }
+
+    private function extendSaveParameters(
+        array &$parameters,
+        Payment $unzerPayment,
+        ?Shipment $unzerShipment = null,
+        ?AbstractTransactionType $transaction = null
+    ): void {
+        $unzerPaymentData = !is_null($unzerShipment) ?
+            $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
+            $this->getUnzerPaymentData($unzerPayment, $transaction);
+        $parameters = array_merge($parameters, $unzerPaymentData);
+
+        $parameters = array_merge(
+            $parameters,
+            $this->getServiceFromContainer(SavedPaymentSaveService::class)
+                ->getTransactionParameters($unzerPayment)
+        );
     }
 }

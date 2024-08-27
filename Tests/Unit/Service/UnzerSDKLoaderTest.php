@@ -7,6 +7,7 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
+use Monolog\Logger;
 use OxidEsales\Eshop\Core\Session;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
@@ -32,11 +33,12 @@ class UnzerSDKLoaderTest extends TestCase
     public function testSimpleSDKLoadingWithWrongKey(): void
     {
         $sut = $this->getSut([
-            'getUnzerPrivateKey' => 'someWrongKey',
             'isDebugMode' => false
         ]);
 
-        $this->expectExceptionMessageMatches("@^Illegal key@i");
+        $this->expectExceptionMessage(
+            'Try to get the SDK with the Key "" defined by paymentId "", currency "", customerType ""'
+        );
         $this->assertInstanceOf(Unzer::class, $sut->getUnzerSDK());
     }
 
@@ -55,7 +57,9 @@ class UnzerSDKLoaderTest extends TestCase
     protected function getSut($moduleSettingValues): UnzerSDKLoader
     {
         $moduleSettings = $this->createConfiguredMock(ModuleSettings::class, $moduleSettingValues);
-        $debugHandler = $this->createPartialMock(DebugHandler::class, []);
+        $debugHandler = $this->getMockBuilder(DebugHandler::class)
+            ->setConstructorArgs([$this->createMock(Logger::class)])
+            ->getMock();
         $session = $this->createConfiguredMock(Session::class, []);
 
         return new UnzerSDKLoader($moduleSettings, $debugHandler, $session);

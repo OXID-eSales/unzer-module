@@ -15,6 +15,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 /**
  * @group unzer_module
  * @group FirstGroup
+ * @group IDEALCest
  */
 final class IDEALCest extends BaseCest
 {
@@ -73,7 +74,7 @@ final class IDEALCest extends BaseCest
         $orderPage->submitOrder();
 
         // first page : put in bank name
-        $I->waitForText($price);
+        $I->waitForText($price, 60);
         $I->waitForElement($this->BICInput);
         $I->fillField($this->BICInput, $idealPaymentData['account_bankname']);
         $I->click($this->nextButton);

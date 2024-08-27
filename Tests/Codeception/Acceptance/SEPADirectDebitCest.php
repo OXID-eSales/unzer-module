@@ -16,16 +16,8 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  * @group unzer_module
  * @group SecondGroup
  */
-final class SEPADirectDebitCest extends BaseCest
+final class SEPADirectDebitCest extends AbstractSepaCest
 {
-    private string $sepaPaymentLabel = "//label[@for='payment_oscunzer_sepa']";
-    private string $IBANInput = "//input[contains(@id, 'unzer-iban-input')]";
-
-    protected function getOXID(): array
-    {
-        return ['oscunzer_sepa'];
-    }
-
     /**
      * @param AcceptanceTester $I
      * @group SEPADirectPaymentTest

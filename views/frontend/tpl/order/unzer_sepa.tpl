@@ -1,7 +1,7 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
-[{if $unzerPaymentType != false }]
+[{if $savedPaymentTypes != false }]
 <div class="savedpayment">
-    [{foreach from=$unzerPaymentType item="setting" key="type"}]
+    [{foreach from=$savedPaymentTypes item="setting" key="type"}]
     [{if $type == 'sepa'}]
     <form id="payment-saved-cards" class="unzerUI form" novalidate>
         <table class="table">
@@ -14,12 +14,12 @@
             </thead>
             <tbody>
 
-            [{foreach from=$setting item="paymentType" key=paymenttypeid }]
+            [{foreach from=$setting item="paymentType" }]
                 <tr>
                     <th scope="row">[{$paymentType.holder}]</th>
                     <td>[{$paymentType.iban}]</td>
                     <td>
-                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymenttypeid}]"
+                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymentType.id}]"
                                style="-webkit-appearance: radio">
                     </td>
                 </tr>
@@ -43,7 +43,7 @@
     [{/foreach}]
 </div>
 [{/if}]
-[{if $unzerPaymentType.sepa != false }]
+[{if $savedPaymentTypes.sepa != false }]
 <br>
     <label>
         <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue IBAN

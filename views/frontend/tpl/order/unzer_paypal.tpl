@@ -4,8 +4,8 @@
     <div class="savedpayment">
         <form id="payment-saved-cards" class="unzerUI form" novalidate>
             [{if $oView->getPaymentSaveSetting()}]
-            [{foreach from=$unzerPaymentType item="setting" key="type"}]
-            [{if $unzerPaymentType != false}]
+            [{foreach from=$savedPaymentTypes item="setting" key="type"}]
+            [{if $savedPaymentTypes != false}]
             [{if $type == 'paypal'}]
 
             <table class="table">
@@ -19,12 +19,12 @@
                 <tbody>
                 [{assign var="counter" value=0}]
 
-                [{foreach from=$setting item="paymentType" key=paymenttypeid }]
+                [{foreach from=$setting item="paymentType" }]
                     <tr>
-                        <th scope="row">[{$paymentType.email}]</th>
+                        <td scope="row">[{$paymentType.email}]</td>
                         <td>[{$type}]</td>
                         <td>
-                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymenttypeid}]" style="-webkit-appearance: radio">
+                            <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymentType.id}]" style="-webkit-appearance: radio">
                         </td>
                     </tr>
                     [{/foreach}]
@@ -51,48 +51,49 @@
 [{capture assign="unzerPaypalJS"}]
 [{if false}]<script>[{/if}]
 
-        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-            if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+        let orderConfirmAgbBottom = $('#orderConfirmAgbBottom');
+        let savedCardsTableEl = $('#payment-saved-cards');
+
+        orderConfirmAgbBottom.submit(function( event ) {
+            if(!orderConfirmAgbBottom.hasClass("submitable")){
                 event.preventDefault();
-                $( "#payment-saved-cards" ).submit();
+                savedCardsTableEl.submit();
             }
         });
 
         // Handling payment form submission
-        $( "#payment-saved-cards" ).submit(function( event ) {
+        savedCardsTableEl.submit(function( event ) {
             event.preventDefault();
             let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
-            let paymentData = {
-                id: selectedPaymentTypeId,
-                resources: {
-                    typeId: selectedPaymentTypeId
-                }
-            };
-            let paymentDataString = JSON.stringify(paymentData);
-
-            let hiddenInput3 = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'paymentData')
-                .val(paymentDataString);
+            if (selectedPaymentTypeId) {
+                let paymentData = {
+                    id: selectedPaymentTypeId,
+                    resources: {
+                        typeId: selectedPaymentTypeId
+                    }
+                };
+                let paymentDataString = JSON.stringify(paymentData);
+                let hiddenInput3 = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'paymentData')
+                    .val(paymentDataString);
+                let hiddenInput4 = $(document.createElement('input'))
+                    .attr('type', 'hidden')
+                    .attr('name', 'is_saved_payment_in_action')
+                    .val(1);
+                orderConfirmAgbBottom.find(".hidden")
+                    .append(hiddenInput3)
+                    .append(hiddenInput4);
+            }
             let hiddenInput2 = $(document.createElement('input'))
                 .attr('type', 'hidden')
                 .attr('name', 'oscunzersavepayment')
                 .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
 
-            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
-            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput3);
-
-            let hiddenInput4 = $(document.createElement('input'))
-                .attr('type', 'hidden')
-                .attr('name', 'is_saved_payment_in_action')
-                .val(1);
-
-            $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput4);
-
-            console.log(hiddenInput4);
-
-            $('#orderConfirmAgbBottom').addClass("submitable");
-            $("#orderConfirmAgbBottom").submit();
+            orderConfirmAgbBottom.find(".hidden")
+                .append(hiddenInput2)
+            orderConfirmAgbBottom.addClass("submitable")
+                .submit();
         });
 
  [{if false}]</script>[{/if}]
