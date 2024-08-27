@@ -80,6 +80,7 @@ $aModule = [
     'templates' => [
         // admin
         '@osc-unzer/admin/tpl/oscunzer_order.tpl' => 'views/smarty/admin/tpl/oscunzer_order.tpl',
+        '@osc-unzer/frontend/tpl/account/account_saved_payments.tpl' =>        'views/smarty/frontend/tpl/account/account_saved_payments.tpl',
 
         // frontend
         '@osc-unzer/frontend/tpl/order/unzer_assets' =>                    'views/smarty/frontend/tpl/order/unzer_assets.tpl',
@@ -103,7 +104,6 @@ $aModule = [
         '@osc-unzer/frontend/tpl/payment/applepay_availibility_check' =>   'views/smarty/frontend/tpl/payment/applepay_availibility_check.tpl',
         '@osc-unzer/frontend/tpl/payment/payment_unzer' =>                 'views/smarty/frontend/tpl/payment/payment_unzer.tpl',
         '@osc-unzer/frontend/tpl/order/applepay_button' =>                 'views/smarty/frontend/tpl/order/applepay_button.tpl',
-        '@osc-unzer/frontend/tpl/account/account_saved_payments' =>        'views/smarty/frontend/tpl/account/account_saved_payments.tpl',
     ],
     'blocks' => [
         //frontend
