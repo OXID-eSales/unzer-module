@@ -74,7 +74,6 @@ final class IDEALCest extends BaseCest
         $orderPage->submitOrder();
 
         // first page : put in bank name
-        $I->makeScreenshot('idealWrongPrice');
         $I->waitForText($price, 60);
         $I->waitForElement($this->BICInput);
         $I->fillField($this->BICInput, $idealPaymentData['account_bankname']);
