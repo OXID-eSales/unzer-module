@@ -37,7 +37,7 @@ final class UnzerDefinitions
     public const MINIMAL_PAYABLE_AMOUNT = 0.75;
 
     private const PAYMENT_CONSTRAINTS = [
-        'oxfromamount' => 0,
+        'oxfromamount' => 1,
         'oxtoamount' => 10000,
         'oxaddsumtype' => 'abs'
     ];

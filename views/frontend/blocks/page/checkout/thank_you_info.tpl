@@ -1,15 +1,14 @@
 [{$smarty.block.parent}]
-[{assign var="orderNumber" value=$order->oxorder__oxunzerordernr->value}]
-[{if $oViewConf->getPrePaymentIban($orderNumber)}]
+[{if $oView->getUnzerPrePaymentIban()}]
     <strong>[{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_HEADLINE"}]:</strong><br/>
-    [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_IBAN"}]: [{$oViewConf->getPrePaymentIban($orderNumber)}]<br/>
+    [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_IBAN"}]: [{$oView->getUnzerPrePaymentIban()}]<br/>
 [{/if}]
-[{if $oViewConf->getPrePaymentBic($orderNumber)}]
-    [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BIC"}]: [{$oViewConf->getPrePaymentBic($orderNumber)}]<br/>
+[{if $oView->getUnzerPrePaymentBic()}]
+    [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BIC"}]: [{$oView->getUnzerPrePaymentBic()}]<br/>
 [{/if}]
-[{if $oViewConf->getPrePaymentHolder($orderNumber)}]
-    [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_HOLDER"}]: [{$oViewConf->getPrePaymentHolder($orderNumber)}]<br/>
+[{if $oView->getUnzerPrePaymentHolder()}]
+    [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_HOLDER"}]: [{$oView->getUnzerPrePaymentHolder()}]<br/>
 [{/if}]
-[{if $oViewConf->getPrePaymentIban($orderNumber)}]
+[{if $oView->getUnzerPrePaymentIban()}]
     <br/>
 [{/if}]
