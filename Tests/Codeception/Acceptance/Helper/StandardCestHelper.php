@@ -42,14 +42,6 @@ class StandardCestHelper
         $basketSteps->addProductToBasket($basketItem['id'], $amount);
     }
 
-    public function closeBasketModalIfVisible(AcceptanceTester $I)
-    {
-        $closeButtons = $I->grabMultiple($this->basketModalCloseButtonSelector);
-        if (count($closeButtons) > 0) {
-            $I->click($this->basketModalCloseButtonSelector);
-        }
-    }
-
     /**
      * Open checkout page.
      * If user is logged in, open PaymentCheckout page.

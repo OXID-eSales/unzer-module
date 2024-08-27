@@ -14,6 +14,7 @@ use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Page;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\AbstractCreditCardCest;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Helper\CreditCardCestHelper;
+use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Traits\BasketModalSettingTrait;
 
 /**
  * @group unzer_module
@@ -23,6 +24,8 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Helper\CreditCardCe
  */
 final class SavePaymentCreditCardCest extends AbstractCreditCardCest
 {
+    use BasketModalSettingTrait;
+
     private string $savePaymentCheckboxSelector = "#oscunzersavepayment";
     private string $accountLinkSelector = "//*[@id='account_menu']/ul/li[1]/a";
     private string $savePaymentDeleteButtonSelector = "button.btn-danger.delete-cc";
@@ -89,8 +92,6 @@ final class SavePaymentCreditCardCest extends AbstractCreditCardCest
         }
 
         $standardCestHelper->addProductToBasket($this->I);
-
-        $standardCestHelper->closeBasketModalIfVisible($this->I);
 
         $paymentCheckoutPage = $standardCestHelper->openCheckout($homePage);
 

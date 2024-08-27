@@ -13,6 +13,7 @@ use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\AbstractSepaCest;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Helper\StandardCestHelper;
+use OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\Traits\BasketModalSettingTrait;
 use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 
 /**
@@ -23,6 +24,8 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
  */
 final class SavePaymentSepaCest extends AbstractSepaCest
 {
+    use BasketModalSettingTrait;
+
     private string $savePaymentCheckboxSelector = "#oscunzersavepayment";
     private string $accountLinkSelector = "//*[@id='account_menu']/ul/li[1]/a";
     private string $savePaymentDeleteButtonSelector = "button.btn-danger.delete-sepa";
@@ -49,8 +52,6 @@ final class SavePaymentSepaCest extends AbstractSepaCest
         }
 
         $standardCestHelper->addProductToBasket($this->I);
-
-        $standardCestHelper->closeBasketModalIfVisible($this->I);
 
         $paymentCheckoutPage = $standardCestHelper->openCheckout($homePage);
 
