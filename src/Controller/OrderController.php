@@ -9,13 +9,16 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
+use Doctrine\DBAL\ConnectionException;
+use Doctrine\DBAL\Driver\Exception;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
-use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Session;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionProviderInterface;
 use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -110,6 +113,7 @@ class OrderController extends OrderController_parent
      * @throws Redirect
      * @throws DatabaseErrorException
      * @throws \UnzerSDK\Exceptions\UnzerApiException
+     * @throws ConnectionException
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
@@ -119,13 +123,13 @@ class OrderController extends OrderController_parent
         $oUser = $this->getUser();
 
         $oBasket = $this->getSession()->getBasket();
-        if ($oBasket->getProductsCount()) {
-            $oDB = DatabaseProvider::getDb();
+        if ($oBasket && $oBasket->getProductsCount()) {
+            $connectionProvider = $this->getServiceFromContainer(ConnectionProviderInterface::class)->get();
 
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder = $this->getActualOrder();
 
-            $oDB->startTransaction();
+            $connectionProvider->beginTransaction();
 
             $paymentService = $this->getServiceFromContainer(PaymentService::class);
 
@@ -141,7 +145,7 @@ class OrderController extends OrderController_parent
             $unzerService = $this->getServiceFromContainer(Unzer::class);
 
             if (stripos($nextStep, 'thankyou') !== false) {
-                $oDB->commitTransaction();
+                $connectionProvider->commit();
                 $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
 
                 if ($this->isPaymentCancelled($paymentService)) {
@@ -156,8 +160,9 @@ class OrderController extends OrderController_parent
                     );
                 }
 
-                Registry::getSession()->deleteVariable('oscunzersavepayment');
-                Registry::getSession()->deleteVariable('oscunzersavepayment_paypal');
+                $session = $this->getSession();
+                $session->deleteVariable('oscunzersavepayment');
+                $session->deleteVariable('oscunzersavepayment_paypal');
 
                 if ($oBasket->getPaymentId() !== CoreUnzerDefinitions::APPLEPAY_UNZER_PAYMENT_ID) {
                     throw new Redirect($unzerService->prepareRedirectUrl($nextStep));
@@ -169,7 +174,7 @@ class OrderController extends OrderController_parent
                 return;
             }
 
-            $oDB->rollbackTransaction();
+            $connectionProvider->rollBack();
             $translator = $this->getServiceFromContainer(Translator::class);
             throw new RedirectWithMessage(
                 $unzerService->prepareRedirectUrl($nextStep),
@@ -259,7 +264,7 @@ class OrderController extends OrderController_parent
     {
         $country = oxNew(Country::class);
         /** @var string $oxcountryid */
-        $oxcountryid = Registry::getSession()->getUser()->getFieldData('oxcountryid');
+        $oxcountryid = $this->getSession()->getUser()->getFieldData('oxcountryid');
         $country->load($oxcountryid);
 
         /** @var string $oxisoalpha2 */
@@ -275,7 +280,7 @@ class OrderController extends OrderController_parent
         if (!($this->actualOrder instanceof \OxidSolutionCatalysts\Unzer\Model\Order)) {
             $this->actualOrder = oxNew(Order::class);
             /** @var string $sess_challenge */
-            $sess_challenge = Registry::getSession()->getVariable('sess_challenge');
+            $sess_challenge = $this->getSession()->getVariable('sess_challenge');
             $this->actualOrder->load($sess_challenge);
         }
         return $this->actualOrder;
@@ -366,7 +371,7 @@ class OrderController extends OrderController_parent
         if (!$user) {
             return;
         }
-        $sPaymentId = Registry::getSession()->getVariable('paymentid');
+        $sPaymentId = $this->getSession()->getVariable('paymentid');
         if (
             !in_array(
                 $sPaymentId,
@@ -429,37 +434,44 @@ class OrderController extends OrderController_parent
         );
     }
 
+    /**
+     * @throws ConnectionException
+     * @throws DatabaseConnectionException
+     * @throws Exception
+     * @throws Redirect
+     */
     private function cleanUpCancelledPayments(): void
     {
         $oUser = $this->getUser();
-        $oBasket = Registry::getSession()->getBasket();
-        if ($oBasket->getProductsCount()) {
-            $oDB = DatabaseProvider::getDb();
+        $session = $this->getSession();
+        $oBasket = $session->getBasket();
+        if ($oBasket && $oBasket->getProductsCount()) {
+            $connectionProvider = $this->getServiceFromContainer(ConnectionProviderInterface::class)->get();
 
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder = $this->getActualOrder();
 
-            $oDB->startTransaction();
+            $connectionProvider->beginTransaction();
 
-            $isOrderAlreadyCancelled = Registry::getSession()->getVariable('orderCancellationProcessed');
+            $isOrderAlreadyCancelled = $session->getVariable('orderCancellationProcessed');
             if (!$isOrderAlreadyCancelled) {
                 $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
                 $oUser->onOrderExecute($oBasket, $iSuccess);
             }
-            Registry::getSession()->deleteVariable('orderCancellationProcessed');
+            $session->deleteVariable('orderCancellationProcessed');
             //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...
 
             // performing special actions after user finishes order (assignment to special user groups)
             $unzerService = $this->getServiceFromContainer(Unzer::class);
-            Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
+            $session->setVariable('orderDisableSqlActiveSnippet', false);
 
-            $oDB->commitTransaction();
+            $connectionProvider->commit();
 
-            Registry::getSession()->setVariable('sess_challenge', $this->getUtilsObjectInstance()->generateUID());
-            Registry::getSession()->setBasket($oBasket);
-            Registry::getSession()->deleteVariable('orderCancellationProcessed');
-            Registry::getSession()->deleteVariable('oscunzersavepayment');
-            Registry::getSession()->deleteVariable('oscunzersavepayment_paypal');
+            $session->setVariable('sess_challenge', $this->getUtilsObjectInstance()->generateUID());
+            $session->setBasket($oBasket);
+            $session->deleteVariable('orderCancellationProcessed');
+            $session->deleteVariable('oscunzersavepayment');
+            $session->deleteVariable('oscunzersavepayment_paypal');
             $this->redirectUserToCheckout($unzerService, $oOrder);
         }
     }
@@ -498,7 +510,7 @@ class OrderController extends OrderController_parent
         if ($unzerSessionPayment) {
             $currentPayment = $unzerSessionPayment->getPaymentType();
             if ($currentPayment instanceof Paypal || $currentPayment instanceof Card) {
-                $session = Registry::getSession();
+                $session = $this->getSession();
                 /** @var Payment $paymentModel */
                 $paymentModel = $this->getPayment();
                 $paymentExtension = $this->getServiceFromContainer(PaymentExtensionLoader::class)
@@ -513,7 +525,7 @@ class OrderController extends OrderController_parent
 
     private function getUnzerPaymentIdFromSession(): string
     {
-        $paymentId = Registry::getSession()->getVariable('UnzerPaymentId');
+        $paymentId = $this->getSession()->getVariable('UnzerPaymentId');
         if (is_string($paymentId)) {
             return $paymentId;
         }
@@ -521,7 +533,7 @@ class OrderController extends OrderController_parent
         return '';
     }
 
-    private function getSession(): \OxidEsales\Eshop\Core\Session
+    private function getSession(): Session
     {
         return Registry::getSession();
     }

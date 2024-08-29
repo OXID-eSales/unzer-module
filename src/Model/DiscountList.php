@@ -12,14 +12,17 @@ namespace OxidSolutionCatalysts\Unzer\Model;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Groups;
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Application\Model\DiscountList as CoreDisCountList;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionProviderInterface;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class DiscountList extends DiscountList_parent
 {
+    use ServiceContainer;
+
     /**
      * Returns array of discounts that can be globally (transparently) applied
      *
@@ -64,7 +67,7 @@ class DiscountList extends DiscountList_parent
         $sUserId = null;
         $sGroupIds = null;
         $sCountryId = $this->getCountryId($oUser);
-        $oDb = DatabaseProvider::getDb();
+        $connectionProvider = $this->getServiceFromContainer(ConnectionProviderInterface::class)->get();
 
         // checking for current session user which gives additional restrictions for user itself,
         // users group and country
@@ -80,7 +83,7 @@ class DiscountList extends DiscountList_parent
                 if ($sGroupIds) {
                     $sGroupIds .= ', ';
                 }
-                $sGroupIds .= $oDb->quote($oGroup->getId());
+                $sGroupIds .= $connectionProvider->quote($oGroup->getId());
             }
         }
 
@@ -92,12 +95,12 @@ class DiscountList extends DiscountList_parent
         $sCountrySql = $sCountryId ?
             "EXISTS(select oxobject2discount.oxid from oxobject2discount where
             oxobject2discount.OXDISCOUNTID = $sTable.OXID and oxobject2discount.oxtype = 'oxcountry' and
-            oxobject2discount.OXOBJECTID = " . $oDb->quote($sCountryId) . ")" :
+            oxobject2discount.OXOBJECTID = " . $connectionProvider->quote($sCountryId) . ")" :
             '0';
         $sUserSql = $sUserId ?
             "EXISTS(select oxobject2discount.oxid from oxobject2discount where
             oxobject2discount.OXDISCOUNTID = $sTable.OXID and oxobject2discount.oxtype = 'oxuser' and
-            oxobject2discount.OXOBJECTID = " . $oDb->quote($sUserId) . ")" :
+            oxobject2discount.OXOBJECTID = " . $connectionProvider->quote($sUserId) . ")" :
             '0';
         $sGroupSql = $sGroupIds ?
             "EXISTS(select oxobject2discount.oxid from oxobject2discount where

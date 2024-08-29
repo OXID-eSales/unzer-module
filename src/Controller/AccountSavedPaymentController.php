@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Controller;
 
-use Exception;
 use OxidEsales\Eshop\Application\Controller\AccountController;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
 use OxidSolutionCatalysts\Unzer\Service\Transaction;
@@ -35,13 +33,6 @@ class AccountSavedPaymentController extends AccountController
      */
     // phpcs:ignore PSR2.Classes.PropertyDeclaration
     protected $_sThisTemplate = '@osc-unzer/frontend/tpl/account/account_saved_payments';
-
-    /**
-     * @var string
-     */
-    // phpcs:ignore PSR2.Classes.PropertyDeclaration
-    protected $sThisAltTemplate = 'page/privatesales/login';
-
 
     public function render()
     {

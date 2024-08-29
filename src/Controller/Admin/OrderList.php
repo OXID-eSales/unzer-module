@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\ConnectionProviderInterface;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 
 class OrderList extends OrderList_parent
 {
+    use ServiceContainer;
+
     /**
      * Adding folder check
     * bi *
@@ -34,24 +36,25 @@ class OrderList extends OrderList_parent
             unset($whereQuery['oxorder.oxordernr']);
         }
 
-        $database = DatabaseProvider::getDb();
+        $connectionProvider = $this->getServiceFromContainer(ConnectionProviderInterface::class)->get();
+
         $query = parent::prepareWhereQuery($whereQuery, $fullQuery);
         $folders = Registry::getConfig()->getConfigParam('aOrderfolder');
         $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder !== '-1') {
-            $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";
+            $query .= " and ( oxorder.oxfolder = " . $connectionProvider->quote($folder) . " )";
         } elseif (!$folder && is_array($folders)) {
             $folderNames = array_keys($folders);
-            $query .= " and ( oxorder.oxfolder = " . $database->quote($folderNames[0]) . " )";
+            $query .= " and ( oxorder.oxfolder = " . $connectionProvider->quote($folderNames[0]) . " )";
         }
 
         // glue oxordernr
         if ($orderNrSearch) {
-            $oxOrderNr = $database->quoteIdentifier("oxorder.oxordernr");
-            $oxUnzerOrderNr = $database->quoteIdentifier("oxorder.oxunzerordernr");
-            $orderNrValue = $database->quote($orderNrSearch);
-            $query .= " and ({$oxOrderNr} like {$orderNrValue} or {$oxUnzerOrderNr} like {$orderNrValue}) ";
+            $oxOrderNr = $connectionProvider->quoteIdentifier("oxorder.oxordernr");
+            $oxUnzerOrderNr = $connectionProvider->quoteIdentifier("oxorder.oxunzerordernr");
+            $orderNrValue = $connectionProvider->quote($orderNrSearch);
+            $query .= " and ($oxOrderNr like $orderNrValue or $oxUnzerOrderNr like $orderNrValue) ";
         }
 
         return $query;
@@ -65,12 +68,11 @@ class OrderList extends OrderList_parent
      * @SuppressWarnings(PHPMD.StaticAccess)
      *
      * @return string
-     * @throws DatabaseConnectionException
      */
     protected function prepareOrderListQuery(array $whereQuery, string $filterQuery): string
     {
         if (is_array($whereQuery) && count($whereQuery)) {
-            $myUtilsString = \OxidEsales\Eshop\Core\Registry::getUtilsString();
+            $myUtilsString = Registry::getUtilsString();
             foreach ($whereQuery as $identifierName => $fieldValue) {
                 //passing oxunzerordernr because it will be combined with oxordernr
                 if ("oxorder.oxunzerordernr" === $identifierName) {
@@ -81,20 +83,21 @@ class OrderList extends OrderList_parent
                 $isSearchValue = $this->isSearchValue($fieldValue);
                 //removing % symbols
                 $fieldValue = $this->processFilter($fieldValue);
-                if (strlen($fieldValue)) {
-                    $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+                if ($fieldValue !== '') {
+                    $connectionProvider = $this->getServiceFromContainer(ConnectionProviderInterface::class)->get();
                     $values = explode(' ', $fieldValue);
                     //for each search field using AND action
                     $queryBoolAction = ' and (';
 
                     //oxordernr is combined with oxunzerordernr
                     if ("oxorder.oxordernr" === $identifierName) {
-                        $oxOrderNr = $database->quoteIdentifier("oxorder.oxordernr");
-                        $oxUnzerOrderNr = $database->quoteIdentifier("oxorder.oxunzerordernr");
+                        $oxOrderNr = $connectionProvider->quoteIdentifier("oxorder.oxordernr");
+                        $oxUnzerOrderNr = $connectionProvider->quoteIdentifier("oxorder.oxunzerordernr");
                         $orderNrQuery = [];
                         foreach ($values as $value) {
-                            $orderNrQuery[] = "({$oxOrderNr} like '{$value}'"
-                                . " or {$oxUnzerOrderNr} like '{$value}')";
+                            $value = $connectionProvider->quote($value);
+                            $orderNrQuery[] = "($oxOrderNr like $value"
+                                . " or $oxUnzerOrderNr like $value)";
                         }
                         $filterQuery .= "and (" . implode(" or ", $orderNrQuery) . ")";
 
@@ -108,13 +111,13 @@ class OrderList extends OrderList_parent
                         if ($uml) {
                             $queryBoolAction .= '(';
                         }
-                        $quotedIdentifierName = $database->quoteIdentifier($identifierName);
+                        $quotedIdentifierName = $connectionProvider->quoteIdentifier($identifierName);
                         $filterQuery .= " {$queryBoolAction} {$quotedIdentifierName} ";
                         //for search in same field for different values using AND
                         $queryBoolAction = ' and ';
                         $filterQuery .= $this->buildFilter($value, $isSearchValue);
                         if ($uml) {
-                            $filterQuery .= " or {$quotedIdentifierName} ";
+                            $filterQuery .= " or $quotedIdentifierName ";
 
                             $filterQuery .= $this->buildFilter($uml, $isSearchValue);
                             $filterQuery .= ')'; // end of OR section
@@ -136,18 +139,18 @@ class OrderList extends OrderList_parent
      *
      * @return array
      */
-    public function getListFilter()
+    public function getListFilter(): array
     {
         if ($this->_aListFilter === null) {
-            $request = \OxidEsales\Eshop\Core\Registry::getRequest();
+            $this->_aListFilter = [];
+            $request = Registry::getRequest();
             $filter = $request->getRequestParameter("where");
             $request->checkParamSpecialChars($filter);
 
-            if (!empty($filter['oxorder']['oxordernr'])) {
+            if (is_array($filter) && !empty($filter['oxorder']['oxordernr'])) {
                 $filter['oxorder']['oxunzerordernr'] = $filter['oxorder']['oxordernr'];
+                $this->_aListFilter = $filter;
             }
-
-            $this->_aListFilter = $filter;
         }
 
         return $this->_aListFilter;

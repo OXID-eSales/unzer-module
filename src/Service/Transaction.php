@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Driver\ResultStatement;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
 use OxidSolutionCatalysts\Unzer\Model\Transaction as TransactionModel;
@@ -380,21 +381,40 @@ class Transaction
     }
 
     /**
-     * @param $paymentid
+     * @param string $paymentid
      * @return array|false
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public static function getTransactionDataByPaymentId(string $paymentid)
+    public function getTransactionDataByPaymentId(string $paymentid): ?array
     {
+        $result = false;
+
         if ($paymentid) {
-            return DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT DISTINCT OXORDERID, OXUSERID FROM oscunzertransaction WHERE TYPEID=?",
-                [$paymentid]
-            );
+
+            $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+            $queryBuilder = $queryBuilderFactory->create();
+
+            $query = $queryBuilder
+                ->select(
+                    'oxorderid',
+                    'oxuserid'
+                )
+                ->from('oscunzertransaction')
+                ->distinct()
+                ->where($queryBuilder->expr()->eq('typeid', ':typeid'));
+
+            $parameters = [
+                ':typeid' => $paymentid,
+            ];
+
+            $queryResult = $query->setParameters($parameters)->execute();
+            if ($queryResult instanceof ResultStatement && $queryResult->columnCount() >= 1) {
+                $result = $queryResult->fetchAllAssociative();
+            }
         }
 
-        return false;
+        return $result;
     }
 
     /**
@@ -419,21 +439,42 @@ class Transaction
 
     /**
      * @param string $orderid
+     * @param bool $withoutCancel
      * @return string
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function getPaymentIdByOrderId(string $orderid, bool $withoutCancel = false): string
     {
+        $transActionConst = $this->transActionConst;
+        if ($withoutCancel) {
+            $transActionConst = array_diff($transActionConst, [PaymentState::STATE_NAME_CANCELED]);
+        }
+
         $result = '';
-        if ($orderid) {
-            $result = DatabaseProvider::getDb()->getOne(
-                "SELECT DISTINCT TYPEID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN (" . $this->prepareTransActionConstForSql($withoutCancel) . ")",
-                [$orderid]
-            );
-            $result = is_string($result) ? $result : '';
+
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->select(
+                'typeid'
+            )
+            ->from('oscunzertransaction')
+            ->distinct()
+            ->where($queryBuilder->expr()->eq('oxorderid', ':oxorderid'))
+            ->andWhere($queryBuilder->expr()->in('oxaction', ':oxaction'))
+            ->setMaxResults(1);
+
+        $parameters = [
+            ':oxorderid' => $orderid,
+            ':oxaction'  => $transActionConst
+        ];
+
+        $queryResult = $query->setParameters($parameters)->execute();
+        if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
+            $result = $queryResult->fetchOne();
         }
 
         return $result;
@@ -442,34 +483,46 @@ class Transaction
     /**
      * @param string $orderid
      * @return string
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getTransactionIdByOrderId(string $orderid): string
     {
         $result = '';
 
-        if ($orderid) {
-            $rows = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll(
-                "SELECT OXID FROM oscunzertransaction
-                WHERE OXORDERID=? AND OXACTION IN ('completed', 'pending', 'canceled', 'chargeback')
-                ORDER BY OXTIMESTAMP DESC LIMIT 1",
-                [$orderid]
-            );
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
 
-            $result = $rows[0]['OXID'];
+        $query = $queryBuilder
+            ->select(
+                'oxid'
+            )
+            ->from('oscunzertransaction')
+            ->where($queryBuilder->expr()->eq('oxorderid', ':oxorderid'))
+            ->andWhere($queryBuilder->expr()->in('oxaction', ':oxaction'))
+            ->orderBy('oxtimestamp', 'desc')
+            ->setMaxResults(1);
+
+        $parameters = [
+            ':oxorderid' => $orderid,
+            ':oxaction'  => $this->transActionConst
+        ];
+
+        $queryResult = $query->setParameters($parameters)->execute();
+        if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
+            $result = $queryResult->fetchOne();
         }
 
-        return ($result === null) ? '' : $result;
+        return $result;
     }
 
     /**
      * @param string $orderid
      * @return array
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerTypeAndCurrencyByOrderId($orderid): array
+    public function getCustomerTypeAndCurrencyByOrderId(string $orderid): array
     {
         $transaction = oxNew(TransactionModel::class);
         $transactionId = $this->getTransactionIdByOrderId($orderid);
@@ -486,21 +539,37 @@ class Transaction
      * @return bool
      * @throws DatabaseConnectionException
      */
-    public function isValidTransactionTypeId($typeid): bool
+    public function isValidTransactionTypeId(string $typeid): bool
     {
-        if (
-            DatabaseProvider::getDb()->getOne(
-                "SELECT DISTINCT TYPEID FROM oscunzertransaction WHERE TYPEID=? ",
-                [$typeid]
+        $result = false;
+
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->select(
+                'oxid'
             )
-        ) {
-            return true;
+            ->from('oscunzertransaction')
+            ->where($queryBuilder->expr()->eq('typeid', ':typeid'))
+            ->distinct()
+            ->setMaxResults(1);
+
+        $parameters = [
+            ':typeid' => $typeid
+        ];
+
+        $queryResult = $query->setParameters($parameters)->execute();
+        if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
+            $result = true;
         }
-        return false;
+
+        return $result;
     }
 
     /**
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @throws Exception|\Doctrine\DBAL\Exception
      */
     public function getTransactionIds(?User $user = null): array
     {
@@ -517,18 +586,34 @@ class Transaction
             return $result;
         }
 
-        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        if ($oDB) {
-            $result = $oDB->getAll(
-                "SELECT ot.OXID, ot.PAYMENTTYPEID, ot.CURRENCY, ot.CUSTOMERTYPE, o.OXPAYMENTTYPE
-                        from oscunzertransaction as ot
-                        left join oxorder as o ON (ot.oxorderid = o.OXID) 
-            where ot.OXUSERID = :oxuserid AND ot.PAYMENTTYPEID IS NOT NULL
-            GROUP BY ot.PAYMENTTYPEID ",
-                [':oxuserid' => $userId]
-            );
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->select(
+                'ot.oxid',
+                'ot.paymenttypeid',
+                'ot.currency',
+                'ot.customertype',
+                'o.oxpaymenttype'
+            )
+            ->from('oscunzertransaction', 'ot')
+            ->leftJoin('ot', 'oxorder', 'o', 'ot.oxorderid = o.oxid')
+            ->where($queryBuilder->expr()->eq('ot.oxuserid', ':oxuserid'))
+            ->where($queryBuilder->expr()->isNotNull('ot.paymenttypeid'))
+            ->groupBy('ot.paymenttypeid');
+
+        $parameters = [
+            ':oxuserid' => $userId,
+        ];
+
+        $queryResult = $query->setParameters($parameters)->execute();
+        $rows = [];
+        if ($queryResult instanceof ResultStatement && $queryResult->columnCount() >= 1) {
+            $rows = $queryResult->fetchAllAssociative();
         }
-        return $result;
+
+        return $rows;
     }
 
     /**
@@ -610,20 +695,6 @@ class Transaction
         }
         return $result;
     }
-
-    /**
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
-     */
-    private function prepareTransActionConstForSql(bool $withoutCancel = false): string
-    {
-        $transActionConst = $this->transActionConst;
-        if ($withoutCancel) {
-            $transActionConst = array_diff($transActionConst, [PaymentState::STATE_NAME_CANCELED]);
-        }
-        return implode(',', DatabaseProvider::getDb()->quoteArray($transActionConst));
-    }
-
 
     private function getTransactionAmount(
         Payment $unzerPayment,

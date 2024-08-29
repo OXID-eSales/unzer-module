@@ -21,6 +21,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerWebhooks;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use UnzerSDK\Constants\PaymentState;
 use UnzerSDK\Resources\Payment;
+use UnzerSDK\Unzer;
 
 class DispatcherController extends FrontendController
 {
@@ -97,10 +98,10 @@ class DispatcherController extends FrontendController
         return $this->unzerWebhooks->getUnzerKeyFromWebhookContext($context);
     }
 
-    private function processPayment(\UnzerSDK\Unzer $unzer, string $paymentId): string
+    private function processPayment(Unzer $unzer, string $paymentId): string
     {
         $order = oxNew(Order::class);
-        $data = $this->transaction::getTransactionDataByPaymentId($paymentId);
+        $data = $this->transaction->getTransactionDataByPaymentId($paymentId);
 
         if (!is_array($data) || !isset($data[0]['OXORDERID'])) {
             return "Invalid Order Data";

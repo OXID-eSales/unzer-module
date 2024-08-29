@@ -9,15 +9,19 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
-use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Driver\ResultStatement;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use RuntimeException;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use UnzerSDK\Unzer;
 
 class UnzerSDKLoader
 {
+    use ServiceContainer;
+
     /**
      * @var ModuleSettings
      */
@@ -110,27 +114,47 @@ class UnzerSDKLoader
      * @param string $sPaymentId
      * @return Unzer
      *
-     * @throws UnzerException|DatabaseConnectionException
+     * @throws UnzerException
+     * @throws Exception|\Doctrine\DBAL\Exception
      * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getUnzerSDKbyPaymentType(string $sPaymentId): Unzer
     {
-        $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $row = $oDB->getRow("SELECT u.CURRENCY, o.OXDELCOMPANY, o.OXBILLCOMPANY, o.OXPAYMENTTYPE
-                            FROM oscunzertransaction u
-                            LEFT JOIN oxorder o ON u.OXORDERID = o.OXID
-                            WHERE u.TYPEID = :typeid
-                            ORDER BY u.OXTIMESTAMP DESC LIMIT 1", [':typeid' => $sPaymentId]);
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->select(
+                'u.currency',
+                'o.oxdelcompany',
+                'o.oxbillcompany',
+                'o.oxpaymenttype'
+            )
+            ->from('oscunzertransaction', 'u')
+            ->leftJoin('u', 'oxorder', 'o', 'u.oxorderid = o.oxid')
+            ->where($queryBuilder->expr()->eq('u.typeid', ':typeid'))
+            ->orderBy('u.oxtimestamp', 'desc')
+            ->setMaxResults(1);
+
+        $parameters = [
+            ':typeid' => $sPaymentId,
+        ];
+
+        $result = $query->setParameters($parameters)->execute();
+        $row = null;
+        if ($result instanceof ResultStatement && $result->columnCount() === 1) {
+            $row = $result->fetchAssociative();
+        }
 
         $customerType = '';
         $currency = '';
         $paymentId = '';
         if ($row) {
-            $currency = $row['CURRENCY'];
-            $paymentId = $row['OXPAYMENTTYPE'];
+            $currency = $row['currency'];
+            $paymentId = $row['oxpaymenttype'];
             if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
                 $customerType = 'B2C';
-                if (!empty($row['OXDELCOMPANY']) || !empty($row['OXBILLCOMPANY'])) {
+                if (!empty($row['oxdelcompany']) || !empty($row['oxbillcompany'])) {
                     $customerType = 'B2B';
                 }
             }
