@@ -54,7 +54,10 @@ class OrderList extends OrderList_parent
             $oxOrderNr = $connectionProvider->quoteIdentifier("oxorder.oxordernr");
             $oxUnzerOrderNr = $connectionProvider->quoteIdentifier("oxorder.oxunzerordernr");
             $orderNrValue = $connectionProvider->quote($orderNrSearch);
-            $query .= " and ($oxOrderNr like $orderNrValue or $oxUnzerOrderNr like $orderNrValue) ";
+            $orderNrValue = is_string($orderNrValue) ? $orderNrValue : '';
+            if ($orderNrValue) {
+                $query .= " and ($oxOrderNr like $orderNrValue or $oxUnzerOrderNr like $orderNrValue) ";
+            }
         }
 
         return $query;
@@ -71,7 +74,7 @@ class OrderList extends OrderList_parent
      */
     protected function prepareOrderListQuery(array $whereQuery, string $filterQuery): string
     {
-        if (is_array($whereQuery) && count($whereQuery)) {
+        if (count($whereQuery)) {
             $myUtilsString = Registry::getUtilsString();
             foreach ($whereQuery as $identifierName => $fieldValue) {
                 //passing oxunzerordernr because it will be combined with oxordernr
@@ -96,10 +99,15 @@ class OrderList extends OrderList_parent
                         $orderNrQuery = [];
                         foreach ($values as $value) {
                             $value = $connectionProvider->quote($value);
-                            $orderNrQuery[] = "($oxOrderNr like $value"
-                                . " or $oxUnzerOrderNr like $value)";
+                            $value = is_string($value) ? $value : '';
+                            if ($value) {
+                                $orderNrQuery[] = "($oxOrderNr like $value"
+                                    . " or $oxUnzerOrderNr like $value)";
+                            }
                         }
-                        $filterQuery .= "and (" . implode(" or ", $orderNrQuery) . ")";
+                        if ($orderNrQuery) {
+                            $filterQuery .= "and (" . implode(" or ", $orderNrQuery) . ")";
+                        }
 
                         continue;
                     }

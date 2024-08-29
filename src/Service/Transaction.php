@@ -382,16 +382,15 @@ class Transaction
 
     /**
      * @param string $paymentid
-     * @return array|false
+     * @return array|null
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
     public function getTransactionDataByPaymentId(string $paymentid): ?array
     {
-        $result = false;
+        $result = null;
 
         if ($paymentid) {
-
             $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
             $queryBuilder = $queryBuilderFactory->create();
 
@@ -475,6 +474,7 @@ class Transaction
         $queryResult = $query->setParameters($parameters)->execute();
         if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
             $result = $queryResult->fetchOne();
+            $result = is_string($result) ? $result : '';
         }
 
         return $result;
@@ -511,6 +511,7 @@ class Transaction
         $queryResult = $query->setParameters($parameters)->execute();
         if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
             $result = $queryResult->fetchOne();
+            $result = is_string($result) ? $result : '';
         }
 
         return $result;

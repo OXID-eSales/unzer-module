@@ -117,6 +117,7 @@ class UnzerSDKLoader
      * @throws UnzerException
      * @throws Exception|\Doctrine\DBAL\Exception
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getUnzerSDKbyPaymentType(string $sPaymentId): Unzer
     {
@@ -150,8 +151,8 @@ class UnzerSDKLoader
         $currency = '';
         $paymentId = '';
         if ($row) {
-            $currency = $row['currency'];
-            $paymentId = $row['oxpaymenttype'];
+            $currency = is_string($row['currency']) ? $row['currency'] : '';
+            $paymentId = is_string($row['oxpaymenttype']) ? $row['oxpaymenttype'] : '';
             if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
                 $customerType = 'B2C';
                 if (!empty($row['oxdelcompany']) || !empty($row['oxbillcompany'])) {
