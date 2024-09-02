@@ -47,7 +47,7 @@ final class SavePaymentCCPPCest extends BaseCest
 
     public function setUp(): void
     {
-        $this->markTestSkipped('Skipping this entire class temporararlly');
+        $this->I->markTestSkipped('Skipping this entire class temporararlly');
     }
 
     /**

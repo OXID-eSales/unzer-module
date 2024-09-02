@@ -15,26 +15,27 @@ class PrePaymentBankAccountService
     {
         $this->session = $session;
     }
-    public function persistBankAccountInfo(Charge $charge)
+    public function persistBankAccountInfo(Charge $charge): void
     {
+        $orderId = $charge->getOrderId() ?? '';
         // in unzer sdk it's called orderId in oxid: oxunzerordernr
         if ($charge->getIban()) {
             $this->session->setVariable(
-                $this->getSessionVariableName($charge->getOrderId(), 'iban'),
+                $this->getSessionVariableName($orderId, 'iban'),
                 $charge->getIban()
             );
         }
 
         if ($charge->getBic()) {
             $this->session->setVariable(
-                $this->getSessionVariableName($charge->getOrderId(), 'bic'),
+                $this->getSessionVariableName($orderId, 'bic'),
                 $charge->getBic()
             );
         }
 
         if ($charge->getHolder()) {
             $this->session->setVariable(
-                $this->getSessionVariableName($charge->getOrderId(), 'holder'),
+                $this->getSessionVariableName($orderId, 'holder'),
                 $charge->getHolder()
             );
         }
@@ -42,27 +43,34 @@ class PrePaymentBankAccountService
 
     public function getIban(string $unzerOrderNumber): ?string
     {
-        return $this->session->getVariable(
-            $this->getSessionVariableName($unzerOrderNumber, 'iban')
-        );
+        return $this->getSessionVariableStringValue($unzerOrderNumber, 'iban');
     }
 
     public function getBic(string $unzerOrderNumber): ?string
     {
-        return $this->session->getVariable(
-            $this->getSessionVariableName($unzerOrderNumber, 'bic')
-        );
+        return $this->getSessionVariableStringValue($unzerOrderNumber, 'bic');
     }
 
     public function getHolder(string $unzerOrderNumber): ?string
     {
-        return $this->session->getVariable(
-            $this->getSessionVariableName($unzerOrderNumber, 'holder')
-        );
+        return $this->getSessionVariableStringValue($unzerOrderNumber, 'holder');
     }
 
     private function getSessionVariableName(string $unzerOrderNumber, string $variableName): string
     {
         return self::SESSION_VARIABLE_PREFIX . '_' . $unzerOrderNumber . '_' . $variableName;
+    }
+
+    private function getSessionVariableStringValue(string $unzerOrderNumber, string $variableName): string
+    {
+        $value = $this->session->getVariable(
+            $this->getSessionVariableName($unzerOrderNumber, $variableName)
+        );
+
+        if (!is_string($value)) {
+            $value = '';
+        }
+
+        return $value;
     }
 }

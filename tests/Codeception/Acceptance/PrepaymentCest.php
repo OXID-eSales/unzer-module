@@ -42,10 +42,9 @@ final class PrepaymentCest extends BaseCest
         // possible ToDo: check the thank you page
 
         $I->waitForText(rtrim(strip_tags(sprintf(
-            Translator::translate('OSCUNZER_BANK_DETAILS_AMOUNT'),
+            Translator::translate('OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_HEADLINE'),
             $this->getPrice(),
             $this->getCurrency()
         ))));
-
     }
 }

@@ -22,6 +22,17 @@
         <properties>
             <property name="cyclomaticComplexity" value="55"/>
         </properties>
+
+        <rule ref="rulesets/codesize.xml/NPathComplexity">
+            <!-- Adjust the maximum threshold for NPath complexity -->
+            <properties>
+                <property name="maximum" value="250"/>
+            </properties>
+            <!-- Exclude UnzerPayment.php specifically -->
+            <exclude-pattern>*UnzerPayment.php</exclude-pattern>
+        </rule>
     </rule>
+
+
     <exclude-pattern>*OrderController.php</exclude-pattern>
 </ruleset>

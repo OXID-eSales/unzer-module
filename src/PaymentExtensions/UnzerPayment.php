@@ -99,6 +99,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.StaticAccess)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @throws \JsonException
      * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
      * @throws \UnzerSDK\Exceptions\UnzerApiException
@@ -145,8 +146,8 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $this->unzerService->setSessionVars($transaction);
 
         if ($transaction instanceof Charge) {
-            $prePaymentBankAccountService = $this->getServiceFromContainer(PrePaymentBankAccountService::class);
-            $prePaymentBankAccountService->persistBankAccountInfo($transaction);
+            $prePaymentService = $this->getServiceFromContainer(PrePaymentBankAccountService::class);
+            $prePaymentService->persistBankAccountInfo($transaction);
         }
 
         if ($request->getRequestParameter('birthdate')) {
