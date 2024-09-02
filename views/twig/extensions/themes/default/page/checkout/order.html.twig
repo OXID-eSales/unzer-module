@@ -253,21 +253,70 @@
     }
 {% if false %}</script>{% endif %}
 {% endcapture %}
-
 {{ script({ add: unzerPaymentJS,  dynamic: __oxid_include_dynamic }) }}
-
 {% capture assign = "preventMultipleClicksJS" %}
     {% if false %}<script>{% endif %}
-    document.getElementById("submitOrder").addEventListener("click", function(event) {
-        var button = event.currentTarget;
-        if (button.disabled) {
-            event.preventDefault();
-        } else {
-            button.disabled = true;
+
+    // Ensure the DOM is fully loaded before running the script
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Select the submitOrder button
+        const submitButton = document.getElementById("submitOrder");
+
+        // Select all radio buttons with class paymenttypeid
+        const radioButtons = document.querySelectorAll('input[type="radio"].paymenttypeid');
+
+        // Select the checkboxes that can override radio button requirements
+        const overrideCheckbox1 = document.getElementById("oscunzersavepayment");
+        const overrideCheckbox2 = document.getElementById("newccard");
+
+        // Function to enable the submit button based on conditions
+        function updateSubmitButtonState() {
+            // Check if any radio button is selected
+            const isRadioSelected = Array.from(radioButtons).some(radio => radio.checked);
+
+            // Check if either override checkbox is checked
+            const isAnyCheckboxChecked = (overrideCheckbox1 && overrideCheckbox1.checked) ||
+                                         (overrideCheckbox2 && overrideCheckbox2.checked);
+
+            // Enable the submit button if a radio is selected or any of the override checkboxes are checked
+            submitButton.disabled = !(isRadioSelected || isAnyCheckboxChecked);
         }
+
+        // Only set up listeners if radio buttons are present
+        if (radioButtons.length > 0) {
+            // Disable the submitOrder button initially
+            submitButton.disabled = true;
+
+            // Add change event listeners to each radio button
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', updateSubmitButtonState);
+            });
+
+            // Add change event listener to the override checkboxes
+            if (overrideCheckbox1) {
+                overrideCheckbox1.addEventListener('change', updateSubmitButtonState);
+            }
+
+            if (overrideCheckbox2) {
+                overrideCheckbox2.addEventListener('change', updateSubmitButtonState);
+            }
+        }
+
+        // Prevent multiple clicks on the submitOrder button
+        submitButton.addEventListener("click", function(event) {
+            const button = event.currentTarget;
+            if (button.disabled) {
+                event.preventDefault();
+            } else {
+                button.disabled = true;
+            }
+        });
     });
+
     {% if false %}</script>{% endif %}
 {% endcapture %}
+
 
 {{ script({ add: preventMultipleClicksJS,  dynamic: __oxid_include_dynamic }) }}
 

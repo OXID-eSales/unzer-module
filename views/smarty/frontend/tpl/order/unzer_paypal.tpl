@@ -49,16 +49,69 @@
     </div>
 
 [{if false}]<script>[{/if}]
+
 [{capture assign="unzerPaypalJS"}]
-        $( '#orderConfirmAgbBottom' ).submit(function( event ) {
-            if(!$( '#orderConfirmAgbBottom' ).hasClass("submitable")){
+    $(document).ready(function() {
+        const submitButton = $('.submitButton.nextStep');
+        const radioButtons = $('input[type="radio"].paymenttypeid');
+        const overrideCheckbox1 = $('#oscunzersavepayment');
+        const overrideCheckbox2 = $('#newccard');
+
+        function updateSubmitButtonState() {
+            const isRadioSelected = radioButtons.is(':checked');
+            const isAnyCheckboxChecked = (overrideCheckbox1.length && overrideCheckbox1.is(':checked')) ||
+                                         (overrideCheckbox2.length && overrideCheckbox2.is(':checked'));
+
+            if (isRadioSelected || isAnyCheckboxChecked) {
+                submitButton.removeClass('disabled');
+            } else {
+                submitButton.addClass('disabled');
+            }
+        }
+
+        if (radioButtons.length > 0) {
+            submitButton.addClass('disabled');
+            radioButtons.on('change', updateSubmitButtonState);
+            if (overrideCheckbox1.length) {
+                overrideCheckbox1.on('change', updateSubmitButtonState);
+            }
+            if (overrideCheckbox2.length) {
+                overrideCheckbox2.on('change', updateSubmitButtonState);
+            }
+        }
+
+        submitButton.on("click", function(event) {
+            if ($(this).hasClass('disabled')) {
                 event.preventDefault();
-                $( "#payment-saved-cards" ).submit();
+            } else {
+                $(this).addClass('disabled');
             }
         });
 
-        // Handling payment form submission
-        $( "#payment-saved-cards" ).submit(function( event ) {
+        overrideCheckbox2.on('change', function() {
+            if ($(this).prop('checked')) {
+                $('.savedpayment').fadeOut();
+                radioButtons.prop('checked', false);
+                $('#newcc').fadeIn();
+                addPaymentElements(Card);
+            } else {
+                $('.savedpayment').fadeIn();
+                $('#newcc').fadeOut();
+                removeCardElements();
+                if (Card && Card.destroy) {
+                    Card.destroy();
+                }
+            }
+        });
+
+        $('#orderConfirmAgbBottom').submit(function(event) {
+            if (!$('#orderConfirmAgbBottom').hasClass("submitable")) {
+                event.preventDefault();
+                $("#payment-saved-cards").submit();
+            }
+        });
+
+        $("#payment-saved-cards").submit(function(event) {
             event.preventDefault();
             let selectedPaymentTypeId = $('input[name=paymenttypeid]:checked').val();
             let paymentData = {
@@ -90,7 +143,9 @@
             $('#orderConfirmAgbBottom').addClass("submitable");
             $("#orderConfirmAgbBottom").submit();
         });
-
+    });
 [{/capture}]
+
+
 [{if false}]</script>[{/if}]
 [{oxscript add=$unzerPaypalJS}]
