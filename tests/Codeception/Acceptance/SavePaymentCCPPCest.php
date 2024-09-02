@@ -45,11 +45,6 @@ final class SavePaymentCCPPCest extends BaseCest
     private string $firstSavedPaypalPayment = "//*[@id='payment-saved-cards']/table/tbody/tr/td[2]/input";
     private string $savedPaymentsLocator = "//*[@id='account_menu']/ul/li[1]/a";
 
-    public function setUp(): void
-    {
-        $this->I->markTestSkipped('Skipping this entire class temporararlly');
-    }
-
     /**
      * @group unzer_module
      * @group SecondGroup
@@ -58,6 +53,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testPaymentWorksWithSavingPayment(AcceptanceTester $I)
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest('if PayPal payment works and save payment flag is clickable');
         $this->initializeTest();
         $this->choosePayment($this->paypalPaymentLabel);
@@ -105,6 +101,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testSavedPaypalPaymentIsVisibleInAccount(AcceptanceTester $I): void
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest("if saved paypal payment is visible in the user's account");
 
         $homePage = $this->I->openShop();
@@ -175,6 +172,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testCannotAddSamePPSecondTime(AcceptanceTester $I): void
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest("if user cannot save Paypal Account twice");
 
         $homePage = $this->I->openShop();
@@ -250,6 +248,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testSavedPaymentIsAvailableInAccountAndCanBeDeleted(AcceptanceTester $I)
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest("if saved paypal payment is visible in the user's account and can be deleted");
         $I->wait(5);
         $homePage = $this->I->openShop();
@@ -277,6 +276,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testPaymentUsingSavedCardWorks(AcceptanceTester $I)
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest('if user can pay with a saved card');
         $this->updateArticleStockAndFlag();
         $this->initializeTest();
@@ -294,6 +294,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testPaymentCardCanSavePayment(AcceptanceTester $I)
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest('if a user can save card as a payment method');
         $this->updateArticleStockAndFlag();
         $this->initializeTest();
@@ -311,6 +312,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testCannotSaveCardTwice(AcceptanceTester $I)
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest('user can not save a card twice');
         $this->updateArticleStockAndFlag();
         $this->initializeTest();
@@ -333,6 +335,7 @@ final class SavePaymentCCPPCest extends BaseCest
      */
     public function testRemoveSavedCardFromAccount(AcceptanceTester $I): void
     {
+        $this->I->markTestSkipped('Skipping this test');
         $I->wantToTest("if saved card is visible in the user's account and can be deleted");
         $I->wait(5);
         $homePage = $I->openShop();
