@@ -67,7 +67,7 @@
                         [{include file="@osc-unzer/frontend/tpl/order/unzer_paypal.tpl"}]
 
                     [{elseif $sPaymentID == "oscunzer_installment_paylater.tpl"}]
-                        [{include file="@osc-unzer/frontend/tpl/order/unzer_installment_paylater"}]
+                        [{include file="@osc-unzer/frontend/tpl/order/unzer_installment_paylater.tpl"}]
                     [{/if}]
                 </div>
             </div>
