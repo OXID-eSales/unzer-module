@@ -359,7 +359,7 @@
             let paymentId = formElement.id.slice(4);
             let inAmount = document.getElementById('uzr_collect_amount');
             if (null !== inAmount.value) {
-                let alertMsg = '[{oxmultilang ident="OSCUNZER_CANCEL_ALERT"}]'
+                let alertMsg = '[{oxmultilang ident="OSCUNZER_COLLECT_ALERT"}]'
                     + ' ' + inAmount.value + ' [{$uzrCurrency}]';
                 if (window.confirm(alertMsg)) {
                     return true;
