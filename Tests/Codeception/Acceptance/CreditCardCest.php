@@ -20,7 +20,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 final class CreditCardCest extends AbstractCreditCardCest
 {
     /**
-     * @group CreditCardPaymentTest
+     * @group CreditCardPaymentTest1
      */
     public function testPaymentUsingMastercardWorks(AcceptanceTester $I): void
     {

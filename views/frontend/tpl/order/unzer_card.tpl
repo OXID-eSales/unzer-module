@@ -49,6 +49,11 @@
                 <!-- Card number UI Element will be inserted here. -->
             </div>
         </div>
+        <div class="field">
+            <div id="card-element-id-cardholder" class="unzerInput">
+                <!-- Card number UI Element will be inserted here. -->
+            </div>
+        </div>
         <div class="two fields">
             <div class="field ten wide">
                 <div id="card-element-id-expiry" class="unzerInput">
@@ -60,7 +65,6 @@
                     <!-- Card CVC UI Element will be inserted here. -->
                 </div>
             </div>
-
         </div>
         [{if $oView->getPaymentSaveSetting()}]
             <div id="payment-sepa-confirm">
@@ -112,7 +116,7 @@
     });
 
     // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]"});
+    let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]",  holderEnabled: true });
     if (savedCardsTableEl.length) {
         cardsCount = parseInt($('input[name=savedCardsCount]').attr('value'), 10);
     }
@@ -126,6 +130,7 @@
         addPaymentElements(Card);
     } else {
         newCardCheckbox.on('change', function() {
+
             Card = unzerInstance.Card();
             if ($(this).prop('checked')) {
                 // Create a Card instance and render the input fields
@@ -192,30 +197,27 @@
 
     newCardCheckbox.on('change', function() {
         if ($(this).prop('checked')) {
-            // Hide saved payment methods and deselect radio buttons
             $('.savedpayment').fadeOut();
             $('input[name="paymenttypeid"]').prop('checked', false);
-
-            // Neue Kreditkarte anzeigen
             $('#newcc').fadeIn();
         } else {
-            // Gespeicherte Zahlungsarten anzeigen
             $('.savedpayment').fadeIn();
-
-            // Neue Kreditkarte ausblenden
             $('#newcc').fadeOut();
         }
     });
     function removeCardElements() {
-        // Clear the contents of the Card-Element containers
         $('#card-element-id-number').empty();
+        $('#card-element-id-name').empty();
         $('#card-element-id-expiry').empty();
         $('#card-element-id-cvc').empty();
     }
     function addPaymentElements(Card) {
-        // Clear the contents of the Card-Element containers
         Card.create('number', {
             containerId: 'card-element-id-number',
+            onlyIframe: false
+        });
+        Card.create('holder', {
+            containerId: 'card-element-id-cardholder',
             onlyIframe: false
         });
         Card.create('expiry', {
