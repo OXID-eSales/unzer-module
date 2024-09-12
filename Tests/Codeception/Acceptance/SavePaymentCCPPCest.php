@@ -20,22 +20,22 @@ use OxidEsales\Codeception\Step\Basket as BasketSteps;
  * @group SecondGroup
  * @group SavePayment
  */
-final class SavePaymentCCPPCest extends BaseCest
+final class SavePaymentCCPPCest extends \OxidSolutionCatalysts\Unzer\Tests\Codeception\Acceptance\AbstractCreditCardCest
 {
-    private string $cardPaymentLabel = "//label[@for='payment_oscunzer_card']";
-    private string $cardNumberIframe = "//iframe[contains(@id, 'unzer-number-iframe')]";
-    private string $expireDateIframe = "//iframe[contains(@id, 'unzer-expiry-iframe')]";
-    private string $CVCIframe = "//iframe[contains(@id, 'unzer-cvc-iframe')]";
-    private string $cardNumberInput = "//input[@id='card-number']";
-    private string $expireDateInput = "//input[@id='card-expiry-date']";
-    private string $CVCInput = "//input[@id='card-ccv']";
-    private string $toCompleteAuthentication = "Click here to complete authentication.";
-    private string $newCard = "#addNewCardCheckboxLabel";
-    private string $saveCard = "#oscunzersavepayment";
-    private string $useSavedCardForPayment = '//*[@id="payment-saved-cards"]/table/tbody/tr/td[3]/input';
-    private string $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
-    private string $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
-    private string $loginInput = "#email";
+    public string $cardPaymentLabel = "//label[@for='payment_oscunzer_card']";
+    public string $cardNumberIframe = "//iframe[contains(@id, 'unzer-number-iframe')]";
+    public string $expireDateIframe = "//iframe[contains(@id, 'unzer-expiry-iframe')]";
+    public string $CVCIframe = "//iframe[contains(@id, 'unzer-cvc-iframe')]";
+    public string $cardNumberInput = "//input[@id='card-number']";
+    public string $expireDateInput = "//input[@id='card-expiry-date']";
+    public string $CVCInput = "//input[@id='card-ccv']";
+    public string $toCompleteAuthentication = "Click here to complete authentication.";
+    public string $newCard = "#addNewCardCheckboxLabel";
+    public string $saveCard = "#oscunzersavepayment";
+    public string $useSavedCardForPayment = '//*[@id="payment-saved-cards"]/table/tbody/tr/td[3]/input';
+    public string $acceptAllCookiesButton = "//button[@id='acceptAllButton']";
+    public string $paypalPaymentLabel = "//label[@for='payment_oscunzer_paypal']";
+    public string $loginInput = "#email";
     private string $passwordInput = "#password";
     private string $loginButton = "#btnLogin";
     private string $submitButton = "#payment-submit-btn";
@@ -46,6 +46,7 @@ final class SavePaymentCCPPCest extends BaseCest
     private string $savePayPalAccountInNextStepInputSelector = "//*[@id='oscunzersavepayment']";
     private string $savePaymentDeletePayPalButtonSelector = "button.btn-danger.delete-paypal";
     private string $savePaymentDeleteCreditCardButtonSelector = "button.btn-danger.delete-cc";
+    public string $cardNumberHolder = "//input[@id='card-holder']";
 
     /**
      * @group unzer_module
@@ -252,7 +253,7 @@ final class SavePaymentCCPPCest extends BaseCest
     public function testPaymentUsingSavedCardWorks(AcceptanceTester $I)
     {
         $I->wantToTest('if user can pay with a saved card');
-        $this->updateArticleStockAndFlag();
+        $this->updateArticleStockAndFlag(15, 1);
         $this->initializeTest();
 
         $this->useSavedCardToPay();
@@ -269,7 +270,7 @@ final class SavePaymentCCPPCest extends BaseCest
     public function testPaymentCardCanSavePayment(AcceptanceTester $I)
     {
         $I->wantToTest('if a user can save card as a payment method');
-        $this->updateArticleStockAndFlag();
+        $this->updateArticleStockAndFlag(15, 1);
         $this->initializeTest();
 
         $this->submitCreditCardPaymentAndSavePayment('mastercard_payment', false, true);
@@ -286,7 +287,7 @@ final class SavePaymentCCPPCest extends BaseCest
     public function testCannotSaveCardTwice(AcceptanceTester $I)
     {
         $I->wantToTest('user can not save a card twice');
-        $this->updateArticleStockAndFlag();
+        $this->updateArticleStockAndFlag(15, 1);
         $this->initializeTest();
 
         $this->submitCreditCardPaymentAndSavePayment('mastercard_payment', true, true);
@@ -386,42 +387,5 @@ final class SavePaymentCCPPCest extends BaseCest
         $this->I->click($this->useSavedCardForPayment);
 
         $orderPage->submitOrder();
-    }
-    /**
-     * @throws \Exception
-     */
-    private function finishCardSubmit(string $name): void
-    {
-        $fixtures = Fixtures::get($name);
-        $this->I->waitForElement($this->cardNumberIframe);
-        $this->I->switchToIFrame($this->cardNumberIframe);
-        $this->I->wait(5);
-        $this->I->fillField($this->cardNumberInput, $fixtures['cardnumber']);
-        $this->I->switchToNextTab(1);
-        $this->I->switchToIFrame($this->expireDateIframe);
-        $this->I->fillField($this->expireDateInput, '12/' . date('y'));
-        $this->I->switchToNextTab(1);
-        $this->I->switchToIFrame($this->CVCIframe);
-        $this->I->fillField($this->CVCInput, $fixtures['CVC']);
-        $this->I->switchToFrame(null);
-    }
-
-
-    private function checkCreditCardPayment()
-    {
-        $this->I->waitForText($this->toCompleteAuthentication, 60);
-        $this->I->click($this->toCompleteAuthentication);
-
-        $this->checkSuccessfulPayment();
-    }
-
-    private function updateArticleStockAndFlag()
-    {
-        $article = Fixtures::get('product');
-        $this->I->updateInDatabase(
-            'oxarticles',
-            ['OXSTOCK' => 15, 'OXSTOCKFLAG' => 1],
-            ['OXID' => $article['id']]
-        );
     }
 }
