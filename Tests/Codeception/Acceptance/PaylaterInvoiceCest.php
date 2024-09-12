@@ -16,6 +16,7 @@ use OxidSolutionCatalysts\Unzer\Tests\Codeception\AcceptanceTester;
 /**
  * @group unzer_module
  * @group SecondGroup
+ * @group PaylaterInvoiceCest
  */
 final class PaylaterInvoiceCest extends BaseCest
 {

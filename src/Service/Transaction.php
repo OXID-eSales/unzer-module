@@ -167,13 +167,15 @@ class Transaction
             $unzerCancelReason = $unzerCancel->getReasonCode() ?? '';
         }
 
+        $customerData = $this->getCustomerTypeAndCurrencyByOrderId($orderid);
+
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'cancelreason' => $unzerCancelReason,
-            'customertype' => '',
+            'customertype' => $customerData['customertype'],
         ];
 
         if ($unzerCancel) {
@@ -677,12 +679,13 @@ class Transaction
 
     private function getBasicSaveParameters(string $orderId, string $userId): array
     {
+        $customerData = $this->getCustomerTypeAndCurrencyByOrderId($orderId);
         return [
             'oxorderid' => $orderId,
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-            'customertype' => '',
+            'customertype' => $customerData['customertype'],
         ];
     }
 
