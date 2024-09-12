@@ -230,7 +230,8 @@
     }
 [{/capture}]
 [{capture assign="unzerCardPreventEmpty"}]
-    const submitButton = document.querySelector("#orderConfirmAgbBottom > div.well.well-sm.cart-buttons > button");
+    const submitButton = document.querySelector("#orderConfirmAgbBottom button.submitButton");
+console.log(submitButton);
     const radioButtons = document.querySelectorAll('input[type="radio"].paymenttypeid');
     const overrideCheckbox1 = document.getElementById("oscunzersavepayment");
     const overrideCheckbox2 = document.getElementById("newccard");
