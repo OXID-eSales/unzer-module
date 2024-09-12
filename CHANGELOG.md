@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - fix: only OK, NOT_FINISHED or CANCEL in oxorder->oxtranstatus allowed
 - fix showing correct amount when cancelling in admin
 - default Amount for Unzer Payments between 1 Euro and 10.000 Euros
+- prevent clicking buy now if no new or vaulted creditcard are selected
 
 ## [1.1.3] - 2023-11-14
 
