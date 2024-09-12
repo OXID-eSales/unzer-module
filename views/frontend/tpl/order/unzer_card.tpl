@@ -88,7 +88,6 @@
     <script>
 [{/if}]
 [{capture assign="unzerCardJS"}]
-
     let newCardCheckbox = $('input[name="newccard"]');
     let savedCardsTableEl = $('#payment-saved-cards');
     let paymentFormCardEl = $('#payment-form-card');
@@ -104,7 +103,6 @@
     });
 
     orderConfirmAgbBottom.submit(function(event) {
-
         if ($(this).hasClass('new-card-selected') && !$(this).hasClass("submitable")) {
             event.preventDefault();
             paymentFormCardEl.submit();
@@ -231,7 +229,37 @@
 
     }
 [{/capture}]
+[{capture assign="unzerCardPreventEmpty"}]
+    const submitButton = document.querySelector("#orderConfirmAgbBottom button.submitButton");
+    const radioButtons = document.querySelectorAll('input[type="radio"].paymenttypeid');
+    const overrideCheckbox1 = document.getElementById("oscunzersavepayment");
+    const overrideCheckbox2 = document.getElementById("newccard");
+
+    function updateSubmitButtonState() {
+        const isRadioSelected = Array.from(radioButtons).some(radio => radio.checked);
+        const isAnyCheckboxChecked = (overrideCheckbox1 && overrideCheckbox1.checked) ||
+                                     (overrideCheckbox2 && overrideCheckbox2.checked);
+
+        submitButton.disabled = !(isRadioSelected || isAnyCheckboxChecked);
+    }
+
+    if (radioButtons.length > 0) {
+        submitButton.disabled = true;
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', updateSubmitButtonState);
+        });
+
+        if (overrideCheckbox1) {
+            overrideCheckbox1.addEventListener('change', updateSubmitButtonState);
+        }
+
+        if (overrideCheckbox2) {
+            overrideCheckbox2.addEventListener('change', updateSubmitButtonState);
+        }
+    }
+[{/capture}]
 [{if false}]
     </script>
 [{/if}]
 [{oxscript add=$unzerCardJS}]
+[{oxscript add=$unzerCardPreventEmpty}]
