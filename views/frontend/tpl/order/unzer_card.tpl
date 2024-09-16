@@ -152,7 +152,6 @@
                         .attr('type', 'hidden')
                         .attr('name', 'oscunzersavepayment')
                         .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
-
                     orderConfirmAgbBottom.find(".hidden")
                         .append(hiddenInput2)
                         .append(hiddenInput);
@@ -237,23 +236,45 @@
         const isAnyCheckboxChecked = (overrideCheckbox1 && overrideCheckbox1.checked) ||
                                      (overrideCheckbox2 && overrideCheckbox2.checked);
 
-        submitButton.disabled = !(isRadioSelected || isAnyCheckboxChecked);
+        const cardholderInput = document.querySelector('#card-element-id-cardholder iframe');
+        const cardnumberInput = document.querySelector('#card-element-id-number iframe');
+        const cvcInput = document.querySelector('#card-element-id-cvc iframe');
+        const expiryInput = document.querySelector('#card-element-id-expiry iframe');
+
+        const areCardFieldsPresent = cardholderInput && cardnumberInput && cvcInput && expiryInput;
+
+        const shouldEnableSubmit = areCardFieldsPresent || isRadioSelected || isAnyCheckboxChecked;
+
+        submitButton.disabled = !shouldEnableSubmit;
     }
 
-    if (radioButtons.length > 0) {
-        submitButton.disabled = true;
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', updateSubmitButtonState);
+    submitButton.disabled = true;
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', updateSubmitButtonState);
+    });
+
+    if (overrideCheckbox1) {
+        overrideCheckbox1.addEventListener('change', updateSubmitButtonState);
+    }
+
+    if (overrideCheckbox2) {
+        overrideCheckbox2.addEventListener('change', updateSubmitButtonState);
+    }
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                updateSubmitButtonState();
+            }
         });
+    });
 
-        if (overrideCheckbox1) {
-            overrideCheckbox1.addEventListener('change', updateSubmitButtonState);
-        }
+    observer.observe(document.body, { childList: true, subtree: true });
 
-        if (overrideCheckbox2) {
-            overrideCheckbox2.addEventListener('change', updateSubmitButtonState);
-        }
-    }
+    updateSubmitButtonState();
+
+    setInterval(updateSubmitButtonState, 1000);
 [{/capture}]
 [{if false}]
     </script>
