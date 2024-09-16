@@ -113,7 +113,6 @@
         orderConfirmAgbBottom.removeClass('new-card-selected');
     });
 
-    // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]",  holderEnabled: true });
     if (savedCardsTableEl.length) {
         cardsCount = parseInt($('input[name=savedCardsCount]').attr('value'), 10);
@@ -128,10 +127,8 @@
         addPaymentElements(Card);
     } else {
         newCardCheckbox.on('change', function() {
-
             Card = unzerInstance.Card();
             if ($(this).prop('checked')) {
-                // Create a Card instance and render the input fields
                 addPaymentElements(Card);
             } else {
                 removeCardElements();
@@ -205,7 +202,7 @@
     });
     function removeCardElements() {
         $('#card-element-id-number').empty();
-        $('#card-element-id-name').empty();
+        $('#card-element-id-cardholder').empty();
         $('#card-element-id-expiry').empty();
         $('#card-element-id-cvc').empty();
     }
