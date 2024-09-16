@@ -53,11 +53,11 @@ class AccountSavedPaymentController extends AccountController
         $ids = $transactionService->getTransactionIds($this->getUser());
         $paymentTypes = false;
         foreach ($ids as $typeData) {
-            $paymentTypeId = $typeData['PAYMENTTYPEID'];
-            $paymentId = (string)$typeData['OXPAYMENTTYPE'];
-            $currency = $typeData['CURRENCY'];
-            $customerType = $typeData['CUSTOMERTYPE'];
-            $transactionOxId = $typeData['OXID'];
+            $paymentTypeId = $typeData['paymenttypeid'];
+            $paymentId = (string)$typeData['oxpaymenttype'];
+            $currency = $typeData['currency'];
+            $customerType = $typeData['customertype'];
+            $transactionOxId = $typeData['oxid'];
 
             if (empty($paymentTypeId)) {
                 continue;

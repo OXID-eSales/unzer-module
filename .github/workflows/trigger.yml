@@ -11,15 +11,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  p80m57both:
-    name: 'Php-8.0-Mysql-5.7'
-    uses: ./.github/workflows/development.yml
-    secrets: inherit
-    with:
-      php: '8.0'
-      mysql: '5.7.37'
-      report_sonarcloud: true
-
   p81m80both:
     name: 'Php-8.1-Mysql-8.0'
     uses: ./.github/workflows/development.yml

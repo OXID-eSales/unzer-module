@@ -19,7 +19,7 @@
                 <div class="row">
                     <div class="col-3">
                         <strong>{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</strong>
-                        <span>>{{ paymentType.number }}</span>
+                        <span>{{ paymentType.number }}</span>
                     </div>
                     <div class="col-3">
                         <strong>{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</strong>
@@ -54,13 +54,13 @@
                 <div class="row">
                     <div class="col-3">
                         <strong>{{ translate({ ident: "EMAIL" }) }}</strong>
-                        <span id="accOrderDate_25">>{{ paymentType.email }}</span>
+                        <span id="accOrderDate_25">{{ paymentType.email }}</span>
                     </div>
                     <div class="col-3"></div>
                     <div class="col-3">
                         <strong>{{ translate({ ident: "OSCUNZER_BRAND" }) }}</strong>
                         <span>
-                                    <span>{{ type }}</span>
+                            <span>{{ type }}</span>
                         </span>
                     </div>
                     <div class="col-3">
@@ -127,8 +127,3 @@
 
 {{ insert_tracker({title: template_title}) }}
 {% include "layout/page.html.twig" %}
-
-
-
-
-

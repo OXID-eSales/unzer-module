@@ -1,42 +1,38 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
 {% if unzerPaymentType %}
-<div class="savedpayment">
-    {% for type, setting in unzerPaymentType %}
-    {% if type != 'paypal' and type != 'sepa' %}
-    <form id="payment-saved-cards" class="unzerUI form" novalidate>
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</th>
-                <th scope="col">{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</th>
-                <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
-                <th scope="col"></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% set counter = 0 %}
+    <div class="savedpayment">
+        {% for type, setting in unzerPaymentType %}
+            {% if type != 'paypal' and type != 'sepa' %}
+            <form id="payment-saved-cards" class="unzerUI form" novalidate>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</th>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</th>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set counter = 0 %}
+                    {% for paymenttypeid, paymentType in setting %}
+                        <tr>
+                            <th scope="row">{{ paymentType.number }}</th>
+                            <td>{{ paymentType.expiryDate }}</td>
+                            <td>{{ type }}</td>
 
-
-            {% for paymenttypeid, paymentType in setting %}
-                <tr>
-                    <th scope="row">{{ paymentType.number }}</th>
-                    <td>{{ paymentType.expiryDate }}</td>
-                    <td>{{ type }}</td>
-
-                    <td>
-                        <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
-                    </td>
-                </tr>
-            {% endfor %}
-
-
-            </tbody>
-        </table>
-    </form>
-    {% endif %}
-    {% endfor %}
-</div>
-    {% endif %}
+                            <td>
+                                <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
 
 {% if unzerPaymentType != false  %}
 <br>
@@ -49,6 +45,11 @@
 
         <div class="field">
             <div id="card-element-id-number" class="unzerInput">
+                <!-- Card number UI Element will be inserted here. -->
+            </div>
+        </div>
+        <div class="field">
+            <div id="card-element-id-cardholder" class="unzerInput">
                 <!-- Card number UI Element will be inserted here. -->
             </div>
         </div>
@@ -152,8 +153,13 @@
             hiddenInput.name = 'paymentData';
             hiddenInput.value = paymentDataString;
             let form = document.getElementById('orderConfirmAgbBottom');
-            form.classList.add("submitable")
-            form.appendChild(hiddenInput)
+            form.classList.add("submitable");
+            form.appendChild(hiddenInput);
+            let hiddenInput2 = document.createElement('input');
+            hiddenInput2.type = 'hidden';
+            hiddenInput2.name = 'is_saved_payment_in_action';
+            hiddenInput2.value = 1;
+            form.appendChild(hiddenInput2);
             form.submit();
         } else {
             Card.createResource()
@@ -205,6 +211,10 @@
             containerId: 'card-element-id-number',
             onlyIframe: false
         });
+        Card.create('holder', {
+            containerId: 'card-element-id-cardholder',
+            onlyIframe: false
+        });
         Card.create('expiry', {
             containerId: 'card-element-id-expiry',
             onlyIframe: false
@@ -220,6 +230,7 @@
         document.getElementById('card-element-id-number').innerHTML = '';
         document.getElementById('card-element-id-expiry').innerHTML = '';
         document.getElementById('card-element-id-cvc').innerHTML = '';
+        document.getElementById('card-element-id-cardholder').innerHTML = '';
     }
 
 {% endcapture %}

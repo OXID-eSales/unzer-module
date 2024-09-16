@@ -50,6 +50,7 @@ return [
     // Payment data for Credit card using Mastercard
     'mastercard_payment' => [
         "cardnumber" => "5453010000059543",
+        "cardholder" => "Adam Smith",
         "CVC" => "123",
         "3DSpassword" => "secret3"
     ],
@@ -57,6 +58,7 @@ return [
     // Payment data for Credit card using Visa
     'visa_payment' => [
         "cardnumber" => "4711100000000000",
+        "cardholder" => "Joe Boe",
         "CVC" => "123",
         "3DSpassword" => "secret3"
     ],

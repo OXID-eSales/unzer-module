@@ -75,18 +75,18 @@ final class BancontactCest extends BaseCest
         $price = str_replace(',', '.', $this->getPrice());
         $fixtures = Fixtures::get($name);
 
-        $this->getAcceptance()->waitForText($price);
-        $this->getAcceptance()->waitForElement($this->cardNumberInput);
-        $this->getAcceptance()->fillField($this->cardNumberInput, $fixtures['cardnumber']);
-        $this->getAcceptance()->selectOption($this->monthExpiredSelect, 12);
-        $this->getAcceptance()->selectOption($this->yearExpiredSelect, date('Y'));
-        $this->getAcceptance()->fillField($this->cvvCodeInput, $fixtures['CVC']);
-        $this->getAcceptance()->click($this->continueButton);
+        $this->I->waitForText($price);
+        $this->I->waitForElement($this->cardNumberInput);
+        $this->I->fillField($this->cardNumberInput, $fixtures['cardnumber']);
+        $this->I->selectOption($this->monthExpiredSelect, 12);
+        $this->I->selectOption($this->yearExpiredSelect, date('Y'));
+        $this->I->fillField($this->cvvCodeInput, $fixtures['CVC']);
+        $this->I->click($this->continueButton);
 
-        $this->getAcceptance()->waitForPageLoad();
-        $this->getAcceptance()->waitForText($price);
-        $this->getAcceptance()->waitForElement($this->continueButton, 30);
-        $this->getAcceptance()->click($this->continueButton);
+        $this->I->waitForPageLoad();
+        $this->I->waitForText($price);
+        $this->I->waitForElement($this->continueButton, 30);
+        $this->I->click($this->continueButton);
     }
 
     /**

@@ -17,12 +17,14 @@ use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentSessionService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
+use UnzerSDK\Constants\RecurrenceTypes;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Interfaces\UnzerParentInterface;
 use UnzerSDK\Resources\Basket as UnzerResourceBasket;
@@ -31,6 +33,7 @@ use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaymentTypePaypal;
+use UnzerSDK\Resources\PaymentTypes\Prepayment as UnzerSDKPaymentTypePrepayment;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -145,7 +148,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $transaction = $this->doTransactions($basketModel, $customer, $userModel, $paymentType);
         $this->unzerService->setSessionVars($transaction);
 
-        if ($transaction instanceof Charge) {
+        if ($transaction instanceof Charge && $paymentType instanceof UnzerSDKPaymentTypePrepayment) {
             $prePaymentService = $this->getServiceFromContainer(PrePaymentBankAccountService::class);
             $prePaymentService->persistBankAccountInfo($transaction);
         }
@@ -344,8 +347,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         foreach ($card2 as $card) {
             if (
                 $card1->getNumber() === $card['number'] &&
-                $card1->getExpiryDate() === $card['expiryDate'] &&
-                $card1->getCardHolder() === $card['cardHolder']
+                $card1->getExpiryDate() === $card['expiryDate']
             ) {
                 return true;
             }

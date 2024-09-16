@@ -126,11 +126,10 @@ abstract class BaseCest
 
     protected function initializeTest(): void
     {
-        $miniBasketMenuElement = '//button[@class="btn btn-minibasket"]';
+        $this->I->wantTo('init open a shop');
+
         $this->I->openShop();
-
         $basketItem = Fixtures::get('product');
-
         $params['fnc'] = 'tobasket';
         $params['aid'] = $basketItem['id'];
         $params['am'] = $this->amount;
@@ -145,6 +144,7 @@ abstract class BaseCest
         }
 
         $this->I->amOnPage('/index.php?' . http_build_query($params));
+        $miniBasketMenuElement = '//button[@class="btn btn-minibasket"]';
         $this->I->waitForElement($miniBasketMenuElement);
         $this->I->waitForPageLoad();
 
@@ -269,14 +269,6 @@ abstract class BaseCest
         $this->I->wait(5);
         $this->I->click($submitButton);
         $this->I->waitForPageLoad(30);
-    }
-
-    /**
-     * @return AcceptanceTester
-     */
-    protected function getAcceptance(): AcceptanceTester
-    {
-        return $this->I;
     }
 
     /**

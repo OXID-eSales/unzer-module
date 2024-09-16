@@ -630,13 +630,13 @@ class Transaction
         $tmpArr = [];
         foreach ($ids as $typeData) {
             $paymentTypes = null;
-            $paymentTypeId = $typeData['PAYMENTTYPEID'] ?: '';
+            $paymentTypeId = $typeData['paymenttypeid'] ?: '';
             if ($paymentTypeId) {
                 $paymentTypes = $this->setPaymentTypes(
                     $user,
-                    $typeData['PAYMENTTYPEID'] ?: '',
-                    $typeData['CURRENCY'] ?: '',
-                    $typeData['CUSTOMERTYPE'] ?: '',
+                    $typeData['paymenttypeid'] ?: '',
+                    $typeData['currency'] ?: '',
+                    $typeData['customertype'] ?: '',
                     $paymentTypeId
                 );
             }
