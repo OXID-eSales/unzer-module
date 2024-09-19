@@ -113,7 +113,6 @@
         orderConfirmAgbBottom.removeClass('new-card-selected');
     });
 
-    // Create an Unzer instance with your public key
     let unzerInstance = new unzer('[{$unzerpub}]', {locale: "[{$unzerLocale}]",  holderEnabled: true });
     if (savedCardsTableEl.length) {
         cardsCount = parseInt($('input[name=savedCardsCount]').attr('value'), 10);
@@ -128,10 +127,8 @@
         addPaymentElements(Card);
     } else {
         newCardCheckbox.on('change', function() {
-
             Card = unzerInstance.Card();
             if ($(this).prop('checked')) {
-                // Create a Card instance and render the input fields
                 addPaymentElements(Card);
             } else {
                 removeCardElements();
@@ -155,7 +152,6 @@
                         .attr('type', 'hidden')
                         .attr('name', 'oscunzersavepayment')
                         .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
-
                     orderConfirmAgbBottom.find(".hidden")
                         .append(hiddenInput2)
                         .append(hiddenInput);
@@ -205,7 +201,7 @@
     });
     function removeCardElements() {
         $('#card-element-id-number').empty();
-        $('#card-element-id-name').empty();
+        $('#card-element-id-cardholder').empty();
         $('#card-element-id-expiry').empty();
         $('#card-element-id-cvc').empty();
     }
@@ -240,23 +236,45 @@
         const isAnyCheckboxChecked = (overrideCheckbox1 && overrideCheckbox1.checked) ||
                                      (overrideCheckbox2 && overrideCheckbox2.checked);
 
-        submitButton.disabled = !(isRadioSelected || isAnyCheckboxChecked);
+        const cardholderInput = document.querySelector('#card-element-id-cardholder iframe');
+        const cardnumberInput = document.querySelector('#card-element-id-number iframe');
+        const cvcInput = document.querySelector('#card-element-id-cvc iframe');
+        const expiryInput = document.querySelector('#card-element-id-expiry iframe');
+
+        const areCardFieldsPresent = cardholderInput && cardnumberInput && cvcInput && expiryInput;
+
+        const shouldEnableSubmit = areCardFieldsPresent || isRadioSelected || isAnyCheckboxChecked;
+
+        submitButton.disabled = !shouldEnableSubmit;
     }
 
-    if (radioButtons.length > 0) {
-        submitButton.disabled = true;
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', updateSubmitButtonState);
+    submitButton.disabled = true;
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', updateSubmitButtonState);
+    });
+
+    if (overrideCheckbox1) {
+        overrideCheckbox1.addEventListener('change', updateSubmitButtonState);
+    }
+
+    if (overrideCheckbox2) {
+        overrideCheckbox2.addEventListener('change', updateSubmitButtonState);
+    }
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                updateSubmitButtonState();
+            }
         });
+    });
 
-        if (overrideCheckbox1) {
-            overrideCheckbox1.addEventListener('change', updateSubmitButtonState);
-        }
+    observer.observe(document.body, { childList: true, subtree: true });
 
-        if (overrideCheckbox2) {
-            overrideCheckbox2.addEventListener('change', updateSubmitButtonState);
-        }
-    }
+    updateSubmitButtonState();
+
+    setInterval(updateSubmitButtonState, 1000);
 [{/capture}]
 [{if false}]
     </script>
