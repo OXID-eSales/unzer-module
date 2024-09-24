@@ -8,7 +8,6 @@
 namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 
 use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
-use OxidSolutionCatalysts\Unzer\Service\Translator;
 use PHPUnit\Framework\TestCase;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 
@@ -18,12 +17,7 @@ class FlexibleSerializerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->translatorMock = $this->createMock(Translator::class);
-        $this->translatorMock->method('translate')
-            ->with('NOT_SERIALIZABLE')
-            ->willReturn('NOT_SERIALIZABLE: ');
-
-        $this->flexibleSerializer = new FlexibleSerializer($this->translatorMock);
+        $this->flexibleSerializer = new FlexibleSerializer();
 
         // Define mock classes
         if (!class_exists('OxidEsales\Eshop\Application\Model\Order', false)) {
@@ -40,23 +34,11 @@ class FlexibleSerializerTest extends TestCase
         }
     }
 
-    public function testSafeSerializeAndUnserializeSimpleObject(): void
-    {
-        $testObject = new \stdClass();
-        $testObject->name = 'Test';
-        $testObject->value = 42;
-
-        $serialized = $this->flexibleSerializer->safeSerialize($testObject);
-        $unserialized = $this->flexibleSerializer->safeUnserialize($serialized);
-
-        $this->assertEquals($testObject, $unserialized);
-    }
-
     public function testSafeSerializeAndUnserializeWithNonSerializableProperty(): void
     {
         $testObject = new \stdClass();
         $testObject->name = 'Test';
-        $testObject->resource = fopen('php://memory', 'r');
+        $testObject->resource = fopen('php://memory', 'rb');
 
         $serialized = $this->flexibleSerializer->safeSerialize($testObject);
         $unserialized = $this->flexibleSerializer->safeUnserialize($serialized);
@@ -71,7 +53,7 @@ class FlexibleSerializerTest extends TestCase
         $order->id = 1;
         $order->customerName = 'John Doe';
 
-        $serialized = serialize($order);
+        $serialized = $this->flexibleSerializer->safeSerialize($order);
         $unserialized = $this->flexibleSerializer->safeUnserialize(
             $serialized,
             [\OxidEsales\Eshop\Application\Model\Order::class]
@@ -80,6 +62,18 @@ class FlexibleSerializerTest extends TestCase
         $this->assertInstanceOf(\OxidEsales\Eshop\Application\Model\Order::class, $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
+    }
+
+    public function testSafeSerializeAndUnserializeSimpleObject(): void
+    {
+        $testObject = new \stdClass();
+        $testObject->name = 'Test';
+        $testObject->value = 42;
+
+        $serialized = $this->flexibleSerializer->safeSerialize($testObject);
+        $unserialized = $this->flexibleSerializer->safeUnserialize($serialized);
+
+        $this->assertEquals($testObject, $unserialized);
     }
 
     public function testSafeUnserializeWithoutAllowedClasses(): void

@@ -14,14 +14,6 @@ use stdClass;
 
 class FlexibleSerializer
 {
-    protected Translator $translator;
-
-    public function __construct(
-        Translator $translator
-    ) {
-        $this->translator = $translator;
-    }
-
     /**
      * Safely serialize an object
      *
@@ -70,8 +62,7 @@ class FlexibleSerializer
                 try {
                     $serializableObj->$key = $this->makeSerializable($value);
                 } catch (Exception $e) {
-                    /** @var object $value */
-                    $serializableObj->$key = $this->translator->translate('NOT_SERIALIZABLE') . get_class($value);
+                    $serializableObj->$key = null;
                 }
             }
             return $serializableObj;
@@ -83,11 +74,7 @@ class FlexibleSerializer
                 try {
                     $serializableArray[$key] = $this->makeSerializable($value);
                 } catch (Exception $e) {
-                    $serializableArray[$key] = $this->translator->translate('NOT_SERIALIZABLE') . (
-                        is_object($value) ?
-                            get_class($value) :
-                            gettype($value)
-                        );
+                    $serializableArray[$key] = null;
                 }
             }
             return $serializableArray;
@@ -107,17 +94,15 @@ class FlexibleSerializer
     private function restoreUnserializable($var, array $allowedClasses)
     {
         if (is_object($var)) {
-            if (isset($var->__class)) {
+            if (isset($var->__class) && $this->isAllowedClass($var->__class, $allowedClasses)) {
                 $className = $var->__class;
-                if ($this->isAllowedClass($className, $allowedClasses)) {
-                    $reflection = new ReflectionClass($className);
-                    $restoredObject = $reflection->newInstanceWithoutConstructor();
-                    unset($var->__class);
-                    foreach (get_object_vars($var) as $key => $value) {
-                        $restoredObject->$key = $this->restoreUnserializable($value, $allowedClasses);
-                    }
-                    return $restoredObject;
+                $reflection = new ReflectionClass($className);
+                $restoredObject = $reflection->newInstanceWithoutConstructor();
+                unset($var->__class);
+                foreach (get_object_vars($var) as $key => $value) {
+                    $restoredObject->$key = $this->restoreUnserializable($value, $allowedClasses);
                 }
+                return $restoredObject;
             }
 
             $result = new stdClass();
@@ -140,25 +125,13 @@ class FlexibleSerializer
         return $var;
     }
 
-    /**
-     * Check if a class is allowed based on inheritance
-     *
-     * @param string $className The class name to check
-     * @param array $allowedClasses An array of allowed class names
-     * @return bool Whether the class is allowed
-     */
     private function isAllowedClass(string $className, array $allowedClasses): bool
     {
-        if (in_array($className, $allowedClasses, true)) {
-            return true;
-        }
-
         foreach ($allowedClasses as $allowedClass) {
-            if (is_subclass_of($className, $allowedClass)) {
+            if ($className === $allowedClass || is_subclass_of($className, $allowedClass)) {
                 return true;
             }
         }
-
         return false;
     }
 }
