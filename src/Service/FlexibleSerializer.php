@@ -99,6 +99,7 @@ class FlexibleSerializer
      * @param array $allowedClasses An array of allowed class names
      * @return mixed The restored variable
      * @throws ReflectionException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function restoreUnserializable($var, array $allowedClasses)
     {

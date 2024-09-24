@@ -40,7 +40,8 @@ class FlexibleSerializerTest extends TestCase
             public string $name = 'Test';
             public $resource;
 
-            public function __construct() {
+            public function __construct()
+            {
                 $this->resource = fopen('php://memory', 'rb');
             }
         };
