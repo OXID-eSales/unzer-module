@@ -43,7 +43,15 @@ class FlexibleSerializer
      */
     public function safeUnserialize(string $serialized, array $allowedClasses = [])
     {
-        $unserializedData = unserialize($serialized, ['allowed_classes' => array_merge($allowedClasses, [stdClass::class])]);
+        $unserializedData = unserialize(
+            $serialized,
+            [
+                'allowed_classes' => array_merge(
+                    $allowedClasses,
+                    [stdClass::class]
+                )
+            ]
+        );
         return $this->restoreUnserializable($unserializedData, $allowedClasses);
     }
 
@@ -62,6 +70,7 @@ class FlexibleSerializer
                 try {
                     $serializableObj->$key = $this->makeSerializable($value);
                 } catch (Exception $e) {
+                    /** @var object $value */
                     $serializableObj->$key = $this->translator->translate('NOT_SERIALIZABLE') . get_class($value);
                 }
             }
@@ -74,7 +83,11 @@ class FlexibleSerializer
                 try {
                     $serializableArray[$key] = $this->makeSerializable($value);
                 } catch (Exception $e) {
-                    $serializableArray[$key] = $this->translator->translate('NOT_SERIALIZABLE') . (is_object($value) ? get_class($value) : gettype($value));
+                    $serializableArray[$key] = $this->translator->translate('NOT_SERIALIZABLE') . (
+                        is_object($value) ?
+                            get_class($value) :
+                            gettype($value)
+                        );
                 }
             }
             return $serializableArray;
@@ -148,5 +161,4 @@ class FlexibleSerializer
 
         return false;
     }
-
 }

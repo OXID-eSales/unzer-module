@@ -10,6 +10,7 @@ namespace OxidSolutionCatalysts\Unzer\Tests\Unit\Service;
 use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use PHPUnit\Framework\TestCase;
+use OxidSolutionCatalysts\Unzer\Model\Order;
 
 class FlexibleSerializerTest extends TestCase
 {
@@ -17,12 +18,26 @@ class FlexibleSerializerTest extends TestCase
 
     protected function setUp(): void
     {
-        $translatorMock = $this->createMock(Translator::class);
-        $translatorMock->method('translate')
-            ->with('OSCUNZER_NOT_SERIALIZABLE')
-            ->willReturn('NOT SERIALIZABLE: ');
+        $this->translatorMock = $this->createMock(Translator::class);
+        $this->translatorMock->method('translate')
+            ->with('NOT_SERIALIZABLE')
+            ->willReturn('NOT_SERIALIZABLE: ');
 
-        $this->flexibleSerializer = new FlexibleSerializer($translatorMock);
+        $this->flexibleSerializer = new FlexibleSerializer($this->translatorMock);
+
+        // Define mock classes
+        if (!class_exists('OxidEsales\Eshop\Application\Model\Order', false)) {
+            class_alias(new class {
+                public int $id;
+                public string $customerName;
+            }, 'OxidEsales\Eshop\Application\Model\Order');
+        }
+
+        if (!class_exists('OxidSolutionCatalysts\Unzer\Model\Order', false)) {
+            class_alias(new class extends \OxidEsales\Eshop\Application\Model\Order {
+                public string $extraField;
+            }, 'OxidSolutionCatalysts\Unzer\Model\Order');
+        }
     }
 
     public function testSafeSerializeAndUnserializeSimpleObject(): void
@@ -52,26 +67,52 @@ class FlexibleSerializerTest extends TestCase
 
     public function testSafeUnserializeWithAllowedClasses(): void
     {
-        $testObject = new TestSerializableClass();
-        $testObject->name = 'Test';
+        $order = new \OxidEsales\Eshop\Application\Model\Order();
+        $order->id = 1;
+        $order->customerName = 'John Doe';
 
-        $serialized = serialize($testObject);
-        $unserialized = $this->flexibleSerializer->safeUnserialize($serialized, [TestSerializableClass::class]);
+        $serialized = serialize($order);
+        $unserialized = $this->flexibleSerializer->safeUnserialize(
+            $serialized,
+            [\OxidEsales\Eshop\Application\Model\Order::class]
+        );
 
-        $this->assertInstanceOf(TestSerializableClass::class, $unserialized);
-        $this->assertEquals('Test', $unserialized->name);
+        $this->assertInstanceOf(\OxidEsales\Eshop\Application\Model\Order::class, $unserialized);
+        $this->assertEquals(1, $unserialized->id);
+        $this->assertEquals('John Doe', $unserialized->customerName);
     }
 
     public function testSafeUnserializeWithoutAllowedClasses(): void
     {
-        $testObject = new TestSerializableClass();
-        $testObject->name = 'Test';
+        $order = new \OxidEsales\Eshop\Application\Model\Order();
+        $order->id = 1;
+        $order->customerName = 'John Doe';
 
-        $serialized = serialize($testObject);
+        $serialized = serialize($order);
         $unserialized = $this->flexibleSerializer->safeUnserialize($serialized);
 
         $this->assertInstanceOf(\stdClass::class, $unserialized);
-        $this->assertEquals('Test', $unserialized->name);
+        $this->assertEquals(1, $unserialized->id);
+        $this->assertEquals('John Doe', $unserialized->customerName);
+    }
+
+    public function testSafeSerializeAndUnserializeExtendedObject(): void
+    {
+        $extendedOrder = new Order();
+        $extendedOrder->id = 1;
+        $extendedOrder->customerName = 'John Doe';
+        $extendedOrder->extraField = 'Extra Info';
+
+        $serialized = $this->flexibleSerializer->safeSerialize($extendedOrder);
+        $unserialized = $this->flexibleSerializer->safeUnserialize(
+            $serialized,
+            [\OxidEsales\Eshop\Application\Model\Order::class]
+        );
+
+        $this->assertInstanceOf(Order::class, $unserialized);
+        $this->assertEquals(1, $unserialized->id);
+        $this->assertEquals('John Doe', $unserialized->customerName);
+        $this->assertEquals('Extra Info', $unserialized->extraField);
     }
 
     public function testSafeSerializeAndUnserializeNestedObject(): void
@@ -90,7 +131,7 @@ class FlexibleSerializerTest extends TestCase
         $this->assertEquals(42, $unserialized->nested->value);
     }
 
-    public function testSafeSerializeAndUnserializeCustomObject()
+    public function testSafeSerializeAndUnserializeCustomObject(): void
     {
         $order = new Order();
         $order->id = 1;
@@ -103,36 +144,4 @@ class FlexibleSerializerTest extends TestCase
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
     }
-
-    public function testSafeSerializeAndUnserializeExtendedObject()
-    {
-        $extendedOrder = new ExtendedOrder();
-        $extendedOrder->id = 1;
-        $extendedOrder->customerName = 'John Doe';
-        $extendedOrder->extraField = 'Extra Info';
-
-        $serialized = $this->flexibleSerializer->safeSerialize($extendedOrder);
-        $unserialized = $this->flexibleSerializer->safeUnserialize($serialized, [Order::class]);
-
-        $this->assertInstanceOf(ExtendedOrder::class, $unserialized);
-        $this->assertEquals(1, $unserialized->id);
-        $this->assertEquals('John Doe', $unserialized->customerName);
-        $this->assertEquals('Extra Info', $unserialized->extraField);
-    }
-}
-
-class TestSerializableClass
-{
-    public string $name;
-}
-
-class Order
-{
-    public int $id;
-    public string $customerName;
-}
-
-class ExtendedOrder extends Order
-{
-    public string $extraField;
 }

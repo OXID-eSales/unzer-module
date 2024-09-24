@@ -169,9 +169,9 @@ class PaymentController extends PaymentController_parent
             $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
 
             $paymentId = $tmpOrder->getFieldData('oxpaymenttype');
-            $paymentId = $paymentId ?: '';
+            $paymentId = is_string($paymentId) ? $paymentId : '';
             $currency = $tmpOrder->getFieldData('oxcurrency');
-            $currency = $currency ?: '';
+            $currency = is_string($currency) ? $currency : '';
             $customerType = !empty($tmpOrder->getFieldData('oxdelcompany'))
             || !empty($tmpOrder->getFieldData('oxbillcompany')) ?
                 'B2B' :
