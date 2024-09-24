@@ -15,10 +15,10 @@ use stdClass;
 class FlexibleSerializer
 {
     /**
-     * Safely serialize an object
+     * Safely serialize data, handling non-serializable properties.
      *
-     * @param mixed $object The object to serialize
-     * @return string The serialized string
+     * @param mixed $object The data to be serialized.
+     * @return string The serialized data as a string.
      */
     public function safeSerialize($object): string
     {
@@ -27,11 +27,11 @@ class FlexibleSerializer
     }
 
     /**
-     * Safely unserialize a string with optional allowed classes
+     * Safely unserialize data, restoring objects of allowed classes.
      *
-     * @param string $serialized The serialized string
-     * @param array $allowedClasses An array of allowed class names
-     * @return mixed The unserialized data
+     * @param string $serialized The serialized data string.
+     * @param array $allowedClasses An array of fully qualified class names that are allowed to be unserialized.
+     * @return mixed The unserialized data.
      */
     public function safeUnserialize(string $serialized, array $allowedClasses = [])
     {
@@ -48,103 +48,115 @@ class FlexibleSerializer
     }
 
     /**
-     * Make an object or array serializable
+     * Convert data into a serializable format, handling objects and resources.
      *
-     * @param mixed $var The variable to make serializable
-     * @return mixed The serializable version of the variable
-     * @throws ReflectionException
+     * @param mixed $data The data to be made serializable.
+     * @return mixed The data in a serializable format.
      */
-    private function makeSerializable($var)
+    private function makeSerializable($data)
     {
-        if (is_object($var)) {
-            $serializableObj = new stdClass();
-            $serializableObj->__class = get_class($var);
-            $reflection = new ReflectionClass($var);
-            foreach ($reflection->getProperties() as $property) {
-                $property->setAccessible(true);
-                $key = $property->getName();
-                try {
-                    $value = $property->getValue($var);
-                    $serializableObj->$key = $this->makeSerializable($value);
-                } catch (Exception $e) {
-                    $serializableObj->$key = null;
-                }
+        if (is_object($data)) {
+            $serializable = new stdClass();
+            $serializable->__class = get_class($data);
+            foreach (get_object_vars($data) as $key => $value) {
+                $serializable->$key = $this->makeSerializable($value);
             }
-            return $serializableObj;
+            return $serializable;
         }
 
-        if (is_array($var)) {
-            $serializableArray = [];
-            foreach ($var as $key => $value) {
-                try {
-                    $serializableArray[$key] = $this->makeSerializable($value);
-                } catch (Exception $e) {
-                    $serializableArray[$key] = null;
-                }
-            }
-            return $serializableArray;
+        if (is_array($data)) {
+            return array_map([$this, 'makeSerializable'], $data);
         }
 
-        if (is_resource($var)) {
+        if (is_resource($data)) {
             return null;
         }
 
-        return $var;
+        return $data;
     }
 
     /**
-     * Restore unserializable data
+     * Restore unserializable data, including objects of allowed classes.
      *
-     * @param mixed $var The variable to restore
-     * @param array $allowedClasses An array of allowed class names
-     * @return mixed The restored variable
-     * @throws ReflectionException
+     * @param mixed $data The data to be restored.
+     * @param array $allowedClasses An array of fully qualified class names that are allowed to be restored.
+     * @return mixed The restored data.
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ElseExpression)
      */
-    private function restoreUnserializable($var, array $allowedClasses)
+    private function restoreUnserializable($data, array $allowedClasses)
     {
-        if (is_object($var)) {
-            if (isset($var->__class) && $this->isAllowedClass($var->__class, $allowedClasses)) {
-                $className = $var->__class;
+        if (is_array($data)) {
+            return array_map(function ($item) use ($allowedClasses) {
+                return $this->restoreUnserializable($item, $allowedClasses);
+            }, $data);
+        }
+
+        if (is_object($data) && isset($data->__class)) {
+            $className = $data->__class;
+            if ($this->isAllowedClass($className, $allowedClasses)) {
                 $reflection = new ReflectionClass($className);
-                $restoredObject = $reflection->newInstanceWithoutConstructor();
-                unset($var->__class);
-                foreach (get_object_vars($var) as $key => $value) {
-                    if (property_exists($restoredObject, $key)) {
-                        $property = $reflection->getProperty($key);
-                        $property->setAccessible(true);
-                        $property->setValue($restoredObject, $this->restoreUnserializable($value, $allowedClasses));
+                $restored = $reflection->newInstanceWithoutConstructor();
+                foreach (get_object_vars($data) as $key => $value) {
+                    if ($key !== '__class') {
+                        if ($reflection->hasProperty($key)) {
+                            $property = $reflection->getProperty($key);
+                            $property->setAccessible(true);
+                            $property->setValue($restored, $this->restoreUnserializable($value, $allowedClasses));
+                        } else {
+                            $restored->$key = $this->restoreUnserializable($value, $allowedClasses);
+                        }
                     }
                 }
-                return $restoredObject;
+                return $restored;
             }
+        }
 
-            $result = new stdClass();
-            foreach (get_object_vars($var) as $key => $value) {
+        if (is_object($data)) {
+            $restored = new stdClass();
+            foreach (get_object_vars($data) as $key => $value) {
                 if ($key !== '__class') {
-                    $result->$key = $this->restoreUnserializable($value, $allowedClasses);
+                    $restored->$key = $this->restoreUnserializable($value, $allowedClasses);
                 }
             }
-            return $result;
+            return $restored;
         }
 
-        if (is_array($var)) {
-            $result = [];
-            foreach ($var as $key => $value) {
-                $result[$key] = $this->restoreUnserializable($value, $allowedClasses);
-            }
-            return $result;
-        }
-
-        return $var;
+        return $data;
     }
 
+    /**
+     * Check if a given class is allowed based on the list of allowed classes.
+     *
+     * @param string $className The name of the class to check.
+     * @param array $allowedClasses An array of allowed class names.
+     * @return bool True if the class is allowed, false otherwise.
+     */
     private function isAllowedClass(string $className, array $allowedClasses): bool
     {
         foreach ($allowedClasses as $allowedClass) {
-            if ($className === $allowedClass || is_subclass_of($className, $allowedClass)) {
+            if (
+                $className === $allowedClass ||
+                is_subclass_of($className, $allowedClass) ||
+                $this->isClassAlias($className, $allowedClass)
+            ) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Check if two class names refer to the same class (are aliases).
+     *
+     * @param string $className The name of the class to check.
+     * @param string $aliasName The name of the potential alias to check against.
+     * @return bool True if the classes are aliases, false otherwise.
+     */
+    private function isClassAlias(string $className, string $aliasName): bool
+    {
+        if (class_exists($className) && class_exists($aliasName)) {
+            return (new ReflectionClass($className))->getName() === (new ReflectionClass($aliasName))->getName();
         }
         return false;
     }

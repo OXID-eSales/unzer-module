@@ -12,7 +12,8 @@
          stopOnIncomplete="false"
          stopOnSkipped="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         verbose="false">
+         verbose="false"
+         bootstrap="additional_bootstrap_phpunit.php">
     <testsuites>
         <testsuite name="UnitTests">
             <directory>Unit/</directory>
