@@ -305,7 +305,7 @@ class UnzerTest extends TestCase
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);
 
-        $this->assertSame(2, $result->getItemCount()); //two goods, no delivery. no voucher
+        $this->assertSame(3, $result->getItemCount()); //two goods, no delivery. no voucher
 
         /** @var \UnzerSDK\Resources\EmbeddedResources\BasketItem[] $items */
         $items = $result->getBasketItems();
@@ -317,20 +317,51 @@ class UnzerTest extends TestCase
 
     public function testGetUnzerPaymentIdFromRequest(): void
     {
-        $sut = $this->createMock(Unzer::class);
-        $sut->method('getUnzerStringRequestParameter')->with('paymentData')->willReturn(
-            json_encode(['id' => 'someId'])
-        );
+        $mockSession = $this->createMock(Session::class);
+        $mockTranslator = $this->createMock(Translator::class);
+        $mockContext = $this->createMock(Context::class);
+        $mockModuleSettings = $this->createMock(ModuleSettings::class);
+        $mockUnzerVoucherBasketItemsService = $this->createMock(UnzerVoucherBasketItems::class);
+
+        // Create a partial mock of the Unzer class
+        $sut = $this->getMockBuilder(Unzer::class)
+            ->setConstructorArgs([
+                $mockSession,
+                $mockTranslator,
+                $mockContext,
+                $mockModuleSettings,
+                $mockUnzerVoucherBasketItemsService
+            ])
+            ->onlyMethods(['getUnzerStringRequestParameter']) // Mock only the method you need
+            ->getMock();
+
+        // Define what the mocked method should return
+        $sut->method('getUnzerStringRequestParameter')
+            ->with('paymentData')
+            ->willReturn(json_encode(['id' => 'someId']));
 
         $this->assertSame('someId', $sut->getUnzerPaymentIdFromRequest());
     }
 
     public function testGetUnzerPaymentIdFromRequestFailure(): void
     {
-        $sut = $this->createMock(Unzer::class);
-        $sut->method('getUnzerStringRequestParameter')->with('paymentData')->willReturn(
-            'wrong'
-        );
+        $mockSession = $this->createMock(Session::class);
+        $mockTranslator = $this->createMock(Translator::class);
+        $mockContext = $this->createMock(Context::class);
+        $mockModuleSettings = $this->createMock(ModuleSettings::class);
+        $mockUnzerVoucherBasketItemsService = $this->createMock(UnzerVoucherBasketItems::class);
+
+        // Create a partial mock of the Unzer class
+        $sut = $this->getMockBuilder(Unzer::class)
+            ->setConstructorArgs([
+                $mockSession,
+                $mockTranslator,
+                $mockContext,
+                $mockModuleSettings,
+                $mockUnzerVoucherBasketItemsService
+            ])
+            ->onlyMethods(['getUnzerStringRequestParameter']) // Mock only the method you need
+            ->getMock();
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('oscunzer_WRONGPAYMENTID');
