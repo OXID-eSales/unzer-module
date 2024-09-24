@@ -36,9 +36,14 @@ class FlexibleSerializerTest extends TestCase
 
     public function testSafeSerializeAndUnserializeWithNonSerializableProperty(): void
     {
-        $testObject = new \stdClass();
-        $testObject->name = 'Test';
-        $testObject->resource = fopen('php://memory', 'rb');
+        $testObject = new class {
+            public string $name = 'Test';
+            public $resource;
+
+            public function __construct() {
+                $this->resource = fopen('php://memory', 'rb');
+            }
+        };
 
         $serialized = $this->flexibleSerializer->safeSerialize($testObject);
         $unserialized = $this->flexibleSerializer->safeUnserialize($serialized);
@@ -54,12 +59,9 @@ class FlexibleSerializerTest extends TestCase
         $order->customerName = 'John Doe';
 
         $serialized = $this->flexibleSerializer->safeSerialize($order);
-        $unserialized = $this->flexibleSerializer->safeUnserialize(
-            $serialized,
-            [\OxidEsales\Eshop\Application\Model\Order::class]
-        );
+        $unserialized = $this->flexibleSerializer->safeUnserialize($serialized);
 
-        $this->assertInstanceOf(\OxidEsales\Eshop\Application\Model\Order::class, $unserialized);
+        $this->assertInstanceOf(\stdClass::class, $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
     }

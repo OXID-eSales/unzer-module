@@ -52,14 +52,19 @@ class FlexibleSerializer
      *
      * @param mixed $var The variable to make serializable
      * @return mixed The serializable version of the variable
+     * @throws ReflectionException
      */
     private function makeSerializable($var)
     {
         if (is_object($var)) {
             $serializableObj = new stdClass();
             $serializableObj->__class = get_class($var);
-            foreach (get_object_vars($var) as $key => $value) {
+            $reflection = new ReflectionClass($var);
+            foreach ($reflection->getProperties() as $property) {
+                $property->setAccessible(true);
+                $key = $property->getName();
                 try {
+                    $value = $property->getValue($var);
                     $serializableObj->$key = $this->makeSerializable($value);
                 } catch (Exception $e) {
                     $serializableObj->$key = null;
@@ -78,6 +83,10 @@ class FlexibleSerializer
                 }
             }
             return $serializableArray;
+        }
+
+        if (is_resource($var)) {
+            return null;
         }
 
         return $var;
@@ -100,7 +109,11 @@ class FlexibleSerializer
                 $restoredObject = $reflection->newInstanceWithoutConstructor();
                 unset($var->__class);
                 foreach (get_object_vars($var) as $key => $value) {
-                    $restoredObject->$key = $this->restoreUnserializable($value, $allowedClasses);
+                    if (property_exists($restoredObject, $key)) {
+                        $property = $reflection->getProperty($key);
+                        $property->setAccessible(true);
+                        $property->setValue($restoredObject, $this->restoreUnserializable($value, $allowedClasses));
+                    }
                 }
                 return $restoredObject;
             }
