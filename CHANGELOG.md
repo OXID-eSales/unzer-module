@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - fix showing correct amount when cancelling in admin
 - default Amount for Unzer Payments between 1 Euro and 10.000 Euros
 - prevent clicking buy now if no new or vaulted creditcard are selected
+- [0007723](https://bugs.oxid-esales.com/view.php?id=7723): In net mode, rounding errors are possible. If the total number of items is greater than the OXID total, a voucher will be added for the amount of the rounding error. Conversely, a dummy item will be added.
 
 ## [1.1.3] - 2023-11-14
 

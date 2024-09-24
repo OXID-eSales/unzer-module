@@ -339,14 +339,16 @@ class Unzer
         $shopBasketContents = $basketModel->getContents();
 
         $unzerBasketItems = $basket->getBasketItems();
+        $itemsToReCalculate = 0.0;
 
         // Add Basket-Items
         /** @var \OxidEsales\Eshop\Application\Model\BasketItem $basketItem */
         foreach ($shopBasketContents as $basketItem) {
             $unzerBasketItem = new BasketItem();
             $priceBrutto = $basketItem->getUnitPrice()->getBruttoPrice();
+            $quantity = (int)$basketItem->getAmount();
             $unzerBasketItem->setTitle($basketItem->getTitle())
-                ->setQuantity((int)$basketItem->getAmount())
+                ->setQuantity($quantity)
                 ->setType(BasketItemTypes::GOODS)
                 ->setAmountNet($priceBrutto)
                 ->setAmountPerUnit($priceBrutto)
@@ -357,6 +359,7 @@ class Unzer
                 ->setAmountPerUnitGross($priceBrutto);
 
             $unzerBasketItems[] = $unzerBasketItem;
+            $itemsToReCalculate += $quantity * $priceBrutto;
         }
 
         // Add DeliveryCosts
@@ -374,12 +377,38 @@ class Unzer
                 ->setAmountPerUnitGross($deliveryCosts->getBruttoPrice());
 
             $unzerBasketItems[] = $unzerBasketItem;
+            $itemsToReCalculate += $deliveryCosts->getBruttoPrice();
         }
 
         // Add Vouchers
         $voucherBasketItems = $this->unzerVoucherBasketItemsService->getVoucherBasketItems($basketModel);
         if (count($voucherBasketItems)) {
             $unzerBasketItems = array_merge($unzerBasketItems, $voucherBasketItems);
+        }
+
+        // (mostly) in net-mode some rounding issues are possible
+        if ($itemsToReCalculate !== $priceForPayment) {
+            $unzerBasketItem = new BasketItem();
+            $unzerBasketItem->setTitle($this->translator->translate('OSCUNZER_FIX_ROUNDING'))
+                ->setQuantity(1)
+                ->setAmountVat(0.0)
+                ->setVat(0.0);
+
+            if ($itemsToReCalculate < $priceForPayment) {
+                $fixRoundPrice = Registry::getUtils()->fRound((string)($priceForPayment - $itemsToReCalculate));
+                $unzerBasketItem->setType(BasketItemTypes::GOODS)
+                    ->setAmountNet($fixRoundPrice)
+                    ->setAmountPerUnit($fixRoundPrice)
+                    ->setAmountGross($fixRoundPrice)
+                    ->setAmountDiscountPerUnitGross(0.)
+                    ->setAmountPerUnitGross($fixRoundPrice);
+            } elseif ($itemsToReCalculate > $priceForPayment) {
+                $fixRoundPrice = Registry::getUtils()->fRound((string)($itemsToReCalculate - $priceForPayment));
+                $unzerBasketItem->setType(BasketItemTypes::VOUCHER)
+                    ->setAmountPerUnitGross(0.)
+                    ->setAmountDiscountPerUnitGross($fixRoundPrice);
+            }
+            $unzerBasketItems[] = $unzerBasketItem;
         }
 
         $basket->setBasketItems($unzerBasketItems);
