@@ -4,13 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.2.0] - unreleased - 2024-??-??
+## [1.2.0] - 2024-09-26
 
 ### NEW
-- New Paymentmethod Unzer installment (Paylater)
+- New payment method Unzer installment (Paylater)
 - If a customer interrupt the order in the checkout for any reason, the order is still saved using a temporary order and Unzer's webhook + scheduled cleanup  temporary order
 - add confirm dialog when collecting money in admin and disable the collect button until site is reloaded
-- UNZER-456: add the requirement not to sending the payment to unzer, if the minimum payment amount is not reached
 - provide Cardholder field for Credit cards
 
 ### FIXED
@@ -19,24 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [0007586](https://bugs.oxid-esales.com/view.php?id=7586) - Fix: Unable to finish the checkout process using the Apple Pay as the payment method
 - [0007638](https://bugs.oxid-esales.com/view.php?id=7638) - Fix: Sometimes duplicate order-positions in Backend, and dublicate ordermails ...
 - Discounts with time restrictions may not be invalidated directly in the checkout...
-- provided additional Order-Number is searchable
-- increase line spacing for the error messages
 - Save Payment Data for registered Users
-- fix inconsistent data for Paylater payment methods
-- use Module-Logger also in UnzerPayment
-- Avoid checking AppleCert if ApplePay is off
-- Fix Save Module Config
-- Show the remaining amount instead of the full amount in the transaction history if an order was e.g. partially collected
-- Inform the customer in frontend, if the payment was cancelled by customer during checkout
-- fix system crashes sporadically [not always replicatable] on card payment on return from the 3d-auth page with this in log
-- fix show prePayment-BankInformations on Thankyou-Page
-- save ApplePay-Certificates in any case of change ModuleConfiguration
-- fix provide ShopMetadata for UnzerPayment
-- fix show multiple vouchers separately
-- fix: only OK, NOT_FINISHED or CANCEL in oxorder->oxtranstatus allowed
-- fix showing correct amount when cancelling in admin
-- default Amount for Unzer Payments between 1 Euro and 10.000 Euros
-- prevent clicking buy now if no new or vaulted creditcard are selected
 - [0007723](https://bugs.oxid-esales.com/view.php?id=7723): In net mode, rounding errors are possible. If the total number of items is greater than the OXID total, a voucher will be added for the amount of the rounding error. Conversely, a dummy item will be added.
 - If other modules are installed that also extend the order model and contain non-serializable elements, maintenance may occur. Solution: Use a serializer that only contains data and no other elements.
 
