@@ -593,6 +593,7 @@ class Transaction
         $query = $queryBuilder
             ->select(
                 'ot.oxid',
+                'ot.oxuserid',
                 'ot.paymenttypeid',
                 'ot.currency',
                 'ot.customertype',
@@ -601,7 +602,7 @@ class Transaction
             ->from('oscunzertransaction', 'ot')
             ->leftJoin('ot', 'oxorder', 'o', 'ot.oxorderid = o.oxid')
             ->where($queryBuilder->expr()->eq('ot.oxuserid', ':oxuserid'))
-            ->where($queryBuilder->expr()->isNotNull('ot.paymenttypeid'))
+            ->andWhere($queryBuilder->expr()->isNotNull('ot.paymenttypeid'))
             ->groupBy('ot.paymenttypeid');
 
         $parameters = [
