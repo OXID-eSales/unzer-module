@@ -256,6 +256,14 @@
                 document.querySelector( '.oxDate' ).classList.remove("text-danger");
             }
         });
+
+         document.querySelectorAll("#payment-form input").forEach(function(element) {
+            element.addEventListener("input", function() {
+                document.querySelector('#error-holder').innerHTML = '';
+                document.querySelector("#submitOrder").classList.add("submitable");
+                document.querySelector("#submitOrder").disabled = false;
+            });
+        });
     {% if false %}</script>{% endif %}
     {% endcapture %}
     {{ script({ add: unzerInvoiceJS, dynamic: __oxid_include_dynamic }) }}

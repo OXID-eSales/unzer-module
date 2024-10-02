@@ -159,7 +159,6 @@
                 .submit();
         }
 
-        // Creating a SEPA resource
         SepaDirectDebit.createResource()
             .then(function(result) {
                 let hiddenInput = document.createElement('input');
@@ -187,13 +186,19 @@
             });
     });
 
+     document.querySelectorAll("#payment-form-sepa input").forEach(function(element) {
+        element.addEventListener("input", function() {
+            document.querySelector('#error-holder').innerHTML = '';
+            document.querySelector("#submitOrder").classList.add("submitable");
+            document.querySelector("#submitOrder").disabled = false;
+        });
+     });
+
     function removeCardElements() {
-        // Clear the contents of the Card-Element containers
         document.getElementById('sepa-IBAN').innerHTML = '';
     }
 
     function addElements(SepaDirectDebit) {
-        // Clear the contents of the Card-Element containers and create new ones
         SepaDirectDebit.create('sepa-direct-debit', {
             containerId: 'sepa-IBAN'
         });

@@ -72,10 +72,16 @@
         document.querySelector("#payment-form-installment").requestSubmit();
     }
 
-    // Create an Unzer instance with your public key
     let unzerInstance = new unzer('{{ unzerpub }}', {locale: "{{ unzerLocale }}"});
-
     let InstallmentSecured = unzerInstance.PaylaterInstallment();
+
+    InstallmentSecured.create({
+            containerId: 'unzer-installment',
+            amount: {{ totalgross.getPrice() }},
+            currency: '{{ uzrcurrency }}',
+            country: '{{ oView.getUserCountryIso() }}',
+            threatMetrixId: '{{ unzerThreatMetrixSessionID }}'
+        });
 
     document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function(event) {
         if (!this.classList.contains("submitable")) {
@@ -84,15 +90,14 @@
         }
     });
 
-    InstallmentSecured.create({
-        containerId: 'unzer-installment',
-        amount: {{ totalgross.getPrice() }},
-        currency: '{{ uzrcurrency }}',
-        country: '{{ oView.getUserCountryIso() }}',
-        threatMetrixId: '{{ unzerThreatMetrixSessionID }}'
+    document.querySelectorAll("#payment-form-installment").forEach(function(element) {
+        element.addEventListener("input", function() {
+            document.querySelector('#error-holder').innerHTML = '';
+            document.querySelector("#submitOrder").classList.add("submitable");
+            document.querySelector("#submitOrder").disabled = false;
+        });
     });
 
-    // Handling payment form submission
     document.querySelector("#payment-form-installment").addEventListener('submit', function(event) {
         event.preventDefault();
         InstallmentSecured.createResource()
