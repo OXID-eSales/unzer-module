@@ -153,13 +153,12 @@
             errorHolderId: 'error-holder',
         })
 
-        // Handle payment form submission.
         document.querySelector( "#payment-form" ).addEventListener('submit', function( event ) {
             event.preventDefault();
             paylaterInvoice.createResource()
             .then(function(result) {
                 let typeId = result.id;
-                // submit the payment type ID to your server-side integration
+
                 let selectConsumer = '{{ customerType }}';
                 if(
                     (
@@ -227,6 +226,9 @@
                 } else {
                     document.querySelector( '.unzerCompanyForm' ).classList.remove("text-danger");
                 }
+                document.querySelector('#error-holder').innerHTML = '';
+                document.querySelector("#submitOrder").classList.add("submitable");
+                document.querySelector("#submitOrder").disabled = false;
             });
         {% endif %}
 
