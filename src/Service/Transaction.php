@@ -457,9 +457,7 @@ class Transaction
         $queryBuilder = $queryBuilderFactory->create();
 
         $query = $queryBuilder
-            ->select(
-                'typeid'
-            )
+            ->select('typeid')
             ->from('oscunzertransaction')
             ->distinct()
             ->where($queryBuilder->expr()->eq('oxorderid', ':oxorderid'))
@@ -469,6 +467,40 @@ class Transaction
         $parameters = [
             ':oxorderid' => $orderid,
             ':oxaction'  => $transActionConst
+        ];
+
+        $queryResult = $query->setParameters($parameters)->execute();
+        if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
+            $result = $queryResult->fetchOne();
+            $result = is_string($result) ? $result : '';
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $orderid
+     * @return string
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
+    public function getAdminPaymentIdByOrderId(string $orderid): string
+    {
+        $result = '';
+
+        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+        $queryBuilder = $queryBuilderFactory->create();
+
+        $query = $queryBuilder
+            ->select('typeid')
+            ->from('oscunzertransaction')
+            ->distinct()
+            ->where($queryBuilder->expr()->eq('oxorderid', ':oxorderid'))
+            ->setMaxResults(1);
+
+        $parameters = [
+            ':oxorderid' => $orderid,
         ];
 
         $queryResult = $query->setParameters($parameters)->execute();
