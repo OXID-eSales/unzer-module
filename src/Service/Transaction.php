@@ -512,7 +512,12 @@ class Transaction
             ':oxaction'  => $this->transActionConst
         ];
 
-        $queryResult = $query->setParameters($parameters)->execute();
+        $parameterTypes = [
+            ':oxorderid' => \PDO::PARAM_STR,
+            ':oxaction'  => Connection::PARAM_STR_ARRAY // Specify array type
+        ];
+
+        $queryResult = $query->setParameters($parameters, $parameterTypes)->execute();
         if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
             $result = $queryResult->fetchOne();
             $result = is_string($result) ? $result : '';
