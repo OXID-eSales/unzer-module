@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidSolutionCatalysts\Unzer\Service;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Driver\ResultStatement;
 use OxidEsales\Eshop\Application\Model\User;
@@ -469,41 +470,12 @@ class Transaction
             ':oxaction'  => $transActionConst
         ];
 
-        $queryResult = $query->setParameters($parameters)->execute();
-        if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
-            $result = $queryResult->fetchOne();
-            $result = is_string($result) ? $result : '';
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string $orderid
-     * @return string
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
-     */
-    public function getAdminPaymentIdByOrderId(string $orderid): string
-    {
-        $result = '';
-
-        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
-        $queryBuilder = $queryBuilderFactory->create();
-
-        $query = $queryBuilder
-            ->select('typeid')
-            ->from('oscunzertransaction')
-            ->distinct()
-            ->where($queryBuilder->expr()->eq('oxorderid', ':oxorderid'))
-            ->setMaxResults(1);
-
-        $parameters = [
-            ':oxorderid' => $orderid,
+        $parameterTypes = [
+            ':oxorderid' => \PDO::PARAM_STR,
+            ':oxaction'  => Connection::PARAM_STR_ARRAY // Specify array type
         ];
 
-        $queryResult = $query->setParameters($parameters)->execute();
+        $queryResult = $query->setParameters($parameters, $parameterTypes)->execute();
         if ($queryResult instanceof ResultStatement && $queryResult->columnCount()) {
             $result = $queryResult->fetchOne();
             $result = is_string($result) ? $result : '';
