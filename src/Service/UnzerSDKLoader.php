@@ -76,7 +76,9 @@ class UnzerSDKLoader
             $sdk = $this->getUnzerSDKbyKey($key);
         } catch (UnzerException $e) {
             $logEntry = sprintf(
-                'Try to get the SDK with the Key "%s" defined by paymentId "%s", currency "%s", customerType "%s"',
+                'Try to get the SDK with the Key "%s" defined by paymentId "%s", currency "%s", customerType "%s" '
+                . $e->getTraceAsString()
+                ,
                 $key,
                 $paymentId,
                 $currency,
@@ -121,6 +123,18 @@ class UnzerSDKLoader
      */
     public function getUnzerSDKbyPaymentType(string $sPaymentId): Unzer
     {
+        $customerData = $this->getCustomerTypeCurByPaymentId($sPaymentId);
+
+        return $this->getUnzerSDK(
+            (string)$customerData['oxpaymenttype'],
+            $customerData['currency'],
+            $customerData['customertype']
+        );
+    }
+
+
+    public function getCustomerTypeCurByPaymentId(string $sPaymentId): array
+    {
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         $queryBuilder = $queryBuilderFactory->create();
 
@@ -143,27 +157,27 @@ class UnzerSDKLoader
 
         $result = $query->setParameters($parameters)->execute();
         $row = null;
-        if ($result instanceof ResultStatement && $result->columnCount() === 1) {
-            $row = $result->fetchAssociative();
+        if ($result instanceof ResultStatement) {
+            $row = $result->fetchAllAssociative();
+            if (is_array($row) && count($row) > 0) {
+                $row = $row[0];
+            }
         }
 
         $customerType = '';
         $currency = '';
-        $paymentId = '';
+        $oxpaymenttype = '';
         if ($row) {
             $currency = is_string($row['currency']) ? $row['currency'] : '';
-            $paymentId = is_string($row['oxpaymenttype']) ? $row['oxpaymenttype'] : '';
-            if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-                $customerType = 'B2C';
+            $oxpaymenttype = is_string($row['oxpaymenttype']) ? $row['oxpaymenttype'] : '';
+            $customerType = 'B2C';
+            if ($oxpaymenttype === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
                 if (!empty($row['oxdelcompany']) || !empty($row['oxbillcompany'])) {
                     $customerType = 'B2B';
                 }
             }
-            if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-                $customerType = 'B2C';
-            }
         }
 
-        return $this->getUnzerSDK((string)$paymentId, $currency, $customerType);
+        return ['oxpaymenttype' => $oxpaymenttype, 'currency' => $currency, 'customertype' => $customerType];
     }
 }

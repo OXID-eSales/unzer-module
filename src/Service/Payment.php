@@ -366,7 +366,12 @@ class Payment
         string $reason
     ): Exception|bool|UnzerApiException {
         try {
-            $sdk = $this->unzerSDKLoader->getUnzerSDKbyPaymentType($unzerid);
+            $userData = $this->unzerSDKLoader->getCustomerTypeCurByPaymentId($unzerid);
+            $sdk = $this->unzerSDKLoader->getUnzerSDK(
+                $userData['oxpaymenttype'],
+                $userData['currency'],
+                $userData['customertype']
+            );
 
             if ($chargeid) {
                 $unzerCharge = $sdk->fetchChargeById($unzerid, $chargeid);
@@ -378,13 +383,16 @@ class Payment
                 $cancellation = $sdk->cancelChargedPayment($payment, $cancellation);
             }
 
+
+
             /** @var string $oxuserid */
             $oxuserid = $oOrder->getFieldData('oxuserid');
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
                 $cancellation,
-                $oOrder
+                $oOrder,
+                $userData['customertype']
             );
         } catch (UnzerApiException $e) {
             return $e;

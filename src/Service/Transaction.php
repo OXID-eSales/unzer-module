@@ -153,7 +153,8 @@ class Transaction
         string $orderid,
         string $userId,
         ?Cancellation $unzerCancel,
-        Order $oOrder
+        Order $oOrder,
+        string $customerType = ''
     ): bool {
         $unzerCancelReason = '';
         if ($unzerCancel !== null) {
@@ -166,6 +167,7 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'cancelreason' => $unzerCancelReason,
+            'customertype' => $customerType,
         ];
 
         if ($unzerCancel instanceof Cancellation) {

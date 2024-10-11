@@ -37,7 +37,7 @@ class Transaction extends BaseModel
      */
     public function getUnzerCreated(): ?string
     {
-        return $this->getRawField('OXACTIONDATE');
+        return $this->getRawField('oxactiondate');
     }
 
     /**
@@ -45,7 +45,7 @@ class Transaction extends BaseModel
      */
     public function getUnzerCustomerId(): ?string
     {
-        return $this->getRawField('CUSTOMERID');
+        return $this->getRawField('customerid');
     }
 
     /**
@@ -53,14 +53,14 @@ class Transaction extends BaseModel
      */
     public function getUnzerCustomerType(): ?string
     {
-        return $this->getRawField('CUSTOMERTYPE');
+        return $this->getRawField('customertype');
     }
     /**
      * @return string|null
      */
     public function getUnzerState(): ?string
     {
-        return $this->getRawField('OXACTION');
+        return $this->getRawField('oxaction');
     }
 
     /**
@@ -68,7 +68,7 @@ class Transaction extends BaseModel
      */
     public function getUnzerTypeId(): ?string
     {
-        return $this->getRawField('TYPEID');
+        return $this->getRawField('typeid');
     }
 
     /**
@@ -76,7 +76,7 @@ class Transaction extends BaseModel
      */
     public function getUnzerShortId(): ?string
     {
-        return $this->getRawField('SHORTID');
+        return $this->getRawField('shortid');
     }
 
     /**
@@ -84,7 +84,7 @@ class Transaction extends BaseModel
      */
     public function getUnzerCurrency(): ?string
     {
-        return $this->getRawField('CURRENCY');
+        return $this->getRawField('currency');
     }
 
     /**
@@ -92,13 +92,13 @@ class Transaction extends BaseModel
      */
     public function getUnzerAmount(): ?string
     {
-        return $this->getRawField('AMOUNT');
+        return $this->getRawField('amount');
     }
 
     public function getUnzerRemaining(): ?string
     {
         if ($this->getUnzerState() === 'partly') {
-            return $this->getRawField('REMAINING');
+            return $this->getRawField('remaining');
         }
 
         return $this->getUnzerAmount();
@@ -109,12 +109,12 @@ class Transaction extends BaseModel
      */
     public function getUnzerTraceId(): ?string
     {
-        return $this->getRawField('TRACEID');
+        return $this->getRawField('traceid');
     }
 
     public function setTransStatus(string $status): void
     {
-        $this->setFieldData('OXTRANSSTATUS', $status);
+        $this->setFieldData('oxtransstatus', $status);
     }
 
     /**
@@ -123,7 +123,7 @@ class Transaction extends BaseModel
     public function getUnzerMetaData(): ?array
     {
         /** @var string $json */
-        $json = $this->getRawField('METADATA');
+        $json = $this->getRawField('metadata');
         if ($json) {
             /** @var array $jsonDecoded */
             $jsonDecoded = json_decode($json, true);
