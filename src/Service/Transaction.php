@@ -92,7 +92,7 @@ class Transaction
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-            'customertype' => '',
+            'customertype' => $this->getCustomerTypeByOrder($oOrder)
         ];
 
         if ($unzerPayment) {
@@ -100,19 +100,6 @@ class Transaction
                 $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
                 $this->getUnzerPaymentData($unzerPayment);
             $params = array_merge($params, $unzerPaymentData);
-
-            // for PaylaterInvoice, store the customer type
-            if (
-                $unzerPayment->getPaymentType() instanceof PaylaterInvoice ||
-                $unzerPayment->getPaymentType() instanceof PaylaterInstallment
-            ) {
-                $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
-                $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
-                $params['customertype'] = 'B2C';
-                if (!empty($delCompany) || !empty($billCompany)) {
-                    $params['customertype'] = 'B2B';
-                }
-            }
         }
 
         if ($this->saveTransaction($params, $oOrder)) {
@@ -153,8 +140,7 @@ class Transaction
         string $orderid,
         string $userId,
         ?Cancellation $unzerCancel,
-        Order $oOrder,
-        string $customerType = ''
+        Order $oOrder
     ): bool {
         $unzerCancelReason = '';
         if ($unzerCancel !== null) {
@@ -167,7 +153,7 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'cancelreason' => $unzerCancelReason,
-            'customertype' => $customerType,
+            'customertype' => $this->getCustomerTypeByOrder($oOrder),
         ];
 
         if ($unzerCancel instanceof Cancellation) {
@@ -191,6 +177,7 @@ class Transaction
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+            'customertype' => $this->getCustomerTypeByOrder($oOrder)
         ];
 
         if ($unzerCharge instanceof Charge) {
@@ -529,15 +516,15 @@ class Transaction
     }
 
     /**
-     * @param string $orderid
+     * @param string $orderId
      * @return array
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerTypeAndCurrencyByOrderId(string $orderid): array
+    public function getCustomerTypeAndCurrencyFromTransactionByOrderId(string $orderId): array
     {
         $transaction = oxNew(TransactionModel::class);
-        $transactionId = $this->getTransactionIdByOrderId($orderid);
+        $transactionId = $this->getTransactionIdByOrderId($orderId);
         $transaction->load($transactionId);
 
         return [
@@ -715,5 +702,17 @@ class Transaction
     ): ?float {
         return $transaction instanceof Cancellation ?
             $transaction->getAmount() : $unzerPayment->getAmount()->getTotal();
+    }
+
+    private function getCustomerTypeByOrder(Order $oOrder): string
+    {
+        $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
+        $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
+        $customerType = 'B2C';
+        if (!empty($delCompany) || !empty($billCompany)) {
+            $$customerType = 'B2B';
+        }
+
+        return $customerType;
     }
 }

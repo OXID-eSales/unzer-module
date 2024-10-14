@@ -30,6 +30,8 @@ use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
+use UnzerSDK\Resources\PaymentTypes\Prepayment as UnzerSDKPrepayment;
+use UnzerSDK\Resources\PaymentTypes\Invoice as UnzerSDKInvoice;
 
 /**
  * TODO: Decrease count of dependencies to 13
@@ -391,8 +393,7 @@ class Payment
                 $oOrder->getId(),
                 $oxuserid,
                 $cancellation,
-                $oOrder,
-                $userData['customertype']
+                $oOrder
             );
         } catch (UnzerApiException $e) {
             return $e;
@@ -585,5 +586,19 @@ class Payment
     public function isPdfSession(): bool
     {
         return (bool)Registry::getRequest()->getRequestParameter('pdfConfirm', '0');
+    }
+
+    public function isInvoice(): bool
+    {
+        return $this
+                ->getSessionUnzerPayment()
+                ->getPaymentType() instanceof UnzerSDKInvoice;
+    }
+
+    public function isPrepayment(): bool
+    {
+        return $this
+                ->getSessionUnzerPayment()
+                ->getPaymentType() instanceof UnzerSDKPrepayment;
     }
 }

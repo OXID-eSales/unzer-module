@@ -138,9 +138,7 @@ class OrderController extends OrderController_parent
             //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
             $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
 
-            // performing special actions after user finishes order (assignment to special user groups)
             $oUser->onOrderExecute($oBasket, $iSuccess);
-
             $nextStep = $this->getNextStep($iSuccess);
             $unzerService = $this->getServiceFromContainer(Unzer::class);
 

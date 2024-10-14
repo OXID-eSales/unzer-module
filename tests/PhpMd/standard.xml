@@ -30,6 +30,7 @@
             </properties>
             <!-- Exclude UnzerPayment.php specifically -->
             <exclude-pattern>*UnzerPayment.php</exclude-pattern>
+            <exclude-pattern>*UnzerSDKLoader.php</exclude-pattern>
         </rule>
     </rule>
 

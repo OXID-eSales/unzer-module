@@ -18,6 +18,9 @@ use RuntimeException;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use UnzerSDK\Unzer;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ */
 class UnzerSDKLoader
 {
     use ServiceContainer;
@@ -77,8 +80,7 @@ class UnzerSDKLoader
         } catch (UnzerException $e) {
             $logEntry = sprintf(
                 'Try to get the SDK with the Key "%s" defined by paymentId "%s", currency "%s", customerType "%s" '
-                . $e->getTraceAsString()
-                ,
+                . $e->getTraceAsString(),
                 $key,
                 $paymentId,
                 $currency,
@@ -164,13 +166,12 @@ class UnzerSDKLoader
             }
         }
 
-        $customerType = '';
+        $customerType = 'B2C';
         $currency = '';
         $oxpaymenttype = '';
         if ($row) {
             $currency = is_string($row['currency']) ? $row['currency'] : '';
             $oxpaymenttype = is_string($row['oxpaymenttype']) ? $row['oxpaymenttype'] : '';
-            $customerType = 'B2C';
             if ($oxpaymenttype === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
                 if (!empty($row['oxdelcompany']) || !empty($row['oxbillcompany'])) {
                     $customerType = 'B2B';
