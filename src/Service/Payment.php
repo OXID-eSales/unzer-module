@@ -29,6 +29,8 @@ use UnzerSDK\Resources\Payment as UnzerPayment;
 use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\InstallmentSecured;
+use UnzerSDK\Resources\PaymentTypes\Prepayment as UnzerSDKPrepayment;
+use UnzerSDK\Resources\PaymentTypes\Invoice as UnzerSDKInvoice;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Shipment;
@@ -569,5 +571,19 @@ class Payment
     public function isPdfSession(): bool
     {
         return $this->getUnzerBoolRequestParameter('pdfConfirm');
+    }
+
+    public function isInvoice(): bool
+    {
+        return $this
+                ->getSessionUnzerPayment()
+                ->getPaymentType() instanceof UnzerSDKInvoice;
+    }
+
+    public function isPrepayment(): bool
+    {
+        return $this
+                ->getSessionUnzerPayment()
+                ->getPaymentType() instanceof UnzerSDKPrepayment;
     }
 }
