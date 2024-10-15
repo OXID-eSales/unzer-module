@@ -129,10 +129,8 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $companyType
         );
 
-        // first try to fetch customer, secondly create anew if not found in unzer
         try {
             $customer = $this->unzerSDK->fetchCustomer($customer);
-            // for comparison and update, the original object must be recreated
             $originalCustomer = $this->unzerService->getUnzerCustomer(
                 $userModel,
                 null,

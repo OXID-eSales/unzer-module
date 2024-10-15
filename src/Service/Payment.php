@@ -100,7 +100,7 @@ class Payment
     {
         $paymentExtension = null;
         /** @var string $customerType */
-        $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', '');
+        $customerType = Registry::getRequest()->getRequestParameter('unzer_customer_type', 'B2C');
         $user = $this->session->getUser();
         $basket = $this->session->getBasket();
         $currency = $basket->getBasketCurrency()->name;
@@ -120,14 +120,6 @@ class Payment
                 $user,
                 $basket
             );
-
-//     MAYBE WE DONT NEED IT HERE       /** @var string $sess_challenge */
-//            $sess_challenge = $this->session->getVariable('sess_challenge');
-//            $this->transactionService->writeTransactionToDB(
-//                $sess_challenge,
-//                $this->session->getUser()->getId(),
-//                $this->getSessionUnzerPayment(true)
-//            );
 
             $paymentStatus = $this->getUnzerPaymentStatus() !== self::STATUS_ERROR;
 
@@ -496,7 +488,8 @@ class Payment
         }
 
         $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
-        $transactionDetails = $this->transactionService->getCustomerTypeAndCurrencyByOrderId($oOrder->getId());
+        $transactionDetails = $this->transactionService
+            ->getCustomerTypeAndCurrencyFromTransactionByOrderId($oOrder->getId());
 
         $blSuccess = false;
 
