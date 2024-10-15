@@ -29,7 +29,7 @@ class TransactionTest extends IntegrationTestCase
             'oxuserid' => 'userId',
             'oxshopid' => 5,
             'oxactiondate' => '2021-12-10 16:44:54',
-            'customertype' => '',
+            'customertype' => 'B2C',
             'metadata' => '""'
         ];
 
@@ -73,7 +73,7 @@ class TransactionTest extends IntegrationTestCase
             'oxaction' => 'statename',
             'metadata' => 'metadataJson',
             'customerid' => 'unzerCustomerId',
-            'customertype' => '',
+            'customertype' => 'B2C',
             'remaining' => 0.0
         ]);
 

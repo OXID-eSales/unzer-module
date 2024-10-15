@@ -352,11 +352,11 @@ class Order extends Order_parent
         }
     }
 
-    private function sendOrderConfirmationEmail(User $oUser, Basket  $oBasket, UserPayment $oUserPayment): int
+    private function sendOrderConfirmationEmail(User $oUser, Basket $oBasket, UserPayment $oUserPayment): int
     {
         Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
         $iRet = $this->sendOrderByEmail($oUser, $oBasket, $oUserPayment);
         Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
-        return $iRet;
+        return (int)$iRet;
     }
 }

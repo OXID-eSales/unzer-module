@@ -583,15 +583,23 @@ class Payment
 
     public function isInvoice(): bool
     {
-        return $this
-                ->getSessionUnzerPayment()
-                ->getPaymentType() instanceof UnzerSDKInvoice;
+        $sessionPayment = $this->getSessionUnzerPayment(true);
+
+        if ($sessionPayment === null) {
+            return false;
+        }
+
+        return $sessionPayment->getPaymentType() instanceof UnzerSDKInvoice;
     }
 
     public function isPrepayment(): bool
     {
-        return $this
-                ->getSessionUnzerPayment()
-                ->getPaymentType() instanceof UnzerSDKPrepayment;
+        $sessionPayment = $this->getSessionUnzerPayment(true);
+
+        if ($sessionPayment === null) {
+            return false;
+        }
+
+        return $sessionPayment->getPaymentType() instanceof UnzerSDKPrepayment;
     }
 }

@@ -223,7 +223,7 @@ class PaymentTest extends IntegrationTestCase
 
         $extensionLoader
             ->method('getPaymentExtensionByCustomerTypeAndCurrency')
-            ->with($paymentModel, '', 'EUR')
+            ->with($paymentModel, 'B2C', 'EUR')
             ->willReturn($paymentExtension);
 
         return $extensionLoader;
