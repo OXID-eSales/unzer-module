@@ -97,6 +97,7 @@ class Order extends Order_parent
             } else {
                 if ($unzerPaymentStatus !== PaymentService::STATUS_NOT_FINISHED) {
                     Registry::getSession()->setVariable('orderCancellationProcessed', true);
+                    $iRet = 1; //TODO: not sure if this is correct - this is hardcoded for the Paypal cancellaction
                 }
                 $this->_setOrderStatus($unzerPaymentStatus); //ERROR if paypal
                 $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
@@ -339,11 +340,11 @@ class Order extends Order_parent
         }
     }
 
-    private function sendOrderConfirmationEmail(User $oUser, Basket  $oBasket, UserPayment $oUserPayment): int
+    private function sendOrderConfirmationEmail(User $oUser, Basket $oBasket, UserPayment $oUserPayment): int
     {
         Registry::getSession()->setVariable('blDontCheckProductStockForUnzerMails', true);
         $iRet = $this->_sendOrderByEmail($oUser, $oBasket, $oUserPayment);
         Registry::getSession()->deleteVariable('blDontCheckProductStockForUnzerMails');
-        return $iRet;
+        return (int)$iRet;
     }
 }

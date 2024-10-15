@@ -499,9 +499,6 @@ class OrderController extends OrderController_parent
                 $oUser->onOrderExecute($oBasket, $iSuccess);
             }
             Registry::getSession()->deleteVariable('orderCancellationProcessed');
-            //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...
-
-            // performing special actions after user finishes order (assignment to special user groups)
             $unzerService = $this->getServiceFromContainer(Unzer::class);
             Registry::getSession()->setVariable('orderDisableSqlActiveSnippet', false);
 
