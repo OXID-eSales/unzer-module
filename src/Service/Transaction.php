@@ -28,6 +28,7 @@ use UnzerSDK\Resources\Metadata;
 use UnzerSDK\Resources\Payment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInvoice;
+use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaypal;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use UnzerSDK\Resources\TransactionTypes\Charge;
@@ -630,10 +631,10 @@ class Transaction
         foreach ($ids as $typeData) {
             $paymentTypes = null;
             $paymentTypeId = $typeData['paymenttypeid'] ?: '';
-            if ($paymentTypeId) {
+            if ($paymentTypeId !== '') {
                 $paymentTypes = $this->setPaymentTypes(
                     $user,
-                    $typeData['paymenttypeid'] ?: '',
+                    $paymentTypeId,
                     $typeData['currency'] ?: '',
                     $typeData['customertype'] ?: '',
                     $paymentTypeId
@@ -690,7 +691,11 @@ class Transaction
 
         foreach ($this->transPaymentTypeIds as $unzerId => $oxVar) {
             if (strpos($paymentTypeId, $unzerId)) {
-                $result[$oxVar][$paymentTypeId] = $paymentType->expose();
+                if ($paymentType instanceof UnzerResourceCard && method_exists($paymentType, 'getBrand')) {
+                    $result[$oxVar][$paymentType->getBrand()] = $paymentType->expose();
+                } elseif ($paymentType instanceof UnzerResourcePaypal && !empty($paymentType->getEmail())) {
+                    $result[$oxVar]['paypal'] = $paymentType->expose();
+                }
             }
         }
         return $result;

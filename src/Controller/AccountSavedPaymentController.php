@@ -17,6 +17,7 @@ use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaypal;
 
 class AccountSavedPaymentController extends AccountController
 {
@@ -47,6 +48,11 @@ class AccountSavedPaymentController extends AccountController
         return $this->_sThisTemplate;
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function setPaymentListsToView(): void
     {
         $transactionService = $this->getServiceFromContainer(Transaction::class);
@@ -69,12 +75,17 @@ class AccountSavedPaymentController extends AccountController
                     $currency,
                     $customerType
                 );
+
                 $paymentType = $unzerSDK->fetchPaymentType($paymentTypeId);
                 if (strpos($paymentTypeId, 'crd') && method_exists($paymentType, 'getBrand')) {
                     $paymentTypes[$paymentType->getBrand()][$transactionOxId] = $paymentType->expose();
                 }
-                if (strpos($paymentTypeId, 'ppl')) {
-                    $paymentTypes['paypal'][$transactionOxId] = $paymentType->expose();
+                if (
+                    strpos($paymentTypeId, 'ppl')
+                    && $paymentType instanceof UnzerSDKPaypal
+                    && !empty($paymentType->getEmail())
+                ) {
+                        $paymentTypes['paypal'][$transactionOxId] = $paymentType->expose();
                 }
                 if (strpos($paymentTypeId, 'sdd')) {
                     $paymentTypes['sepa'][$transactionOxId] = $paymentType->expose();

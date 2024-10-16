@@ -3,32 +3,32 @@
     <div class="savedpayment">
         {% for type, setting in unzerPaymentType %}
             {% if type != 'paypal' and type != 'sepa' %}
-            <form id="payment-saved-cards" class="unzerUI form" novalidate>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</th>
-                        <th scope="col">{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</th>
-                        <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
-                        <th scope="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% set counter = 0 %}
-                    {% for paymenttypeid, paymentType in setting %}
+                <form id="payment-saved-cards" class="unzerUI form" novalidate>
+                    <table class="table">
+                        <thead>
                         <tr>
-                            <th scope="row">{{ paymentType.number }}</th>
-                            <td>{{ paymentType.expiryDate }}</td>
-                            <td>{{ type }}</td>
-
-                            <td>
-                                <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
-                            </td>
+                            <th scope="col">{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</th>
+                            <th scope="col">{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</th>
+                            <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
+                            <th scope="col"></th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </form>
+                        </thead>
+                        <tbody>
+                        {% set counter = 0 %}
+                        {% for paymenttypeid, paymentType in setting %}
+                            <tr>
+                                <th scope="row">{{ paymentType.number }}</th>
+                                <td>{{ paymentType.expiryDate }}</td>
+                                <td>{{ type }}</td>
+
+                                <td>
+                                    <input type="radio" class="paymenttypeid" name="paymenttypeid" value="{{ paymenttypeid }}" style="-webkit-appearance: radio">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
             {% endif %}
         {% endfor %}
     </div>
@@ -37,7 +37,7 @@
 {% if unzerPaymentType != false  %}
 <br>
     <label>
-        <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox"> Neue Kreditkarte
+        <input type="checkbox" name="newccard" id="newccard" value="show"  style="-webkit-appearance: checkbox">{{ translate({ ident: "OSCUNZER_NEW_CARD" }) }}
     </label>
 {% endif %}
 <div id="newcc" style="display:none;" class="card-body">
