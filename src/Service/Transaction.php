@@ -660,6 +660,9 @@ class Transaction
         return $this->paymentTypes;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function setPaymentTypes(
         ?User $user,
         string $paymentId,
@@ -692,9 +695,14 @@ class Transaction
         foreach ($this->transPaymentTypeIds as $unzerId => $oxVar) {
             if (strpos($paymentTypeId, $unzerId)) {
                 if ($paymentType instanceof UnzerResourceCard && method_exists($paymentType, 'getBrand')) {
-                    $result[$oxVar][$paymentType->getBrand()] = $paymentType->expose();
+                    $sensitiveData = $paymentType->expose();
+                    $sensitiveData = is_array($sensitiveData) ? $sensitiveData : get_object_vars($sensitiveData);
+                    $result[$oxVar][$paymentTypeId] = array_merge(
+                        $sensitiveData,
+                        ['brand' => $paymentType->getBrand()]
+                    );
                 } elseif ($paymentType instanceof UnzerResourcePaypal && !empty($paymentType->getEmail())) {
-                    $result[$oxVar]['paypal'] = $paymentType->expose();
+                    $result[$oxVar][$paymentTypeId] = $paymentType->expose();
                 }
             }
         }
