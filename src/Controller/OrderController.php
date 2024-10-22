@@ -144,18 +144,9 @@ class OrderController extends OrderController_parent
 
             if (stripos($nextStep, 'thankyou') !== false) {
                 $connectionProvider->commit();
-                $unzerPaymentId = $this->getUnzerPaymentIdFromSession();
 
                 if ($this->isPaymentCancelled($paymentService)) {
                     $this->cleanUpCancelledPayments();
-                }
-
-                if (!empty($unzerPaymentId) && $unzerService->ifImmediatePostAuthCollect($paymentService)) {
-                    $paymentService->doUnzerCollect(
-                        $oOrder,
-                        $unzerPaymentId,
-                        (float)$oOrder->getTotalOrderSum()
-                    );
                 }
 
                 $session = $this->getSession();
@@ -519,16 +510,6 @@ class OrderController extends OrderController_parent
                 $session->setVariable('oscunzersavepayment', $savePayment);
             }
         }
-    }
-
-    private function getUnzerPaymentIdFromSession(): string
-    {
-        $paymentId = $this->getSession()->getVariable('UnzerPaymentId');
-        if (is_string($paymentId)) {
-            return $paymentId;
-        }
-
-        return '';
     }
 
     private function getSession(): Session

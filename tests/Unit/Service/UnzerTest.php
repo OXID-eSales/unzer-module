@@ -101,34 +101,6 @@ class UnzerTest extends IntegrationTestCase
         ];
     }
 
-    public function testIfImmediatePostAuthCollectTrue(): void
-    {
-        $moduleSettings = $this->createPartialMock(ModuleSettings::class, ['getPaymentProcedureSetting']);
-        $moduleSettings->method('getPaymentProcedureSetting')
-            ->willReturn(ModuleSettings::PAYMENT_CHARGE);
-        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
-        $paymentService = $this->getPaymentServiceMock($sut);
-
-        $this->assertTrue($sut->ifImmediatePostAuthCollect($paymentService));
-    }
-
-    public function testIfImmediatePostAuthCollectFalse(): void
-    {
-        $moduleSettings = $this->createPartialMock(ModuleSettings::class, ['getPaymentProcedureSetting']);
-        $moduleSettings->method('getPaymentProcedureSetting')
-            ->willReturn(ModuleSettings::PAYMENT_AUTHORIZE);
-        $sut = $this->getSut([ModuleSettings::class => $moduleSettings]);
-        $paymentService = $this->getPaymentServiceMock($sut);
-
-        $paymentService->method('getUnzerOrderId')
-            ->willReturn('666');
-
-        $sql = "INSERT INTO oxorder SET OXID=9999, OXPAYMENTTYPE='oscunzer_paypal', OXUNZERORDERNR='666'";
-        DatabaseProvider::getDb()->execute($sql);
-
-        $this->assertFalse($sut->ifImmediatePostAuthCollect($paymentService));
-    }
-
     private function getPaymentServiceMock($sut)
     {
         return $this->getMockBuilder(Payment::class)

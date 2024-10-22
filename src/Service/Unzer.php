@@ -655,43 +655,6 @@ class Unzer
         return (bool)$this->session->getVariable('UzrAjaxRedirect');
     }
 
-    public function ifImmediatePostAuthCollect(Payment $paymentService): bool
-    {
-        $paymentMethod = $this->getPaymentMethodFromOrder((string)$paymentService->getUnzerOrderId());
-        $paymentProcedure = $this->getPaymentProcedure(str_replace('oscunzer_', '', $paymentMethod));
-        return $paymentProcedure === ModuleSettings::PAYMENT_CHARGE;
-    }
-
-    private function getPaymentMethodFromOrder(string $oxUnzerOrderNr): string
-    {
-        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
-        $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
-
-        $queryBuilder = $queryBuilderFactory->create();
-
-        $query = $queryBuilder
-            ->select('OXPAYMENTTYPE')
-            ->from('oxorder')
-            ->where("OXUNZERORDERNR = :oxunzerordernr");
-
-        $parameters = [
-            ':oxunzerordernr' => $oxUnzerOrderNr,
-        ];
-
-        $result = $query->setParameters($parameters)->execute();
-
-        if ($result instanceof ResultStatement) {
-            /** @var string $value */
-            $value = $result->fetchColumn();
-            if (empty($value)) {
-                $value = '';
-            }
-            return $value;
-        }
-
-        return '';
-    }
-
     private function getPaymentDataArrayFromRequest(): array
     {
         /** @var string $jsonPaymentData */
