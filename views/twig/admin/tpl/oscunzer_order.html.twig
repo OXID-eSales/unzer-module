@@ -250,7 +250,7 @@
                                 {% if canRefundFully %}
                                     <td><input type="text" id="amount_s-chg_payout"
                                                name="amount" value="{{ canCancelAmount|number_format(2, '.', '') }}"> {{ uzrCurrency }}</td>
-                                    <td><button type="submit">{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}</button></td>
+                                    <td><button type="submit" id="charge_payout">{{ translate({ ident: "OSCUNZER_PAYOUT" }) }}</button></td>
                                 {% else %}
                                     <td>{{ canCancelAmount|number_format(2, '.') }} {{ uzrCurrency }}</td>
                                     <td></td>
@@ -289,7 +289,6 @@
                         <td>{{ oUnzerCancel.cancelDate|escape }}</td>
                         <td>{{ oUnzerCancel.cancellationId|escape }}</td>
                         <td>{{ oUnzerCancel.cancelledAmount|escape|number_format(2, '.', ' ') }} {{ uzrCurrency }}</td>
-                        reason = {{ oUnzerCancel.cancelReason }}
                         {% if blCancelReasonReq and oUnzerCancel.cancelReason != '' %}
                             {% set escaped_reason = oUnzerCancel.cancelReason|e %}
                             {% set translate_ident = 'OSCUNZER_REASON_' ~ escaped_reason %}
@@ -344,28 +343,28 @@
 {% capture assign = "payoutNoticeJS" %}
 {% if false %} <script> {%  endif %}
     document.addEventListener('DOMContentLoaded', function () {
-    let submitButtons = document.querySelectorAll('input[id^="submit_s-chg-"]');
-    submitButtons.forEach(function(button) {
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            let idMatch = button.id.match(/submit_s-chg-(\d+)/);
-            if (idMatch && idMatch[1]) {
-                let idNumber = idMatch[1];
+        let submitButtons = document.querySelectorAll('input[id^="submit_s-chg-"]');
+        submitButtons.forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                let idMatch = button.id.match(/submit_s-chg-(\d+)/);
+                if (idMatch && idMatch[1]) {
+                    let idNumber = idMatch[1];
 
-                let amountInput = document.getElementById('amount_s-chg-' + idNumber);
-                let amount = amountInput ? amountInput.value : 0;
+                    let amountInput = document.getElementById('amount_s-chg-' + idNumber);
+                    let amount = amountInput ? amountInput.value : 0;
 
-                let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
+                    let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
 
-                if (!confirmed) {
-                    event.preventDefault();
-                } else {
-                    document.getElementById('uzr_s-chg-' + idNumber).submit();
+                    if (!confirmed) {
+                        event.preventDefault();
+                    } else {
+                        document.getElementById('uzr_s-chg-' + idNumber).submit();
+                    }
                 }
-            }
+            });
         });
     });
-});
 {% if false %} </script> {%  endif %}
 
 {% endcapture %}
@@ -387,6 +386,27 @@
     });
 {% endcapture %}
 {{ script({ add: cancelAuthConfirm, dynamic: __oxid_include_dynamic }) }}
+
+
+{% capture assign = "paylaterPayout" %}
+    {% if false %} <script> {%  endif %}
+        document.addEventListener('DOMContentLoaded', function () {
+            let cancelAuthForms = document.querySelectorAll('form[id^="uzr_s-chg_payout"]');
+            cancelAuthForms.forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    let amountInput = document.querySelector('input[id="amount_s-chg_payout"]');
+                    let amount = amountInput ? amountInput.value : 0;
+                    let confirmed = window.confirm('{{ translate({ ident: "OSCUNZER_CANCEL_ALERT" }) }}' + ' ' + amount + ' {{ uzrCurrency }}');
+                    if (!confirmed) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+    {% if false %} </script> {%  endif %}
+{% endcapture %}
+{{ script({ add: paylaterPayout, dynamic: __oxid_include_dynamic }) }}
+
 
 
 {% include "bottomnaviitem.html.twig" %}

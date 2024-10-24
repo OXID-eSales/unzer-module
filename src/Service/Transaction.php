@@ -98,7 +98,7 @@ class Transaction
 
         if ($unzerPayment) {
             $unzerPaymentData = $unzerShipment !== null ?
-                $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
+                $this->getUnzerShipmentData($unzerShipment) :
                 $this->getUnzerPaymentData($unzerPayment);
             $params = array_merge($params, $unzerPaymentData);
         }
@@ -330,7 +330,7 @@ class Transaction
         ];
     }
 
-    protected function getUnzerShipmentData(Shipment $unzerShipment, Payment $unzerPayment): array
+    protected function getUnzerShipmentData(Shipment $unzerShipment): array
     {
         $currency = '';
         $customerId = '';
@@ -342,7 +342,7 @@ class Transaction
                 $customerId = $customer->getId();
             }
         }
-        $params = [
+        return [
             'amount'     => $unzerShipment->getAmount(),
             'currency'   => $currency,
             'fetchedAt'  => $unzerShipment->getFetchedAt(),
@@ -353,18 +353,7 @@ class Transaction
             'traceid'    => $unzerShipment->getTraceId(),
             'metadata'   => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
         ];
-
-        $unzerCustomer = $unzerPayment->getCustomer();
-        if ($unzerCustomer instanceof Customer) {
-            $params['customerid'] = $unzerCustomer->getId();
-        }
-
-        return $params;
     }
-
-    /**
-     * @return TransactionModel
-     */
 
     protected function getNewTransactionObject(): TransactionModel
     {
@@ -723,7 +712,7 @@ class Transaction
         $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
         $customerType = 'B2C';
         if (!empty($delCompany) || !empty($billCompany)) {
-            $$customerType = 'B2B';
+            $customerType = 'B2B';
         }
 
         return $customerType;

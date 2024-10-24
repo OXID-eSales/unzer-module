@@ -168,18 +168,26 @@ class PaymentController extends PaymentController_parent
         /** @var Order $tmpOrder */
         $tmpOrder = oxNew(TmpOrder::class)->getTmpOrderByOxOrderId($oxSessionOrderId);
         if ($tmpOrder) {
-            $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class);
+            $unzerSdkLoader = $this->getServiceFromContainer(UnzerSDKLoader::class);
 
             /** @var string $paymentId */
             $paymentId = $tmpOrder->getFieldData('oxpaymenttype');
             /** @var string $currency */
             $currency = $tmpOrder->getFieldData('oxcurrency');
-            $customerType = !empty($tmpOrder->getFieldData('oxdelcompany'))
-            || !empty($tmpOrder->getFieldData('oxbillcompany')) ?
-                'B2B' :
-                'B2C';
+            $customerType = $tmpOrder->getFieldData('customertype') ?? '';
 
-            $result = $unzerSDK->getUnzerSDK(
+            if (!is_string($customerType)) {
+                $customerType = '';
+            }
+
+            if (empty($customerType)) {
+                $customerType = (!empty($tmpOrder->getFieldData('oxdelcompany')))
+                || !empty($tmpOrder->getFieldData('oxbillcompany')) ?
+                    'B2B' :
+                    'B2C';
+            }
+
+            $result = $unzerSdkLoader->getUnzerSDK(
                 $paymentId,
                 $currency,
                 $customerType
