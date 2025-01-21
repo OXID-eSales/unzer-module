@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [0007739](https://bugs.oxid-esales.com/view.php?id=7739): Fix that order with payment method Unzer bancontact is not created after successful payment
 - Fix email notification sending for payments with auth only mode
 - Fix transactions list in order admin
+- Fix issue while using Coupons
 
 ## [1.2.0] - 2024-09-26
 

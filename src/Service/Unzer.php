@@ -382,6 +382,9 @@ class Unzer
         // Add Vouchers
         $voucherBasketItems = $this->unzerVoucherBasketItemsService->getVoucherBasketItems($basketModel);
         if (count($voucherBasketItems)) {
+            foreach ($voucherBasketItems as $voucherBasketItem) {
+                $itemsToReCalculate -= $voucherBasketItem->getAmountDiscountPerUnitGross();
+            }
             $unzerBasketItems = array_merge($unzerBasketItems, $voucherBasketItems);
         }
 
