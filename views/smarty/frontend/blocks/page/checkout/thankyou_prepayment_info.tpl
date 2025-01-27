@@ -13,7 +13,7 @@
     [{/if}]
     [{if $oView->getUnzerPrePaymentDescriptor($orderNumber)}]
         [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_DESCRIPTOR"}]: [{$oViewConf->getUnzerPrePaymentDescriptor($orderNumber)}]<br/>
-        [{/if}]
+    [{/if}]
     [{if $oViewConf->getPrePaymentIban($orderNumber)}]
         <br/>
     [{/if}]

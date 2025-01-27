@@ -42,7 +42,7 @@
         unzerApplePayInstance.createResource(paymentData)
             .then(function (result) {
                 session.completePayment({ status: window.ApplePaySession.STATUS_SUCCESS });
-                window.location.href = decodedUrl + '&cl=thankyou';
+                window.location.href = '{{ oViewConf.getSelfLink() }}&cl=thankyou';
             })
             .catch(function (error) {
                 abortPaymentSession(session);

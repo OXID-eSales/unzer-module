@@ -10,6 +10,7 @@
  */
 
 use OxidSolutionCatalysts\Unzer\Controller\AccountSavedPaymentController;
+use OxidSolutionCatalysts\Unzer\Controller\ThankYouController;
 use OxidSolutionCatalysts\Unzer\Model\DiscountList;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\AdminOrderController;
 use OxidSolutionCatalysts\Unzer\Controller\Admin\ModuleConfiguration;
@@ -59,6 +60,7 @@ $aModule = [
     'email'       => 'info@oxid-esales.com',
     'extend'      => [
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => ModuleConfiguration::class,
+        \OxidEsales\Eshop\Application\Controller\ThankYouController::class        => ThankYouController::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class           => OrderMain::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderList::class           => OrderList::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class           => OrderController::class,
@@ -76,7 +78,7 @@ $aModule = [
         'unzer_dispatcher'        => DispatcherController::class,
         'unzer_installment'       => InstallmentController::class,
         'unzer_applepay_callback' => ApplePayCallbackController::class,
-        'unzer_saved_payments'    => AccountSavedPaymentController::class,
+        'unzer_saved_payments'    => AccountSavedPaymentController::class
     ],
     'templates'   => [
         // admin
@@ -154,7 +156,7 @@ $aModule = [
         [
             'template' => 'order_list.tpl',
             'block'    => 'admin_order_list_item',
-            'file'     => 'views/admin/blocks/admin_order_list_item.tpl'
+            'file'     => 'views/smarty/admin/blocks/admin_order_list_item.tpl'
         ],
         //email
         [

@@ -129,6 +129,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $this->saveMerchantCert($systemMode);
         $this->saveMerchantKey($systemMode);
+        $this->saveMerchantIdentifier($systemMode);
         $this->savePaymentCert($systemMode);
         $this->savePaymentKey($systemMode);
 
@@ -252,6 +253,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
             $this->saveMerchantCert($systemMode);
             $this->saveMerchantKey($systemMode);
+            $this->saveMerchantIdentifier($systemMode);
             $this->savePaymentCert($systemMode);
             $this->savePaymentKey($systemMode);
 
@@ -307,6 +309,27 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
+    private function saveMerchantIdentifier(string $systemMode): void
+    {
+        $errorIds = [
+            'onEmpty' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_EMPTY',
+            'onShort' => 'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_TOO_SHORT'
+        ];
+
+        $paramName = $systemMode . '-' . 'applepay_merchant_identifier';
+        $newValue = $_POST['confstrs'][$paramName];
+
+        $oldValue = $this->moduleSettings->getApplePayMerchantIdentifier();
+
+        $this->setIsUpdate($oldValue, $newValue);
+
+        $isValid = $this->validateCredentialsForSaving($newValue, $errorIds);
+
+        if ($isValid && $this->isUpdate) {
+            $this->moduleSettings->setApplePayMerchantIdentifier($newValue);
+        }
+    }
+
     private function savePaymentKey(string $systemMode): void
     {
         $errorIds = [
@@ -352,16 +375,16 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    private function validateCredentialsForSaving(?string $string, array $errors): bool
+    private function validateCredentialsForSaving(?string $newValue, array $errors): bool
     {
-        if ($string === null || strlen($string) === 0) {
+        if (($newValue === null || strlen($newValue) === 0)) {
             if ($this->getIsUpdate()) {
                 $this->addErrorToDisplay($errors['onEmpty']);
             }
             return true;
         }
 
-        if (strlen($string) > 1 && strlen($string) < 32) {
+        if (is_string($newValue) && strlen($newValue) > 1 && strlen($newValue) < 32) {
             $this->addErrorToDisplay($errors['onShort']);
             return false;
         }

@@ -214,6 +214,11 @@ class ModuleSettings
         return '';
     }
 
+    public function setApplePayMerchantIdentifier(string $applepayMerchId): void
+    {
+        $this->saveSetting($this->getSystemMode() . '-applepay_merchant_identifier', $applepayMerchId);
+    }
+
     /**
      * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */

@@ -79,6 +79,9 @@ $aLang = [
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_TOO_SHORT' => 'ApplePay: Händlerzertifikat ist zu kurz',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_CERT_EMPTY' => 'ApplePay: Händlerzertifikat ist leer',
 
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_TOO_SHORT' => 'ApplePay: Händler ID ist zu kurz',
+    'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_MERCHANT_ID_EMPTY' => 'ApplePay: Händler ID ist leer',
+
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_TOO_SHORT' => 'ApplePay: Zahlungsschlüssel ist zu kurz',
     'OSCUNZER_ERROR_TRANSMITTING_APPLEPAY_PAYMENT_KEY_EMPTY' => 'ApplePay: Zahlungsschlüssel ist leer',
 

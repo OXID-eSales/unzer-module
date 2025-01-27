@@ -500,7 +500,7 @@ class Unzer
 
     public function getPaymentProcedure(string $paymentMethod): string
     {
-        if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured', 'applepay', 'paylater-installment'])) {
+        if (in_array($paymentMethod, ['paypal', 'card', 'installment-secured', 'paylater-installment'])) {
             return $this->moduleSettings->getPaymentProcedureSetting($paymentMethod);
         }
 
