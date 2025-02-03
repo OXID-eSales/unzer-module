@@ -1,100 +1,148 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
 {% if false %}<script>{% endif %}
 {% capture assign = "unzerApplePayJS" %}
+
     const unzerInstance = new unzer('{{ unzerpub }}');
     const unzerApplePayInstance = unzerInstance.ApplePay();
-
-    // Get the form element
     const form = document.getElementById('orderConfirmAgbBottom');
+    const selfUrlEncoded = decodeURIComponent('{{ oViewConf.getSelfActionLink()|url_encode('raw') }}')
+    const selfActionUrl = selfUrlEncoded.replace(/&amp;/g, '&')
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        setupApplePaySession();
-    });
+    const applePaySubmit = document.getElementById('submitOrder');
+    if (applePaySubmit) {
+        applePaySubmit.addEventListener('click', function (e) {
+            console.log("Apple Pay button clicked");
+            e.preventDefault();
+            try {
+                console.log("Initializing Apple Pay session setup...");
+                setupApplePaySession();
+            } catch (error) {
+                console.error("Error during Apple Pay session setup:", error.message);
+            }
+        });
+    } else {
+        console.error("Apple Pay submit button not found!");
+    }
 
     function startApplePaySession(applePayPaymentRequest) {
+        console.log("Starting Apple Pay session with request:", applePayPaymentRequest);
+
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
             const session = new ApplePaySession(6, applePayPaymentRequest);
 
             session.onvalidatemerchant = function (event) {
+                console.log("Merchant validation triggered with event:", event);
                 merchantValidationCallback(session, event);
             };
 
             session.onpaymentauthorized = function (event) {
+                console.log("Payment authorized with event:", event);
                 applePayAuthorizedCallback(event, session);
             };
 
-            session.oncancel = onCancelCallback;
+            session.oncancel = function (event) {
+                console.log("Apple Pay session canceled with event:", event);
+                onCancelCallback(event);
+            };
 
+            console.log("Beginning Apple Pay session...");
             session.begin();
         } else {
+            console.error("Apple Pay is not supported on this device or browser.");
             handleError({ message: 'This device does not support Apple Pay!', error: new Error('Apple Pay not supported') });
         }
     }
 
     function applePayAuthorizedCallback(event, session) {
-        const paymentData = event.payment.token.paymentData;
-        let actionEncodedUrl = '{{ oViewConf.getSelfActionLink() }}';
-        let decodedUrl = actionEncodedUrl.replace(/&amp;amp;/g, '&');
-        let headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        headers.append('Accept', 'application/json');
-        unzerApplePayInstance.createResource(paymentData)
-            .then(function (result) {
-                session.completePayment({ status: window.ApplePaySession.STATUS_SUCCESS });
-                window.location.href = '{{ oViewConf.getSelfLink() }}&cl=thankyou';
-            })
-            .catch(function (error) {
+        try {
+            const paymentData = event.payment.token.paymentData;
+            unzerApplePayInstance.createResource(paymentData)
+                .then(function (result) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'paymentData';
+                hiddenInput.value = JSON.stringify(result);
+                form.appendChild(hiddenInput);
+                const formData = new FormData(form);
+                console.log("Submitting payment data to encoded:", selfActionUrl);
+                fetch(selfActionUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        handleError({message: response.statusText});
+                        window.location.href = url + 'cl=payment&payerror=2';
+                    }
+                    session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
+                    let thankyouUrl = selfActionUrl + 'cl=thankyou';
+                    console.log("Redirecting to thank you page:", thankyouUrl);
+                    setTimeout(() => {
+                        window.location.href = thankyouUrl;
+                    }, 2000);
+                    return;
+                }).catch(error => {
+                    console.error("Error during executeunzer operation:", error);
+                    handleError({message: error.message});
+                    abortPaymentSession(session);
+                    window.location.href = selfActionUrl + 'cl=payment&payerror=2';
+                    return;
+                });
+            }).catch(error => {
+                console.error("Error creating Apple Pay resource:", error);
+                handleError({message: error.message});
                 abortPaymentSession(session);
-                window.location.href = '{{ oViewConf.getSelfLink() }}cl=payment&payerror=2';
-            }
-        );
+                return;
+            });
+        } catch (error) {
+            console.error("Unhandled exception in Apple Pay callback:", error);
+            handleError({message: error.message});
+            abortPaymentSession(session);
+        }
     }
 
     function merchantValidationCallback(session, event) {
-        let shopSelfUrlEscaped = '{{ oViewConf.getSelfActionLink() }}';
-        let shopSelfUrl = shopSelfUrlEscaped.replace(/&amp;amp;/g, '&');
+        console.log("Validating merchant with event:", event);
 
-        let headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        headers.append('Accept', 'application/json');
-
+        let shopSelfUrlEscaped = '{{ oViewConf.getSelfActionLink()|raw }}';
         let formData = new FormData();
         formData.append('cl', 'unzer_applepay_callback');
         formData.append('fnc', 'validateMerchant');
-        formData.append('merchantValidationUrl',  event.validationURL);
-        formData.append('stoken', '{{ oViewConf.getSessionChallengeToken() }}');
+        formData.append('merchantValidationUrl', event.validationURL);
+        formData.append('stoken', '{{ oViewConf.getSessionChallengeToken()|raw }}');
 
-        fetch(
-            shopSelfUrl,
-            {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: headers,
-                body: formData
-            }
-        )
-        .then(response => {
+        console.log("Merchant validation form data:", Array.from(formData.entries()));
+        fetch(shopSelfUrlEscaped, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: formData
+        })
+            .then(response => {
+            console.log("Merchant validation response status:", response.status);
             if (!response.ok) {
-                throw new Error(response.statusText);
+                throw new Error("HTTP error: " + response.statusText);
             }
             return response.json();
         })
-        .then(function (data) {
-            try {
+            .then(function (data) {
+            console.log("Merchant validation response data:", data);
+            if (data.validationResponse && data.validationResponse.merchantSessionIdentifier) {
                 session.completeMerchantValidation(data.validationResponse);
-            } catch (e) {
-                handleError({ message: 'cannot complete merchant valiation ' + e.message, e });
+                console.log("Merchant validation completed successfully.");
+            } else {
+                throw new Error("Invalid validation response: Missing required fields (merchantSessionIdentifier).");
             }
         })
-        .catch(function (error) {
+            .catch(function (error) {
+            console.error("Error during merchant validation:", error);
             handleError({ message: error.message, error });
             session.abort();
         });
     }
 
-    function onCancelCallback() {
-        handleError({ message: 'Canceled by user', error: new Error('Not Error: User canceled') });
+    function onCancelCallback(event) {
+        console.warn("Apple Pay session canceled by user. Event:", event);
+        handleError({ message: 'Payment process canceled by user.' });
     }
 
     {% set currency = oView.getActCurrency() %}
@@ -102,112 +150,274 @@
     {% set deliveryCost = oxcmp_basket.getDeliveryCost() %}
 
     function setupApplePaySession() {
+        console.log("Setting up Apple Pay session...");
         const applePayPaymentRequest = {
             countryCode: '{{ oView.getUserCountryIso() }}',
             currencyCode: '{{ currency.name }}',
             total: {
                 label: '{{ oView.getApplePayLabel() }}',
-                amount: {{ total.getPrice() }},
+                amount: {{ total.getPrice() }}
             },
             merchantCapabilities: [
                 'supports3DS',
                 {% for capability in oView.getSupportedApplePayMerchantCapabilities() %}
                     '{{ capability }}'{% if not loop.last %}, {% endif %}
-    {% endfor %}
+                {% endfor %}
             ],
-            supportedNetworks: [
+             supportedNetworks: [
                 {% for network in oView.getSupportedApplePayNetworks() %}
                     '{{ network }}'{% if not loop.last %}, {% endif %}
-    {% endfor %}
-        ],
-        requiredShippingContactFields: [],
-        requiredBillingContactFields: [],
-        lineItems: [
-            {% if not oxcmp_basket.getDiscounts() %}
-                {
-                    label: '{{ translate({ ident: "TOTAL_NET" }) }}',
-                    type: 'final',
-                    amount: {{ oxcmp_basket.getNettoSum() }},
-                },
-                {% for key, vat in oxcmp_basket.getProductVats(false) %}
-                    {
-                        label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: key }) }}',
-                        type: 'final',
-                        amount: {{ vat }},
-                    },
                 {% endfor %}
-                {
-                    label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
-                    type: 'final',
-                    amount: {{ oxcmp_basket.getBruttoSum() }},
-                },
-            {% else %}
-    {% if oxcmp_basket.isPriceViewModeNetto() %}
-        {
-            label: '{{ translate({ ident: "TOTAL_NET" }) }}',
-            type: 'final',
-            amount: {{ oxcmp_basket.getNettoSum() }},
-        },
-    {% else %}
-        {
-            label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
-            type: 'final',
-            amount: {{ oxcmp_basket.getBruttoSum() }},
-        },
-    {% endif %}
-    {% for oDiscount in oxcmp_basket.getDiscounts() %}
-    {% set discount = oDiscount.dDiscount * -1 %}
-            {
-                label: '{{ oDiscount.sDiscount }}',
-                type: 'final',
-                amount: {{ discount }},
-            },
-        {% endfor %}
-    {% if not oxcmp_basket.isPriceViewModeNetto() %}
-            {
-                label: '{{ translate({ ident: "TOTAL_NET" }) }}',
-                type: 'final',
-                amount: {{ oxcmp_basket.getNettoSum() }},
-            },
-        {% endif %}
-    {% for key, vat in oxcmp_basket.getProductVats(false) %}
-        {
-            label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: key }) }}',
-            type: 'final',
-            amount: {{ vat }},
-        },
-    {% endfor %}
-    {% if oxcmp_basket.isPriceViewModeNetto() %}
-        {
-            label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
-            type: 'final',
-            amount: {{ oxcmp_basket.getBruttoSum() }},
-        },
-    {% endif %}
-    {% endif %}
-
-    {% if oViewConf.getShowVouchers() and oxcmp_basket.getVoucherDiscValue() %}
-    {% for oVoucher in oxcmp_basket.getVouchers() %}
-    {% set voucherDiscount = oVoucher.dVoucherdiscount * -1 %}
-            {
-                label: '{{ translate({ ident: "COUPON" }) }} ({{ translate({ ident: "NUMBER" }) }} {{ oVoucher.sVoucherNr }})',
-                type: 'final',
-                amount: {{ voucherDiscount }},
-            },
-        {% endfor %}
-    {% endif %}
             ],
+            requiredShippingContactFields: [],
+            requiredBillingContactFields: [],
+            lineItems: getApplePayLineItems(),
         };
 
+        console.log("Apple Pay payment request:", applePayPaymentRequest);
         startApplePaySession(applePayPaymentRequest);
     }
 
-    function handleError({ html = '{{ translate({ ident: "oscunzer_APPLEPAY_ERROR" }) }}', message, error } = {}) {
-        {% if oViewConf.isUnzerDebugMode() %}
-        if (message) {
-            console.log("ApplePay Unzer Modul Error: " + message);
+    function getApplePayLineItems() {
+        // --- Basket Data rendered via Twig ---
+        const nettoSum = parseFloat("{{ oxcmp_basket.getNettoSum()|default('0') }}") || 0;
+        const bruttoSum = parseFloat("{{ oxcmp_basket.getBruttoSum()|default('0') }}") || 0;
+        const productVats = {{ oxcmp_basket.getProductVats(false)|json_encode|raw }};
+        const discounts = {{ oxcmp_basket.getDiscounts()|json_encode|raw }};
+        const isPriceViewNetto = {{ oxcmp_basket.isPriceViewModeNetto()|json_encode|raw }};
+        const vouchers = {{ oxcmp_basket.getVouchers()|json_encode|raw }};
+        const voucherDiscValue = parseFloat("{{ oxcmp_basket.getVoucherDiscValue()|default('0') }}") || 0;
+        const basketUser = {{ oxcmp_basket.getBasketUser()|json_encode|raw }};
+        const paymentCost = {{ oxcmp_basket.getPaymentCost()|json_encode|raw }};
+        const wrappingCost = {{ oxcmp_basket.getWrappingCost()|json_encode|raw }};
+        const basketWrappCostVat = {{ oxcmp_basket.getWrappCostVat()|json_encode|raw }};
+        const giftCardCost = {{ oxcmp_basket.getGiftCardCost()|json_encode|raw }};
+        const isProportionalCalculationOn = {{ oxcmp_basket.isProportionalCalculationOn()|json_encode|raw }};
+
+        // Delivery cost – already set, or null.
+        const deliveryCost = {{ deliveryCost ? deliveryCost|json_encode|raw : 'null' }};
+
+        // --- View Configuration rendered as booleans ---
+        const showVouchers = {{ viewConf.getShowVouchers()|json_encode|raw }};
+        const showGiftWrapping = {{ viewConf.getShowGiftWrapping()|json_encode|raw }};
+        const calcDelCostIfNotLoggedIn = {{ viewConf.isFunctionalityEnabled('blCalculateDelCostIfNotLoggedIn')|json_encode|raw }};
+        const showVATForDelivery = {{ viewConf.isFunctionalityEnabled('blShowVATForDelivery')|json_encode|raw }};
+        const showVATForPayCharge = {{ viewConf.isFunctionalityEnabled('blShowVATForPayCharge')|json_encode|raw }};
+        const showVATForWrapping = {{ viewConf.isFunctionalityEnabled('blShowVATForWrapping')|json_encode|raw }};
+
+        const lineItems = [];
+
+        // --- Products / Discounts Section ---
+        if (!discounts || discounts.length === 0) {
+            // No discounts: add total net, each VAT, then total gross.
+            lineItems.push({
+                label: '{{ translate({ ident: "TOTAL_NET" }) }}',
+                type: 'final',
+                amount: nettoSum
+            });
+            for (const key in productVats) {
+                if (productVats.hasOwnProperty(key)) {
+                    lineItems.push({
+                        // Replace the placeholder "KEY" with the actual VAT key.
+                        label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: "KEY" }) }}'.replace('KEY', key),
+                        type: 'final',
+                        amount: parseFloat(productVats[key]) || 0
+                    });
+                }
+            }
+            lineItems.push({
+                label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
+                type: 'final',
+                amount: bruttoSum
+            });
+        } else {
+            // With discounts.
+            if (isPriceViewNetto) {
+                lineItems.push({
+                    label: '{{ translate({ ident: "TOTAL_NET" }) }}',
+                    type: 'final',
+                    amount: nettoSum
+                });
+            } else {
+                lineItems.push({
+                    label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
+                    type: 'final',
+                    amount: bruttoSum
+                });
+            }
+            discounts.forEach(function(oDiscount) {
+                lineItems.push({
+                    label: oDiscount.sDiscount,
+                    type: 'final',
+                    amount: (parseFloat(oDiscount.dDiscount) * -1) || 0
+                });
+            });
+            if (!isPriceViewNetto) {
+                lineItems.push({
+                    label: '{{ translate({ ident: "TOTAL_NET" }) }}',
+                    type: 'final',
+                    amount: nettoSum
+                });
+            }
+            for (const key in productVats) {
+                if (productVats.hasOwnProperty(key)) {
+                    lineItems.push({
+                        label: '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: "KEY" }) }}'.replace('KEY', key),
+                        type: 'final',
+                        amount: parseFloat(productVats[key]) || 0
+                    });
+                }
+            }
+            if (isPriceViewNetto) {
+                lineItems.push({
+                    label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
+                    type: 'final',
+                    amount: bruttoSum
+                });
+            }
         }
-        {% endif %}
+
+        // --- Voucher Handling ---
+        if (showVouchers && voucherDiscValue) {
+            vouchers.forEach(function(oVoucher) {
+                lineItems.push({
+                    label: '{{ translate({ ident: "COUPON" }) }} ({{ translate({ ident: "NUMBER" }) }} ' + oVoucher.sVoucherNr + ')',
+                    type: 'final',
+                    amount: (parseFloat(oVoucher.dVoucherdiscount) * -1) || 0
+                });
+            });
+        }
+
+        // --- Delivery Cost Handling ---
+        if (deliveryCost && (basketUser || calcDelCostIfNotLoggedIn)) {
+            if (showVATForDelivery) {
+                const dShippingVatValue = parseFloat(deliveryCost.vatValue) || 0;
+                lineItems.push({
+                    label: '{{ translate({ ident: "SHIPPING_NET" }) }}',
+                    type: 'final',
+                    amount: parseFloat(deliveryCost.nettoPrice) || 0
+                });
+                if (dShippingVatValue) {
+                    let shippingLabel = '';
+                    if (isProportionalCalculationOn) {
+                        shippingLabel = '{{ translate({ ident: "BASKET_TOTAL_PLUS_PROPORTIONAL_VAT", suffix: "COLON" }) }}';
+                    } else {
+                        shippingLabel = '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: "VAT" }) }}'.replace('VAT', deliveryCost.vat);
+                    }
+                    lineItems.push({
+                        label: shippingLabel,
+                        type: 'final',
+                        amount: dShippingVatValue
+                    });
+                }
+            } else {
+                lineItems.push({
+                    label: '{{ translate({ ident: "SHIPPING_COST" }) }}',
+                    type: 'final',
+                    amount: parseFloat(deliveryCost.bruttoPrice) || 0
+                });
+            }
+        }
+
+        // --- Payment Cost Handling ---
+        if (paymentCost && paymentCost.price) {
+            if (showVATForPayCharge) {
+                let label = '';
+                if (paymentCost.price >= 0) {
+                    label = '{{ translate({ ident: "SURCHARGE" }) }}';
+                } else {
+                    label = '{{ translate({ ident: "DEDUCTION" }) }}' + '{{ translate({ ident: "PAYMENT_METHOD" }) }}';
+                }
+                lineItems.push({
+                    label: label,
+                    type: 'final',
+                    amount: parseFloat(paymentCost.nettoPrice) || 0
+                });
+            }
+            if (paymentCost.vatValue) {
+                let label = '';
+                if (isProportionalCalculationOn) {
+                    label = '{{ translate({ ident: "BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" }) }}';
+                } else {
+                    label = '{{ translate({ ident: "SURCHARGE_PLUS_PERCENT_AMOUNT", args: "PAYVAT" }) }}'.replace('PAYVAT', paymentCost.vat);
+                }
+                lineItems.push({
+                    label: label,
+                    type: 'final',
+                    amount: parseFloat(paymentCost.vatValue) || 0
+                });
+            }
+        } else if (paymentCost) {
+            let label = '';
+            if (paymentCost.price >= 0) {
+                label = '{{ translate({ ident: "SURCHARGE" }) }}';
+            } else {
+                label = '{{ translate({ ident: "DEDUCTION" }) }}' + '{{ translate({ ident: "PAYMENT_METHOD" }) }}';
+            }
+            lineItems.push({
+                label: label,
+                type: 'final',
+                amount: parseFloat(paymentCost.bruttoPrice) || 0
+            });
+        }
+
+        // --- Gift Wrapping and Gift Card Handling ---
+        if (showGiftWrapping) {
+            if (wrappingCost && wrappingCost.price > 0) {
+                if (showVATForWrapping) {
+                    lineItems.push({
+                        label: '{{ translate({ ident: "BASKET_TOTAL_WRAPPING_COSTS_NET" }) }}',
+                        type: 'final',
+                        amount: parseFloat(wrappingCost.nettoPrice) || 0
+                    });
+                    if (basketWrappCostVat) {
+                        lineItems.push({
+                            label: '{{ translate({ ident: "PLUS_VAT" }) }}',
+                            type: 'final',
+                            amount: parseFloat(wrappingCost.vatValue) || 0
+                        });
+                    }
+                } else {
+                    lineItems.push({
+                        label: '{{ translate({ ident: "GIFT_WRAPPING" }) }}',
+                        type: 'final',
+                        amount: parseFloat(wrappingCost.bruttoPrice) || 0
+                    });
+                }
+            }
+            if (giftCardCost && giftCardCost.price > 0) {
+                if (showVATForWrapping) {
+                    lineItems.push({
+                        label: '{{ translate({ ident: "BASKET_TOTAL_GIFTCARD_COSTS_NET" }) }}',
+                        type: 'final',
+                        amount: parseFloat(giftCardCost.nettoPrice) || 0
+                    });
+                    let gcLabel = '';
+                    if (isProportionalCalculationOn) {
+                        gcLabel = '{{ translate({ ident: "BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" }) }}';
+                    } else {
+                        gcLabel = '{{ translate({ ident: "VAT_PLUS_PERCENT_AMOUNT", args: "GCVAT" }) }}'.replace('GCVAT', giftCardCost.vat);
+                    }
+                    lineItems.push({
+                        label: gcLabel,
+                        type: 'final',
+                        amount: parseFloat(giftCardCost.vatValue) || 0
+                    });
+                } else {
+                    lineItems.push({
+                        label: '{{ translate({ ident: "GREETING_CARD" }) }}',
+                        type: 'final',
+                        amount: parseFloat(giftCardCost.bruttoPrice) || 0
+                    });
+                }
+            }
+        }
+
+        return lineItems;
+    }
+
+    function handleError({ html = '{{ translate({ ident: "oscunzer_APPLEPAY_ERROR" }) }}', message, error } = {}) {
+        console.error("Error occurred:", message, error);
 
         const errorElement = document.querySelector('.js-unzer-error-holder');
         if (errorElement) {
@@ -219,10 +429,12 @@
     }
 
     function abortPaymentSession(session) {
+        console.warn("Aborting Apple Pay session...");
         session.completePayment({ status: window.ApplePaySession.STATUS_FAILURE });
         session.abort();
     }
     {% endcapture %}
-{% if false %}</script>{% endif %}
+
+    {% if false %}</script>{% endif %}
 
 {{ script({ add: unzerApplePayJS, dynamic: __oxid_include_dynamic }) }}

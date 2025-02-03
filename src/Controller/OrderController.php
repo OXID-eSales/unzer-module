@@ -95,6 +95,7 @@ class OrderController extends OrderController_parent
         }
 
         $unzer = $this->getServiceFromContainer(Unzer::class);
+
         if ($unzer->isAjaxPayment()) {
             $response = $this->getServiceFromContainer(ResponseHandler::class)->response();
             if ($ret && !str_contains($ret, 'thankyou')) {
@@ -486,7 +487,7 @@ class OrderController extends OrderController_parent
         $oTmpOrder = oxNew(TmpOrder::class);
         $tmpOrderArray = $oTmpOrder->getTmpOrderByUnzerId($orderId);
 
-        if (!$tmpOrderArray) {
+        if (!empty($tmpOrderArray)) {
             return false;
         }
 
