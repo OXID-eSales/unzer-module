@@ -410,7 +410,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ModuleCodeceptionTestsLog-${{ inputs.php }}-${{ inputs.mysql }}-${{ inputs.template_engine }}
+          name: ModuleCodeceptionTestsLog-${{ inputs.php }}-${{ inputs.mysql }}-${{ inputs.template_engine }}-${{ matrix.group }}
           path: |
             docker-compose.yml
             source/composer.json
