@@ -1,12 +1,11 @@
 [{include file="@osc-unzer/frontend/tpl/order/unzer_assets.tpl"}]
 
 [{capture assign="unzerApplePayJS"}]
-[{if false }]<script>[{/if}]
+    [{if false }]<script>[{/if}]
 
     const unzerInstance = new unzer('[{$unzerpub}]');
     const unzerApplePayInstance = unzerInstance.ApplePay();
     const form = document.getElementById('orderConfirmAgbBottom');
-    const encodedUrl = '[{$oViewConf->getSelfActionLink()}]';
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -14,14 +13,17 @@
     });
 
     function startApplePaySession(applePayPaymentRequest) {
+        console.log("Starting Apple Pay session with payment request");
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
             const session = new ApplePaySession(6, applePayPaymentRequest);
 
             session.onvalidatemerchant = function (event) {
+                console.log("Merchant validation requested");
                 merchantValidationCallback(session, event);
             };
 
             session.onpaymentauthorized = function (event) {
+                console.log("Payment authorize started");
                 applePayAuthorizedCallback(event, session);
             };
 
@@ -36,46 +38,45 @@
     }
 
     function applePayAuthorizedCallback(event, session) {
+        let shopSelfUrlEscaped = '[{$oViewConf->getSelfActionLink()}]';
+        let shopSelfUrl = shopSelfUrlEscaped.replace(/&amp;/g, '&');
         try {
             const paymentData = event.payment.token.paymentData;
             unzerApplePayInstance.createResource(paymentData)
                 .then(function (result) {
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'paymentData';
-                hiddenInput.value = JSON.stringify(result);
-                form.appendChild(hiddenInput);
-                const formData = new FormData(form);
-                console.log("Submitting payment data to encoded:", selfActionUrl);
-                fetch(selfActionUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: formData
-                }).then(response => {
-                    if (!response.ok) {
-                        handleError({message: response.statusText});
-                        window.location.href = url + 'cl=payment&payerror=2';
-                    }
-                    session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
-                    let thankyouUrl = selfActionUrl + 'cl=thankyou';
-                    console.log("Redirecting to thank you page:", thankyouUrl);
-                    setTimeout(() => {
-                        window.location.href = thankyouUrl;
-                    }, 2000);
-                    return;
-                }).catch(error => {
-                    console.error("Error during executeunzer operation:", error);
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'paymentData';
+                    hiddenInput.value = JSON.stringify(result);
+                    form.appendChild(hiddenInput);
+                    const formData = new FormData(form);
+                    fetch(shopSelfUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Fetch failed: ${response.statusText}`);
+                        }
+                        return response.text();
+                    })
+                    .then(responseText => {
+                        session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
+                        window.location.href = shopSelfUrl + '&cl=thankyou';
+                    })
+                    .catch(error => {
+                        console.error("Error during fetch operation:", error);
+                        handleError({message: error.message});
+                        abortPaymentSession(session);
+                        window.location.href = shopSelfUrl + '&cl=payment&payerror=2';
+                    });
+                })
+                .catch(error => {
+                    console.error("Error creating Apple Pay resource:", error);
                     handleError({message: error.message});
                     abortPaymentSession(session);
-                    window.location.href = selfActionUrl + 'cl=payment&payerror=2';
-                    return;
                 });
-            }).catch(error => {
-                console.error("Error creating Apple Pay resource:", error);
-                handleError({message: error.message});
-                abortPaymentSession(session);
-                return;
-            });
         } catch (error) {
             console.error("Unhandled exception in Apple Pay callback:", error);
             handleError({message: error.message});
@@ -117,11 +118,9 @@
         });
     }
 
-
     function onCancelCallback(event) {
         handleError({ message: 'Payment process canceled by user.' });
     }
-
 
     [{assign var="currency" value=$oView->getActCurrency()}]
     [{assign var="total" value=$oxcmp_basket->getPrice()}]
@@ -149,26 +148,26 @@
             requiredShippingContactFields: [],
             requiredBillingContactFields: [],
             lineItems: [
-                [{if !$oxcmp_basket->getDiscounts()}]
-                    {
-                        label: '[{oxmultilang ident="TOTAL_NET"}]',
-                        type: 'final',
-                        amount: [{$oxcmp_basket->getNettoSum()}],
-                    },
-                    [{foreach from=$oxcmp_basket->getProductVats(false) item=vat key=key}]
+                    [{if !$oxcmp_basket->getDiscounts()}]
                         {
-                            label: '[{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$key}]',
+                            label: '[{oxmultilang ident="TOTAL_NET"}]',
                             type: 'final',
-                            amount: [{$vat}],
+                            amount: [{$oxcmp_basket->getNettoSum()}]
                         },
-                    [{/foreach}]
-                    {
-                        label: '[{oxmultilang ident="TOTAL_GROSS"}]',
-                        type: 'final',
-                        amount: [{$oxcmp_basket->getBruttoSum()}],
-                    },
-                [{else}]
-                    [{if $oxcmp_basket->isPriceViewModeNetto()}]
+                        [{foreach from=$oxcmp_basket->getProductVats(false) item=vat key=key}]
+                            {
+                                label: '[{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$key}]',
+                                type: 'final',
+                                amount: [{$vat}]
+                            },
+                        [{/foreach}]
+                        {
+                            label: '[{oxmultilang ident="TOTAL_GROSS" args=$key}]',
+                            type: 'final',
+                            amount: [{$oxcmp_basket->getBruttoSum()}]
+                        },
+                    [{else}]
+                        [{if $oxcmp_basket->isPriceViewModeNetto()}]
                             {
                                 label: '[{oxmultilang ident="TOTAL_NET"}]',
                                 type: 'final',
@@ -181,7 +180,8 @@
                                 amount: [{$oxcmp_basket->getBruttoSum()}]
                             },
                         [{/if}]
-                        [{foreach from=$oxcmp_basket->getDiscounts() item="oDiscount"}]
+                        [{assign var="discounts" value=$oxcmp_basket->getDiscounts()}]
+                        [{foreach from=discounts item="oDiscount"}]
                             [{assign var="discount" value=$oDiscount->dDiscount*-1}]
                             {
                                 label: '[{$oDiscount->sDiscount}]',
@@ -210,114 +210,116 @@
                                 amount: [{$oxcmp_basket->getBruttoSum()}]
                             },
                         [{/if}]
-                [{/if}]
-
-                [{if $oViewConf->getShowVouchers() && $oxcmp_basket->getVoucherDiscValue()}]
-                    [{foreach from=$oxcmp_basket->getVouchers() item="oVoucher"}]
-                        [{assign var="voucherDiscount" value=$oVoucher->dVoucherdiscount*-1}]
-                        {
-                            label: '[{oxmultilang ident="COUPON"}] ([{oxmultilang ident="NUMBER"}] [{$oVoucher->sVoucherNr}])',
-                            type: 'final',
-                            amount: [{$voucherDiscount}]
-                        },
-                    [{/foreach}]
-                [{/if}]
-                [{if $deliveryCost && ($oxcmp_basket->getBasketUser() || $oViewConf->isFunctionalityEnabled('blCalculateDelCostIfNotLoggedIn'))}]
-                    [{if $oViewConf->isFunctionalityEnabled('blShowVATForDelivery') }]
-                        [{assign var="dShippingVatValue" value=$deliveryCost->getVatValue()}]
-                        {
-                            label: '[{oxmultilang ident="SHIPPING_NET"}]',
-                            type: 'final',
-                            amount: [{$deliveryCost->getNettoPrice()}]
-                        },
-                        [{if $dShippingVatValue}]
-                            {
-                                label: '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" suffix="COLON"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$deliveryCost->getVat()}][{/if}]',
-                                type: 'final',
-                                amount: [{$dShippingVatValue}]
-                            },
-                        [{/if}]
-                    [{else}]
-                        {
-                            label: '[{oxmultilang ident="SHIPPING_COST"}]',
-                            type: 'final',
-                            amount: [{$deliveryCost->getBruttoPrice()}]
-                        },
                     [{/if}]
-                [{/if}]
 
-                [{assign var="paymentCost" value=$oxcmp_basket->getPaymentCost()}]
-                [{if $paymentCost && $paymentCost->getPrice()}]
-                    [{if $oViewConf->isFunctionalityEnabled('blShowVATForPayCharge')}]
-                        {
-                            label: '[{if $paymentCost->getPrice() >= 0}][{ oxmultilang ident="SURCHARGE" }][{else}][{ oxmultilang ident="DEDUCTION" }][{oxmultilang ident="PAYMENT_METHOD"}][{/if}]',
-                            type: 'final',
-                            amount: [{$paymentCost->getNettoPrice()}]
-                        },
-                        [{if $paymentCost->getVatValue()}]
+                    [{if $oViewConf->getShowVouchers() && $oxcmp_basket->getVoucherDiscValue()}]
+                        [{foreach from=$oxcmp_basket->getVouchers() item="oVoucher"}]
+                            [{assign var="voucherDiscount" value=$oVoucher->dVoucherdiscount*-1}]
                             {
-                                label: '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT"}][{else}][{oxmultilang ident="SURCHARGE_PLUS_PERCENT_AMOUNT" args=$paymentCost->getVat()}][{/if}]',
+                                label: '[{oxmultilang ident="COUPON"}] ([{oxmultilang ident="NUMBER"}] [{$oVoucher->sVoucherNr}])',
                                 type: 'final',
-                                amount: [{$paymentCost->getVatValue()}]
+                                amount: [{$voucherDiscount}]
                             },
-                        [{/if}]
-                    [{else}]
-                        {
-                            label: '[{if $paymentCost->getPrice() >= 0}][{ oxmultilang ident="SURCHARGE" }][{else}][{ oxmultilang ident="DEDUCTION" }][{oxmultilang ident="PAYMENT_METHOD"}][{/if}]',
-                            type: 'final',
-                            amount: [{$paymentCost->getBruttoPrice()}]
-                        },
+                        [{/foreach}]
                     [{/if}]
-                [{/if}]
-                [{if $oViewConf->getShowGiftWrapping()}]
-                    [{assign var="wrappingCost" value=$oxcmp_basket->getWrappingCost()}]
-                    [{if $wrappingCost && $wrappingCost->getPrice() > 0}]
-                        [{if $oViewConf->isFunctionalityEnabled('blShowVATForWrapping')}]
+
+                    [{if $deliveryCost && ($oxcmp_basket->getBasketUser() || $oViewConf->isFunctionalityEnabled('blCalculateDelCostIfNotLoggedIn'))}]
+                        [{if $oViewConf->isFunctionalityEnabled('blShowVATForDelivery') }]
+                            [{assign var="dShippingVatValue" value=$deliveryCost->getVatValue()}]
                             {
-                                label: '[{oxmultilang ident="BASKET_TOTAL_WRAPPING_COSTS_NET"}]',
+                                label: '[{oxmultilang ident="SHIPPING_NET"}]',
                                 type: 'final',
-                                amount: [{$wrappingCost->getNettoPrice()}]
+                                amount: [{$deliveryCost->getNettoPrice()}]
                             },
-                            [{if $oxcmp_basket->getWrappCostVat()}]
+                            [{if $dShippingVatValue}]
                                 {
-                                    label: '[{oxmultilang ident="PLUS_VAT"}]',
+                                    label: '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT" suffix="COLON"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$deliveryCost->getVat()}][{/if}]',
                                     type: 'final',
-                                    amount: [{$wrappingCost->getVatValue()}]
+                                    amount: [{$dShippingVatValue}]
                                 },
                             [{/if}]
                         [{else}]
                             {
-                                label: '[{oxmultilang ident="GIFT_WRAPPING"}]',
+                                label: '[{oxmultilang ident="SHIPPING_COST"}]',
                                 type: 'final',
-                                amount: [{$wrappingCost->getBruttoPrice()}]
+                                amount: [{$deliveryCost->getBruttoPrice()}]
                             },
                         [{/if}]
                     [{/if}]
-                    [{assign var="giftCardCost" value=$oxcmp_basket->getGiftCardCost()}]
-                    [{if $giftCardCost && $giftCardCost->getPrice() > 0 }]
-                        [{if $oViewConf->isFunctionalityEnabled('blShowVATForWrapping') }]
+
+                    [{assign var="paymentCost" value=$oxcmp_basket->getPaymentCost()}]
+                    [{if $paymentCost && $paymentCost->getPrice()}]
+                        [{if $oViewConf->isFunctionalityEnabled('blShowVATForPayCharge')}]
                             {
-                                label: '[{oxmultilang ident="BASKET_TOTAL_GIFTCARD_COSTS_NET"}]',
+                                label: '[{if $paymentCost->getPrice() >= 0}][{ oxmultilang ident="SURCHARGE" }][{else}][{ oxmultilang ident="DEDUCTION" }][{oxmultilang ident="PAYMENT_METHOD"}][{/if}]',
                                 type: 'final',
-                                amount: [{$giftCardCost->getNettoPrice()}]
+                                amount: [{$paymentCost->getNettoPrice()}]
                             },
-                            {
-                                label: '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$giftCardCost->getVat()}][{/if}]',
-                                type: 'final',
-                                amount: [{$giftCardCost->getVatValue()}]
-                            },
+                            [{if $paymentCost->getVatValue()}]
+                                {
+                                    label: '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT"}][{else}][{oxmultilang ident="SURCHARGE_PLUS_PERCENT_AMOUNT" args=$paymentCost->getVat()}][{/if}]',
+                                    type: 'final',
+                                    amount: [{$paymentCost->getVatValue()}]
+                                },
+                            [{/if}]
                         [{else}]
                             {
-                                label: '[{oxmultilang ident="GREETING_CARD"}]',
+                                label: '[{if $paymentCost->getPrice() >= 0}][{ oxmultilang ident="SURCHARGE" }][{else}][{ oxmultilang ident="DEDUCTION" }][{oxmultilang ident="PAYMENT_METHOD"}][{/if}]',
                                 type: 'final',
-                                amount: [{$giftCardCost->getBruttoPrice()}]
+                                amount: [{$paymentCost->getBruttoPrice()}]
                             },
                         [{/if}]
                     [{/if}]
-                [{/if}]
-            ],
-        };
+                    [{if $oViewConf->getShowGiftWrapping()}]
+                        [{assign var="wrappingCost" value=$oxcmp_basket->getWrappingCost()}]
+                        [{if $wrappingCost && $wrappingCost->getPrice() > 0}]
+                            [{if $oViewConf->isFunctionalityEnabled('blShowVATForWrapping')}]
+                                {
+                                    label: '[{oxmultilang ident="BASKET_TOTAL_WRAPPING_COSTS_NET"}]',
+                                    type: 'final',
+                                    amount: [{$wrappingCost->getNettoPrice()}]
+                                },
+                                [{if $oxcmp_basket->getWrappCostVat()}]
+                                    {
+                                        label: '[{oxmultilang ident="PLUS_VAT"}]',
+                                        type: 'final',
+                                        amount: [{$wrappingCost->getVatValue()}]
+                                    },
+                                [{/if}]
+                            [{else}]
+                                {
+                                    label: '[{oxmultilang ident="GIFT_WRAPPING"}]',
+                                    type: 'final',
+                                    amount: [{$wrappingCost->getBruttoPrice()}]
+                                },
+                            [{/if}]
+                        [{/if}]
+                        [{assign var="giftCardCost" value=$oxcmp_basket->getGiftCardCost()}]
+                        [{if $giftCardCost && $giftCardCost->getPrice() > 0 }]
+                            [{if $oViewConf->isFunctionalityEnabled('blShowVATForWrapping') }]
+                                {
+                                    label: '[{oxmultilang ident="BASKET_TOTAL_GIFTCARD_COSTS_NET"}]',
+                                    type: 'final',
+                                    amount: [{$giftCardCost->getNettoPrice()}]
+                                },
+                                {
+                                    label: '[{if $oxcmp_basket->isProportionalCalculationOn()}][{oxmultilang ident="BASKET_TOTAL_PLUS_PROPORTIONAL_VAT"}][{else}][{oxmultilang ident="VAT_PLUS_PERCENT_AMOUNT" args=$giftCardCost->getVat()}][{/if}]',
+                                    type: 'final',
+                                    amount: [{$giftCardCost->getVatValue()}]
+                                },
+                            [{else}]
+                                {
+                                    label: '[{oxmultilang ident="GREETING_CARD"}]',
+                                    type: 'final',
+                                    amount: [{$giftCardCost->getBruttoPrice()}]
+                                }
+                            [{/if}]
+                        [{/if}]
+                    [{/if}]
+                ]
 
+        };
+        console.log('Apple Pay Payment Request:', applePayPaymentRequest);
         startApplePaySession(applePayPaymentRequest);
     }
 
@@ -339,6 +341,6 @@
     }
 
 [{if false}]</script>[{/if}]
-[{/capture}]
+    [{/capture}]
 
 [{oxscript add=$unzerApplePayJS}]
