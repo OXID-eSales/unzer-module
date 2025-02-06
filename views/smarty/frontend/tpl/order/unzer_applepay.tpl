@@ -13,17 +13,14 @@
     });
 
     function startApplePaySession(applePayPaymentRequest) {
-        console.log("Starting Apple Pay session with payment request");
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
             const session = new ApplePaySession(6, applePayPaymentRequest);
 
             session.onvalidatemerchant = function (event) {
-                console.log("Merchant validation requested");
                 merchantValidationCallback(session, event);
             };
 
             session.onpaymentauthorized = function (event) {
-                console.log("Payment authorize started");
                 applePayAuthorizedCallback(event, session);
             };
 
@@ -319,7 +316,6 @@
                 ]
 
         };
-        console.log('Apple Pay Payment Request:', applePayPaymentRequest);
         startApplePaySession(applePayPaymentRequest);
     }
 

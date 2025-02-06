@@ -11,10 +11,8 @@
     const applePaySubmit = document.getElementById('submitOrder');
     if (applePaySubmit) {
         applePaySubmit.addEventListener('click', function (e) {
-            console.log("Apple Pay button clicked");
             e.preventDefault();
             try {
-                console.log("Initializing Apple Pay session setup...");
                 setupApplePaySession();
             } catch (error) {
                 console.error("Error during Apple Pay session setup:", error.message);
@@ -25,27 +23,22 @@
     }
 
     function startApplePaySession(applePayPaymentRequest) {
-        console.log("Starting Apple Pay session with request:", applePayPaymentRequest);
 
         if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
             const session = new ApplePaySession(6, applePayPaymentRequest);
 
             session.onvalidatemerchant = function (event) {
-                console.log("Merchant validation triggered with event:", event);
                 merchantValidationCallback(session, event);
             };
 
             session.onpaymentauthorized = function (event) {
-                console.log("Payment authorized with event:", event);
                 applePayAuthorizedCallback(event, session);
             };
 
             session.oncancel = function (event) {
-                console.log("Apple Pay session canceled with event:", event);
                 onCancelCallback(event);
             };
 
-            console.log("Beginning Apple Pay session...");
             session.begin();
         } else {
             console.error("Apple Pay is not supported on this device or browser.");
@@ -64,7 +57,6 @@
                 hiddenInput.value = JSON.stringify(result);
                 form.appendChild(hiddenInput);
                 const formData = new FormData(form);
-                console.log("Submitting payment data to encoded:", selfActionUrl);
                 fetch(selfActionUrl, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -76,7 +68,6 @@
                     }
                     session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
                     let thankyouUrl = selfActionUrl + 'cl=thankyou';
-                    console.log("Redirecting to thank you page:", thankyouUrl);
                     setTimeout(() => {
                         window.location.href = thankyouUrl;
                     }, 2000);
@@ -102,7 +93,6 @@
     }
 
     function merchantValidationCallback(session, event) {
-        console.log("Validating merchant with event:", event);
 
         let shopSelfUrlEscaped = '{{ oViewConf.getSelfActionLink()|raw }}';
         let formData = new FormData();
@@ -111,24 +101,20 @@
         formData.append('merchantValidationUrl', event.validationURL);
         formData.append('stoken', '{{ oViewConf.getSessionChallengeToken()|raw }}');
 
-        console.log("Merchant validation form data:", Array.from(formData.entries()));
         fetch(shopSelfUrlEscaped, {
             method: 'POST',
             mode: 'no-cors',
             body: formData
         })
             .then(response => {
-            console.log("Merchant validation response status:", response.status);
             if (!response.ok) {
                 throw new Error("HTTP error: " + response.statusText);
             }
             return response.json();
         })
             .then(function (data) {
-            console.log("Merchant validation response data:", data);
             if (data.validationResponse && data.validationResponse.merchantSessionIdentifier) {
                 session.completeMerchantValidation(data.validationResponse);
-                console.log("Merchant validation completed successfully.");
             } else {
                 throw new Error("Invalid validation response: Missing required fields (merchantSessionIdentifier).");
             }
@@ -150,7 +136,6 @@
     {% set deliveryCost = oxcmp_basket.getDeliveryCost() %}
 
     function setupApplePaySession() {
-        console.log("Setting up Apple Pay session...");
         const applePayPaymentRequest = {
             countryCode: '{{ oView.getUserCountryIso() }}',
             currencyCode: '{{ currency.name }}',
@@ -174,7 +159,6 @@
             lineItems: getApplePayLineItems(),
         };
 
-        console.log("Apple Pay payment request:", applePayPaymentRequest);
         startApplePaySession(applePayPaymentRequest);
     }
 
