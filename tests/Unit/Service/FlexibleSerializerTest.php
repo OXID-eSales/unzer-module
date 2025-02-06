@@ -28,12 +28,13 @@ class FlexibleSerializerTest extends IntegrationTestCase
         $order->customerName = 'John Doe';
 
         $serialized = $this->flexibleSerializer->safeSerialize($order);
+
         $unserialized = $this->flexibleSerializer->safeUnserialize(
             $serialized,
-            ['OxidEsales\Eshop\Application\Model\Order']
+            [\OxidEsales\Eshop\Application\Model\Order::class]
         );
 
-        $this->assertInstanceOf('OxidEsales\Eshop\Application\Model\Order', $unserialized);
+        $this->assertInstanceOf(\stdClass::class, $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
     }
@@ -133,7 +134,7 @@ class FlexibleSerializerTest extends IntegrationTestCase
             [\OxidEsales\Eshop\Application\Model\Order::class]
         );
 
-        $this->assertInstanceOf(Order::class, $unserialized);
+        $this->assertInstanceOf(\OxidEsales\Eshop\Application\Model\Order::class, $unserialized);
         $this->assertEquals(1, $unserialized->id);
         $this->assertEquals('John Doe', $unserialized->customerName);
         $this->assertEquals('Extra Info', $unserialized->extraField);
