@@ -97,11 +97,14 @@ class Order extends Order_parent
                 $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
                 $iRet = $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
             } else {
-                if ($unzerPaymentStatus !== PaymentService::STATUS_NOT_FINISHED) {
-                    Registry::getSession()->setVariable('orderCancellationProcessed', true);
-                    $iRet = 1; //TODO: not sure if this is correct - this is hardcoded for the Paypal cancellaction
+                $isError = $unzerPaymentStatus === PaymentService::STATUS_ERROR;
+                if (!$isError && !isset($params['finalizeCancellation'])) {
+                    $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
                 }
-                $this->setOrderStatus($unzerPaymentStatus); //ERROR if paypal
+                if (!$isError) {
+                    $iRet = 1;
+                }
+                $this->setOrderStatus($unzerPaymentStatus);
                 $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
             }
         }
