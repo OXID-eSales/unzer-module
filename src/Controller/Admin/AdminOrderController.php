@@ -198,6 +198,11 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData['aCancellations'] = $this->getCancellationsViewData((string)$unzerPayment->getTraceId());
             $this->_aViewData['blCancelReasonReq'] = $this->isCancelReasonRequired();
 
+            $this->_aViewData['oUnzerTransactions'] = $this->filterTransactionList(
+                $unzerPayment,
+                $this->_aViewData['oUnzerTransactions']
+            );
+
             if (
                 $editObject->getFieldData('oxpaid') == '0000-00-00 00:00:00' &&
                 $fCharged == $unzerPayment->getAmount()->getTotal()
@@ -562,5 +567,22 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $fCancelled;
+    }
+
+    private function filterTransactionList(
+        \UnzerSDK\Resources\Payment $unzerPayment,
+        TransactionList $transactionList
+    ): TransactionList {
+        $traceId = $unzerPayment->getTraceId();
+        $filteredTransactionList = new TransactionList();
+        foreach ($transactionList as $transaction) {
+            if (!is_null($transaction) && $transaction->oscunzertransaction__traceid) {
+                if ($traceId === $transaction->oscunzertransaction__traceid->rawValue) {
+                    $filteredTransactionList->add($transaction);
+                }
+            }
+        }
+
+        return $filteredTransactionList;
     }
 }
