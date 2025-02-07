@@ -445,7 +445,12 @@ class OrderController extends OrderController_parent
 
             $isOrderAlreadyCancelled = $session->getVariable('orderCancellationProcessed');
             if (!$isOrderAlreadyCancelled) {
-                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect($oBasket, $oUser);
+                $iSuccess = (int)$oOrder->finalizeUnzerOrderAfterRedirect(
+                    $oBasket,
+                    $oUser,
+                    ['finalizeCancellation' => true]
+                );
+
                 $oUser->onOrderExecute($oBasket, $iSuccess);
             }
             $session->deleteVariable('orderCancellationProcessed');

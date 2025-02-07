@@ -25,6 +25,8 @@ use OxidSolutionCatalysts\Unzer\Service\Transaction;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\Unzer;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
+use OxidSolutionCatalysts\Unzer\Service\UnzerVoucherBasketItems;
+use OxidSolutionCatalysts\Unzer\Service\UnzerVoucherBasketItemsInterface;
 
 class UnzerTest extends IntegrationTestCase
 {
@@ -271,8 +273,7 @@ class UnzerTest extends IntegrationTestCase
 
         $sut = $this->getSut();
         $result = $sut->getUnzerBasket("someOrderId", $shopBasketModel);
-
-        $this->assertSame(2, $result->getItemCount()); //two goods, no delivery. no voucher
+        $this->assertSame(3, $result->getItemCount()); //two goods + shipping costs. no voucher
 
         /** @var \UnzerSDK\Resources\EmbeddedResources\BasketItem[] $items */
         $items = $result->getBasketItems();
@@ -314,6 +315,15 @@ class UnzerTest extends IntegrationTestCase
         $translatorMock->expects($this->any())
             ->method('translate')
             ->willReturn('Shipping costs');
+
+        $voucherBasketItemsMock = $this->getMockBuilder(UnzerVoucherBasketItemsInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $voucherBasketItemsMock->expects($this->any())
+            ->method('getVoucherBasketItems')
+            ->willReturn([]);
+
+
         return new Unzer(
             $this->createPartialMock(Session::class, []),
             $translatorMock,
@@ -322,6 +332,7 @@ class UnzerTest extends IntegrationTestCase
                 $this->createPartialMock(ModuleSettings::class, []),
             $settings[Request::class] ?:
                 $this->createPartialMock(Request::class, []),
+            $voucherBasketItemsMock,
         );
     }
 }

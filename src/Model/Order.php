@@ -34,15 +34,14 @@ class Order extends Order_parent
     use ServiceContainer;
 
     /**
-     * @param Basket $oBasket
-     * @param User $oUser
-     * @return int|bool
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.ElseExpression)
-     */
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * */
     public function finalizeUnzerOrderAfterRedirect(
         Basket $oBasket,
-        User $oUser
+        User $oUser,
+        array $params = []
     ): bool|int {
         $orderId = Registry::getSession()->getVariable('sess_challenge');
         $orderId = is_string($orderId) ? $orderId : '';

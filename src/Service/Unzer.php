@@ -62,33 +62,27 @@ class Unzer
 {
     use ServiceContainer;
 
-    /** @var Session */
-    protected $session;
-
-    /** @var Translator */
-    protected $translator;
-
-    /** @var Context */
-    protected $context;
-
-    /** @var ModuleSettings */
-    protected $moduleSettings;
-
-    /** @var Request */
-    protected $request;
+    protected Session $session;
+    protected Translator $translator;
+    protected Context $context;
+    protected ModuleSettings $moduleSettings;
+    protected Request $request;
+    private UnzerVoucherBasketItemsInterface $vbItemsService;
 
     public function __construct(
         Session $session,
         Translator $translator,
         Context $context,
         ModuleSettings $moduleSettings,
-        Request $request
+        Request $request,
+        UnzerVoucherBasketItemsInterface $vbItemsService
     ) {
         $this->session = $session;
         $this->translator = $translator;
         $this->context = $context;
         $this->moduleSettings = $moduleSettings;
         $this->request = $request;
+        $this->vbItemsService = $vbItemsService;
     }
 
     /**
@@ -345,24 +339,20 @@ class Unzer
             ->setCurrencyCode($basketModel->getBasketCurrency()->name);
 
         $priceForPayment = $basketModel->getPriceForPayment();
-        $discountAmount = $basketModel->getTotalDiscount()->getPrice();
-
-        $voucherAmount = 0.0;
-        if (!is_null($basketModel->getVoucherDiscount())) {
-            $voucherAmount = $basketModel->getVoucherDiscount()->getPrice();
-        }
 
         $shopBasketContents = $basketModel->getContents();
 
         $unzerBasketItems = $basket->getBasketItems();
+        $itemsToReCalculate = 0.0;
 
         // Add Basket-Items
         /** @var \OxidEsales\Eshop\Application\Model\BasketItem $basketItem */
         foreach ($shopBasketContents as $basketItem) {
             $unzerBasketItem = new BasketItem();
             $priceBrutto = $basketItem->getUnitPrice()->getBruttoPrice();
+            $quantity = (int)$basketItem->getAmount();
             $unzerBasketItem->setTitle($basketItem->getTitle())
-                ->setQuantity((int)$basketItem->getAmount())
+                ->setQuantity($quantity)
                 ->setType(BasketItemTypes::GOODS)
                 ->setAmountNet($priceBrutto)
                 ->setAmountPerUnit($priceBrutto)
@@ -373,6 +363,7 @@ class Unzer
                 ->setAmountPerUnitGross($priceBrutto);
 
             $unzerBasketItems[] = $unzerBasketItem;
+            $itemsToReCalculate += $quantity * $priceBrutto;
         }
 
         // Add DeliveryCosts
@@ -390,36 +381,37 @@ class Unzer
                 ->setAmountPerUnitGross($deliveryCosts->getBruttoPrice());
 
             $unzerBasketItems[] = $unzerBasketItem;
+            $itemsToReCalculate += $deliveryCosts->getBruttoPrice();
         }
 
         // Add Vouchers
-        $totalVoucherAmount = $voucherAmount + $discountAmount;
-        if ($totalVoucherAmount > 0.) {
-            $unzerBasketItem = new BasketItem();
-            $unzerBasketItem->setTitle($this->translator->translate('DISCOUNT'))
-                ->setQuantity(1)
-                ->setType(BasketItemTypes::VOUCHER)
-                ->setAmountNet($totalVoucherAmount)
-                ->setAmountPerUnit($totalVoucherAmount)
-                ->setAmountGross($totalVoucherAmount)
-                ->setVat(0)
-                ->setAmountPerUnitGross(0.)
-                ->setAmountDiscountPerUnitGross($totalVoucherAmount);
+        $voucherBasketItems = $this->vbItemsService->getVoucherBasketItems($basketModel);
+        if (count($voucherBasketItems)) {
+            $unzerBasketItems = array_merge($unzerBasketItems, $voucherBasketItems);
+        }
 
-            $unzerBasketItems[] = $unzerBasketItem;
-        } elseif ($totalVoucherAmount < 0.) {
-            $totalVoucherAmount *= -1.;
+        // (mostly) in net-mode some rounding issues are possible
+        if ($itemsToReCalculate !== $priceForPayment) {
             $unzerBasketItem = new BasketItem();
-            $unzerBasketItem->setTitle($this->translator->translate('SURCHARGE'))
+            $unzerBasketItem->setTitle($this->translator->translate('OSCUNZER_FIX_ROUNDING'))
                 ->setQuantity(1)
-                ->setType(BasketItemTypes::GOODS)
-                ->setAmountNet($totalVoucherAmount)
-                ->setAmountPerUnit($totalVoucherAmount)
-                ->setAmountGross($totalVoucherAmount)
-                ->setVat(0)
-                ->setAmountPerUnitGross($totalVoucherAmount)
-                ->setAmountDiscountPerUnitGross(0.);
+                ->setAmountVat(0.0)
+                ->setVat(0.0);
 
+            if ($itemsToReCalculate < $priceForPayment) {
+                $fixRoundPrice = Registry::getUtils()->fRound((string)($priceForPayment - $itemsToReCalculate));
+                $unzerBasketItem->setType(BasketItemTypes::GOODS)
+                    ->setAmountNet($fixRoundPrice)
+                    ->setAmountPerUnit($fixRoundPrice)
+                    ->setAmountGross($fixRoundPrice)
+                    ->setAmountDiscountPerUnitGross(0.)
+                    ->setAmountPerUnitGross($fixRoundPrice);
+            } elseif ($itemsToReCalculate > $priceForPayment) {
+                $fixRoundPrice = Registry::getUtils()->fRound((string)($itemsToReCalculate - $priceForPayment));
+                $unzerBasketItem->setType(BasketItemTypes::VOUCHER)
+                    ->setAmountPerUnitGross(0.)
+                    ->setAmountDiscountPerUnitGross($fixRoundPrice);
+            }
             $unzerBasketItems[] = $unzerBasketItem;
         }
 
