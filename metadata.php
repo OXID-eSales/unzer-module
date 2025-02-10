@@ -54,7 +54,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail'   => 'logo.svg',
-    'version'     => '2.2.0-rc.14',
+    'version'     => '2.2.0-rc.15',
     'author'      => 'OXID eSales AG',
     'url'         => 'https://www.oxid-esales.com',
     'email'       => 'info@oxid-esales.com',
