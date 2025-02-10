@@ -63,9 +63,11 @@
                     body: formData
                 }).then(response => {
                     if (!response.ok) {
+                        console.error("HTTP error: " + response.statusText);
                         handleError({message: response.statusText});
                         window.location.href = url + 'cl=payment&payerror=2';
                     }
+                    alert("Payment successful!");
                     session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
                     let thankyouUrl = selfActionUrl + 'cl=thankyou';
                     setTimeout(() => {
@@ -110,6 +112,7 @@
             if (!response.ok) {
                 throw new Error("HTTP error: " + response.statusText);
             }
+
             return response.json();
         })
             .then(function (data) {
@@ -229,13 +232,16 @@
                     amount: bruttoSum
                 });
             }
-            discounts.forEach(function(oDiscount) {
+
+            Object.entries(discounts).forEach(([key, discObj]) => {
+                let discountFloat = -1 * (parseFloat(discObj.dDiscount));
                 lineItems.push({
-                    label: oDiscount.sDiscount,
+                    label: discObj.sDiscount,
                     type: 'final',
-                    amount: (parseFloat(oDiscount.dDiscount) * -1) || 0
+                    amount: discountFloat.toFixed(2)
                 });
             });
+
             if (!isPriceViewNetto) {
                 lineItems.push({
                     label: '{{ translate({ ident: "TOTAL_NET" }) }}',
@@ -252,6 +258,7 @@
                     });
                 }
             }
+
             if (isPriceViewNetto) {
                 lineItems.push({
                     label: '{{ translate({ ident: "TOTAL_GROSS" }) }}',
@@ -263,11 +270,12 @@
 
         // --- Voucher Handling ---
         if (showVouchers && voucherDiscValue) {
-            vouchers.forEach(function(oVoucher) {
+            Object.values(vouchers).forEach(function(oVoucher) {
+                let discountFloat = -1 * parseFloat(oVoucher.dVoucherdiscount);
                 lineItems.push({
                     label: '{{ translate({ ident: "COUPON" }) }} ({{ translate({ ident: "NUMBER" }) }} ' + oVoucher.sVoucherNr + ')',
                     type: 'final',
-                    amount: (parseFloat(oVoucher.dVoucherdiscount) * -1) || 0
+                    amount: discountFloat.toFixed(2)
                 });
             });
         }
@@ -396,7 +404,8 @@
                 }
             }
         }
-
+        console.log("Apple Pay line items:");
+        console.log(lineItems);
         return lineItems;
     }
 

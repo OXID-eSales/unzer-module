@@ -387,6 +387,9 @@ class Unzer
         // Add Vouchers
         $voucherBasketItems = $this->vbItemsService->getVoucherBasketItems($basketModel);
         if (count($voucherBasketItems)) {
+            foreach ($voucherBasketItems as $voucherBasketItem) {
+                $itemsToReCalculate -= $voucherBasketItem->getAmountDiscountPerUnitGross();
+            }
             $unzerBasketItems = array_merge($unzerBasketItems, $voucherBasketItems);
         }
 
