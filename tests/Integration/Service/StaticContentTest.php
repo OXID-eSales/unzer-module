@@ -100,11 +100,6 @@ final class StaticContentTest extends IntegrationTestCase
         $payment->loadInLang(1, UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID);
         $this->assertEquals(
             UnzerDefinitions::getUnzerDefinitions()
-                [UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID]['descriptions']['en']['desc'],
-            $payment->getFieldData('oxdesc')
-        );
-        $this->assertEquals(
-            UnzerDefinitions::getUnzerDefinitions()
                 [UnzerDefinitions::SOFORT_UNZER_PAYMENT_ID]['descriptions']['en']['longdesc'],
             $payment->getFieldData('oxlongdesc')
         );

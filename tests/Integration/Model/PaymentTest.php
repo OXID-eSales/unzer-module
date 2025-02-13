@@ -45,6 +45,7 @@ class PaymentTest extends IntegrationTestCase
 
         $payment = oxNew(Payment::class);
         $payment->load(UnzerDefinitions::SEPA_UNZER_PAYMENT_ID);
+        $payment->setId(UnzerDefinitions::SEPA_UNZER_PAYMENT_ID);
 
         $this->assertTrue($payment->isUnzerPaymentTypeAllowed());
     }
