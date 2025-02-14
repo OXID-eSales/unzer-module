@@ -67,7 +67,6 @@
                         handleError({message: response.statusText});
                         window.location.href = url + 'cl=payment&payerror=2';
                     }
-                    alert("Payment successful!");
                     session.completePayment({status: window.ApplePaySession.STATUS_SUCCESS});
                     let thankyouUrl = selfActionUrl + 'cl=thankyou';
                     setTimeout(() => {
@@ -404,15 +403,13 @@
                 }
             }
         }
-        console.log("Apple Pay line items:");
-        console.log(lineItems);
+
         return lineItems;
     }
 
     function handleError({ html = '{{ translate({ ident: "oscunzer_APPLEPAY_ERROR" }) }}', message, error } = {}) {
-        console.error("Error occurred:", message, error);
-
         const errorElement = document.querySelector('.js-unzer-error-holder');
+        applePaySubmit.disabled = false;
         if (errorElement) {
             errorElement.innerHTML = html;
             errorElement.style.display = 'block';
@@ -422,7 +419,7 @@
     }
 
     function abortPaymentSession(session) {
-        console.warn("Aborting Apple Pay session...");
+        applePaySubmit.disabled = false;
         session.completePayment({ status: window.ApplePaySession.STATUS_FAILURE });
         session.abort();
     }

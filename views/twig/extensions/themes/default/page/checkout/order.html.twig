@@ -267,7 +267,7 @@
             const isRadioSelected = Array.from(radioButtons).some(radio => radio.checked);
             const isAnyCheckboxChecked = (overrideCheckbox1 && overrideCheckbox1.checked) ||
                                          (overrideCheckbox2 && overrideCheckbox2.checked);
-            submitButton.disabled = !(isRadioSelected || isAnyCheckboxChecked);
+            submitButton.disabled = !(isRadioSelected || isAnyCheckboxChecked || applePayButton);
         }
 
         if (radioButtons.length > 0) {
@@ -291,7 +291,6 @@
 
             if (applePayButton) {
                 button.disabled = false;
-                console.log("apple pay button is pressed");
             }
 
             if (button.disabled) {
