@@ -12,6 +12,7 @@ use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderServiceInterface;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use UnzerSDK\Resources\Basket;
 use UnzerSDK\Resources\Customer;
@@ -59,7 +60,8 @@ class UnzerPaymentTest extends IntegrationTestCase
                 $unzerServiceMock,
                 new \OxidSolutionCatalysts\Unzer\Service\DebugHandler(
                     $this->createMock(\Monolog\Logger::class)
-                )
+                ),
+                new \OxidSolutionCatalysts\Unzer\Service\TmpOrderService()
             ],
             '',
             true,

@@ -311,7 +311,7 @@ class AdminOrderController extends AdminDetailsController
     protected function getCustomerTypeAndCurrencyFromTransaction(): array
     {
         $transactionService = $this->getServiceFromContainer(TransactionService::class);
-        return $transactionService->getCustomerTypeAndCurrencyFromTransactionByOrderId($this->getEditObjectId());
+        return $transactionService->getCustomerTypeAndCurrencyByOrderId($this->getEditObjectId());
     }
 
     /**

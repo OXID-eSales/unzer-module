@@ -34,6 +34,7 @@ return [
     'MYSQL_CONFIG_PATH' => getMysqlConfigPath(),
     'SELENIUM_SERVER_PORT' => getenv('SELENIUM_SERVER_PORT') ?: '4444',
     'SELENIUM_SERVER_IP' => getenv('SELENIUM_SERVER_IP') ?: 'selenium',
+    'SELENIUM_SERVER_HOST' => getenv('SELENIUM_SERVER_HOST') ?: 'selenium',
     'BROWSER_NAME' => getenv('BROWSER_NAME') ?: 'chrome',
     'PHP_BIN' => $phpBinEnv,
     'SCREEN_SHOT_URL' => $screenShotPathEnv

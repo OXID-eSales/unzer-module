@@ -17,6 +17,7 @@ use OxidEsales\Eshop\Core\Request;
 use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use OxidSolutionCatalysts\Unzer\Service\DebugHandler;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -27,6 +28,7 @@ use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Interfaces\UnzerParentInterface;
 use UnzerSDK\Resources\Basket as UnzerResourceBasket;
 use UnzerSDK\Resources\Customer;
+use UnzerSDK\Resources\PaymentTypes\BasePaymentType;
 use UnzerSDK\Resources\PaymentTypes\PaylaterInstallment;
 use UnzerSDK\Resources\PaymentTypes\Card as UnzerSDKPaymentTypeCard;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaymentTypePaypal;
@@ -55,19 +57,20 @@ abstract class UnzerPayment implements UnzerPaymentInterface
     protected bool $ajaxResponse = false;
     protected array $allowedCurrencies = [];
     private DebugHandler $logger;
+    private TmpOrderService $tmpOrderService;
 
     public function __construct(
         Unzer $unzerSDK,
         UnzerService $unzerService,
-        DebugHandler $logger
+        DebugHandler $logger,
+        TmpOrderService $tmpOrderService
     ) {
         $this->unzerSDK = $unzerSDK;
         $this->unzerService = $unzerService;
-
         $this->unzerOrderId = $this->unzerService->generateUnzerOrderId();
-
         $this->unzerService->setIsAjaxPayment($this->ajaxResponse);
         $this->logger = $logger;
+        $this->tmpOrderService = $tmpOrderService;
     }
 
     public function getUnzerOrderId(): string
@@ -168,7 +171,6 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         User $userModel,
         UnzerParentInterface $paymentType
     ): AbstractTransactionType {
-        $this->throwExceptionIfPaymentDataError();
         $paymentProcedure = $this->unzerService->getPaymentProcedure($this->paymentMethod);
         $uzrBasket = $this->unzerService->getUnzerBasket($this->unzerOrderId, $basketModel);
         /** @var $paymentType PaylaterInstallment */
@@ -179,21 +181,28 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $auth->setCurrency($currency->name);
             $auth->setReturnUrl($this->unzerService->prepareOrderRedirectUrl($this->redirectUrlNeedPending()));
             $auth->setOrderId($this->unzerOrderId);
-
             $uzrRiskData = $this->unzerService->getUnzerRiskData(
                 $customer,
                 $userModel
             );
             $auth->setRiskData($uzrRiskData);
             $sdkPaymentID = UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID;
+            $customerType = $this->tmpOrderService
+                ->getCustomerType($currency->name, $sdkPaymentID);
             try {
-                /** @var UnzerSDKLoader $loader */
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
                 $UnzerSdk = $loader->getUnzerSDK(
                     $sdkPaymentID,
-                    $currency->name
+                    $currency->name,
+                    $customerType
                 );
-                $transaction = $UnzerSdk->performAuthorization($auth, $paymentType, $customer, null, $uzrBasket);
+                $transaction = $UnzerSdk->performAuthorization(
+                    $auth,
+                    $paymentType,
+                    $customer,
+                    $this->unzerService->getShopMetadata($this->paymentMethod),
+                    $uzrBasket
+                );
             } catch (UnzerApiException $e) {
                 throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
             }

@@ -37,6 +37,7 @@ class Order extends Order_parent
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @SuppressWarnings(PHPMD.ElseExpression)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * */
     public function finalizeUnzerOrderAfterRedirect(
         Basket $oBasket,
@@ -96,6 +97,9 @@ class Order extends Order_parent
                 $this->setTmpOrderStatus($unzerOrderId, 'FINISHED');
                 $iRet = $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
             } else {
+                if ($unzerPaymentStatus !== PaymentService::STATUS_NOT_FINISHED) {
+                    Registry::getSession()->setVariable('orderCancellationProcessed', true);
+                }
                 $isError = $unzerPaymentStatus === PaymentService::STATUS_ERROR;
                 if (!$isError && !isset($params['finalizeCancellation'])) {
                     $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);

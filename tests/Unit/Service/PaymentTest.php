@@ -16,6 +16,7 @@ use OxidSolutionCatalysts\Unzer\Exception\Redirect;
 use OxidSolutionCatalysts\Unzer\Exception\RedirectWithMessage;
 use OxidSolutionCatalysts\Unzer\PaymentExtensions\UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
+use OxidSolutionCatalysts\Unzer\Service\TmpOrderService;
 use OxidSolutionCatalysts\Unzer\Service\Unzer as UnzerService;
 use OxidSolutionCatalysts\Unzer\Service\PaymentExtensionLoader;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
@@ -212,7 +213,8 @@ class PaymentTest extends IntegrationTestCase
             ->setConstructorArgs([
                 $this->getUnzerSDKLoaderMock(),
                 $this->getUnzerServiceMock(),
-                $this->getLoggerMock()
+                $this->getLoggerMock(),
+                new TmpOrderService()
             ])->onlyMethods(['getPaymentExtension', 'getPaymentExtensionByCustomerTypeAndCurrency'])
             ->getMock();
 

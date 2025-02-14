@@ -82,25 +82,33 @@ class Transaction
         string $orderid,
         string $userId,
         ?Payment $unzerPayment,
-        ?Shipment $unzerShipment = null
+        ?Shipment $unzerShipment = null,
+        ?AbstractTransactionType $transaction = null
     ): bool {
 
         $oOrder = oxNew(Order::class);
         $oOrder->load($orderid);
 
-        $params = [
-            'oxorderid' => $orderid,
-            'oxshopid' => $this->context->getCurrentShopId(),
-            'oxuserid' => $userId,
-            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-            'customertype' => $this->getCustomerTypeByOrder($oOrder)
-        ];
+        $params = $this->getBasicSaveParameters($orderid, $userId);
 
         if ($unzerPayment) {
-            $unzerPaymentData = $unzerShipment !== null ?
-                $this->getUnzerShipmentData($unzerShipment) :
-                $this->getUnzerPaymentData($unzerPayment);
-            $params = array_merge($params, $unzerPaymentData);
+            $this->extendSaveParameters(
+                $params,
+                $unzerPayment,
+                $unzerShipment,
+                $transaction
+            );
+
+            if (
+                $unzerPayment->getPaymentType() instanceof PaylaterInvoice ||
+                $unzerPayment->getPaymentType() instanceof PaylaterInstallment
+            ) {
+                $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
+                $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
+                if (!empty($delCompany) || !empty($billCompany)) {
+                    $params['customertype'] = 'B2B';
+                }
+            }
         }
 
         if ($this->saveTransaction($params, $oOrder)) {
@@ -196,7 +204,6 @@ class Transaction
     {
         unset($params['oxactiondate']);
         unset($params['serialized_basket']);
-        unset($params['customertype']);
 
         /** @var string $jsonEncode */
         $jsonEncode = json_encode($params);
@@ -330,7 +337,7 @@ class Transaction
         ];
     }
 
-    protected function getUnzerShipmentData(Shipment $unzerShipment): array
+    protected function getUnzerShipmentData(Shipment $unzerShipment, Payment $unzerPayment): array
     {
         $currency = '';
         $customerId = '';
@@ -342,7 +349,7 @@ class Transaction
                 $customerId = $customer->getId();
             }
         }
-        return [
+        $params = [
             'amount'     => $unzerShipment->getAmount(),
             'currency'   => $currency,
             'fetchedAt'  => $unzerShipment->getFetchedAt(),
@@ -353,6 +360,13 @@ class Transaction
             'traceid'    => $unzerShipment->getTraceId(),
             'metadata'   => json_encode(["InvoiceId" => $unzerShipment->getInvoiceId()])
         ];
+
+        $unzerCustomer = $unzerPayment->getCustomer();
+        if ($unzerCustomer instanceof Customer) {
+            $params['customerid'] = $unzerCustomer->getId();
+        }
+
+        return $params;
     }
 
     protected function getNewTransactionObject(): TransactionModel
@@ -511,14 +525,14 @@ class Transaction
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCustomerTypeAndCurrencyFromTransactionByOrderId(string $orderId): array
+    public function getCustomerTypeAndCurrencyByOrderId(string $orderId): array
     {
         $transaction = oxNew(TransactionModel::class);
         $transactionId = $this->getTransactionIdByOrderId($orderId);
         $transaction->load($transactionId);
 
         return [
-            'customertype' => $transaction->getFieldData('customertype') ?? '',
+            'customertype' => $transaction->getFieldData('customertype') ?? 'B2C',
             'currency' => $transaction->getFieldData('currency') ?? '',
         ];
     }
@@ -625,7 +639,7 @@ class Transaction
                     $user,
                     $paymentTypeId,
                     $typeData['currency'] ?: '',
-                    $typeData['customertype'] ?: '',
+                    !empty($typeData['customertype']) ? $typeData['customertype'] : 'B2C',
                     $paymentTypeId
                 );
             }
@@ -647,6 +661,18 @@ class Transaction
 
         $this->paymentTypes = $result;
         return $this->paymentTypes;
+    }
+
+    protected function getBasicSaveParameters(string $orderId, string $userId): array
+    {
+        $customerData = $this->getCustomerTypeAndCurrencyByOrderId($orderId);
+        return [
+            'oxorderid' => $orderId,
+            'oxshopid' => $this->context->getCurrentShopId(),
+            'oxuserid' => $userId,
+            'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
+            'customertype' => $customerData['customertype'],
+        ];
     }
 
     /**
@@ -710,11 +736,24 @@ class Transaction
     {
         $delCompany = $oOrder->getFieldData('oxdelcompany') ?? '';
         $billCompany = $oOrder->getFieldData('oxbillcompany') ?? '';
-        $customerType = 'B2C';
-        if (!empty($delCompany) || !empty($billCompany)) {
-            $customerType = 'B2B';
-        }
+        return (!empty($delCompany) || !empty($billCompany)) ? 'B2B' : 'B2C';
+    }
 
-        return $customerType;
+    private function extendSaveParameters(
+        array &$parameters,
+        Payment $unzerPayment,
+        ?Shipment $unzerShipment = null,
+        ?AbstractTransactionType $transaction = null
+    ): void {
+        $unzerPaymentData = !is_null($unzerShipment) ?
+            $this->getUnzerShipmentData($unzerShipment, $unzerPayment) :
+            $this->getUnzerPaymentData($unzerPayment, $transaction);
+        $parameters = array_merge($parameters, $unzerPaymentData);
+
+        $parameters = array_merge(
+            $parameters,
+            $this->getServiceFromContainer(SavedPaymentSaveService::class)
+                ->getTransactionParameters($unzerPayment)
+        );
     }
 }

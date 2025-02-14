@@ -492,7 +492,7 @@ class OrderController extends OrderController_parent
         $oTmpOrder = oxNew(TmpOrder::class);
         $tmpOrderArray = $oTmpOrder->getTmpOrderByUnzerId($orderId);
 
-        if (!empty($tmpOrderArray)) {
+        if (count($tmpOrderArray) > 0) {
             return false;
         }
 

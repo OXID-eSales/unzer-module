@@ -39,7 +39,8 @@ class PaymentExtensionLoaderTest extends IntegrationTestCase
             $this->getMockBuilder(Unzer::class)
                 ->disableOriginalConstructor()
                 ->getMock(),
-            $this->logger
+            $this->logger,
+            new \OxidSolutionCatalysts\Unzer\Service\TmpOrderService()
         );
 
         $loadedPaymentType = $sut->getPaymentExtension($paymentStub);

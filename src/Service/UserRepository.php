@@ -34,6 +34,9 @@ class UserRepository
             $country->load($countryId);
             /** @var string $result */
             $result = $country->getFieldData('oxisoalpha2');
+            if (null == $result) {
+                $result = '';
+            }
         }
         return $result;
     }

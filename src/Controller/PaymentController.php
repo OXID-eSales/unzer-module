@@ -158,10 +158,7 @@ class PaymentController extends PaymentController_parent
         }
     }
 
-    /**
-     * @param $oxOrderIdOfTmpOrder string
-     * @return Unzer|null
-     */
+
     private function getUnzerSDKFromTmpOrder(string $oxSessionOrderId): ?Unzer
     {
         $result = null;
@@ -174,18 +171,7 @@ class PaymentController extends PaymentController_parent
             $paymentId = $tmpOrder->getFieldData('oxpaymenttype');
             /** @var string $currency */
             $currency = $tmpOrder->getFieldData('oxcurrency');
-            $customerType = $tmpOrder->getFieldData('customertype') ?? '';
-
-            if (!is_string($customerType)) {
-                $customerType = '';
-            }
-
-            if (empty($customerType)) {
-                $customerType = (!empty($tmpOrder->getFieldData('oxdelcompany')))
-                || !empty($tmpOrder->getFieldData('oxbillcompany')) ?
-                    'B2B' :
-                    'B2C';
-            }
+            $customerType = $this->getCustomerTypeFromTmpOrder($tmpOrder);
 
             $result = $unzerSdkLoader->getUnzerSDK(
                 $paymentId,
@@ -194,5 +180,19 @@ class PaymentController extends PaymentController_parent
             );
         }
         return $result;
+    }
+
+    private function getCustomerTypeFromTmpOrder(Order $tmpOrder): string
+    {
+        if (
+            empty($tmpOrder->getFieldData('oxdelcompany'))
+            && empty($tmpOrder->getFieldData('oxbillcompany'))
+            && empty($tmpOrder->oxorder__oxbillcompany->value)
+            && empty($tmpOrder->oxorder__oxdelcompany->value)
+        ) {
+            return 'B2C';
+        }
+
+        return 'B2B';
     }
 }
