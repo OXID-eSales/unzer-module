@@ -101,7 +101,8 @@ class Order extends Order_parent
                     Registry::getSession()->setVariable('orderCancellationProcessed', true);
                 }
                 $isError = $unzerPaymentStatus === PaymentService::STATUS_ERROR;
-                if (!$isError && !isset($params['finalizeCancellation'])) {
+                $cancelled = $unzerPaymentStatus === PaymentService::STATUS_CANCELED;
+                if (!$isError && !$cancelled && !isset($params['finalizeCancellation'])) {
                     $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
                 }
                 if (!$isError) {
