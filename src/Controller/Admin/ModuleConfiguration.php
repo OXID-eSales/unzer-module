@@ -325,7 +325,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
 
         $isValid = $this->validateCredentialsForSaving($newValue, $errorIds);
 
-        if ($isValid && $this->isUpdate) {
+        if ($isValid && $this->isUpdate && $newValue !== null) {
             $this->moduleSettings->setApplePayMerchantIdentifier($newValue);
         }
     }

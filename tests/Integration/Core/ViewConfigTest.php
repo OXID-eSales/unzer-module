@@ -21,7 +21,7 @@ class ViewConfigTest extends IntegrationTestCase
     {
         $di = ContainerFactory::getInstance()->getContainer();
         $bridge = $di->get(ModuleSettingBridgeInterface::class);
-        $bridge->save('UnzerSystemMode', 1, Module::MODULE_ID);
+        $bridge->save('UnzerSystemMode', ModuleSettings::SYSTEM_MODE_PRODUCTION, Module::MODULE_ID);
         $bridge->save('production-UnzerPublicKey', 'publickey', Module::MODULE_ID);
         $bridge->save('production-UnzerPrivateKey', 'privatekey', Module::MODULE_ID);
 

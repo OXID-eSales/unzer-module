@@ -7,15 +7,24 @@
 
 namespace OxidSolutionCatalysts\Unzer\Tests\Integration\Model;
 
-use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
-use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
+use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
+use OxidSolutionCatalysts\Unzer\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
-use OxidSolutionCatalysts\Unzer\Module;
 
 class PaymentTest extends IntegrationTestCase
 {
+    private ModuleSettings $moduleSettings;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $container = ContainerFactory::getInstance()->getContainer();
+        $this->moduleSettings = $container->get(ModuleSettings::class);
+    }
+
     public function testIsUnzerPayment()
     {
         $payment = oxNew(Payment::class);
@@ -37,14 +46,35 @@ class PaymentTest extends IntegrationTestCase
         $this->assertFalse($payment->isUnzerPaymentTypeAllowed());
     }
 
-    public function testIsUnzerPaymentTypeAllowedOnNotUnzerPaymentAndValidCurrency()
+    public function testIsUnzerPaymentTypeAllowedOnUnzerPaymentAndValidCurrency()
     {
-        $di = ContainerFactory::getInstance()->getContainer();
-        $bridge = $di->get(ModuleSettingBridgeInterface::class);
-        $bridge->save('production-UnzerPrivateKey', 's-priv-someExampleOfGoodKey', Module::MODULE_ID);
+        // Set the private key for the current system mode
+        $this->moduleSettings->setSystemMode(ModuleSettings::SYSTEM_MODE_PRODUCTION);
+        $this->moduleSettings->saveSetting('production-UnzerPrivateKey', 's-priv-someExampleOfGoodKey');
 
         $payment = oxNew(Payment::class);
         $payment->load(UnzerDefinitions::SEPA_UNZER_PAYMENT_ID);
+        $payment->setId(UnzerDefinitions::SEPA_UNZER_PAYMENT_ID);
+
+        $this->assertTrue($payment->isUnzerPaymentTypeAllowed());
+    }
+
+    public function testIsUnzerPaymentTypeAllowedWithInvalidPrivateKey()
+    {
+        $this->moduleSettings->setSystemMode(ModuleSettings::SYSTEM_MODE_PRODUCTION);
+        $this->moduleSettings->saveSetting('production-UnzerPrivateKey', '');
+        $payment = oxNew(Payment::class);
+        $payment->setId(UnzerDefinitions::SEPA_UNZER_PAYMENT_ID);
+        $this->expectException(UnzerException::class);
+        $payment->isUnzerPaymentTypeAllowed();
+    }
+
+    public function testIsUnzerPaymentTypeAllowedInSandboxMode()
+    {
+        $this->moduleSettings->setSystemMode(ModuleSettings::SYSTEM_MODE_SANDBOX);
+        $this->moduleSettings->saveSetting('sandbox-UnzerPrivateKey', 's-priv-someExampleOfGoodKey');
+
+        $payment = oxNew(Payment::class);
         $payment->setId(UnzerDefinitions::SEPA_UNZER_PAYMENT_ID);
 
         $this->assertTrue($payment->isUnzerPaymentTypeAllowed());

@@ -11,14 +11,13 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Session;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Core\Exception\FileException;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
 use Exception;
 use OxidEsales\EshopCommunity\Application\Model\User;
+
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -42,26 +41,28 @@ class ModuleSettings
         'visa' => '1'
     ];
 
-    private ModuleSettingBridgeInterface $moduleSettingBridge;
-    private ModuleConfigurationDaoBridgeInterface $moduleInfoBridge;
+    private ModuleSettingServiceInterface $moduleSettingService;
     private Session $session;
     private Config $config;
+    private DebugHandler $debugHandler;
 
     public function __construct(
-        ModuleSettingBridgeInterface $moduleSettingBridge,
-        ModuleConfigurationDaoBridgeInterface $moduleInfoBridge,
+        ModuleSettingServiceInterface $moduleSettingService,
         Session $session,
-        Config $config
+        Config $config,
+        DebugHandler $debugHandler,
     ) {
-        $this->moduleSettingBridge = $moduleSettingBridge;
-        $this->moduleInfoBridge = $moduleInfoBridge;
+        $this->moduleSettingService = $moduleSettingService;
         $this->session = $session;
         $this->config = $config;
+        $this->debugHandler = $debugHandler;
     }
 
     public function isDebugMode(): bool
     {
-        return $this->getSettingValue('UnzerDebug') === true;
+        return ($this->getSettingValue('UnzerDebug') == 1)
+            || ($this->getSettingValue('UnzerDebug') === true)
+            || ($this->getSettingValue('UnzerDebug') === 'true');
     }
 
     public function isSandboxMode(): bool
@@ -71,10 +72,17 @@ class ModuleSettings
 
     public function getSystemMode(): string
     {
-        if ($this->getSettingValue('UnzerSystemMode')) {
-            return self::SYSTEM_MODE_PRODUCTION;
+        $systemMode = $this->getSettingValue('UnzerSystemMode');
+
+        if (is_string($systemMode)) {
+            return $systemMode === self::SYSTEM_MODE_PRODUCTION ? self::SYSTEM_MODE_PRODUCTION : self::SYSTEM_MODE_SANDBOX;
         }
-        return self::SYSTEM_MODE_SANDBOX;
+
+        if ($systemMode instanceof \Symfony\Component\String\UnicodeString) {
+            return $systemMode->toString() === self::SYSTEM_MODE_PRODUCTION ? self::SYSTEM_MODE_PRODUCTION : self::SYSTEM_MODE_SANDBOX;
+        }
+
+        return '0';
     }
 
     public function setSystemMode(string $systemMode): void
@@ -105,9 +113,8 @@ class ModuleSettings
 
     public function useModuleJQueryInFrontend(): bool
     {
-        /** @var bool $unzerJQuery */
         $unzerJQuery = $this->getSettingValue('UnzerjQuery');
-        return $unzerJQuery;
+        return $unzerJQuery == '1';
     }
 
     public function getPaymentProcedureSetting(string $paymentMethod): string
@@ -123,7 +130,7 @@ class ModuleSettings
 
     public function getModuleVersion(): string
     {
-        return $this->moduleInfoBridge->get(Module::MODULE_ID)->getVersion();
+        return Module::MODULE_VERSION;
     }
 
     public function getGitHubName(): string
@@ -340,7 +347,11 @@ class ModuleSettings
 
     public function saveWebhookConfiguration(array $webhookConfig): void
     {
-        $this->moduleSettingBridge->save('webhookConfiguration', $webhookConfig, Module::MODULE_ID);
+        $this->moduleSettingService->saveCollection(
+            'webhookConfiguration',
+            $webhookConfig,
+            Module::MODULE_ID
+        );
     }
 
     public function getWebhookConfiguration(): array
@@ -378,20 +389,44 @@ class ModuleSettings
         return $privateKeys;
     }
 
-    private function saveSetting(string $name, bool|int|string|array $setting): void
+    public function saveSetting(string $name, mixed $value): void
     {
-        $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
+        if (is_string($value)) {
+            $this->moduleSettingService->saveString($name, $value, Module::MODULE_ID);
+        } elseif (is_bool($value)) {
+            $this->moduleSettingService->saveBoolean($name, $value, Module::MODULE_ID);
+        } elseif (is_int($value)) {
+            $this->moduleSettingService->saveInteger($name, $value, Module::MODULE_ID);
+        } elseif (is_array($value)) {
+            $this->moduleSettingService->saveCollection($name, $value, Module::MODULE_ID);
+        }
     }
 
-    private function getSettingValue(string $key): mixed
+    public function getSettingValue(string $key): mixed
     {
-        $result = '';
         try {
-            $result = $this->moduleSettingBridge->get($key, Module::MODULE_ID);
-        } catch (ModuleConfigurationNotFoundException $exception) {
-            //todo: improve
+            if (!$this->moduleSettingService->exists($key, Module::MODULE_ID)) {
+                $this->debugHandler->log('Setting ' . $key . ' not found');
+                return '';
+            }
+
+            if ($key === 'UnzerDebug') {
+                return $this->moduleSettingService->getBoolean($key, Module::MODULE_ID);
+            }
+
+            if ($key === 'UnzerSystemMode') {
+                return $this->moduleSettingService->getString($key, Module::MODULE_ID);
+            }
+
+            if (in_array($key, ['webhookConfiguration' , 'applepay_merchant_capabilities', 'applepay_networks'])) {
+                return $this->moduleSettingService->getCollection($key, Module::MODULE_ID);
+            }
+
+            return $this->moduleSettingService->getString($key, Module::MODULE_ID)->toString();
+        } catch (Exception $exception) {
+            $this->debugHandler->log($exception->getMessage() . ' ' . $exception->getTraceAsString());
+            return '';
         }
-        return $result;
     }
 
     /**
@@ -493,7 +528,6 @@ class ModuleSettings
 
     private function getInvoiceB2CEURPrivateKey(): string
     {
-        /** @var string $key */
         $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2CEURPrivateKey');
         return $key;
     }
@@ -722,7 +756,7 @@ class ModuleSettings
      * @param string $context
      * @return bool
      */
-    private function hasWebhookConfiguration(string $context): bool
+    protected function hasWebhookConfiguration(string $context): bool
     {
         $privateKeysContext = $this->getPrivateKeysWithContext();
         return (!empty($privateKeysContext[$context]));

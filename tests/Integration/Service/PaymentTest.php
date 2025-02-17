@@ -40,7 +40,8 @@ class PaymentTest extends IntegrationTestCase
             $this->createPartialMock(Translator::class, []),
             $this->createPartialMock(UnzerService::class, []),
             $this->createPartialMock(UnzerSDKLoader::class, []),
-            $this->createPartialMock(TransactionService::class, [])
+            $this->createPartialMock(TransactionService::class, []),
+            new \OxidSolutionCatalysts\Unzer\Service\TmpOrderService()
         );
 
         $this->assertSame($expectedResult, $sut->removeTemporaryOrder());

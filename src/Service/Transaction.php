@@ -12,7 +12,10 @@ namespace OxidSolutionCatalysts\Unzer\Service;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\ConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidSolutionCatalysts\Unzer\Exception\UnzerException;
 use OxidEsales\Eshop\Application\Model\Order;
@@ -210,28 +213,29 @@ class Transaction
         return md5($jsonEncode);
     }
 
-    protected function saveTransaction(array $params, Order $oOrder): bool
+    public function saveTransaction(array $params, Order $oOrder): bool
     {
         $transaction = $this->getNewTransactionObject();
-
-        //check if metadata exists
         $params['metadata'] = $params['metadata'] ?? json_encode('', JSON_THROW_ON_ERROR);
 
-        // building oxid from unique index columns
-        // only write to DB if oxid doesn't exist to prevent multiple entries of the same transaction
-        $oxid = $this->prepareTransactionOxid($params);
-        if (!$transaction->load($oxid)) {
-            if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
-                $transaction->setTransStatus('aborted');
+        try {
+            $oxid = $this->prepareTransactionOxid($params);
+            if (!$transaction->load($oxid)) {
+                if ($oOrder->getFieldData('oxtransstatus') === 'ABORTED') {
+                    $transaction->setTransStatus('aborted');
+                }
+
+                $transaction->assign($params);
+                $transaction->setId($oxid);
+                $transaction->save();
+
+                return true;
             }
-
-            $transaction->assign($params);
-            $transaction->setId($oxid);
-            $transaction->save();
-
+        } catch (DatabaseErrorException $e) {
+            $debugHandler = $this->getServiceFromContainer(DebugHandler::class);
+            $debugHandler->log('saveTransaction: ' . $e->getMessage());
             return true;
         }
-
         return false;
     }
 

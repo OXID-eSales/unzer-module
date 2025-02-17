@@ -21,6 +21,7 @@ final class UnzerDefinitions
     public const IDEAL_UNZER_PAYMENT_ID = 'oscunzer_ideal';
     public const INSTALLMENT_UNZER_PAYMENT_ID = 'oscunzer_installment';
     public const INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID = 'oscunzer_installment_paylater';
+
     public const INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice';
     public const OLD_INVOICE_UNZER_PAYMENT_ID = 'oscunzer_invoice_old';
     public const PAYPAL_UNZER_PAYMENT_ID = 'oscunzer_paypal';
@@ -32,6 +33,8 @@ final class UnzerDefinitions
     public const SOFORT_UNZER_PAYMENT_ID = 'oscunzer_sofort';
     public const WECHATPAY_UNZER_PAYMENT_ID = 'oscunzer_wechatpay';
     public const APPLEPAY_UNZER_PAYMENT_ID = 'oscunzer_applepay';
+
+    public const MINIMAL_PAYABLE_AMOUNT = 0.75;
 
     private const PAYMENT_CONSTRAINTS = [
         'oxfromamount' => 0,

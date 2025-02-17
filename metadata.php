@@ -54,7 +54,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail'   => 'logo.svg',
-    'version'     => '2.2.0-rc.15',
+    'version'     => Module::MODULE_VERSION,
     'author'      => 'OXID eSales AG',
     'url'         => 'https://www.oxid-esales.com',
     'email'       => 'info@oxid-esales.com',
@@ -182,7 +182,7 @@ $aModule = [
             'group' => 'unzerenvironment',
             'name'  => 'UnzerDebug',
             'type'  => 'bool',
-            'value' => '0',
+            'value' => true,
         ],
         [
             'group' => 'unzermerchant',

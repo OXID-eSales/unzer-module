@@ -147,7 +147,6 @@ jobs:
           docker compose exec -T php composer update --no-interaction
           docker compose exec -T php bin/oe-console oe:database:reset \
             --db-host=mysql --db-port=3306 --db-name=example --db-user=root --db-password=root --force
-          docker compose exec -T php bin/oe-console oe:module:activate osc-unzer
 
       - name: Put module settings
         continue-on-error: true
@@ -275,6 +274,10 @@ jobs:
           make up
           sleep 2
 
+      - name: Run composer install
+        run: |
+          docker compose exec -T php composer install --no-interaction
+
       - name: Run tests
         run: |
           docker compose exec -T \
@@ -282,9 +285,7 @@ jobs:
             php php vendor/bin/phpunit \
               -c /var/www/vendor/${{ env.PACKAGE_NAME }}/tests/phpunit.xml \
               --testsuite=Integration \
-              --bootstrap=/var/www/source/bootstrap.php \
-              --coverage-text \
-              --coverage-php=/var/www/integration.cov
+              --bootstrap=/var/www/source/bootstrap.php 
 
       - name: Upload log artifact
         if: always()
