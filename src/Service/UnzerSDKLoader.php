@@ -139,6 +139,7 @@ class UnzerSDKLoader
 
     public function getCustomerTypeCurByPaymentId(string $sPaymentId): array
     {
+        /** @var QueryBuilderFactoryInterface $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         $queryBuilder = $queryBuilderFactory->create();
 

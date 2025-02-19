@@ -17,13 +17,20 @@ use OxidEsales\Eshop\Core\ViewConfig;
 
 class ViewConfigTest extends IntegrationTestCase
 {
+    private ModuleSettings $moduleSettings;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->container = ContainerFactory::getInstance()->getContainer();
+        $this->moduleSettings = $this->container->get(ModuleSettings::class);
+    }
+
     public function testModuleSettings()
     {
-        $di = ContainerFactory::getInstance()->getContainer();
-        $bridge = $di->get(ModuleSettingBridgeInterface::class);
-        $bridge->save('UnzerSystemMode', ModuleSettings::SYSTEM_MODE_PRODUCTION, Module::MODULE_ID);
-        $bridge->save('production-UnzerPublicKey', 'publickey', Module::MODULE_ID);
-        $bridge->save('production-UnzerPrivateKey', 'privatekey', Module::MODULE_ID);
+        $this->moduleSettings->saveSetting('UnzerSystemMode', true);
+        $this->moduleSettings->saveSetting('production-UnzerPublicKey', 'publickey');
+        $this->moduleSettings->saveSetting('production-UnzerPrivateKey', 'privatekey');
 
         $viewConfig = $this->getViewConfig();
         $this->assertSame(ModuleSettings::SYSTEM_MODE_PRODUCTION, $viewConfig->getUnzerSystemMode());

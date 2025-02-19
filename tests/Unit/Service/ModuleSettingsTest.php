@@ -25,7 +25,6 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use Symfony\Component\Filesystem\Filesystem;
 
-
 class ModuleSettingsTest extends TestCase
 {
     use ContainerTrait;
@@ -46,8 +45,8 @@ class ModuleSettingsTest extends TestCase
 
     public function testSetAndGetSystemMode()
     {
-        $this->moduleSettings->saveSetting('UnzerSystemMode', ModuleSettings::SYSTEM_MODE_PRODUCTION);
-        $this->assertEquals(ModuleSettings::SYSTEM_MODE_PRODUCTION, $this->moduleSettings->getSystemMode());
+        $this->moduleSettings->saveSetting('UnzerSystemMode', true);
+        $this->assertEquals(true, $this->moduleSettings->getSystemMode());
     }
 
     public function testSetAndGetDebugMode()

@@ -174,9 +174,8 @@ $aModule = [
         [
             'group'       => 'unzerenvironment',
             'name'        => 'UnzerSystemMode',
-            'type'        => 'select',
-            'value'       => '0',
-            'constraints' => '0|1'
+            'type'        => 'bool',
+            'value'       => false,
         ],
         [
             'group' => 'unzerenvironment',
@@ -443,7 +442,7 @@ $aModule = [
             'group' => 'unzerother',
             'name'  => 'UnzerjQuery',
             'type'  => 'bool',
-            'value' => '0',
+            'value' => false,
         ],
         [
             'group' => 'unzerother',

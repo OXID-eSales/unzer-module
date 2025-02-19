@@ -135,24 +135,20 @@ jobs:
           docker compose exec -T \
             php composer require ${{ env.PACKAGE_NAME }}:* --no-interaction --no-update
 
-      - name: Install demodata
-        run: |
-          docker compose exec -T \
-            php composer config repositories.oxid-esales/oxideshop-demodata-ce \
-            --json '{"type":"git", "url":"https://github.com/OXID-eSales/oxideshop_demodata_ce"}'
-          docker compose exec -T php composer require oxid-esales/oxideshop-demodata-ce:dev-master --no-update
-
       - name: Install dependencies and reset shop
         run: |
           docker compose exec -T php composer update --no-interaction
           docker compose exec -T php bin/oe-console oe:database:reset \
-            --db-host=mysql --db-port=3306 --db-name=example --db-user=root --db-password=root --force
+          --db-host=mysql --db-port=3306 --db-name=example --db-user=root --db-password=root --force
 
       - name: Put module settings
         continue-on-error: true
         run: |
           mkdir -p source/var/configuration/environment/shops/1/modules
           echo "${{ secrets.MODULE_SETTINGS_OXID7 }}" > source/var/configuration/environment/shops/1/modules/osc-unzer.yaml
+
+      - name: Activate module
+        run: |
           docker compose exec -T php php bin/oe-console oe:module:activate osc-unzer
 
       - name: Show docker log
@@ -256,6 +252,7 @@ jobs:
             source/test-module/phpstan.report.json
             source/test-module/phpmd.report.json
 
+
   integration_tests:
     needs: [ install_shop_with_module ]
     runs-on: ubuntu-latest
@@ -273,10 +270,6 @@ jobs:
         run: |
           make up
           sleep 2
-
-      - name: Run composer install
-        run: |
-          docker compose exec -T php composer install --no-interaction
 
       - name: Run tests
         run: |
@@ -328,9 +321,7 @@ jobs:
             php php vendor/bin/phpunit \
               -c /var/www/vendor/${{ env.PACKAGE_NAME }}/tests/phpunit.xml \
               --testsuite=Unit \
-              --bootstrap=/var/www/source/bootstrap.php \
-              --coverage-text \
-              --coverage-php=/var/www/unit.cov
+              --bootstrap=/var/www/source/bootstrap.php 
 
       - name: Stop containers
         if: always()
@@ -391,9 +382,11 @@ jobs:
           docker compose exec -T php composer require twig/twig:v3.8.0 --no-update
           docker compose exec -T php composer update --no-interaction
 
-      - name: Activate theme
+
+      - name: Activate theme and Unzer Payment Plugin
         run: |
-          docker compose exec -T php bin/oe-console oe:theme:activate apex
+          docker compose exec -T php php bin/oe-console oe:module:activate osc-unzer
+          docker compose exec -T php php bin/oe-console oe:theme:activate apex
 
       - name: Run tests
         run: |
@@ -440,18 +433,6 @@ jobs:
           key: installation-${{ join(inputs.*, '-') }}-${{ github.run_number }}-${{ github.run_attempt }}
           restore-keys: |
             installation-${{ join(inputs.*, '-') }}-${{ github.run_number }}-${{ github.run_attempt }}
-
-      - name: Download unit artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: ModuleUnitTestsLog-${{ inputs.php }}-${{ inputs.mysql }}-${{ inputs.template_engine }}
-          path: ./source/coverage/
-
-      - name: Download integration artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: ModuleIntegrationTestsLog-${{ inputs.php }}-${{ inputs.mysql }}-${{ inputs.template_engine }}
-          path: ./source/coverage/
 
       - name: Start containers
         run: |

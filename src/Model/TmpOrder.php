@@ -74,8 +74,8 @@ class TmpOrder extends BaseModel
      */
     public function getOxIdFromTmpOrder(string $orderOxId, string $unzerOrderNr): string
     {
+        /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $queryBuilderFactory->create();
         $queryBuilder
             ->select('oxid')
@@ -100,8 +100,8 @@ class TmpOrder extends BaseModel
      */
     public function getTmpOrderByUnzerId(string $unzerOrderNr): array
     {
+        /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $queryBuilderFactory->create();
         $queryBuilder
             ->select('*')
@@ -124,8 +124,8 @@ class TmpOrder extends BaseModel
      */
     public function getTmpOrderByOxOrderId(string $oxSessionOrderId): ?CoreOrderModel
     {
+        /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $queryBuilderFactory->create();
         $queryBuilder
             ->select('*')

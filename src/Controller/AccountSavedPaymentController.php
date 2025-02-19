@@ -18,6 +18,7 @@ use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Core\Registry;
 use UnzerSDK\Exceptions\UnzerApiException;
 use UnzerSDK\Resources\PaymentTypes\Paypal as UnzerSDKPaypal;
+use UnzerSDK\Unzer;
 
 class AccountSavedPaymentController extends AccountController
 {
@@ -55,6 +56,7 @@ class AccountSavedPaymentController extends AccountController
      */
     protected function setPaymentListsToView(): void
     {
+        /** @var Transaction $transactionService */
         $transactionService = $this->getServiceFromContainer(Transaction::class);
         $ids = $transactionService->getTransactionIds($this->getUser());
         $paymentTypes = false;
@@ -70,6 +72,7 @@ class AccountSavedPaymentController extends AccountController
             }
 
             try {
+                /** @var Unzer $unzerSDK */
                 $unzerSDK = $this->getServiceFromContainer(UnzerSDKLoader::class)->getUnzerSDK(
                     $paymentId,
                     $currency,

@@ -139,6 +139,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $this->unzerService->setSessionVars($transaction);
 
         if ($transaction instanceof Charge && $paymentType instanceof UnzerSDKPaymentTypePrepayment) {
+            /** @var PrePaymentBankAccountService $prePaymentService */
             $prePaymentService = $this->getServiceFromContainer(PrePaymentBankAccountService::class);
             $prePaymentService->persistBankAccountInfo($transaction);
         }
@@ -164,6 +165,8 @@ abstract class UnzerPayment implements UnzerPaymentInterface
 
     /**
      * @SuppressWarnings(PHPMD.ElseExpression)
+     * @throws \OxidSolutionCatalysts\Unzer\Exception\UnzerException
+     * @throws \Exception
      */
     protected function doTransactions(
         Basket $basketModel,
@@ -190,6 +193,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $customerType = $this->tmpOrderService
                 ->getCustomerType($currency->name, $sdkPaymentID);
             try {
+                /** @var UnzerSDKLoader $loader */
                 $loader = $this->getServiceFromContainer(UnzerSDKLoader::class);
                 $UnzerSdk = $loader->getUnzerSDK(
                     $sdkPaymentID,
@@ -266,6 +270,7 @@ abstract class UnzerPayment implements UnzerPaymentInterface
 
     private function getDefaultExceptionMessage(): string
     {
+        /** @var Translator $translator */
         $translator = $this->getServiceFromContainer(Translator::class);
         return $translator->translate('OSCUNZER_ERROR_DURING_CHECKOUT');
     }
@@ -291,8 +296,9 @@ abstract class UnzerPayment implements UnzerPaymentInterface
         $transactionService = $this->getServiceFromContainer(
             TransactionService::class
         );
-        $payment = $this->getServiceFromContainer(PaymentService::class)
-            ->getSessionUnzerPayment(true);
+        /** @var PaymentService $paymentService */
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        $payment = $paymentService->getSessionUnzerPayment(true);
         try {
             $transactionService->writeTransactionToDB(
                 Registry::getSession()->getSessionChallengeToken(),
@@ -315,8 +321,9 @@ abstract class UnzerPayment implements UnzerPaymentInterface
             $savedUserPayments = $transactionService->getSavedPaymentsForUser($user, $ids, true);
         }
 
-        $currentPayment = $this->getServiceFromContainer(PaymentService::class)
-            ->getSessionUnzerPayment(true);
+        /** @var PaymentService $paymentService */
+        $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        $currentPayment = $paymentService->getSessionUnzerPayment(true);
 
         if ($currentPayment) {
             $currentPaymentType = $currentPayment->getPaymentType();

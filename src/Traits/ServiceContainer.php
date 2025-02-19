@@ -11,10 +11,17 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 
 trait ServiceContainer
 {
+    /**
+     * @template T
+     * @psalm-param class-string<T> $serviceName
+     * @return T
+     */
     protected function getServiceFromContainer(string $serviceName)
     {
-        return ContainerFactory::getInstance()
+        $service = ContainerFactory::getInstance()
             ->getContainer()
             ->get($serviceName);
+        /** @var T $service */
+        return $service;
     }
 }

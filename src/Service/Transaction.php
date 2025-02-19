@@ -232,6 +232,7 @@ class Transaction
                 return true;
             }
         } catch (DatabaseErrorException $e) {
+            /** @var \OxidSolutionCatalysts\Unzer\Service\DebugHandler $debugHandler */
             $debugHandler = $this->getServiceFromContainer(DebugHandler::class);
             $debugHandler->log('saveTransaction: ' . $e->getMessage());
             return true;
@@ -389,6 +390,7 @@ class Transaction
         $result = null;
 
         if ($paymentid) {
+            /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
             $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
             $queryBuilder = $queryBuilderFactory->create();
 
@@ -451,7 +453,9 @@ class Transaction
 
         $result = '';
 
+        /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
+
         $queryBuilder = $queryBuilderFactory->create();
 
         $query = $queryBuilder
@@ -491,6 +495,7 @@ class Transaction
     {
         $result = '';
 
+        /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         $queryBuilder = $queryBuilderFactory->create();
 
@@ -549,7 +554,7 @@ class Transaction
     public function isValidTransactionTypeId(string $typeid): bool
     {
         $result = false;
-
+        /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         $queryBuilder = $queryBuilderFactory->create();
 
@@ -593,6 +598,7 @@ class Transaction
             return $result;
         }
 
+        /** @var \OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactory $queryBuilderFactory */
         $queryBuilderFactory = $this->getServiceFromContainer(QueryBuilderFactoryInterface::class);
         $queryBuilder = $queryBuilderFactory->create();
 
@@ -692,6 +698,7 @@ class Transaction
         $result = [];
 
         try {
+            /** @var UnzerSDKLoader $UnzerSdk */
             $UnzerSdk = $this->getServiceFromContainer(UnzerSDKLoader::class);
             $unzerSDK = $UnzerSdk->getUnzerSDK(
                 $paymentId,
@@ -706,6 +713,7 @@ class Transaction
                 'comes from the transactions of the user: "%s"',
                 $userId
             );
+            /** @var \OxidSolutionCatalysts\Unzer\Service\DebugHandler $logger */
             $logger = $this->getServiceFromContainer(DebugHandler::class);
             $logger->log($logEntry);
             return null;
@@ -754,10 +762,11 @@ class Transaction
             $this->getUnzerPaymentData($unzerPayment, $transaction);
         $parameters = array_merge($parameters, $unzerPaymentData);
 
+        /** @var SavedPaymentSaveService $savedPaymentService */
+        $savedPaymentService = $this->getServiceFromContainer(SavedPaymentSaveService::class);
         $parameters = array_merge(
             $parameters,
-            $this->getServiceFromContainer(SavedPaymentSaveService::class)
-                ->getTransactionParameters($unzerPayment)
+            $savedPaymentService->getTransactionParameters($unzerPayment)
         );
     }
 }

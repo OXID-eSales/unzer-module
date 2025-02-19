@@ -17,7 +17,7 @@ use OxidEsales\Facts\Facts;
 use OxidSolutionCatalysts\Unzer\Module;
 use Exception;
 use OxidEsales\EshopCommunity\Application\Model\User;
-
+use TypeError;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -60,34 +60,51 @@ class ModuleSettings
 
     public function isDebugMode(): bool
     {
-        return ($this->getSettingValue('UnzerDebug') == 1)
-            || ($this->getSettingValue('UnzerDebug') === true)
-            || ($this->getSettingValue('UnzerDebug') === 'true');
+        $isUnzerDebug = $this->getSettingValue('UnzerDebug');
+        if (is_string($isUnzerDebug)) {
+            return $isUnzerDebug === '1' || $isUnzerDebug === 'true';
+        }
+
+        if (is_bool($isUnzerDebug)) {
+            return $isUnzerDebug;
+        }
+
+        return false;
     }
 
     public function isSandboxMode(): bool
     {
-        return $this->getSystemMode() === self::SYSTEM_MODE_SANDBOX;
+        return $this->getSystemMode() == self::SYSTEM_MODE_SANDBOX;
     }
 
     public function getSystemMode(): string
     {
         $systemMode = $this->getSettingValue('UnzerSystemMode');
 
-        if (is_string($systemMode)) {
-            return $systemMode === self::SYSTEM_MODE_PRODUCTION ? self::SYSTEM_MODE_PRODUCTION : self::SYSTEM_MODE_SANDBOX;
+        if ($systemMode === self::SYSTEM_MODE_PRODUCTION || $systemMode == '1' || $systemMode === true) {
+            return self::SYSTEM_MODE_PRODUCTION;
         }
 
-        if ($systemMode instanceof \Symfony\Component\String\UnicodeString) {
-            return $systemMode->toString() === self::SYSTEM_MODE_PRODUCTION ? self::SYSTEM_MODE_PRODUCTION : self::SYSTEM_MODE_SANDBOX;
-        }
-
-        return '0';
+        return self::SYSTEM_MODE_SANDBOX;
     }
 
-    public function setSystemMode(string $systemMode): void
+    /**
+     * @throws \Exception
+     */
+    public function setSystemMode(string|bool $systemMode): void
     {
-        $this->saveSetting('UnzerSystemMode', $systemMode);
+        if (is_bool($systemMode)) {
+            $this->saveSetting('UnzerSystemMode', $systemMode);
+            return;
+        }
+
+        if (is_string($systemMode)) {
+            if ($systemMode === self::SYSTEM_MODE_PRODUCTION || $systemMode == 1) {
+                $this->saveSetting('UnzerSystemMode', true);
+                return;
+            }
+            $this->saveSetting('UnzerSystemMode', false);
+        }
     }
 
     public function getInstallmentRate(): float
@@ -113,8 +130,9 @@ class ModuleSettings
 
     public function useModuleJQueryInFrontend(): bool
     {
+        /** @var bool $unzerJQuery */
         $unzerJQuery = $this->getSettingValue('UnzerjQuery');
-        return $unzerJQuery == '1';
+        return $unzerJQuery == 1;
     }
 
     public function getPaymentProcedureSetting(string $paymentMethod): string
@@ -212,6 +230,7 @@ class ModuleSettings
     public function getApplePayMerchantCertKey(): string
     {
         $path = $this->getApplePayMerchantCertKeyFilePath();
+
         if (file_exists($path)) {
             /** @var string $fileContest */
             $fileContest = file_get_contents($path);
@@ -391,42 +410,49 @@ class ModuleSettings
 
     public function saveSetting(string $name, mixed $value): void
     {
-        if (is_string($value)) {
-            $this->moduleSettingService->saveString($name, $value, Module::MODULE_ID);
-        } elseif (is_bool($value)) {
-            $this->moduleSettingService->saveBoolean($name, $value, Module::MODULE_ID);
-        } elseif (is_int($value)) {
-            $this->moduleSettingService->saveInteger($name, $value, Module::MODULE_ID);
-        } elseif (is_array($value)) {
-            $this->moduleSettingService->saveCollection($name, $value, Module::MODULE_ID);
+        $settingsKeyType = $this->getKeyType($name);
+        switch ($settingsKeyType) {
+            case 'string':
+                if (is_string($value)) {
+                    $this->moduleSettingService->saveString($name, $value, Module::MODULE_ID);
+                }
+                break;
+            case 'bool':
+                if (is_bool($value)) {
+                    $this->moduleSettingService->saveBoolean($name, $value, Module::MODULE_ID);
+                }
+                break;
+            case 'array':
+                if (is_array($value)) {
+                    $this->moduleSettingService->saveCollection($name, $value, Module::MODULE_ID);
+                }
+                break;
+            case 'int':
+                if (is_int($value)) {
+                    $this->moduleSettingService->saveInteger($name, $value, Module::MODULE_ID);
+                }
+                break;
+            default:
+                throw new TypeError('Unknown key: ' . $name);
         }
     }
 
-    public function getSettingValue(string $key): mixed
+
+    public function getSettingValue(string $key): array|bool|int|null|string
     {
-        try {
-            if (!$this->moduleSettingService->exists($key, Module::MODULE_ID)) {
-                $this->debugHandler->log('Setting ' . $key . ' not found');
-                return '';
-            }
-
-            if ($key === 'UnzerDebug') {
+        $settingsKeyType = $this->getKeyType($key);
+        switch ($settingsKeyType) {
+            case 'string':
+                return $this->moduleSettingService->getString($key, Module::MODULE_ID)->toString();
+            case 'bool':
                 return $this->moduleSettingService->getBoolean($key, Module::MODULE_ID);
-            }
-
-            if ($key === 'UnzerSystemMode') {
-                return $this->moduleSettingService->getString($key, Module::MODULE_ID);
-            }
-
-            if (in_array($key, ['webhookConfiguration' , 'applepay_merchant_capabilities', 'applepay_networks'])) {
+            case 'array':
                 return $this->moduleSettingService->getCollection($key, Module::MODULE_ID);
-            }
-
-            return $this->moduleSettingService->getString($key, Module::MODULE_ID)->toString();
-        } catch (Exception $exception) {
-            $this->debugHandler->log($exception->getMessage() . ' ' . $exception->getTraceAsString());
-            return '';
+            case 'int':
+                return $this->moduleSettingService->getInteger($key, Module::MODULE_ID);
         }
+        $this->debugHandler->log('ModuleSettings::getSettingValue() Unknown key type: ' . $key);
+        return null;
     }
 
     /**
@@ -528,6 +554,7 @@ class ModuleSettings
 
     private function getInvoiceB2CEURPrivateKey(): string
     {
+        /** @var string $key */
         $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2CEURPrivateKey');
         return $key;
     }
@@ -760,5 +787,18 @@ class ModuleSettings
     {
         $privateKeysContext = $this->getPrivateKeysWithContext();
         return (!empty($privateKeysContext[$context]));
+    }
+
+    private function getKeyType(string $key): string
+    {
+        if (in_array($key, ['UnzerDebug', 'UnzerjQuery', 'UnzerSystemMode'])) {
+            return 'bool';
+        }
+
+        if (in_array($key, ['webhookConfiguration' , 'applepay_merchant_capabilities', 'applepay_networks'])) {
+            return 'array';
+        }
+
+        return 'string';
     }
 }

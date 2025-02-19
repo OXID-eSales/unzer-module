@@ -18,14 +18,11 @@ class Payment extends Payment_parent
 {
     use ServiceContainer;
 
-    /**
-     * Checks if the payment method is an unzer payment method
-     *
-     * @return bool
-     */
     public function isUnzerPayment(): bool
     {
-        return $this->getServiceFromContainer(PaymentValidator::class)->isUnzerPayment($this);
+        /** @var PaymentValidator $service */
+        $service = $this->getServiceFromContainer(PaymentValidator::class);
+        return $service->isUnzerPayment($this);
     }
 
     /**
@@ -38,8 +35,9 @@ class Payment extends Payment_parent
         if (!$this->isUnzerPayment()) {
             return false;
         }
-
-        return $this->getServiceFromContainer(PaymentValidator::class)->isPaymentCurrencyAllowed($this);
+        /** @var PaymentValidator $service */
+        $service = $this->getServiceFromContainer(PaymentValidator::class);
+        return $service->isPaymentCurrencyAllowed($this);
     }
 
     /**
@@ -49,16 +47,21 @@ class Payment extends Payment_parent
      */
     public function isUnzerSecuredPayment(): bool
     {
-        return $this->getServiceFromContainer(PaymentValidator::class)->isSecuredPayment($this);
+        /** @var PaymentValidator $service */
+        $service = $this->getServiceFromContainer(PaymentValidator::class);
+        return $service->isSecuredPayment($this);
     }
 
     public function isUnzerPaymentHealthy(): bool
     {
-        return $this->getServiceFromContainer(PaymentValidator::class)->isConfigurationHealthy($this);
+        /** @var PaymentValidator $service */
+        $service = $this->getServiceFromContainer(PaymentValidator::class);
+        return $service->isConfigurationHealthy($this);
     }
 
     private function canDoUnzerAbility(string $sAbility): bool
     {
+        /** @var UnzerDefinitions $definitionService */
         $definitionService = $this->getServiceFromContainer(UnzerDefinitions::class);
         /** @var string $moduleId */
         $moduleId = $this->getFieldData('oxid');

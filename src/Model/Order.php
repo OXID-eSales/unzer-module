@@ -53,13 +53,16 @@ class Order extends Order_parent
         }
 
         if ($this->checkOrderExist($orderId)) {
+            /** @var DebugHandler $logger */
             $logger = $this->getServiceFromContainer(DebugHandler::class);
             $logger->log('finalizeUnzerOrderAfterRedirect: Order already exists, no need to save again: ' . $orderId);
             return self::ORDER_STATE_ORDEREXISTS;
         }
 
         $this->setId($orderId);
+        /** @var PaymentService $paymentService */
         $paymentService = $this->getServiceFromContainer(PaymentService::class);
+        /** @var Unzer $unzerService */
         $unzerService = $this->getServiceFromContainer(Unzer::class);
         $unzerPaymentStatus = $paymentService->getUnzerPaymentStatus();
 
@@ -287,11 +290,13 @@ class Order extends Order_parent
         /** @var string $oxpaymenttype */
         $oxpaymenttype = $this->getFieldData('oxpaymenttype');
         if ($oxpaymenttype !== null && str_contains($oxpaymenttype, "oscunzer")) {
+            /** @var TransactionService $transactionService */
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
-
+            /** @var PaymentService $service */
+            $service = $this->getServiceFromContainer(PaymentService::class);
             $unzerPayment = $unzerPayment instanceof \UnzerSDK\Resources\Payment ?
                 $unzerPayment :
-                $this->getServiceFromContainer(PaymentService::class)->getSessionUnzerPayment(true);
+                $service->getSessionUnzerPayment(true);
 
             $transactionService->writeTransactionToDB(
                 $this->getId(),

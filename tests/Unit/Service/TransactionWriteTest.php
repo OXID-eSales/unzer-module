@@ -105,7 +105,10 @@ class TransactionWriteTest extends TestCase
 
         try {
             $result = $this->transactionService->saveTransaction($params, $this->oOrder);
-            $this->assertTrue($result, 'saveTransaction should return true even when other DatabaseErrorException occurs.');
+            $this->assertTrue(
+                $result,
+                'saveTransaction should return true even when other DatabaseErrorException occurs.'
+            );
         } catch (\Throwable $e) {
             $this->fail('saveTransaction threw an unexpected exception: ' . $e->getMessage());
         }
