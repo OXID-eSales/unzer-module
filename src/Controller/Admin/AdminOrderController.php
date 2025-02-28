@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
+use OxidSolutionCatalysts\Unzer\Service\Payment as UnzerPaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
 use OxidSolutionCatalysts\Unzer\Service\UnzerSDKLoader;
@@ -40,17 +41,8 @@ class AdminOrderController extends AdminDetailsController
 {
     use ServiceContainer;
 
-    /**
-     * Active order object
-     *
-     * @var Order $editObject
-     */
-    protected $editObject = null;
-
-    /** @var Payment $oPayment */
-    protected $oPayment = null;
-
-    /** @var string $sTypeId */
+    protected ?Order $editObject = null;
+    protected ?Payment $oPayment = null;
     protected string $sTypeId;
 
     /**
@@ -58,9 +50,8 @@ class AdminOrderController extends AdminDetailsController
      * name of template file "oscunzer_order.tpl".
      *
      * @return string
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
-     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      * @SuppressWarnings(PHPMD.ElseExpression)
      */
     public function render()
@@ -79,7 +70,9 @@ class AdminOrderController extends AdminDetailsController
             /** @var Order $oOrder */
             $oOrder = $this->getEditObject();
 
-            $this->_aViewData['paymentTitle'] = $this->oPayment->getFieldData('OXDESC');
+            $this->_aViewData['paymentTitle'] = !is_null($this->oPayment)
+                ? $this->oPayment->getFieldData('OXDESC')
+                : 'empty OXDESC field';
             $this->_aViewData['oOrder'] = $oOrder;
             /** @var string $sPaymentId */
             $sPaymentId = $oOrder->getFieldData('oxpaymenttype');
@@ -187,7 +180,8 @@ class AdminOrderController extends AdminDetailsController
                 }
             }
             $this->_aViewData['totalAmountCharge'] = $fCharged;
-            $this->_aViewData['remainingAmountCharge'] = floatval($editObject->getTotalOrderSum()) - $fCharged;
+            $this->_aViewData['remainingAmountCharge'] =
+                $this->autoParseFloat($editObject->getTotalOrderSum()) - $fCharged;
 
             $fCancelled = $this->getFullCancelled($unzerPayment);
             $this->_aViewData['totalAmountCancel'] = $fCancelled;
@@ -251,13 +245,7 @@ class AdminOrderController extends AdminDetailsController
         return $cancellations;
     }
 
-    /**
-     * Adding HolderData to View (if there is any)
-     *
-     * @param Charge $charge
-     * @return void
-     */
-    protected function addChargeViewData(Charge $charge)
+    protected function addChargeViewData(Charge $charge): void
     {
         $holderData = [];
         $holderData['bic'] = $charge->getBic();
@@ -275,6 +263,7 @@ class AdminOrderController extends AdminDetailsController
             $this->_aViewData["holderData"] = $holderData;
         }
     }
+
     protected function addAuthorizationViewData(Authorization $authorization): void
     {
         $date = '';
@@ -335,7 +324,7 @@ class AdminOrderController extends AdminDetailsController
         $translator = $this->getServiceFromContainer(Translator::class);
 
         if ($unzerid) {
-            $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+            $paymentService = $this->getServiceFromContainer(UnzerPaymentService::class);
             /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
             $oOrder = $this->getEditObject();
             $oStatus = $paymentService->sendShipmentNotification($oOrder, $unzerid);
@@ -349,28 +338,9 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * @return void
-     */
     public function doUnzerCollect(): void
     {
-        $this->forceReloadListFrame();
-        /** @var string $unzerid */
-        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-
-        $amountParam = Registry::getRequest()->getRequestParameter('amount');
-
-        if (is_numeric($amountParam)) {
-            $amount = floatval($amountParam);
-        } else {
-            $amount = 0.0;
-        }
-
-        $translator = $this->getServiceFromContainer(Translator::class);
-
-        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
-        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
-        $oOrder = $this->getEditObject();
+        list($amount, $oOrder, $unzerid, $paymentService, $translator) = $this->prepareAction();
         $oStatus = $paymentService->doUnzerCollect($oOrder, $unzerid, $amount);
 
         if ($oStatus instanceof UnzerApiException) {
@@ -378,10 +348,7 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * @return void
-     */
-    public function doUnzerCancel()
+    public function doUnzerCancel(): void
     {
         $this->forceReloadListFrame();
         /** @var string $unzerid */
@@ -393,18 +360,10 @@ class AdminOrderController extends AdminDetailsController
         }
 
         $cancelAmountParam = Registry::getRequest()->getRequestParameter('amount');
-        if (is_numeric($cancelAmountParam)) {
-            $amount = floatval($cancelAmountParam);
-        } else {
-            $amount = 0.0;
-        }
+        $amount = $this->autoParseFloat($cancelAmountParam);
 
         $fChargedParam = Registry::getRequest()->getRequestParameter('chargedamount');
-        if (is_numeric($fChargedParam)) {
-            $fCharged = floatval($fChargedParam);
-        } else {
-            $fCharged = 0.0;
-        }
+        $fCharged = $this->autoParseFloat($fChargedParam);
 
         /** @var string $reason */
         $reason = Registry::getRequest()->getRequestParameter('reason') ?? '';
@@ -425,7 +384,7 @@ class AdminOrderController extends AdminDetailsController
                 . $translator->translate('OSCUNZER_CANCEL_ERR_AMOUNT') . " " . $amount;
             return;
         }
-        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
+        $paymentService = $this->getServiceFromContainer(UnzerPaymentService::class);
         /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
         $oOrder = $this->getEditObject();
         $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, floatval($amount), $reason);
@@ -434,23 +393,9 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * @return void
-     */
-    public function doUnzerAuthorizationCancel()
+    public function doUnzerAuthorizationCancel(): void
     {
-        $this->forceReloadListFrame();
-        /** @var string $unzerid */
-        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
-        /** @var string $sAmount */
-        $sAmount = Registry::getRequest()->getRequestParameter('amount');
-        $amount = floatval($sAmount);
-
-        $translator = $this->getServiceFromContainer(Translator::class);
-
-        $paymentService = $this->getServiceFromContainer(\OxidSolutionCatalysts\Unzer\Service\Payment::class);
-        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
-        $oOrder = $this->getEditObject();
+        list($amount, $oOrder, $unzerid, $paymentService, $translator) = $this->prepareAction();
         $oStatus = $paymentService->doUnzerAuthorizationCancel($oOrder, $unzerid, $amount);
 
         if ($oStatus instanceof UnzerApiException) {
@@ -458,11 +403,6 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
-    /**
-     * Method checks is order was made with unzer payment
-     *
-     * @return bool
-     */
     public function isUnzerOrder(): bool
     {
         $isUnzer = false;
@@ -584,5 +524,46 @@ class AdminOrderController extends AdminDetailsController
         }
 
         return $filteredTransactionList;
+    }
+
+    private function autoParseFloat(mixed $numberStr): float
+    {
+        if (!is_string($numberStr) || empty(trim($numberStr))) {
+            return 0.0;
+        }
+
+        $numberStr = trim($numberStr);
+        if (preg_match('/^\d{1,3}(\.\d{3})*,\d+$/', $numberStr)) {
+            // Detected European format (thousands separator as dot, decimal as comma)
+            // Convert to standard format: replace thousand separators (.) and change decimal (,) to dot
+            $numberStr = str_replace(['.', ','], ['', '.'], $numberStr);
+        } elseif (preg_match('/^\d{1,3}(,\d{3})*\.\d+$/', $numberStr)) {
+            // Detected US format (thousands separator as comma, decimal as dot)
+            // Convert to standard format: remove commas
+            $numberStr = str_replace(',', '', $numberStr);
+        } elseif (preg_match('/^\d+,\d+$/', $numberStr)) {
+            // Detected numbers that use a comma as a decimal separator but no thousands separator
+            $numberStr = str_replace(',', '.', $numberStr);
+        }
+
+        return is_numeric($numberStr) ? (float)$numberStr : 0.0;
+    }
+
+    private function prepareAction(): array
+    {
+        $this->forceReloadListFrame();
+        /** @var string $unzerid */
+        $unzerid = Registry::getRequest()->getRequestParameter('unzerid');
+        /** @var string $sAmount */
+        $sAmount = Registry::getRequest()->getRequestParameter('amount');
+        $amount = $this->autoParseFloat($sAmount);
+
+        $translator = $this->getServiceFromContainer(Translator::class);
+
+        $paymentService = $this->getServiceFromContainer(UnzerPaymentService::class);
+        /** @var \OxidSolutionCatalysts\Unzer\Model\Order $oOrder */
+        $oOrder = $this->getEditObject();
+
+        return [$amount, $oOrder, $unzerid, $paymentService, $translator];
     }
 }
