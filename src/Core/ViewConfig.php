@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidSolutionCatalysts\Unzer\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Theme;
 use OxidSolutionCatalysts\Unzer\Service\PrePaymentBankAccountService;
 use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
@@ -23,15 +24,17 @@ class ViewConfig extends ViewConfig_parent
 
     /**
      * is this a "Flow"-Theme Compatible Theme?
-     * @var bool $isFlowCompatibleTheme
+     * @var boolean
+     * @deprecated variable will be removed because it only played a role in the Smarty template engine context.
      */
-    protected $isFlowCompatibleTheme = null;
+    protected ?bool $isFlowCompatibleTheme = null;
 
     /**
      * is this a "Wave"-Theme Compatible Theme?
-     * @var bool $isWaveCompatibleTheme
+     * @var boolean
+     * @deprecated variable will be removed because it only played a role in the Smarty template engine context.
      */
-    protected $isWaveCompatibleTheme = null;
+    protected ?bool $isWaveCompatibleTheme = null;
 
     /** @var ModuleSettings $moduleSettings */
     protected $moduleSettings;
@@ -157,27 +160,31 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * Template variable getter. Check if active theme is a Flow Theme Compatible Theme
+     * Template variable getter. Check if is a Flow Theme Compatible Theme
      *
      * @return boolean
+     *
+     * @deprecated method will be removed because it only played a role in the Smarty template engine context.
      */
-    public function isFlowCompatibleTheme() //phpcs:ignore no return type because extended class method doesn't have it
+    public function isFlowCompatibleTheme(): bool
     {
         if (is_null($this->isFlowCompatibleTheme)) {
-            $this->isFlowCompatibleTheme = $this->isCompatibleTheme('flow');
+            $this->isFlowCompatibleTheme = $this->isThemeBasedOn('flow');
         }
         return $this->isFlowCompatibleTheme;
     }
 
     /**
-     * Template variable getter. Check if active theme is a Wave Theme Compatible Theme
+     * Template variable getter. Check if is a Wave Theme Compatible Theme
      *
      * @return boolean
+     *
+     * @deprecated method will be removed because it only played a role in the Smarty template engine context.
      */
-    public function isWaveCompatibleTheme() //phpcs:ignore no return type because extended class method doesn't have it
+    public function isWaveCompatibleTheme(): bool
     {
         if (is_null($this->isWaveCompatibleTheme)) {
-            $this->isWaveCompatibleTheme = $this->isCompatibleTheme('wave');
+            $this->isWaveCompatibleTheme = $this->isThemeBasedOn('wave');
         }
         return $this->isWaveCompatibleTheme;
     }
@@ -185,20 +192,22 @@ class ViewConfig extends ViewConfig_parent
     /**
      * Template variable getter. Check if is a ??? Theme Compatible Theme
      *
-     * @param string|null $themeId
+     * @param string $themeId
      *
      * @return boolean
+     *
+     * @deprecated method will be removed because it only played a role in the Smarty template engine context.
      */
-    public function isCompatibleTheme($themeId = null)
+    protected function isThemeBasedOn(string $themeId): bool
     {
         $result = false;
         if ($themeId) {
-            $theme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
+            $theme = oxNew(Theme::class);
             $theme->load($theme->getActiveThemeId());
             // check active theme or parent theme
             if (
-                $theme->getActiveThemeId() == $themeId ||
-                $theme->getInfo('parentTheme') == $themeId
+                $theme->getActiveThemeId() === $themeId ||
+                $theme->getInfo('parentTheme') === $themeId
             ) {
                 $result = true;
             }
