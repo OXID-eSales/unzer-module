@@ -161,28 +161,58 @@
 
         SepaDirectDebit.createResource()
             .then(function(result) {
+                // Store the reference to the form
+                const form = document.getElementById('orderConfirmAgbBottom');
+
+                // Create the first hidden input for paymentData
                 let hiddenInput = document.createElement('input');
                 hiddenInput.type = 'hidden';
                 hiddenInput.name = 'paymentData';
                 hiddenInput.value = JSON.stringify(result);
-                document.getElementById('orderConfirmAgbBottom').appendChild(hiddenInput);
+                form.appendChild(hiddenInput);
 
+                // Create the sepaConfirmation hidden input (was missing in your code)
+                let hiddenInput1 = document.createElement('input');
+                hiddenInput1.type = 'hidden';
+                hiddenInput1.name = 'sepaConfirmation';
+
+                // Check if the SEPA agreement element exists
+                const sepaAgreementElement = document.querySelector('.sepaagreement #oscunzersepaagreement');
+                hiddenInput1.value = (sepaAgreementElement && sepaAgreementElement.checked) ? '1' : '0';
+                form.appendChild(hiddenInput1);
+
+                // Create the save-payment hidden input
                 let hiddenInput2 = document.createElement('input');
                 hiddenInput2.type = 'hidden';
                 hiddenInput2.name = 'oscunzersavepayment';
-                hiddenInput2.value = document.getElementById('oscunzersavepayment').checked ? '1' : '0';
-                document.getElementById('orderConfirmAgbBottom').appendChild(hiddenInput).appendChild(hiddenInput1).appendChild(hiddenInput2);
 
-                document.getElementById('orderConfirmAgbBottom').classList.add("submitable");
-                document.getElementById("orderConfirmAgbBottom").submit();
+                // Check if the save-payment element exists
+                const savePaymentElement = document.getElementById('oscunzersavepayment');
+                hiddenInput2.value = (savePaymentElement && savePaymentElement.checked) ? '1' : '0';
+                form.appendChild(hiddenInput2);
+
+                // Submit form
+                form.classList.add("submitable");
+                form.submit();
             })
             .catch(function(error) {
-                document.getElementById('error-holder').innerHTML = error.message;
-                window.scrollTo({
-                    top: document.getElementById("orderPayment").offsetTop - 150,
-                    behavior: 'smooth'
-                });
-                zahlungsButton.disabled = false;
+                const errorHolder = document.getElementById('error-holder');
+                if (errorHolder) {
+                    errorHolder.innerHTML = error.message;
+                }
+
+                const orderPayment = document.getElementById("orderPayment");
+                if (orderPayment) {
+                    window.scrollTo({
+                        top: orderPayment.offsetTop - 150,
+                        behavior: 'smooth'
+                    });
+                }
+
+                // Make sure zahlungsButton is defined before accessing it
+                if (typeof zahlungsButton !== 'undefined') {
+                    zahlungsButton.disabled = false;
+                }
             });
     });
 

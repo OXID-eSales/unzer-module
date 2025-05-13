@@ -140,22 +140,35 @@
         if (SepaDirectDebit) {
             SepaDirectDebit.createResource()
                 .then(function (result) {
-
+                    // Create the first hidden input for Payment Data
                     let hiddenInput = $(document.createElement('input'))
                         .attr('type', 'hidden')
                         .attr('name', 'paymentData')
                         .val(JSON.stringify(result));
                     $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput);
 
+                    // Check whether the Sepaconfirmation element exists before it is accessed
+                    let sepaAgreementValue = '0';
+                    if ($('.sepaagreement #oscunzersepaagreement').length > 0) {
+                        sepaAgreementValue = $('.sepaagreement #oscunzersepaagreement').is(':checked') ? '1' : '0';
+                    }
+
                     let hiddenInput1 = $(document.createElement('input'))
                         .attr('type', 'hidden')
                         .attr('name', 'sepaConfirmation')
-                        .val($('.sepaagreement #oscunzersepaagreement').is(':checked') ? '1' : '0');
+                        .val(sepaAgreementValue);
                     $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput1);
+
+                    // Check whether the savepayment element exists before it is accessed
+                    let savePaymentValue = '0';
+                    if ($('#oscunzersavepayment').length > 0) {
+                        savePaymentValue = $('#oscunzersavepayment').is(':checked') ? '1' : '0';
+                    }
+
                     let hiddenInput2 = $(document.createElement('input'))
                         .attr('type', 'hidden')
                         .attr('name', 'oscunzersavepayment')
-                        .val($('#oscunzersavepayment').is(':checked') ? '1' : '0');
+                        .val(savePaymentValue);
                     $('#orderConfirmAgbBottom').find(".hidden").append(hiddenInput2);
 
                     $('#orderConfirmAgbBottom').addClass("submitable");
