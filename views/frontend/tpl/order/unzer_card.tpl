@@ -1,38 +1,37 @@
 [{include file="modules/osc/unzer/unzer_assets.tpl"}]
 [{if $savedPaymentTypes}]
     <div class="savedpayment">
-        [{foreach from=$savedPaymentTypes item="setting" key="type"}]
-            [{if $type != 'paypal' && $type != 'sepa'}]
-                [{assign var="savedCardsCount" value=$setting|@count}]
-                <form id="payment-saved-cards" class="unzerUI form" novalidate>
-                    <input type="hidden" name="savedCardsCount" value="[{$savedCardsCount}]">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">[{oxmultilang ident="OSCUNZER_CARD_NUMBER"}]</th>
-                            <th scope="col">[{oxmultilang ident="OSCUNZER_EXPIRY_DATE"}]</th>
-                            <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            [{assign var="counter" value=0}]
+        [{assign var="savedCardsCount" value=0}]
+        <form id="payment-saved-cards" class="unzerUI form" novalidate>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">[{oxmultilang ident="OSCUNZER_CARD_NUMBER"}]</th>
+                        <th scope="col">[{oxmultilang ident="OSCUNZER_EXPIRY_DATE"}]</th>
+                        <th scope="col">[{oxmultilang ident="OSCUNZER_BRAND"}]</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    [{foreach from=$savedPaymentTypes item="setting" key="type"}]
+                        [{if $type != 'paypal' && $type != 'sepa'}]
                             [{foreach from=$setting item="paymentType" }]
+                                [{assign var="savedCardsCount" value=$savedCardsCount+1}]
                                 <tr>
                                     <th scope="row">[{$paymentType.number}]</th>
                                     <td>[{$paymentType.expiryDate}]</td>
                                     <td>[{$type}]</td>
-
                                     <td>
                                         <input type="radio" class="paymenttypeid" name="paymenttypeid" value="[{$paymentType.id}]" style="-webkit-appearance: radio">
                                     </td>
                                 </tr>
                             [{/foreach}]
-                        </tbody>
-                    </table>
-                </form>
-            [{/if}]
-        [{/foreach}]
+                        [{/if}]
+                    [{/foreach}]
+                </tbody>
+            </table>
+            <input type="hidden" name="savedCardsCount" value="[{$savedCardsCount}]" />
+        </form>
     </div>
 [{/if}]
 
