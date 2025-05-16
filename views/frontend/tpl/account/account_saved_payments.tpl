@@ -105,6 +105,6 @@
     [{/if}]
     [{/capture}]
 [{capture append="oxidBlock_sidebar"}]
-    [{include file="page/account/inc/account_menu.tpl"}]
+    [{include file="page/account/inc/account_menu.tpl" active_link="unzer_saved_payments"}]
     [{/capture}]
 [{include file="layout/page.tpl" sidebar="Left"}]
