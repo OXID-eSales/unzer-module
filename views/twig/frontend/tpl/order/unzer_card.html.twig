@@ -1,19 +1,19 @@
 {% include "@osc-unzer/frontend/tpl/order/unzer_assets.html.twig" %}
 {% if unzerPaymentType %}
     <div class="savedpayment">
-        {% for type, setting in unzerPaymentType %}
-            {% if type != 'paypal' and type != 'sepa' %}
-                <form id="payment-saved-cards" class="unzerUI form" novalidate>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</th>
-                            <th scope="col">{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</th>
-                            <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
+        <form id="payment-saved-cards" class="unzerUI form" novalidate>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_CARD_NUMBER" }) }}</th>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_EXPIRY_DATE" }) }}</th>
+                        <th scope="col">{{ translate({ ident: "OSCUNZER_BRAND" }) }}</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for type, setting in unzerPaymentType %}
+                    {% if type != 'paypal' and type != 'sepa' %}
                         {% set counter = 0 %}
                         {% for paymenttypeid, paymentType in setting %}
                             <tr>
@@ -25,11 +25,11 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </form>
-            {% endif %}
-        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
     </div>
 {% endif %}
 
