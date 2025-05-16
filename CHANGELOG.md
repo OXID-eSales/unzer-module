@@ -39,6 +39,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Order of credit card data input fields optimized
 - Add Descriptor for PrePayment on ThankYou-Page
 - remove Option "Capture Later"-Option for ApplePay
+- [0007795](https://bugs.oxid-esales.com/view.php?id=7795): Fix select several saved credit cards in the checkout
+- [0007796](https://bugs.oxid-esales.com/view.php?id=7796): Fix the style adjusted in the frontend user account - Saved Payments
 
 ## [2.1.4] - 2023-11-23
 
