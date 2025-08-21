@@ -502,7 +502,7 @@ class Payment
 
     public function isInvoice(): bool
     {
-        $sessionPayment = $this->getSessionUnzerPayment();
+        $sessionPayment = $this->getSessionUnzerPayment(true);
 
         if ($sessionPayment === null) {
             return false;
@@ -514,7 +514,7 @@ class Payment
 
     public function isPrepayment(): bool
     {
-        $sessionPayment = $this->getSessionUnzerPayment();
+        $sessionPayment = $this->getSessionUnzerPayment(true);
 
         if ($sessionPayment === null) {
             return false;
