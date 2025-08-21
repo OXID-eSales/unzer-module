@@ -106,11 +106,12 @@ class Order extends Order_parent
                 $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
 
                 $isError = $unzerPaymentStatus === PaymentService::STATUS_ERROR;
-                if (!$isError && !isset($params['finalizeCancellation'])) {
+                $isCanceled = $unzerPaymentStatus === PaymentService::STATUS_CANCELED;
+                if (!$isError && !$isCanceled && !isset($params['finalizeCancellation'])) {
                     //  then we consider this is a payment with only auth mode and the order is completed
                     $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
                 }
-                if (!$isError) {
+                if (!$isError && !$isCanceled) {
                     $iRet = 1;
                 }
             }
