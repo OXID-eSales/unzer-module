@@ -108,7 +108,7 @@ class Order extends Order_parent
                 if (!$isError && !$cancelled && !isset($params['finalizeCancellation'])) {
                     $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
                 }
-                if (!$isError) {
+                if (!$isError && !$cancelled) {
                     $iRet = 1;
                 }
                 $this->setOrderStatus($unzerPaymentStatus);

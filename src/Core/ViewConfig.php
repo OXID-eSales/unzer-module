@@ -36,16 +36,12 @@ class ViewConfig extends ViewConfig_parent
      */
     protected ?bool $isWaveCompatibleTheme = null;
 
-    /** @var ModuleSettings $moduleSettings */
-    protected $moduleSettings;
-
     /**
      * @inheritDoc
      */
     public function __construct()
     {
         parent::__construct();
-        $this->moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
     }
 
     /**
@@ -55,7 +51,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerSystemMode(): string
     {
-        return $this->moduleSettings->getSystemMode();
+        return $this->getModuleSettings()->getSystemMode();
     }
 
     /**
@@ -63,7 +59,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isUnzerDebugMode(): bool
     {
-        return $this->moduleSettings->isDebugMode();
+        return $this->getModuleSettings()->isDebugMode();
     }
 
     /**
@@ -75,14 +71,14 @@ class ViewConfig extends ViewConfig_parent
     {
         $paymentId = Registry::getSession()->getBasket()->getPaymentId();
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-            return $this->moduleSettings->getInvoicePublicKey();
+            return $this->getModuleSettings()->getInvoicePublicKey();
         }
 
         if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return $this->moduleSettings->getInstallmentPublicKey();
+            return $this->getModuleSettings()->getInstallmentPublicKey();
         }
 
-        return $this->moduleSettings->getStandardPublicKey();
+        return $this->getModuleSettings()->getStandardPublicKey();
     }
 
     /**
@@ -94,36 +90,36 @@ class ViewConfig extends ViewConfig_parent
     {
         $paymentId = Registry::getSession()->getBasket()->getPaymentId();
         if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-            return  $this->moduleSettings->getInvoicePrivateKey();
+            return  $this->getModuleSettings()->getInvoicePrivateKey();
         }
         if ($paymentId === UnzerDefinitions::INSTALLMENT_UNZER_PAYLATER_PAYMENT_ID) {
-            return $this->moduleSettings->getInstallmentPrivateKey();
+            return $this->getModuleSettings()->getInstallmentPrivateKey();
         }
 
-        return $this->moduleSettings->getStandardPrivateKey();
+        return $this->getModuleSettings()->getStandardPrivateKey();
     }
 
     public function getUnzerB2BPubKey(): string
     {
-        $key = $this->moduleSettings->getInvoicePublicKey('B2B');
+        $key = $this->getModuleSettings()->getInvoicePublicKey('B2B');
         return $key;
     }
 
     public function getUnzerB2BPrivKey(): string
     {
-        $key = $this->moduleSettings->getInvoicePrivateKey('B2B');
+        $key = $this->getModuleSettings()->getInvoicePrivateKey('B2B');
         return $key;
     }
 
     public function getUnzerB2CPubKey(): string
     {
-        $key = $this->moduleSettings->getInvoicePublicKey();
+        $key = $this->getModuleSettings()->getInvoicePublicKey();
         return $key;
     }
 
     public function getUnzerB2CPrivKey(): string
     {
-        $key = $this->moduleSettings->getInvoicePrivateKey('B2C');
+        $key = $this->getModuleSettings()->getInvoicePrivateKey('B2C');
         return $key;
     }
 
@@ -146,7 +142,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function getUnzerInstallmentRate(): float
     {
-        return $this->moduleSettings->getInstallmentRate();
+        return $this->getModuleSettings()->getInstallmentRate();
     }
 
     /**
@@ -156,7 +152,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function useModuleJQueryInFrontend(): bool
     {
-        return $this->moduleSettings->useModuleJQueryInFrontend();
+        return $this->getModuleSettings()->useModuleJQueryInFrontend();
     }
 
     /**
@@ -220,7 +216,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isB2CInvoiceEligibility(): bool
     {
-        return $this->moduleSettings->isB2CInvoiceEligibility();
+        return $this->getModuleSettings()->isB2CInvoiceEligibility();
     }
 
     /**
@@ -228,7 +224,7 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isB2BInvoiceEligibility(): bool
     {
-        return $this->moduleSettings->isB2BInvoiceEligibility();
+        return $this->getModuleSettings()->isB2BInvoiceEligibility();
     }
 
     public function getBasketCurrencyName(): string
@@ -270,5 +266,10 @@ class ViewConfig extends ViewConfig_parent
     private function getPrePaymentBankAccountService(): PrePaymentBankAccountService
     {
         return $this->getServiceFromContainer(PrePaymentBankAccountService::class);
+    }
+    
+    private function getModuleSettings(): ModuleSettings
+    {
+        return $this->getServiceFromContainer(ModuleSettings::class);
     }
 }
