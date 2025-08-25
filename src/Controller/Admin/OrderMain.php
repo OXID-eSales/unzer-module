@@ -2,6 +2,8 @@
 
 namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
@@ -15,9 +17,10 @@ class OrderMain extends OrderMain_parent
     use ServiceContainer;
 
     /**
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws UnzerApiException
+     * @throws DatabaseConnectionException
+     * @return void
      */
     protected function onOrderSend(): void
     {
@@ -38,9 +41,9 @@ class OrderMain extends OrderMain_parent
     }
 
     /**
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
-     * @throws \UnzerSDK\Exceptions\UnzerApiException
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws UnzerApiException
+     * @throws DatabaseConnectionException
      */
     public function sendShipmentNotification(Order $oOrder): void
     {
