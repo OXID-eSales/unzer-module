@@ -166,7 +166,7 @@ class Transaction
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'cancelreason' => $unzerCancelReason,
-            'customertype' => $this->getCustomerTypeByOrder($oOrder),
+            'customertype' => $customerData['customertype'],
         ];
 
         if ($unzerCancel) {
@@ -499,7 +499,7 @@ class Transaction
     public function getCustomerTypeAndCurrencyFromTransactionByOrderId($orderId): array
     {
         $transaction = oxNew(TransactionModel::class);
-        $transactionId = $this->getTransactionIdByOrderId($orderid);
+        $transactionId = $this->getTransactionIdByOrderId($orderId);
         $transaction->load($transactionId);
 
         return [
