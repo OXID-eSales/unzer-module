@@ -86,7 +86,7 @@ class Payment
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         $paymentExtension = null;
-        $customerType = $this->getUnzerStringRequestParameter('unzer_customer_type','B2C');
+        $customerType = $this->getUnzerStringRequestParameter('unzer_customer_type', 'B2C');
         $user = $this->session->getUser();
         $basket = $this->session->getBasket();
         $currency = $basket->getBasketCurrency()->name;
@@ -408,7 +408,8 @@ class Payment
         }
 
         $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
-        $transactionDetails = $this->transactionService->getCustomerTypeAndCurrencyFromTransactionByOrderId($oOrder->getId());
+        $transactionDetails =
+            $this->transactionService->getCustomerTypeAndCurrencyFromTransactionByOrderId($oOrder->getId());
 
         $blSuccess = false;
 
