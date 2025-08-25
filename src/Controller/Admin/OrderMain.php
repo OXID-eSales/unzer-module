@@ -19,7 +19,7 @@ class OrderMain extends OrderMain_parent
      * @throws \UnzerSDK\Exceptions\UnzerApiException
      * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
      */
-    protected function onOrderSend()
+    protected function onOrderSend(): void
     {
         $sOxid = $this->getEditObjectId();
         $oOrder = oxNew(Order::class);

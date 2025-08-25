@@ -158,15 +158,13 @@ class Transaction
             $unzerCancelReason = $unzerCancel->getReasonCode() ?? '';
         }
 
-        $customerData = $this->getCustomerTypeAndCurrencyFromTransactionByOrderId($orderid);
-
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
             'cancelreason' => $unzerCancelReason,
-            'customertype' => $customerData['customertype'],
+            'customertype' => $this->getCustomerTypeByOrder($oOrder),
         ];
 
         if ($unzerCancel) {
@@ -185,6 +183,9 @@ class Transaction
      */
     public function writeChargeToDB(string $orderid, string $userId, ?Charge $unzerCharge): bool
     {
+        $oOrder = oxNew(Order::class);
+        $oOrder->load($orderid);
+
         $params = [
             'oxorderid' => $orderid,
             'oxshopid' => $this->context->getCurrentShopId(),
