@@ -157,6 +157,8 @@ class Transaction
         if ($unzerCancel !== null) {
             $unzerCancelReason = $unzerCancel->getReasonCode() ?? '';
         }
+        $oOrder = oxNew(Order::class);
+        $oOrder->load($orderid);
 
         $params = [
             'oxorderid' => $orderid,
