@@ -14,6 +14,9 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidSolutionCatalysts\Unzer\Core\UnzerDefinitions;
 use UnzerSDK\Unzer;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ */
 class UnzerSDKLoader
 {
     /**
@@ -73,7 +76,8 @@ class UnzerSDKLoader
             $sdk = $this->getUnzerSDKbyKey($key);
         } catch (UnzerException $e) {
             $logEntry = sprintf(
-                'Try to get the SDK with the Key "%s" defined by paymentId "%s", currency "%s", customerType "%s"',
+                'Try to get the SDK with the Key "%s" defined by paymentId "%s", currency "%s", customerType "%s"'
+                . $e->getTraceAsString(),
                 $key,
                 $paymentId,
                 $currency,
@@ -123,14 +127,13 @@ class UnzerSDKLoader
                             WHERE u.TYPEID = :typeid
                             ORDER BY u.OXTIMESTAMP DESC LIMIT 1", [':typeid' => $sPaymentId]);
 
-        $customerType = '';
+        $customerType = 'B2C';
         $currency = '';
         $paymentId = '';
         if ($row) {
             $currency = $row['CURRENCY'];
             $paymentId = $row['OXPAYMENTTYPE'];
             if ($paymentId === UnzerDefinitions::INVOICE_UNZER_PAYMENT_ID) {
-                $customerType = 'B2C';
                 if (!empty($row['OXDELCOMPANY']) || !empty($row['OXBILLCOMPANY'])) {
                     $customerType = 'B2B';
                 }

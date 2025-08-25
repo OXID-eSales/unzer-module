@@ -45,7 +45,7 @@ class Order extends Order_parent
         Basket $oBasket,
         User $oUser,
         array $params = []
-    ) {
+    ): bool|int {
         $orderId = Registry::getSession()->getVariable('sess_challenge');
         $orderId = is_string($orderId) ? $orderId : '';
         $iRet = self::ORDER_STATE_PAYMENTERROR;
@@ -101,18 +101,17 @@ class Order extends Order_parent
                 if ($unzerPaymentStatus !== PaymentService::STATUS_NOT_FINISHED) {
                     Registry::getSession()->setVariable('orderCancellationProcessed', true);
                 }
-
-                $this->_setOrderStatus($unzerPaymentStatus);
-                $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
-
                 $isError = $unzerPaymentStatus === PaymentService::STATUS_ERROR;
-                if (!$isError && !isset($params['finalizeCancellation'])) {
+                $cancelled = $unzerPaymentStatus === PaymentService::STATUS_CANCELED;
+                if (!$isError && !$cancelled && !isset($params['finalizeCancellation'])) {
                     //  then we consider this is a payment with only auth mode and the order is completed
                     $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
                 }
                 if (!$isError) {
                     $iRet = 1;
                 }
+                $this->_setOrderStatus($unzerPaymentStatus);
+                $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
             }
         }
 
