@@ -169,7 +169,7 @@ class Transaction
             'customertype' => $this->getCustomerTypeByOrder($oOrder),
         ];
 
-        if ($unzerCancel) {
+        if ($unzerCancel instanceof Cancellation) {
             $params = array_merge($params, $this->getUnzerCancelData($unzerCancel));
         }
 
@@ -193,7 +193,7 @@ class Transaction
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-            'customertype' => $this->getCustomerTypeByOrder($oOrder),
+            'customertype' => $this->getCustomerTypeByOrder($oOrder)
         ];
 
         if ($unzerCharge instanceof Charge) {
@@ -672,13 +672,14 @@ class Transaction
 
     private function getBasicSaveParameters(string $orderId, string $userId): array
     {
-        $customerData = $this->getCustomerTypeAndCurrencyFromTransactionByOrderId($orderId);
+        $oOrder = oxNew(Order::class);
+        $oOrder->load($orderId);
         return [
             'oxorderid' => $orderId,
             'oxshopid' => $this->context->getCurrentShopId(),
             'oxuserid' => $userId,
             'oxactiondate' => date('Y-m-d H:i:s', $this->utilsDate->getTime()),
-            'customertype' => $customerData['customertype'],
+            'customertype' => $this->getCustomerTypeByOrder($oOrder),
         ];
     }
 
