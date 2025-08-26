@@ -1,24 +1,5 @@
 [{include file="headitem.tpl" title="GENERAL_ADMIN_TITLE"|oxmultilangassign}]
 
-[{if $paymentTitle && $totalBasketPrice}]
-    <h3>[{$paymentTitle}] : [{$totalBasketPrice}] / [{oxmultilang ident='OSCUNZER_TRANSACTION_ORDERNR' suffix='COLON'}] [{$oOrder->oxorder__oxunzerordernr->value}]</h3>
-[{/if}]
-
-[{* payment abilities *}]
-[{assign var="canCollectFully" value=$oView->canCollectFully()}]
-[{assign var="canCollectPartially" value=$oView->canCollectPartially()}]
-[{assign var="canRefundFully" value=$oView->canRefundFully()}]
-[{assign var="canRefundPartially" value=$oView->canRefundPartially()}]
-[{assign var="canRevertPartially" value=$oView->canRevertPartially()}]
-
-[{if $isChargeBack}]
-    [{assign var="canCollectFully" value=false}]
-    [{assign var="canCollectPartially" value=false}]
-    [{assign var="canRefundFully" value=false}]
-    [{assign var="canRefundPartially" value=false}]
-    [{assign var="canRevertPartially" value=false}]
-[{/if}]
-
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="oxid" value="[{$oxid}]">
@@ -29,6 +10,25 @@
     [{if !$oUnzerTransactions}]
         [{oxmultilang ident="OSCUNZER_NO_UNZER_ORDER"}]
     [{else}]
+        [{if $paymentTitle && $totalBasketPrice}]
+            <h3>[{$paymentTitle}] : [{$totalBasketPrice}] / [{oxmultilang ident='OSCUNZER_TRANSACTION_ORDERNR' suffix='COLON'}] [{$oOrder->oxorder__oxunzerordernr->value}]</h3>
+        [{/if}]
+
+        [{* payment abilities *}]
+        [{assign var="canCollectFully" value=$oView->canCollectFully()}]
+        [{assign var="canCollectPartially" value=$oView->canCollectPartially()}]
+        [{assign var="canRefundFully" value=$oView->canRefundFully()}]
+        [{assign var="canRefundPartially" value=$oView->canRefundPartially()}]
+        [{assign var="canRevertPartially" value=$oView->canRevertPartially()}]
+
+        [{if $isChargeBack}]
+            [{assign var="canCollectFully" value=false}]
+            [{assign var="canCollectPartially" value=false}]
+            [{assign var="canRefundFully" value=false}]
+            [{assign var="canRefundPartially" value=false}]
+            [{assign var="canRevertPartially" value=false}]
+        [{/if}]
+
         <table>
             <tbody>
                 <tr>
