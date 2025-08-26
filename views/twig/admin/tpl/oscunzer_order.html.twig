@@ -1,24 +1,5 @@
 {% include "headitem.html.twig" with {title: "GENERAL_ADMIN_TITLE"|translate} %}
 
-{% if paymentTitle and totalBasketPrice %}
-    <h3>{{ paymentTitle }} : {{ totalBasketPrice }} / {{ translate({ ident: 'OSCUNZER_TRANSACTION_ORDERNR', suffix: 'COLON' }) }} {{ oOrder.oxorder__oxunzerordernr.value }}</h3>
-{% endif %}
-
-{# payment abilities #}
-{% set canCollectFully = oView.canCollectFully() %}
-{% set canCollectPartially = oView.canCollectPartially() %}
-{% set canRefundFully = oView.canRefundFully() %}
-{% set canRefundPartially = oView.canRefundPartially() %}
-{% set canRevertPartially = oView.canRevertPartially() %}
-
-{% if isChargeBack %}
-    {% set canCollectFully = false %}
-    {% set canCollectPartially = false %}
-    {% set canRefundFully = false %}
-    {% set canRefundPartially = false %}
-    {% set canRevertPartially = false %}
-{% endif %}
-
 <form name="transfer" id="transfer" action="{{ oViewConf.getSelfLink() }}" method="post">
     {{ oViewConf.getHiddenSid()|raw }}
     <input type="hidden" name="oxid" value="{{ oxid }}">
@@ -29,6 +10,24 @@
     {% if not oUnzerTransactions %}
         {{ translate({ ident: "OSCUNZER_NO_UNZER_ORDER" }) }}
     {% else %}
+        {% if paymentTitle and totalBasketPrice %}
+            <h3>{{ paymentTitle }} : {{ totalBasketPrice }} / {{ translate({ ident: 'OSCUNZER_TRANSACTION_ORDERNR', suffix: 'COLON' }) }} {{ oOrder.oxorder__oxunzerordernr.value }}</h3>
+        {% endif %}
+
+        {# payment abilities #}
+        {% set canCollectFully = oView.canCollectFully() %}
+        {% set canCollectPartially = oView.canCollectPartially() %}
+        {% set canRefundFully = oView.canRefundFully() %}
+        {% set canRefundPartially = oView.canRefundPartially() %}
+        {% set canRevertPartially = oView.canRevertPartially() %}
+
+        {% if isChargeBack %}
+            {% set canCollectFully = false %}
+            {% set canCollectPartially = false %}
+            {% set canRefundFully = false %}
+            {% set canRefundPartially = false %}
+            {% set canRevertPartially = false %}
+        {% endif %}
         <table>
             <tbody>
             <tr>
