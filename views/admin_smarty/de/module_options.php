@@ -94,8 +94,8 @@ $aLang = [
     'SHOP_MODULE_production-UnzerPayLaterInstallmentB2CCHFPrivateKey' => 'Live privater Schlüssel für Ratenkauf B2C-Käufe in CHF',
     'SHOP_MODULE_production-UnzerPayLaterInstallmentB2CCHFPublicKey' => 'Live öffentlicher Schlüssel für Ratenkauf B2C-Käufe in CHF',
     // sandbox Paylater Invoice B2C EUR
-    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPrivateKey' => 'Sandbox privater Schlüssel für Rechnung B2B-Käufe in EUR',
-    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPublicKey' => 'Sandbox öffentlicher Schlüssel für Rechnung B2B-Käufe in EUR',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPrivateKey' => 'Sandbox privater Schlüssel für Rechnung B2C-Käufe in EUR',
+    'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2CEURPublicKey' => 'Sandbox öffentlicher Schlüssel für Rechnung B2C-Käufe in EUR',
     // sandbox Paylater Invoice B2B EUR
     'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPrivateKey' => 'Sandbox privater Schlüssel für Rechnung B2B-Käufe in EUR',
     'SHOP_MODULE_sandbox-UnzerPayLaterInvoiceB2BEURPublicKey' => 'Sandbox öffentlicher Schlüssel Rechnung für B2B-Käufe in EUR',
