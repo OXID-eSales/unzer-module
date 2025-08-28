@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [0007808](https://bugs.oxid-esales.com/view.php?id=7808): fix, even if the credit card payment was cancelled (when entering the secure code), an order confirmation is sent
 - fix Maintenance-Mode in module deactivation (OXID7.3)
 - move some parts in the admin-order-tpl, to prevent maintenance for non-unzer-orders
+- fix Backend-Option-Translations for Invoice-Keys
+- for UnzerSystemMode use select-Option like in OXID6 
 
 ## [2.2.0] - 2025-06-06
 
