@@ -174,8 +174,9 @@ $aModule = [
         [
             'group'       => 'unzerenvironment',
             'name'        => 'UnzerSystemMode',
-            'type'        => 'bool',
-            'value'       => false,
+            'type'        => 'select',
+            'value'       => '0',
+            'constraints' => '0|1'
         ],
         [
             'group' => 'unzerenvironment',
