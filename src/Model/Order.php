@@ -102,12 +102,12 @@ class Order extends Order_parent
                     Registry::getSession()->setVariable('orderCancellationProcessed', true);
                 }
                 $isError = $unzerPaymentStatus === PaymentService::STATUS_ERROR;
-                $cancelled = $unzerPaymentStatus === PaymentService::STATUS_CANCELED;
-                if (!$isError && !$cancelled && !isset($params['finalizeCancellation'])) {
+                $isCanceled = $unzerPaymentStatus === PaymentService::STATUS_CANCELED;
+                if (!$isError && !$isCanceled && !isset($params['finalizeCancellation'])) {
                     //  then we consider this is a payment with only auth mode and the order is completed
                     $this->sendOrderConfirmationEmail($oUser, $oBasket, $oUserPayment);
                 }
-                if (!$isError) {
+                if (!$isError && !$isCanceled) {
                     $iRet = 1;
                 }
                 $this->_setOrderStatus($unzerPaymentStatus);
