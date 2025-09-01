@@ -45,7 +45,7 @@ class Order extends Order_parent
         Basket $oBasket,
         User $oUser,
         array $params = []
-    ): bool|int {
+    ) {
         $orderId = Registry::getSession()->getVariable('sess_challenge');
         $orderId = is_string($orderId) ? $orderId : '';
         $iRet = self::ORDER_STATE_PAYMENTERROR;
