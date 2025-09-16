@@ -123,14 +123,12 @@ class ModuleSettings
         return $unzerPrivateKey;
     }
 
-
     public function getStandardPublicKey(): string
     {
         /** @var string $unzerPublicKey */
         $unzerPublicKey = $this->getSettingValue($this->getSystemMode() . '-UnzerPublicKey');
         return $unzerPublicKey;
     }
-
 
     public function useModuleJQueryInFrontend(): bool
     {
@@ -151,18 +149,15 @@ class ModuleSettings
         return self::PAYMENT_CHARGE;
     }
 
-
     public function getModuleVersion(): string
     {
         return $this->moduleInfoBridge->get(Module::MODULE_ID)->getVersion();
     }
 
-
     public function getGitHubName(): string
     {
         return Module::GITHUB_NAME;
     }
-
 
     public function isApplePayEligibility(): bool
     {
@@ -192,7 +187,6 @@ class ModuleSettings
         );
     }
 
-
     public function getActiveApplePayMerchantCapabilities(): array
     {
         return array_keys(array_filter(
@@ -200,7 +194,6 @@ class ModuleSettings
             [$this, 'isActiveSetting']
         ));
     }
-
 
     public function getApplePayNetworks(): array
     {
@@ -212,7 +205,6 @@ class ModuleSettings
         );
     }
 
-
     public function getActiveApplePayNetworks(): array
     {
         return array_keys(array_filter(
@@ -220,7 +212,6 @@ class ModuleSettings
             [$this, 'isActiveSetting']
         ));
     }
-
 
     public function getApplePayMerchantIdentifier(): string
     {
@@ -230,12 +221,10 @@ class ModuleSettings
         return $applepayMerchId;
     }
 
-
     public function setApplePayMerchantIdentifier(string $applepayMerchId): void
     {
         $this->saveSetting($this->getSystemMode() . '-applepay_merchant_identifier', $applepayMerchId);
     }
-
 
     public function getApplePayMerchantCert(): string
     {
@@ -254,8 +243,6 @@ class ModuleSettings
         return '';
     }
 
-
-
     public function getApplePayPaymentCert(): string
     {
         try {
@@ -271,8 +258,6 @@ class ModuleSettings
 
         return '';
     }
-
-
 
     public function getApplePayPaymentPrivateKey(): string
     {
@@ -290,7 +275,6 @@ class ModuleSettings
         return '';
     }
 
-
     public function getApplePayMerchantCertKey(): string
     {
         try {
@@ -306,7 +290,6 @@ class ModuleSettings
 
         return '';
     }
-
 
     public function saveApplePayMerchantCapabilities(array $capabilities): void
     {
@@ -385,12 +368,10 @@ class ModuleSettings
         $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentKeyId', $paymentKeyId);
     }
 
-
     public function saveApplePayPaymentCertificateId(string $certificateId): void
     {
         $this->saveSetting($this->getSystemMode() . 'ApplePayPaymentCertificateId', $certificateId);
     }
-
 
     public function getApplePayPaymentKeyId(): string
     {
@@ -399,7 +380,6 @@ class ModuleSettings
         return $paymentKeyId;
     }
 
-
     public function getApplePayPaymentCertificateId(): string
     {
         /** @var string $certificateId */
@@ -407,18 +387,15 @@ class ModuleSettings
         return $certificateId;
     }
 
-
     public function saveApplePayNetworks(array $networks): void
     {
         $this->saveSetting('applepay_networks', $networks);
     }
 
-
     public function saveWebhookConfiguration(array $webhookConfig): void
     {
         $this->saveSetting('webhookConfiguration', $webhookConfig);
     }
-
 
     public function getWebhookConfiguration(): array
     {
@@ -426,7 +403,6 @@ class ModuleSettings
         $webhookConfig = $this->getSettingValue('webhookConfiguration');
         return $webhookConfig;
     }
-
 
     public function getPrivateKeysWithContext(): array
     {
@@ -785,6 +761,7 @@ class ModuleSettings
         }
         return $key;
     }
+
     /**
      * @param string $currency
      * @return string
@@ -800,6 +777,7 @@ class ModuleSettings
         }
         return $key;
     }
+
     /**
      * @return bool
      */
@@ -810,12 +788,26 @@ class ModuleSettings
 
     private function isCHFSupported(): bool
     {
-        return true;
+        return $this->isCurrencySupported('CHF');
     }
 
     private function isEURSupported(): bool
     {
-        return true;
+        return $this->isCurrencySupported('EUR');
+    }
+
+    private function isCurrencySupported(string $currency = ''): bool
+    {
+        $result = false;
+
+        $aCurrencies = $this->config->getCurrencyArray();
+        foreach ($aCurrencies as $oCur) {
+            if ($oCur->name === $currency) {
+                $result = true;
+                break;
+            }
+        }
+        return $result;
     }
 
     /**
