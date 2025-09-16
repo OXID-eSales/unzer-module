@@ -145,9 +145,7 @@ class OrderController extends OrderController_parent
 
             $this->getServiceFromContainer(SavedPaymentSessionService::class)->unsetSavedPayment();
 
-            // performing special actions after user finishes order (assignment to special user groups)
             $oUser->onOrderExecute($oBasket, $iSuccess);
-
             $nextStep = $this->_getNextStep($iSuccess);
             $unzerService = $this->getServiceFromContainer(Unzer::class);
 

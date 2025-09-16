@@ -101,10 +101,6 @@ class Order extends Order_parent
                 if ($unzerPaymentStatus !== PaymentService::STATUS_NOT_FINISHED) {
                     Registry::getSession()->setVariable('orderCancellationProcessed', true);
                 }
-
-                $this->_setOrderStatus($unzerPaymentStatus);
-                $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
-
                 $isError = $unzerPaymentStatus === PaymentService::STATUS_ERROR;
                 $isCanceled = $unzerPaymentStatus === PaymentService::STATUS_CANCELED;
                 if (!$isError && !$isCanceled && !isset($params['finalizeCancellation'])) {
@@ -114,6 +110,8 @@ class Order extends Order_parent
                 if (!$isError && !$isCanceled) {
                     $iRet = 1;
                 }
+                $this->_setOrderStatus($unzerPaymentStatus);
+                $this->setTmpOrderStatus($unzerOrderId, $unzerPaymentStatus);
             }
         }
 

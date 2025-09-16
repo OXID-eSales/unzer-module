@@ -86,7 +86,7 @@ class Payment
     public function executeUnzerPayment(PaymentModel $paymentModel): bool
     {
         $paymentExtension = null;
-        $customerType = $this->getUnzerStringRequestParameter('unzer_customer_type');
+        $customerType = $this->getUnzerStringRequestParameter('unzer_customer_type', 'B2C');
         $user = $this->session->getUser();
         $basket = $this->session->getBasket();
         $currency = $basket->getBasketCurrency()->name;
@@ -304,7 +304,8 @@ class Payment
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $cancellation
+                $cancellation,
+                $oOrder
             );
         } catch (UnzerApiException $e) {
             return $e;
@@ -381,7 +382,8 @@ class Payment
             $this->transactionService->writeCancellationToDB(
                 $oOrder->getId(),
                 $oxuserid,
-                $cancellation
+                $cancellation,
+                $oOrder
             );
         } catch (UnzerApiException $e) {
             return $e;
@@ -407,7 +409,8 @@ class Payment
         }
 
         $sPaymentId = $sPaymentId ?? $this->transactionService->getPaymentIdByOrderId($oOrder->getId());
-        $transactionDetails = $this->transactionService->getCustomerTypeAndCurrencyByOrderId($oOrder->getId());
+        $transactionDetails =
+            $this->transactionService->getCustomerTypeAndCurrencyFromTransactionByOrderId($oOrder->getId());
 
         $blSuccess = false;
 
@@ -502,7 +505,7 @@ class Payment
 
     public function isInvoice(): bool
     {
-        $sessionPayment = $this->getSessionUnzerPayment();
+        $sessionPayment = $this->getSessionUnzerPayment(true);
 
         if ($sessionPayment === null) {
             return false;
@@ -514,7 +517,7 @@ class Payment
 
     public function isPrepayment(): bool
     {
-        $sessionPayment = $this->getSessionUnzerPayment();
+        $sessionPayment = $this->getSessionUnzerPayment(true);
 
         if ($sessionPayment === null) {
             return false;
