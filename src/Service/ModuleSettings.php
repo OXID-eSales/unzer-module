@@ -22,6 +22,7 @@ use TypeError;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 class ModuleSettings
 {
@@ -74,7 +75,7 @@ class ModuleSettings
 
     public function isSandboxMode(): bool
     {
-        return $this->getSystemMode() == self::SYSTEM_MODE_SANDBOX;
+        return $this->getSystemMode() === self::SYSTEM_MODE_SANDBOX;
     }
 
     public function getSystemMode(): string
@@ -107,6 +108,9 @@ class ModuleSettings
         }
     }
 
+    /**
+     * @return float
+     */
     public function getInstallmentRate(): float
     {
         /** @var float $unzerOption */
@@ -437,7 +441,6 @@ class ModuleSettings
         }
     }
 
-
     public function getSettingValue(string $key): array|bool|int|null|string
     {
         $settingsKeyType = $this->getKeyType($key);
@@ -472,14 +475,32 @@ class ModuleSettings
         );
     }
 
-    public function isInstallmentEligibility(): bool
+    public function isInvoiceEligibility(): bool
     {
-        return (
-            !$this->isB2BEligibility() && //B2C Customers only
-            ($this->isB2CInstallmentEligibility() &&
-                $this->hasWebhookConfiguration('b2ceurinstallment') ||
-                $this->hasWebhookConfiguration('b2cchfinstallment'))
-            );
+        return
+        (
+            $this->isB2BEligibility() &&
+            $this->isBasketCurrencyCHF() &&
+            $this->isB2BCHFInvoiceEligibility()
+        )
+        ||
+        (
+            $this->isB2BEligibility() &&
+            $this->isBasketCurrencyEUR() &&
+            $this->isB2BEURInvoiceEligibility()
+        )
+        ||
+        (
+            !$this->isB2BEligibility() &&
+            $this->isBasketCurrencyCHF() &&
+            $this->isB2CCHFInvoiceEligibility()
+        )
+        ||
+        (
+            !$this->isB2BEligibility() &&
+            $this->isBasketCurrencyEUR() &&
+            $this->isB2CEURInvoiceEligibility()
+        );
     }
 
     public function isB2BEligibility(): bool
@@ -490,79 +511,75 @@ class ModuleSettings
         return !empty($userCompany);
     }
 
-    public function isInvoiceEligibility(): bool
+    public function isInstallmentEligibility(): bool
     {
         return (
-                ($this->isB2CInvoiceEligibility() &&
-                    $this->hasWebhookConfiguration('b2ceur') &&
-                    $this->hasWebhookConfiguration('b2cchf'))
-            ||
-                ($this->isB2BInvoiceEligibility() &&
-                    $this->hasWebhookConfiguration('b2beur') &&
-                    $this->hasWebhookConfiguration('b2bchf'))
+            !$this->isB2BEligibility() && //B2C Customers only
+            (
+                ($this->isBasketCurrencyCHF() && $this->isB2CCHFInstallmentEligibility()) ||
+                ($this->isBasketCurrencyEUR() && $this->isB2CEURInstallmentEligibility())
+            )
         );
     }
 
-    public function isB2CInvoiceEligibility(): bool
+    public function isB2CCHFInstallmentEligibility(): bool
     {
-        return (
-                $this->isBasketCurrencyCHF() &&
-                !empty($this->getInvoiceB2CCHFPublicKey()) &&
-                !empty($this->getInvoiceB2CCHFPrivateKey())
-            ) ||
-            (
-                $this->isBasketCurrencyEUR() &&
-                !empty($this->getInvoiceB2CEURPublicKey()) &&
-                !empty($this->getInvoiceB2CEURPrivateKey())
-            );
+        return
+            $this->isCHFSupported() &&
+            !empty($this->getInstallmentB2CCHFPublicKey()) &&
+            !empty($this->getInstallmentB2CCHFPrivateKey()) &&
+            $this->hasWebhookConfiguration('b2cchfinstallment');
     }
 
-    public function isB2CInstallmentEligibility(): bool
+    public function isB2CEURInstallmentEligibility(): bool
     {
-        return (
-                $this->isBasketCurrencyCHF() &&
-                !empty($this->getInstallmentB2CCHFPublicKey()) &&
-                !empty($this->getInstallmentB2CCHFPrivateKey())
-            ) ||
-            (
-                $this->isBasketCurrencyEUR() &&
-                !empty($this->getInstallmentB2CEURPublicKey()) &&
-                !empty($this->getInstallmentB2CEURPrivateKey())
-            );
+        return
+            $this->isEURSupported() &&
+            !empty($this->getInstallmentB2CEURPublicKey()) &&
+            !empty($this->getInstallmentB2CEURPrivateKey()) &&
+            $this->hasWebhookConfiguration('b2ceurinstallment');
     }
 
-    public function isB2BInvoiceEligibility(): bool
+    public function isB2CCHFInvoiceEligibility(): bool
     {
-        return (
-            $this->isBasketCurrencyCHF() &&
+        return
+            $this->isCHFSupported() &&
+            !empty($this->getInvoiceB2CCHFPublicKey()) &&
+            !empty($this->getInvoiceB2CCHFPrivateKey()) &&
+            $this->hasWebhookConfiguration('b2cchf');
+    }
+
+    public function isB2CEURInvoiceEligibility(): bool
+    {
+        return
+            $this->isEURSupported() &&
+            !empty($this->getInvoiceB2CEURPublicKey()) &&
+            !empty($this->getInvoiceB2CEURPrivateKey()) &&
+            $this->hasWebhookConfiguration('b2ceur');
+    }
+
+    public function isB2BCHFInvoiceEligibility(): bool
+    {
+        return
+            $this->isCHFSupported() &&
             !empty($this->getInvoiceB2BCHFPublicKey()) &&
-            !empty($this->getInvoiceB2BCHFPrivateKey())
-        ) ||
-        (
+            !empty($this->getInvoiceB2BCHFPrivateKey()) &&
+            $this->hasWebhookConfiguration('b2bchf');
+    }
+
+    public function isB2BEURInvoiceEligibility(): bool
+    {
+        return
             $this->isBasketCurrencyEUR() &&
             !empty($this->getInvoiceB2BEURPublicKey()) &&
-            !empty($this->getInvoiceB2BEURPrivateKey())
-        );
-    }
-
-    private function getInvoiceB2BEURPublicKey(): string
-    {
-        /** @var string $key */
-        $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2BEURPublicKey');
-        return $key;
+            !empty($this->getInvoiceB2BEURPrivateKey()) &&
+            $this->hasWebhookConfiguration('b2beur');
     }
 
     private function getInvoiceB2CEURPrivateKey(): string
     {
         /** @var string $key */
         $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2CEURPrivateKey');
-        return $key;
-    }
-
-    private function getInvoiceB2CCHFPublicKey(): string
-    {
-        /** @var string $key */
-        $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2CCHFPublicKey');
         return $key;
     }
 
@@ -580,6 +597,12 @@ class ModuleSettings
         return $key;
     }
 
+    private function getInvoiceB2BEURPublicKey(): string
+    {
+        /** @var string $key */
+        $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2BEURPublicKey');
+        return $key;
+    }
     private function getInvoiceB2CCHFPrivateKey(): string
     {
         /** @var string $key */
@@ -587,6 +610,12 @@ class ModuleSettings
         return $key;
     }
 
+    private function getInvoiceB2CCHFPublicKey(): string
+    {
+        /** @var string $key */
+        $key = $this->getSettingValue($this->getSystemMode() . '-UnzerPayLaterInvoiceB2CCHFPublicKey');
+        return $key;
+    }
     private function getInvoiceB2BCHFPrivateKey(): string
     {
         /** @var string $key */
@@ -637,20 +666,20 @@ class ModuleSettings
     {
         $result = '';
 
-        if ($customerType === 'B2C' && $this->isB2CInvoiceEligibility()) {
-            if ($this->isBasketCurrencyCHF()) {
+        if ($customerType === 'B2C') {
+            if ($this->isBasketCurrencyCHF() && $this->isB2CCHFInvoiceEligibility()) {
                 $result = $this->getInvoiceB2CCHFPublicKey();
             }
-            if ($this->isBasketCurrencyEUR()) {
+            if ($this->isBasketCurrencyEUR() && $this->isB2CEURInvoiceEligibility()) {
                 $result = $this->getInvoiceB2CEURPublicKey();
             }
         }
 
-        if ($customerType === 'B2B' && $this->isB2BInvoiceEligibility()) {
-            if ($this->isBasketCurrencyCHF()) {
+        if ($customerType === 'B2B') {
+            if ($this->isBasketCurrencyCHF() && $this->isB2BCHFInvoiceEligibility()) {
                 $result = $this->getInvoiceB2BCHFPublicKey();
             }
-            if ($this->isBasketCurrencyEUR()) {
+            if ($this->isBasketCurrencyEUR() && $this->isB2BEURInvoiceEligibility()) {
                 $result = $this->getInvoiceB2BEURPublicKey();
             }
         }
@@ -666,20 +695,20 @@ class ModuleSettings
     {
         $result = '';
 
-        if ($customerType === 'B2C' && $this->isB2CInvoiceEligibility()) {
-            if ($this->isBasketCurrencyCHF()) {
+        if ($customerType === 'B2C') {
+            if ($this->isBasketCurrencyCHF() && $this->isB2CCHFInvoiceEligibility()) {
                 $result = $this->getInvoiceB2CCHFPrivateKey();
             }
-            if ($this->isBasketCurrencyEUR()) {
+            if ($this->isBasketCurrencyEUR() && $this->isB2CEURInvoiceEligibility()) {
                 $result = $this->getInvoiceB2CEURPrivateKey();
             }
         }
 
-        if ($customerType === 'B2B' && $this->isB2BInvoiceEligibility()) {
-            if ($this->isBasketCurrencyCHF()) {
+        if ($customerType === 'B2B') {
+            if ($this->isBasketCurrencyCHF() && $this->isB2BCHFInvoiceEligibility()) {
                 $result = $this->getInvoiceB2BCHFPrivateKey();
             }
-            if ($this->isBasketCurrencyEUR()) {
+            if ($this->isBasketCurrencyEUR() && $this->isB2BEURInvoiceEligibility()) {
                 $result = $this->getInvoiceB2BEURPrivateKey();
             }
         }
@@ -691,28 +720,25 @@ class ModuleSettings
     {
         $result = '';
 
-        if ($this->isB2CInstallmentEligibility()) {
-            if ($this->isBasketCurrencyCHF()) {
-                $result = $this->getInstallmentB2CCHFPublicKey();
-            }
-            if ($this->isBasketCurrencyEUR()) {
-                $result = $this->getInstallmentB2CEURPublicKey();
-            }
+        if ($this->isBasketCurrencyCHF() && $this->isB2CCHFInstallmentEligibility()) {
+            $result = $this->getInstallmentB2CCHFPublicKey();
+        }
+        if ($this->isBasketCurrencyEUR() && $this->isB2CEURInstallmentEligibility()) {
+            $result = $this->getInstallmentB2CEURPublicKey();
         }
 
         return $result;
     }
+
     public function getInstallmentPrivateKey(): string
     {
         $result = '';
 
-        if ($this->isB2CInstallmentEligibility()) {
-            if ($this->isBasketCurrencyCHF()) {
-                $result = $this->getInstallmentB2CCHFPrivateKey();
-            }
-            if ($this->isBasketCurrencyEUR()) {
-                $result = $this->getInstallmentB2CEURPrivateKey();
-            }
+        if ($this->isBasketCurrencyCHF() && $this->isB2CCHFInstallmentEligibility()) {
+            $result = $this->getInstallmentB2CCHFPrivateKey();
+        }
+        if ($this->isBasketCurrencyEUR() && $this->isB2CEURInstallmentEligibility()) {
+            $result = $this->getInstallmentB2CEURPrivateKey();
         }
 
         return $result;
@@ -728,6 +754,7 @@ class ModuleSettings
         string $currency
     ): string {
         $key = '';
+        $customerType = $customerType === 'B2B' ? 'B2B' : 'B2C';
         if ($customerType === 'B2C' && $currency === 'EUR') {
             $key = $this->getInvoiceB2CEURPrivateKey();
         } elseif ($customerType === 'B2C' && $currency === 'CHF') {
@@ -761,6 +788,30 @@ class ModuleSettings
     private function isBasketCurrencyCHF(): bool
     {
         return $this->getBasketCurrency() === 'CHF';
+    }
+
+    private function isCHFSupported(): bool
+    {
+        return $this->isCurrencySupported('CHF');
+    }
+
+    private function isEURSupported(): bool
+    {
+        return $this->isCurrencySupported('EUR');
+    }
+
+    private function isCurrencySupported(string $currency = ''): bool
+    {
+        $result = false;
+
+        $aCurrencies = $this->config->getCurrencyArray();
+        foreach ($aCurrencies as $oCur) {
+            if ($oCur->name === $currency) {
+                $result = true;
+                break;
+            }
+        }
+        return $result;
     }
 
     /**

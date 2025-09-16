@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - fix Maintenance-Mode in module deactivation (OXID7.3)
 - move some parts in the admin-order-tpl, to prevent maintenance for non-unzer-orders
 - fix Backend-Option-Translations for Invoice-Keys
-- for UnzerSystemMode use select-Option like in OXID6 
+- for UnzerSystemMode use select-Option like in OXID6
+- [0007826](https://bugs.oxid-esales.com/view.php?id=7826): fix, paylater-invoice must not require both EUR and CHF webhooks, checks for Invoice and Installment Eligibility now currency independent
 
 ## [2.2.0] - 2025-06-06
 
