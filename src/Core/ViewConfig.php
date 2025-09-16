@@ -205,7 +205,8 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isB2CInvoiceEligibility(): bool
     {
-        return $this->moduleSettings->isB2CInvoiceEligibility();
+        return $this->moduleSettings->isB2CEURInvoiceEligibility() ||
+            $this->moduleSettings->isB2CCHFInvoiceEligibility();
     }
 
     /**
@@ -213,7 +214,8 @@ class ViewConfig extends ViewConfig_parent
      */
     public function isB2BInvoiceEligibility(): bool
     {
-        return $this->moduleSettings->isB2BInvoiceEligibility();
+        return $this->moduleSettings->isB2BEURInvoiceEligibility() ||
+            $this->moduleSettings->isB2BCHFInvoiceEligibility();
     }
 
     public function getBasketCurrencyName(): string
