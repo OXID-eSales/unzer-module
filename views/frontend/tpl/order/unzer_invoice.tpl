@@ -215,6 +215,12 @@
         $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', true);
     });
 
+    $('#paylater-invoice input:checkbox').change(function(event) {
+        if ($(this).prop('checked') === true) {
+            $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+        }
+    });
+
     [{/capture}]
     [{oxscript add=$unzerInvoiceJS}]
 [{/block}]
