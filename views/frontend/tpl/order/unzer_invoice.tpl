@@ -203,6 +203,9 @@
         })
         .catch(function(error) {
         document.getElementById('error-holder').innerText = error.customerMessage || error.message || 'Error'
+        $('html, body').animate({
+            scrollTop: $("#orderPayment").offset().top - 150
+        }, 350);
         })
 
     });
