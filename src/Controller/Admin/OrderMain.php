@@ -22,7 +22,7 @@ class OrderMain extends OrderMain_parent
      * @throws DatabaseConnectionException
      * @return void
      */
-    protected function onOrderSend(): void
+    protected function onOrderSend()
     {
         $sOxid = $this->getEditObjectId();
         $oOrder = oxNew(Order::class);
