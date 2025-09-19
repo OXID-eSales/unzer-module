@@ -202,12 +202,55 @@
         }
         })
         .catch(function(error) {
-        document.getElementById('error-holder').innerText = error.customerMessage || error.message || 'Error'
+            document.getElementById('error-holder').innerText = error.customerMessage || error.message || 'Error';
+            $('html, body').animate({
+                scrollTop: $("#orderPayment").offset().top - 150
+            }, 350);
         })
 
     });
 
-    $('#orderConfirmAgbBottom').submit(function( event ) {
+    $('#orderConfirmAgbBottom').submit(function( event ) {    $('#birthdate_year').change(function(event) {
+        if ($('#birthdate_year').val() === "") {
+            $('.oxDate').addClass("text-danger");
+        } else {
+            $('.oxDate').removeClass("text-danger");
+            if ($('#paylater-invoice input:checkbox').prop('checked') === true) {
+                $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+            }
+        }
+    });
+
+    $('#birthdate_month').change(function(event) {
+        if ($('#birthdate_month').val() === "") {
+            $('.oxDate').addClass("text-danger");
+        } else {
+            $('.oxDate').removeClass("text-danger");
+            if ($('#paylater-invoice input:checkbox').prop('checked') === true) {
+                $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+            }
+        }
+    });
+
+    $('#birthdate_day').change(function(event) {
+        if ($('#birthdate_day').val() === "") {
+            $('.oxDate').addClass("text-danger");
+        } else {
+            $('.oxDate').removeClass("text-danger");
+            if ($('#paylater-invoice input:checkbox').prop('checked') === true) {
+                $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+            }
+        }
+    });
+
+    $('#paylater-invoice input:checkbox').change(function(event) {
+        if ($(this).prop('checked') === true) {
+            $('#error-holder')[0].innerHTML = '';
+            if (!$('.oxDate').hasClass("text-danger")) {
+                $( '#orderConfirmAgbBottom .submitButton' ).prop('disabled', false);
+            }
+        }
+    });
         if(!$('#orderConfirmAgbBottom').hasClass("submitable")){
             event.preventDefault();
             $("#payment-form").submit();
