@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.2.1] - 2025-??-??
+## [2.2.1] - 2025-09-19
 
 ### FIXED
 - [0007808](https://bugs.oxid-esales.com/view.php?id=7808): fix, even if the credit card payment was cancelled (when entering the secure code), an order confirmation is sent
