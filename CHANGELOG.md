@@ -4,12 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.2.3] - 2025-??-??
+## [1.2.3] - 2025-09-19
 
 ### FIXED
 - [0007808](https://bugs.oxid-esales.com/view.php?id=7808): fix, even if the credit card payment was cancelled (when entering the secure code), an order confirmation is sent
 - move some parts in the admin-order-tpl, to prevent maintenance for non-unzer-orders
 - [0007826](https://bugs.oxid-esales.com/view.php?id=7826): fix, paylater-invoice must not require both EUR and CHF webhooks, checks for Invoice and Installment Eligibility now currency independent
+- [0007828](https://bugs.oxid-esales.com/view.php?id=7828): fix,  If you forget to select checkbox in Unzer Paylater (Rechnungskauf) and clicks on ‘Pay’, the shop freezes
 
 ## [1.2.2] - 2025-06-06
 
