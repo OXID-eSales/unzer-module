@@ -1,5 +1,6 @@
 [{assign var="isUnzerPayment" value=$listitem->oxorder__oxpaymenttype->value|stripos:"oscunzer"}]
 [{if $isUnzerPayment !== false}]
+    [{$smarty.block.parent}]
     <script type="text/javascript">
         var elements = document.getElementsByClassName("order_no");
         var unzer_order = elements[elements.length-1].getElementsByTagName("a");
