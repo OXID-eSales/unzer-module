@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.2.4] - 2025-??-??
 
 ### FIXED
-- [0007832](https://bugs.oxid-esales.com/view.php?id=7832): fix, 0007832: Display problems in the shop admin if the admin_order_list_item block has already been expanded by other module
+- [0007832](https://bugs.oxid-esales.com/view.php?id=7832): fix, Display problems in the shop admin if the admin_order_list_item block has already been expanded by other module
+- [0007836](https://bugs.oxid-esales.com/view.php?id=7836): fix, When unzer is activated for the first time, Maintenance Mode is displayed in the navigation bar in the shop admin
 
 ## [1.2.3] - 2025-09-19
 
