@@ -27,6 +27,7 @@ use OxidSolutionCatalysts\Unzer\Model\Article;
 use OxidSolutionCatalysts\Unzer\Model\Order;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Module;
+use OxidSolutionCatalysts\Unzer\Service\ModuleSettings;
 
 $sMetadataVersion = '2.1';
 
@@ -225,20 +226,13 @@ $aModule = [
             'group' => 'unzerapplepay',
             'name' => 'applepay_merchant_capabilities',
             'type' => 'aarr',
-            'value' => [
-                'supportsCredit' => '1',
-                'supportsDebit' => '1'
-            ]
+            'value' => ModuleSettings::APPLE_PAY_MERCHANT_CAPABILITIES
         ],
         [
             'group' => 'unzerapplepay',
             'name' => 'applepay_networks',
             'type' => 'aarr',
-            'value' => [
-                'maestro' => '1',
-                'masterCard' => '1',
-                'visa' => '1'
-            ]
+            'value' => ModuleSettings::APPLE_PAY_NETWORKS
         ],
         [
             'group' => 'unzerapplepay',
