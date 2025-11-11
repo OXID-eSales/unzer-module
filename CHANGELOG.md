@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.2.2] - 2025-??-??
+## [2.2.2] - 2025-11-11
 
 ### FIXED
 - [0007832](https://bugs.oxid-esales.com/view.php?id=7832): fix, 0007832: Display problems in the shop admin if the admin_order_list_item block has already been expanded by other module
