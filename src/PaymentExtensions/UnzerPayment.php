@@ -211,7 +211,7 @@ abstract class UnzerPayment
                     $uzrBasket
                 );
             } catch (UnzerApiException $e) {
-                throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage());
+                throw new UnzerApiException($e->getMerchantMessage(), $e->getClientMessage(), $e->getCode());
             }
         } else {
             $priceObj = $basketModel->getPrice();

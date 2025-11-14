@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.5] - 2025-??-??
+
+### FIXED
+- [0007827](https://bugs.oxid-esales.com/view.php?id=7827): fix errormessage-handling & add two new translations, one message to explain error API.320.100.135 from bugtracker #7827
+
 ## [1.2.4] - 2025-11-11
 
 ### FIXED

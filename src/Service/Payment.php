@@ -123,12 +123,12 @@ class Payment
                 $this->unzerService->prepareOrderRedirectUrl(
                     $paymentExtension instanceof AbstractUnzerPayment && $paymentExtension->redirectUrlNeedPending()
                 ),
-                $this->translator->translateCode($e->getErrorId(), $e->getClientMessage())
+                $this->translator->translateCode($e->getCode(), $e->getClientMessage())
             );
         } catch (Exception $e) {
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(false),
-                $e->getMessage()
+                $this->translator->translateCode($e->getCode(), $e->getClientMessage())
             );
         }
 
