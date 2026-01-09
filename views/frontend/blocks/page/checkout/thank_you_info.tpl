@@ -1,6 +1,5 @@
 [{$smarty.block.parent}]
-[{assign var="payment" value=$oView->getPayment()}]
-    [{if $payment->isUnzerPayment()}]
+[{if $oView|method_exists:'getUnzerPrePaymentIban'}]
     [{if $oView->getUnzerPrePaymentIban()}]
         <strong>[{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_HEADLINE"}]:</strong><br/>
         [{oxmultilang ident="OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_IBAN"}]: [{$oView->getUnzerPrePaymentIban()}]<br/>
