@@ -140,7 +140,7 @@ class Payment
         } catch (Exception $e) {
             throw new RedirectWithMessage(
                 $this->unzerService->prepareOrderRedirectUrl(false),
-                $this->translator->translateCode($e->getCode(), $e->getClientMessage())
+                $this->translator->translateCode($e->getCode(), $e->getMessage())
             );
         }
 
