@@ -116,11 +116,28 @@ class AccountSavedPaymentController extends AccountController
      */
     public function deletePayment(): void
     {
+        if (!Registry::getSession()->checkSessionChallenge()) {
+            return;
+        }
+
+        $user = $this->getUser();
+        if (!$user) {
+            return;
+        }
+
         $paymentTypeId = Registry::getRequest()->getRequestParameter('paymenttypeid', '');
         $paymentTypeId = is_string($paymentTypeId) ? $paymentTypeId : '';
         /** @var \OxidSolutionCatalysts\Unzer\Model\Transaction $transaction */
         $transaction = oxNew(\OxidSolutionCatalysts\Unzer\Model\Transaction::class);
-        $transaction->load($paymentTypeId);
+        if (!$transaction->load($paymentTypeId)) {
+            return;
+        }
+
+        // Verify the transaction belongs to the current user
+        if ($transaction->getFieldData('oxuserid') !== $user->getId()) {
+            return;
+        }
+
         $transaction->setPaymentTypeId(null);
         $transaction->save();
     }

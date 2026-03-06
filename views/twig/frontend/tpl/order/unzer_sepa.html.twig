@@ -198,7 +198,7 @@
             .catch(function(error) {
                 const errorHolder = document.getElementById('error-holder');
                 if (errorHolder) {
-                    errorHolder.innerHTML = error.message;
+                    errorHolder.textContent = error.message;
                 }
 
                 const orderPayment = document.getElementById("orderPayment");

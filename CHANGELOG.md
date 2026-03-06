@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.6] - 2026-??-??
+
+### Security
+
+- Migrate TmpOrder serialization to FlexibleSerializer with `allowed_classes` restriction (prevents PHP object injection)
+- Add SSRF protection: URL whitelist for Apple Pay merchantValidationUrl (ApplePayCallbackController)
+- Remove double URL decoding in ApplePayCallbackController::validateMerchant()
+- Add CSRF protection (checkSessionChallenge) to AccountSavedPaymentController::deletePayment()
+- Add owner verification check to AccountSavedPaymentController::deletePayment() (prevents IDOR)
+- Fix DOM-XSS: replace innerHTML/jQuery .html() with textContent/.text() for error messages in payment templates
+- Add request body size limit (1 MB) to DispatcherController webhook endpoint
+- Replace MD5 with SHA-256 for transaction ID generation (Transaction::prepareTransactionOxid)
+- Add SECURITY.md documenting known security considerations and intentionally unfixed items
+
 ## [2.2.5] - 2026-02-19
 
 ### FIXED

@@ -210,7 +210,7 @@ class Transaction
 
         /** @var string $jsonEncode */
         $jsonEncode = json_encode($params);
-        return md5($jsonEncode);
+        return hash('sha256', $jsonEncode);
     }
 
     public function saveTransaction(array $params, Order $oOrder): bool

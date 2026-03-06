@@ -16,5 +16,5 @@ class Module
 {
     public const MODULE_ID = 'osc-unzer';
     public const GITHUB_NAME = 'OXID-eSales/unzer-module';
-    public const MODULE_VERSION = '2.2.5';
+    public const MODULE_VERSION = '2.2.6-rc.1';
 }

@@ -39,7 +39,7 @@
                 document.querySelector( "#orderConfirmAgbBottom" ).submit();
             })
             .catch(function(error) {
-                document.querySelector('#error-holder').innerHTML = error.message;
+                document.querySelector('#error-holder').textContent = error.message;
                 document.querySelector('html, body').animate({
                     scrollTop: document.querySelector("#orderPayment").getBoundingClientRect().top + window.scrollY - 150
                 }, 350);

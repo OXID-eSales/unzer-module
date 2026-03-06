@@ -124,7 +124,7 @@
                 document.querySelector("#orderConfirmAgbBottom").submit();
             })
             .catch(function(error) {
-                document.querySelector('#error-holder').innerHTML = error.message;
+                document.querySelector('#error-holder').textContent = error.message;
                 window.scrollTo({
                     top: document.querySelector("#orderPayment").offsetTop - 150,
                     behavior: 'smooth'

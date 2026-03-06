@@ -40,7 +40,7 @@
             $( "#orderConfirmAgbBottom" ).submit();
         })
         .catch(function(error) {
-            $('#error-holder').html(error.message)
+            $('#error-holder').text(error.message)
             $('html, body').animate({
             scrollTop: $("#orderPayment").offset().top - 150
             }, 350);

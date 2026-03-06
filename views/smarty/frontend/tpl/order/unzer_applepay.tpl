@@ -324,7 +324,7 @@
 
         const errorElement = document.querySelector('.js-unzer-error-holder');
         if (errorElement) {
-            errorElement.innerHTML = html;
+            errorElement.textContent = html;
             errorElement.style.display = 'block';
             errorElement.focus();
             window.scrollTo({ top: 0, behavior: 'smooth' });

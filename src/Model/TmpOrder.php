@@ -13,9 +13,11 @@ use Doctrine\DBAL\Driver\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Driver\Result;
 use Exception;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidSolutionCatalysts\Unzer\Service\FlexibleSerializer;
 use OxidSolutionCatalysts\Unzer\Traits\ServiceContainer;
 use OxidEsales\Eshop\Application\Model\Order as CoreOrderModel;
 
@@ -47,7 +49,8 @@ class TmpOrder extends BaseModel
             'order'         => $oOrder,
             'orderArticles' => $oOrderArticles->getArray()
         ];
-        $serializedOrder = serialize($completeOrder);
+        $flexibleSerializer = $this->getServiceFromContainer(FlexibleSerializer::class);
+        $serializedOrder = $flexibleSerializer->safeSerialize($completeOrder);
         $base64Order = base64_encode($serializedOrder);
 
         /** @var Order $oOrder */
@@ -140,8 +143,9 @@ class TmpOrder extends BaseModel
         $result = $rawRes->fetchAssociative();
 
         if (is_array($result) && isset($result['tmporder']) && is_string($result['tmporder'])) {
-            $tmpOrder = $result['tmporder'];
-            $result = unserialize(base64_decode($tmpOrder));
+            $tmpOrder = base64_decode($result['tmporder']);
+            $flexibleSerializer = $this->getServiceFromContainer(FlexibleSerializer::class);
+            $result = $flexibleSerializer->safeUnserialize($tmpOrder, [CoreOrderModel::class, Field::class]);
             if (is_array($result) && isset($result['order']) && is_object($result['order'])) {
                 /** @var CoreOrderModel $order */
                 $order = $result['order'];
