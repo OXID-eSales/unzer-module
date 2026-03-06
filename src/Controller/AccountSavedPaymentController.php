@@ -47,6 +47,15 @@ class AccountSavedPaymentController extends AccountController
      */
     public function deletePayment(): void
     {
+        if (!\OxidEsales\Eshop\Core\Registry::getSession()->checkSessionChallenge()) {
+            return;
+        }
+
+        $user = $this->getUser();
+        if (!$user) {
+            return;
+        }
+
         $savedPaymentUserId = $this->getUnzerStringRequestParameter('savedPaymentUserId');
         $loadService = $this->getServiceFromContainer(SavedPaymentLoadService::class);
         $transactionsIds = $loadService->getSavedPaymentTransactionsByUserId(

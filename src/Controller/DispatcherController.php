@@ -51,7 +51,7 @@ class DispatcherController extends FrontendController
 
     public function updatePaymentTransStatus(): void
     {
-        $jsonRequest = file_get_contents('php://input');
+        $jsonRequest = file_get_contents('php://input', false, null, 0, 1048576);
         if ($jsonRequest === false) {
             $this->exitWithMessage("Invalid Json");
             return;

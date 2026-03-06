@@ -310,7 +310,7 @@
                 }
             [{/if}]
 
-            $('.js-unzer-error-holder').html(html).show(0, function () {
+            $('.js-unzer-error-holder').text(html).show(0, function () {
                 $(this).focus();
                 $('html, body').animate({scrollTop: 0}, "slow");
             });
