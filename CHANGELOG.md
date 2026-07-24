@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- [0007977](https://bugs.oxid-esales.com/view.php?id=7977): Fix a `TypeError` on the thank-you page (and the resulting missing order-confirmation mail) for orders without an Unzer order number. `ViewConfig::getPrePaymentIban()` / `getPrePaymentBic()` / `getPrePaymentHolder()` / `getPrePaymentDescriptor()` declared a non-nullable `string $unzerOrderNumber` parameter, but `thankyou.html.twig` passes `order.oxorder__oxunzerordernr.value`, which is `null` whenever the order carries no Unzer order number. Passing `null` to the non-nullable parameter threw `TypeError`, which bubbled up as a `Twig\Error\RuntimeError` and aborted the whole thank-you page render — so the page errored out and no confirmation mail was sent. The parameters are now nullable (`?string`) and each method returns `null` early on an empty/`null` order number, so the bank-info block simply renders nothing instead of crashing. The fix lives in the shared `Core/ViewConfig.php`, so it covers both the Twig (Apex) and Smarty template paths. Note: the OXID 6.x variant is not affected — there the equivalent logic lives in `ThankYouController` and already guards the empty order number internally (the template calls the getters without arguments). File touched: `src/Core/ViewConfig.php`.
+
 ## [2.2.7] - 2026-06-11
 
 ### Fixed

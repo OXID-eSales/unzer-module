@@ -237,29 +237,45 @@ class ViewConfig extends ViewConfig_parent
         return $currencyName;
     }
 
-    public function getPrePaymentIban(string $unzerOrderNumber): ?string
+    public function getPrePaymentIban(?string $unzerOrderNumber): ?string
     {
+        if (!$unzerOrderNumber) {
+            return null;
+        }
+
         $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
 
         return $prePaymentBankAccountService->getIban($unzerOrderNumber);
     }
 
-    public function getPrePaymentBic(string $unzerOrderNumber): ?string
+    public function getPrePaymentBic(?string $unzerOrderNumber): ?string
     {
+        if (!$unzerOrderNumber) {
+            return null;
+        }
+
         $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
 
         return $prePaymentBankAccountService->getBic($unzerOrderNumber);
     }
 
-    public function getPrePaymentHolder(string $unzerOrderNumber): ?string
+    public function getPrePaymentHolder(?string $unzerOrderNumber): ?string
     {
+        if (!$unzerOrderNumber) {
+            return null;
+        }
+
         $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
 
         return $prePaymentBankAccountService->getHolder($unzerOrderNumber);
     }
 
-    public function getPrePaymentDescriptor(string $unzerOrderNumber): ?string
+    public function getPrePaymentDescriptor(?string $unzerOrderNumber): ?string
     {
+        if (!$unzerOrderNumber) {
+            return null;
+        }
+
         $prePaymentBankAccountService = $this->getPrePaymentBankAccountService();
 
         return $prePaymentBankAccountService->getDescriptor($unzerOrderNumber);
