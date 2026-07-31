@@ -25,6 +25,11 @@ class_alias(
 );
 
 class_alias(
+    \OxidEsales\Eshop\Core\Email::class,
+    \OxidSolutionCatalysts\Unzer\Core\Email_parent::class
+);
+
+class_alias(
     \OxidEsales\Eshop\Application\Controller\OrderController::class,
     \OxidSolutionCatalysts\Unzer\Controller\OrderController_parent::class
 );

@@ -1,0 +1,32 @@
+[{assign var="shop" value=$oEmailView->getShop()}]
+[{assign var="oViewConf" value=$oEmailView->getViewConfig()}]
+[{block name="unzer_email_plain_cancel_intro"}]
+[{if $isUnzerOwnerMail}]
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_INTRO_OWNER"}]
+[{else}]
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_SALUTATION"}] [{$order->oxorder__oxbillfname->getRawValue()}] [{$order->oxorder__oxbilllname->getRawValue()}],
+
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_INTRO"}]
+[{/if}]
+[{/block}]
+
+[{block name="unzer_email_plain_cancel_details"}]
+[{oxmultilang ident="ORDER_NUMBER" suffix="COLON"}] [{$order->oxorder__oxordernr->value}]
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_ORDER_TOTAL" suffix="COLON"}] [{$order->oxorder__oxtotalordersum->value|string_format:"%.2f"}] [{$order->oxorder__oxcurrency->value}]
+[{if $unzerRefundedAmount !== null}]
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_REFUNDED" suffix="COLON"}] [{$unzerRefundedAmount|string_format:"%.2f"}] [{$unzerCurrencyCode}]
+[{/if}]
+[{/block}]
+
+[{block name="unzer_email_plain_cancel_note"}]
+[{if !$isUnzerOwnerMail}]
+[{if $unzerRefundedAmount !== null}]
+[{oxmultilang ident="OSCUNZER_REFUND_MAIL_NOTE"}]
+[{else}]
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_NOTE_NO_REFUND"}]
+[{/if}]
+[{/if}]
+[{/block}]
+
+[{$shop->oxshops__oxname->getRawValue()}]
+[{$shop->oxshops__oxurl->value}]

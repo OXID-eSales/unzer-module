@@ -5,6 +5,10 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidSolutionCatalysts\Unzer\Core\RefundMailService;
+use OxidEsales\Eshop\Application\Model\Payment;
+use OxidSolutionCatalysts\Unzer\Model\Payment as UnzerPayment;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
 
 class OrderList extends OrderList_parent
@@ -51,5 +55,61 @@ class OrderList extends OrderList_parent
         }
 
         return $query;
+    }
+
+    /**
+     * Sends the cancellation confirmation mail after an order was cancelled in
+     * the backend. An order cancellation moves no money in this module, so the
+     * mail confirms the cancellation only; a refund is triggered separately in
+     * the order view and confirmed separately.
+     *
+     * Orders of other payment methods and orders that cannot be loaded are passed
+     * straight through to the parent implementation.
+     *
+     * @return void
+     */
+    public function cancelOrder()
+    {
+        $orderId = $this->getEditObjectId();
+        if (!$orderId) {
+            parent::cancelOrder();
+
+            return;
+        }
+
+        $order = oxNew(Order::class);
+        if (!$order->load($orderId) || !$this->isUnzerOrder($order)) {
+            parent::cancelOrder();
+
+            return;
+        }
+
+        parent::cancelOrder();
+
+        $currency = $order->getFieldData('oxcurrency');
+        $mailService = oxNew(RefundMailService::class);
+        $mailService->sendCancelMail($order, null, is_scalar($currency) ? (string)$currency : '');
+    }
+
+    /**
+     * Whether the order was paid with an unzer payment method, the same check the
+     * order view uses: the payment id carries the module prefix and the payment
+     * still exists.
+     *
+     * @param Order $order
+     * @return bool
+     */
+    protected function isUnzerOrder(Order $order): bool
+    {
+        $paymentType = $order->getFieldData('oxpaymenttype');
+        $paymentType = is_scalar($paymentType) ? (string)$paymentType : '';
+        if (strpos($paymentType, 'oscunzer') === false) {
+            return false;
+        }
+
+        /** @var UnzerPayment $payment */
+        $payment = oxNew(Payment::class);
+
+        return $payment->load($paymentType) && $payment->isUnzerPayment();
     }
 }

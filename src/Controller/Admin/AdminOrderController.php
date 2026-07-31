@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidSolutionCatalysts\Unzer\Traits\Request;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
+use OxidSolutionCatalysts\Unzer\Core\RefundMailService;
 use OxidSolutionCatalysts\Unzer\Service\Payment as UnzerPaymentService;
 use OxidSolutionCatalysts\Unzer\Service\Transaction as TransactionService;
 use OxidSolutionCatalysts\Unzer\Service\Translator;
@@ -391,7 +392,14 @@ class AdminOrderController extends AdminDetailsController
         $oStatus = $paymentService->doUnzerCancel($oOrder, $unzerid, $chargeid, $amount, (string)$reason);
         if ($oStatus instanceof UnzerApiException) {
             $this->_aViewData['errCancel'] = $translator->translateCode($oStatus->getErrorId(), $oStatus->getMessage());
+
+            return;
         }
+
+        // Unzer confirmed the refund, so this is the point where a confirmation
+        // mail may go out; the service decides whether one is sent and to whom
+        $mailService = oxNew(RefundMailService::class);
+        $mailService->sendRefundMail($oOrder, $amount, $this->getOrderCurrency($oOrder));
     }
 
 
@@ -422,6 +430,20 @@ class AdminOrderController extends AdminDetailsController
         }
     }
 
+
+    /**
+     * getFieldData() is untyped, so anything that is not a plain value yields an
+     * empty string instead of being cast.
+     *
+     * @param Order $order
+     * @return string
+     */
+    protected function getOrderCurrency($order): string
+    {
+        $currency = $order->getFieldData('oxcurrency');
+
+        return is_scalar($currency) ? (string)$currency : '';
+    }
 
     public function isUnzerOrder(): bool
     {

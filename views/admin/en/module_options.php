@@ -112,4 +112,17 @@ $aLang = [
     // sandbox Paylater Installment B2C EUR
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPrivateKey' => 'Sandbox Private-Key for Installment B2C-purchases in CHF',
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPublicKey' => 'Sandbox Public-Key for Installment B2C-purchases in CHF',
+    'SHOP_MODULE_GROUP_unzermails' => 'Confirmation mails',
+    'SHOP_MODULE_UnzerRefundMailRecipient' => 'Confirmation mail on refund',
+    'SHOP_MODULE_UnzerRefundMailRecipient_0' => 'Do not send a mail',
+    'SHOP_MODULE_UnzerRefundMailRecipient_1' => 'To the customer',
+    'SHOP_MODULE_UnzerRefundMailRecipient_2' => 'To the shop owner',
+    'SHOP_MODULE_UnzerRefundMailRecipient_3' => 'To customer and shop owner',
+    'HELP_SHOP_MODULE_UnzerRefundMailRecipient' => 'Who is notified by email once a refund (cancellation of a charge) was triggered in the backend and Unzer confirmed it? The mail states the order number and the refunded amount.',
+    'SHOP_MODULE_UnzerCancelMailRecipient' => 'Confirmation mail on cancellation',
+    'SHOP_MODULE_UnzerCancelMailRecipient_0' => 'Do not send a mail',
+    'SHOP_MODULE_UnzerCancelMailRecipient_1' => 'To the customer',
+    'SHOP_MODULE_UnzerCancelMailRecipient_2' => 'To the shop owner',
+    'SHOP_MODULE_UnzerCancelMailRecipient_3' => 'To customer and shop owner',
+    'HELP_SHOP_MODULE_UnzerCancelMailRecipient' => 'Who is notified by email once an Unzer order was cancelled in the backend? An order cancellation does not trigger an automatic refund - this mail only confirms the cancellation. A refund is triggered separately in the order view and confirmed separately.',
 ];

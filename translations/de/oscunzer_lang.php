@@ -135,4 +135,25 @@ $aLang = [
     'OSCUNZER_FIX_ROUNDING' => 'Korrektur Rundung',
     'OSCUNZER_NOT_SERIALIZABLE' => 'NOT SERIALIZABLE: ',
     'OSCUNZER_PREPAYMENT_BANK_ACCOUNT_INFO_BANK_DESCRIPTOR' => 'Verwendungszweck',
+    'OSCUNZER_REFUND_MAIL_TITLE'                => 'Rückerstattung zu Ihrer Bestellung',
+    'OSCUNZER_REFUND_MAIL_SUBJECT'              => 'Rückerstattung zu Ihrer Bestellung %s',
+    'OSCUNZER_REFUND_MAIL_SUBJECT_OWNER'        => 'Unzer: Rückerstattung zur Bestellung %s veranlasst',
+    'OSCUNZER_REFUND_MAIL_SALUTATION'           => 'Guten Tag',
+    'OSCUNZER_REFUND_MAIL_INTRO'                => 'wir haben eine Rückerstattung über Unzer für Sie veranlasst.',
+    'OSCUNZER_REFUND_MAIL_INTRO_OWNER'          => 'Für die folgende Bestellung wurde über Unzer eine Rückerstattung '
+        . 'veranlasst.',
+    'OSCUNZER_REFUND_MAIL_AMOUNT'               => 'Erstatteter Betrag',
+    'OSCUNZER_REFUND_MAIL_ORDER_TOTAL'          => 'Bestellwert',
+    'OSCUNZER_REFUND_MAIL_NOTE'                 => 'Die Gutschrift erfolgt über Unzer auf das von Ihnen bei Unzer '
+        . 'verwendete Zahlungsmittel. Wie lange das dauert, hängt von Ihrem Zahlungsmittel und Ihrer Bank ab.',
+    'OSCUNZER_CANCEL_MAIL_TITLE'                => 'Stornierung Ihrer Bestellung',
+    'OSCUNZER_CANCEL_MAIL_SUBJECT'              => 'Stornierung Ihrer Bestellung %s',
+    'OSCUNZER_CANCEL_MAIL_SUBJECT_OWNER'        => 'Unzer: Bestellung %s storniert',
+    'OSCUNZER_CANCEL_MAIL_SALUTATION'           => 'Guten Tag',
+    'OSCUNZER_CANCEL_MAIL_INTRO'                => 'Ihre Bestellung wurde storniert.',
+    'OSCUNZER_CANCEL_MAIL_INTRO_OWNER'          => 'Die folgende Bestellung wurde storniert.',
+    'OSCUNZER_CANCEL_MAIL_ORDER_TOTAL'          => 'Bestellwert',
+    'OSCUNZER_CANCEL_MAIL_REFUNDED'             => 'Erstatteter Betrag',
+    'OSCUNZER_CANCEL_MAIL_NOTE_NO_REFUND'       => 'Sollte für diese Bestellung bereits eine Zahlung erfolgt sein, '
+        . 'erhalten Sie die Rückerstattung in einer separaten Nachricht bestätigt.',
 ];

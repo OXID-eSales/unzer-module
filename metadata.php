@@ -21,6 +21,7 @@ use OxidSolutionCatalysts\Unzer\Controller\OrderController;
 use OxidSolutionCatalysts\Unzer\Controller\PaymentController;
 use OxidSolutionCatalysts\Unzer\Controller\ThankYouController;
 use OxidSolutionCatalysts\Unzer\Core\Config;
+use OxidSolutionCatalysts\Unzer\Core\Email;
 use OxidSolutionCatalysts\Unzer\Core\ShopControl;
 use OxidSolutionCatalysts\Unzer\Core\ViewConfig;
 use OxidSolutionCatalysts\Unzer\Model\Article;
@@ -53,7 +54,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.2.8',
+    'version' => '1.3.0-rc.1',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -62,6 +63,7 @@ $aModule = [
         \OxidEsales\Eshop\Core\Config::class => Config::class,
         \OxidEsales\Eshop\Core\ShopControl::class => ShopControl::class,
         \OxidEsales\Eshop\Core\ViewConfig::class => ViewConfig::class,
+        \OxidEsales\Eshop\Core\Email::class => Email::class,
         // Controller
         \OxidEsales\Eshop\Application\Controller\OrderController::class => OrderController::class,
         \OxidEsales\Eshop\Application\Controller\PaymentController::class => PaymentController::class,
@@ -83,6 +85,12 @@ $aModule = [
         'unzer_saved_payments' => AccountSavedPaymentController::class,
     ],
     'templates' => [
+        // mails
+        'modules/osc/unzer/email/html/refund.tpl' => 'osc/unzer/views/frontend/tpl/email/html/refund.tpl',
+        'modules/osc/unzer/email/plain/refund.tpl' => 'osc/unzer/views/frontend/tpl/email/plain/refund.tpl',
+        'modules/osc/unzer/email/html/cancel.tpl' => 'osc/unzer/views/frontend/tpl/email/html/cancel.tpl',
+        'modules/osc/unzer/email/plain/cancel.tpl' => 'osc/unzer/views/frontend/tpl/email/plain/cancel.tpl',
+
         // admin
         'oscunzer_order.tpl' => 'osc/unzer/views/admin/tpl/oscunzer_order.tpl',
 
@@ -165,6 +173,20 @@ $aModule = [
         ],
     ],
     'settings' => [
+        [
+            'group' => 'unzermails',
+            'name' => 'UnzerRefundMailRecipient',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1|2|3'
+        ],
+        [
+            'group' => 'unzermails',
+            'name' => 'UnzerCancelMailRecipient',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1|2|3'
+        ],
         [
             'group' => 'unzerenvironment',
             'name' => 'UnzerSystemMode',

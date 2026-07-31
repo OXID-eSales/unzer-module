@@ -112,4 +112,17 @@ $aLang = [
     // sandbox Paylater Installment B2C EUR
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPrivateKey' => 'Sandbox privater Schlüssel für Ratenkauf B2C-Käufe in CHF',
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPublicKey' => 'Sandbox öffentlicher Schlüssel für Ratenkauf B2C-Käufe in CHF',
+    'SHOP_MODULE_GROUP_unzermails' => 'Bestätigungsmails',
+    'SHOP_MODULE_UnzerRefundMailRecipient' => 'Bestätigungsmail bei Rückerstattung',
+    'SHOP_MODULE_UnzerRefundMailRecipient_0' => 'Keine Mail versenden',
+    'SHOP_MODULE_UnzerRefundMailRecipient_1' => 'An den Kunden',
+    'SHOP_MODULE_UnzerRefundMailRecipient_2' => 'An den Shop-Betreiber',
+    'SHOP_MODULE_UnzerRefundMailRecipient_3' => 'An Kunden und Shop-Betreiber',
+    'HELP_SHOP_MODULE_UnzerRefundMailRecipient' => 'Wer wird per E-Mail informiert, wenn im Backend eine Rückerstattung (Storno einer Buchung) ausgelöst wurde und Unzer sie bestätigt hat? Die Mail nennt Bestellnummer und erstatteten Betrag.',
+    'SHOP_MODULE_UnzerCancelMailRecipient' => 'Bestätigungsmail bei Storno',
+    'SHOP_MODULE_UnzerCancelMailRecipient_0' => 'Keine Mail versenden',
+    'SHOP_MODULE_UnzerCancelMailRecipient_1' => 'An den Kunden',
+    'SHOP_MODULE_UnzerCancelMailRecipient_2' => 'An den Shop-Betreiber',
+    'SHOP_MODULE_UnzerCancelMailRecipient_3' => 'An Kunden und Shop-Betreiber',
+    'HELP_SHOP_MODULE_UnzerCancelMailRecipient' => 'Wer wird per E-Mail informiert, wenn eine Unzer-Bestellung im Backend storniert wurde? Ein Bestell-Storno löst keine automatische Rückerstattung aus — diese Mail bestätigt nur die Stornierung. Eine Rückerstattung wird separat in der Bestellansicht ausgelöst und separat bestätigt.',
 ];

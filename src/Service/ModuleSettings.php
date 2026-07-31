@@ -26,6 +26,23 @@ class ModuleSettings
 {
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
     public const SYSTEM_MODE_PRODUCTION = 'production';
+    /**
+     * Recipients of the refund / cancellation confirmation mails
+     * (module settings UnzerRefundMailRecipient and UnzerCancelMailRecipient)
+     */
+    public const MAIL_RECIPIENT_NONE = '0';
+    public const MAIL_RECIPIENT_CUSTOMER = '1';
+    public const MAIL_RECIPIENT_OWNER = '2';
+    public const MAIL_RECIPIENT_BOTH = '3';
+
+    /**
+     * Backend action a refund was triggered by. The cancellation flow sends its
+     * own mail covering both the cancellation and a refunded amount, so it
+     * suppresses the refund mail and the customer receives one mail, not two.
+     */
+    public const REFUND_CONTEXT_REFUND = 'refund';
+    public const REFUND_CONTEXT_CANCEL = 'cancel';
+
     public const PAYMENT_CHARGE = 'charge';
     public const PAYMENT_AUTHORIZE = 'authorize';
 
@@ -440,6 +457,53 @@ class ModuleSettings
     private function saveSetting(string $name, $setting): void
     {
         $this->moduleSettingBridge->save($name, $setting, Module::MODULE_ID);
+    }
+
+    /**
+     * Recipients of the refund confirmation mail, see the MAIL_RECIPIENT_* modes.
+     * Unknown values mean "no mail".
+     */
+    public function getRefundMailRecipient(): string
+    {
+        return $this->sanitizeMailRecipient($this->getSettingValueAsString('UnzerRefundMailRecipient'));
+    }
+
+    /**
+     * Recipients of the cancellation confirmation mail, see the MAIL_RECIPIENT_*
+     * modes. Unknown values mean "no mail".
+     */
+    public function getCancelMailRecipient(): string
+    {
+        return $this->sanitizeMailRecipient($this->getSettingValueAsString('UnzerCancelMailRecipient'));
+    }
+
+    /**
+     * getSettingValue() is untyped and throws when a setting is not installed
+     * yet, so anything unexpected yields an empty string, which the sanitizer
+     * then maps to "no mail".
+     */
+    private function getSettingValueAsString(string $key): string
+    {
+        try {
+            $value = $this->getSettingValue($key);
+        } catch (\Throwable $throwable) {
+            return '';
+        }
+
+        return is_scalar($value) ? (string)$value : '';
+    }
+
+    private function sanitizeMailRecipient(string $mode): string
+    {
+        return in_array(
+            $mode,
+            [
+                self::MAIL_RECIPIENT_CUSTOMER,
+                self::MAIL_RECIPIENT_OWNER,
+                self::MAIL_RECIPIENT_BOTH,
+            ],
+            true
+        ) ? $mode : self::MAIL_RECIPIENT_NONE;
     }
 
     /**
