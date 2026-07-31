@@ -8,6 +8,9 @@ parameters:
         - ../../vendor/oxid-esales/oxideshop-ce/source/overridablefunctions.php
     ignoreErrors:
         - identifier: missingType.iterableValue
+        - '#Access to an undefined property OxidEsales\\Eshop\\Application\\Model\\Order::\$oxorder__oxbillfname#'
+        - '#Access to an undefined property OxidEsales\\Eshop\\Application\\Model\\Order::\$oxorder__oxbilllname#'
+        - '#Access to an undefined property OxidEsales\\Eshop\\Application\\Model\\Shop::\$oxshops__oxname#'
 
         - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::markUnzerOrderAsPaid\(\)#'
         - '#Call to an undefined method OxidEsales\\Eshop\\Application\\Model\\Order::getUnzerInvoiceNr\(\)#'

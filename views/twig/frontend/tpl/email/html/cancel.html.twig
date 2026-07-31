@@ -1,0 +1,65 @@
+{% set shop = oEmailView.getShop() %}
+{% set oViewConf = oEmailView.getViewConfig() %}
+
+{% capture assign = "style" %}
+    table.unzercancel th, table.unzercancel td {
+    border: 1px solid #d4d4d4;
+    font-size: 13px;
+    padding: 5px;
+    white-space: nowrap;
+    }
+
+    table.unzercancel {
+    border-collapse: collapse;
+    }
+{% endcapture %}
+
+{% include "email/html/header.html.twig" with { title: ("OSCUNZER_CANCEL_MAIL_TITLE"|translate) ~ " #" ~ order.oxorder__oxordernr.value, style: style } %}
+
+    {% block unzer_email_html_cancel_intro %}
+        <p>
+            {% if isUnzerOwnerMail %}
+                {{ translate({ ident: "OSCUNZER_CANCEL_MAIL_INTRO_OWNER" }) }}
+            {% else %}
+                {{ translate({ ident: "OSCUNZER_CANCEL_MAIL_SALUTATION" }) }}
+                {{ order.oxorder__oxbillfname.getRawValue() }} {{ order.oxorder__oxbilllname.getRawValue() }},
+            {% endif %}
+        </p>
+        {% if not isUnzerOwnerMail %}
+            <p>{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_INTRO" }) }}</p>
+        {% endif %}
+    {% endblock %}
+
+    {% block unzer_email_html_cancel_details %}
+        <table class="unzercancel" border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tbody>
+                <tr valign="top">
+                    <th align="right" class="text-right">{{ translate({ ident: "ORDER_NUMBER", suffix: "COLON" }) }}</th>
+                    <td>{{ order.oxorder__oxordernr.value }}</td>
+                </tr>
+                <tr valign="top">
+                    <th align="right" class="text-right">{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_ORDER_TOTAL", suffix: "COLON" }) }}</th>
+                    <td>{{ format_price(order.oxorder__oxtotalordersum.value, { currency: currency }) }}</td>
+                </tr>
+                {% if unzerRefundedAmount is not null %}
+                    <tr valign="top">
+                        <th align="right" class="text-right">{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_REFUNDED", suffix: "COLON" }) }}</th>
+                        <td>{{ unzerRefundedAmount|number_format(2, '.', '') }} {{ unzerCurrencyCode }}</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        <br/>
+    {% endblock %}
+
+    {% block unzer_email_html_cancel_note %}
+        {% if not isUnzerOwnerMail %}
+            {% if unzerRefundedAmount is not null %}
+                <p>{{ translate({ ident: "OSCUNZER_REFUND_MAIL_NOTE" }) }}</p>
+            {% else %}
+                <p>{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_NOTE_NO_REFUND" }) }}</p>
+            {% endif %}
+        {% endif %}
+    {% endblock %}
+
+{% include "email/html/footer.html.twig" %}

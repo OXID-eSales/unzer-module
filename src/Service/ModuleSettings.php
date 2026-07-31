@@ -28,6 +28,23 @@ class ModuleSettings
 {
     public const SYSTEM_MODE_SANDBOX = 'sandbox';
     public const SYSTEM_MODE_PRODUCTION = 'production';
+    /**
+     * Recipients of the refund / cancellation confirmation mails
+     * (module settings UnzerRefundMailRecipient and UnzerCancelMailRecipient)
+     */
+    public const MAIL_RECIPIENT_NONE = '0';
+    public const MAIL_RECIPIENT_CUSTOMER = '1';
+    public const MAIL_RECIPIENT_OWNER = '2';
+    public const MAIL_RECIPIENT_BOTH = '3';
+
+    /**
+     * Backend action a refund was triggered by. The cancellation flow sends its
+     * own mail covering both the cancellation and a refunded amount, so it
+     * suppresses the refund mail and the customer receives one mail, not two.
+     */
+    public const REFUND_CONTEXT_REFUND = 'refund';
+    public const REFUND_CONTEXT_CANCEL = 'cancel';
+
     public const PAYMENT_CHARGE = 'charge';
     public const PAYMENT_AUTHORIZE = 'authorize';
 
@@ -838,6 +855,43 @@ class ModuleSettings
     {
         $privateKeysContext = $this->getPrivateKeysWithContext();
         return (!empty($privateKeysContext[$context]));
+    }
+
+    /**
+     * Recipients of the refund confirmation mail, see the MAIL_RECIPIENT_* modes.
+     * Unknown values mean "no mail".
+     */
+    public function getRefundMailRecipient(): string
+    {
+        return $this->sanitizeMailRecipient($this->getSettingValue('UnzerRefundMailRecipient'));
+    }
+
+    /**
+     * Recipients of the cancellation confirmation mail, see the MAIL_RECIPIENT_*
+     * modes. Unknown values mean "no mail".
+     */
+    public function getCancelMailRecipient(): string
+    {
+        return $this->sanitizeMailRecipient($this->getSettingValue('UnzerCancelMailRecipient'));
+    }
+
+    /**
+     * @param array|bool|int|string|null $mode
+     * @return string one of the MAIL_RECIPIENT_* modes
+     */
+    private function sanitizeMailRecipient($mode): string
+    {
+        $mode = is_scalar($mode) ? (string)$mode : '';
+
+        return in_array(
+            $mode,
+            [
+                self::MAIL_RECIPIENT_CUSTOMER,
+                self::MAIL_RECIPIENT_OWNER,
+                self::MAIL_RECIPIENT_BOTH,
+            ],
+            true
+        ) ? $mode : self::MAIL_RECIPIENT_NONE;
     }
 
     private function getKeyType(string $key): string
