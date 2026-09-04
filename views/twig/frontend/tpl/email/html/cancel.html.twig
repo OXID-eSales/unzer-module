@@ -44,7 +44,7 @@
                 {% if unzerRefundedAmount is not null %}
                     <tr valign="top">
                         <th align="right" class="text-right">{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_REFUNDED", suffix: "COLON" }) }}</th>
-                        <td>{{ unzerRefundedAmount|number_format(2, '.', '') }} {{ unzerCurrencyCode }}</td>
+                        <td>{{ format_price(unzerRefundedAmount, { currency: currency }) }}</td>
                     </tr>
                 {% endif %}
             </tbody>

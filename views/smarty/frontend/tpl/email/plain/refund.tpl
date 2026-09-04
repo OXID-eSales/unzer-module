@@ -12,8 +12,8 @@
 
 [{block name="unzer_email_plain_refund_details"}]
 [{oxmultilang ident="ORDER_NUMBER" suffix="COLON"}] [{$order->oxorder__oxordernr->value}]
-[{oxmultilang ident="OSCUNZER_REFUND_MAIL_AMOUNT" suffix="COLON"}] [{$unzerRefundedAmount|string_format:"%.2f"}] [{$unzerCurrencyCode}]
-[{oxmultilang ident="OSCUNZER_REFUND_MAIL_ORDER_TOTAL" suffix="COLON"}] [{$order->oxorder__oxtotalordersum->value|string_format:"%.2f"}] [{$order->oxorder__oxcurrency->value}]
+[{oxmultilang ident="OSCUNZER_REFUND_MAIL_AMOUNT" suffix="COLON"}] [{oxprice price=$unzerRefundedAmount currency=$currency}]
+[{oxmultilang ident="OSCUNZER_REFUND_MAIL_ORDER_TOTAL" suffix="COLON"}] [{oxprice price=$order->oxorder__oxtotalordersum->value currency=$currency}]
 [{/block}]
 
 [{block name="unzer_email_plain_refund_note"}]

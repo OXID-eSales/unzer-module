@@ -12,9 +12,9 @@
 
 [{block name="unzer_email_plain_cancel_details"}]
 [{oxmultilang ident="ORDER_NUMBER" suffix="COLON"}] [{$order->oxorder__oxordernr->value}]
-[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_ORDER_TOTAL" suffix="COLON"}] [{$order->oxorder__oxtotalordersum->value|string_format:"%.2f"}] [{$order->oxorder__oxcurrency->value}]
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_ORDER_TOTAL" suffix="COLON"}] [{oxprice price=$order->oxorder__oxtotalordersum->value currency=$currency}]
 [{if $unzerRefundedAmount !== null}]
-[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_REFUNDED" suffix="COLON"}] [{$unzerRefundedAmount|string_format:"%.2f"}] [{$unzerCurrencyCode}]
+[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_REFUNDED" suffix="COLON"}] [{oxprice price=$unzerRefundedAmount currency=$currency}]
 [{/if}]
 [{/block}]
 

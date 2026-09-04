@@ -44,7 +44,7 @@
                 [{if $unzerRefundedAmount !== null}]
                     <tr valign="top">
                         <th align="right" class="text-right">[{oxmultilang ident="OSCUNZER_CANCEL_MAIL_REFUNDED" suffix="COLON"}]</th>
-                        <td>[{$unzerRefundedAmount|string_format:"%.2f"}] [{$unzerCurrencyCode}]</td>
+                        <td>[{oxprice price=$unzerRefundedAmount currency=$currency}]</td>
                     </tr>
                 [{/if}]
             </tbody>

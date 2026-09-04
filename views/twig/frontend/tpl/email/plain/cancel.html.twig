@@ -12,9 +12,9 @@
 
 {% block unzer_email_plain_cancel_details %}
 {{ translate({ ident: "ORDER_NUMBER", suffix: "COLON" }) }} {{ order.oxorder__oxordernr.value }}
-{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_ORDER_TOTAL", suffix: "COLON" }) }} {{ order.oxorder__oxtotalordersum.value|number_format(2, '.', '') }} {{ order.oxorder__oxcurrency.value }}
+{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_ORDER_TOTAL", suffix: "COLON" }) }} {{ format_price(order.oxorder__oxtotalordersum.value, { currency: currency }) }}
 {% if unzerRefundedAmount is not null %}
-{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_REFUNDED", suffix: "COLON" }) }} {{ unzerRefundedAmount|number_format(2, '.', '') }} {{ unzerCurrencyCode }}
+{{ translate({ ident: "OSCUNZER_CANCEL_MAIL_REFUNDED", suffix: "COLON" }) }} {{ format_price(unzerRefundedAmount, { currency: currency }) }}
 {% endif %}
 {% endblock %}
 

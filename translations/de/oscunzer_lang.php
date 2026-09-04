@@ -140,13 +140,13 @@ $aLang = [
     'OSCUNZER_REFUND_MAIL_SUBJECT'              => 'Rückerstattung zu Ihrer Bestellung %s',
     'OSCUNZER_REFUND_MAIL_SUBJECT_OWNER'        => 'Unzer: Rückerstattung zur Bestellung %s veranlasst',
     'OSCUNZER_REFUND_MAIL_SALUTATION'           => 'Guten Tag',
-    'OSCUNZER_REFUND_MAIL_INTRO'                => 'wir haben eine Rückerstattung über Unzer für Sie veranlasst.',
-    'OSCUNZER_REFUND_MAIL_INTRO_OWNER'          => 'Für die folgende Bestellung wurde über Unzer eine Rückerstattung '
-        . 'veranlasst.',
+    'OSCUNZER_REFUND_MAIL_INTRO'                => 'wir haben eine Rückerstattung für Sie veranlasst.',
+    'OSCUNZER_REFUND_MAIL_INTRO_OWNER'          => 'Für die folgende Bestellung wurde eine Rückerstattung veranlasst '
+        . '(Unzer Payment Provider).',
     'OSCUNZER_REFUND_MAIL_AMOUNT'               => 'Erstatteter Betrag',
     'OSCUNZER_REFUND_MAIL_ORDER_TOTAL'          => 'Bestellwert',
-    'OSCUNZER_REFUND_MAIL_NOTE'                 => 'Die Gutschrift erfolgt über Unzer auf das von Ihnen bei Unzer '
-        . 'verwendete Zahlungsmittel. Wie lange das dauert, hängt von Ihrem Zahlungsmittel und Ihrer Bank ab.',
+    'OSCUNZER_REFUND_MAIL_NOTE'                 => 'Die Rückerstattung wurde Ihrer ursprünglich verwendeten '
+        . 'Zahlungsart gutgeschrieben. Die Wertstellung hängt von Ihrem Zahlungsmittel und Ihrer Bank ab.',
     'OSCUNZER_CANCEL_MAIL_TITLE'                => 'Stornierung Ihrer Bestellung',
     'OSCUNZER_CANCEL_MAIL_SUBJECT'              => 'Stornierung Ihrer Bestellung %s',
     'OSCUNZER_CANCEL_MAIL_SUBJECT_OWNER'        => 'Unzer: Bestellung %s storniert',

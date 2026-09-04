@@ -39,7 +39,7 @@
                 </tr>
                 <tr valign="top">
                     <th align="right" class="text-right">[{oxmultilang ident="OSCUNZER_REFUND_MAIL_AMOUNT" suffix="COLON"}]</th>
-                    <td>[{$unzerRefundedAmount|string_format:"%.2f"}] [{$unzerCurrencyCode}]</td>
+                    <td>[{oxprice price=$unzerRefundedAmount currency=$currency}]</td>
                 </tr>
                 <tr valign="top">
                     <th align="right" class="text-right">[{oxmultilang ident="OSCUNZER_REFUND_MAIL_ORDER_TOTAL" suffix="COLON"}]</th>

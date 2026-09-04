@@ -140,12 +140,13 @@ $aLang = [
     'OSCUNZER_REFUND_MAIL_SUBJECT'              => 'Refund for your order %s',
     'OSCUNZER_REFUND_MAIL_SUBJECT_OWNER'        => 'Unzer: refund issued for order %s',
     'OSCUNZER_REFUND_MAIL_SALUTATION'           => 'Dear',
-    'OSCUNZER_REFUND_MAIL_INTRO'                => 'we have issued a refund for you via Unzer.',
-    'OSCUNZER_REFUND_MAIL_INTRO_OWNER'          => 'A refund has been issued via Unzer for the following order.',
+    'OSCUNZER_REFUND_MAIL_INTRO'                => 'we have issued a refund for you.',
+    'OSCUNZER_REFUND_MAIL_INTRO_OWNER'          => 'A refund has been issued for the following order (Unzer Payment '
+        . 'Provider).',
     'OSCUNZER_REFUND_MAIL_AMOUNT'               => 'Refunded amount',
     'OSCUNZER_REFUND_MAIL_ORDER_TOTAL'          => 'Order total',
-    'OSCUNZER_REFUND_MAIL_NOTE'                 => 'Unzer credits the amount to the payment method you used at '
-        . 'Unzer. How long this takes depends on that payment method and your bank.',
+    'OSCUNZER_REFUND_MAIL_NOTE'                 => 'The refund has been credited to the payment method you originally '
+        . 'used. When the amount becomes available depends on your payment method and your bank.',
     'OSCUNZER_CANCEL_MAIL_TITLE'                => 'Cancellation of your order',
     'OSCUNZER_CANCEL_MAIL_SUBJECT'              => 'Cancellation of your order %s',
     'OSCUNZER_CANCEL_MAIL_SUBJECT_OWNER'        => 'Unzer: order %s cancelled',
