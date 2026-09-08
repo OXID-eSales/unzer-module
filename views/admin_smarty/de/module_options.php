@@ -111,6 +111,9 @@ $aLang = [
     // sandbox Paylater Installment B2C EUR
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPrivateKey' => 'Sandbox privater Schlüssel für Ratenkauf B2C-Käufe in CHF',
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPublicKey' => 'Sandbox öffentlicher Schlüssel für Ratenkauf B2C-Käufe in CHF',
+    'SHOP_MODULE_GROUP_unzercancel' => 'Storno und Rückerstattung',
+    'SHOP_MODULE_UnzerAutomatedRefundOnCancel' => 'Beim Storno einer Bestellung automatisch erstatten',
+    'HELP_SHOP_MODULE_UnzerAutomatedRefundOnCancel' => 'Ist diese Option aktiv, erstattet der Shop beim Storno einer Bestellung im Backend den noch offenen Betrag der Unzer-Zahlung — also den gebuchten Betrag abzüglich bereits stornierter Teilbeträge. Ist nichts (mehr) offen oder wurde die Zahlung nur autorisiert und nie gebucht, passiert nichts. Scheitert die Rückerstattung, bleibt das Storno trotzdem bestehen: Sie sehen eine Fehlermeldung und können die Rückerstattung in der Bestellansicht nachholen. Ohne diese Option verhält sich das Modul wie bisher — das Storno lässt die Zahlung bei Unzer unberührt.',
     'SHOP_MODULE_GROUP_unzermails' => 'Bestätigungsmails',
     'SHOP_MODULE_UnzerRefundMailRecipient' => 'Bestätigungsmail bei Rückerstattung',
     'SHOP_MODULE_UnzerRefundMailRecipient_0' => 'Keine Mail versenden',
@@ -123,5 +126,5 @@ $aLang = [
     'SHOP_MODULE_UnzerCancelMailRecipient_1' => 'An den Kunden',
     'SHOP_MODULE_UnzerCancelMailRecipient_2' => 'An den Shop-Betreiber',
     'SHOP_MODULE_UnzerCancelMailRecipient_3' => 'An Kunden und Shop-Betreiber',
-    'HELP_SHOP_MODULE_UnzerCancelMailRecipient' => 'Wer wird per E-Mail informiert, wenn eine Unzer-Bestellung im Backend storniert wurde? Ein Bestell-Storno löst keine automatische Rückerstattung aus — diese Mail bestätigt nur die Stornierung. Eine Rückerstattung wird separat in der Bestellansicht ausgelöst und separat bestätigt.',
+    'HELP_SHOP_MODULE_UnzerCancelMailRecipient' => 'Wer wird per E-Mail informiert, wenn eine Unzer-Bestellung im Backend storniert wurde? Wurde dabei automatisch erstattet (Option "Beim Storno einer Bestellung automatisch erstatten"), nennt diese Mail auch den erstatteten Betrag — der Kunde bekommt dann eine Mail statt zwei. Ohne automatische Rückerstattung bestätigt sie nur die Stornierung, und eine später in der Bestellansicht ausgelöste Rückerstattung wird separat bestätigt.',
 ];

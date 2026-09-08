@@ -111,6 +111,9 @@ $aLang = [
     // sandbox Paylater Installment B2C EUR
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPrivateKey' => 'Sandbox Private-Key for Installment B2C-purchases in CHF',
     'SHOP_MODULE_sandbox-UnzerPayLaterInstallmentB2CCHFPublicKey' => 'Sandbox Public-Key for Installment B2C-purchases in CHF',
+    'SHOP_MODULE_GROUP_unzercancel' => 'Cancellation and refund',
+    'SHOP_MODULE_UnzerAutomatedRefundOnCancel' => 'Refund automatically when an order is cancelled',
+    'HELP_SHOP_MODULE_UnzerAutomatedRefundOnCancel' => 'With this option on, cancelling an order in the backend refunds what the unzer payment still holds - the charged amount minus anything cancelled before. If nothing is left to refund, or the payment was only authorized and never charged, nothing happens. Should the refund fail, the cancellation still stands: you get an error message and can issue the refund in the order view. Without this option the module behaves as before and a cancellation leaves the payment at unzer untouched.',
     'SHOP_MODULE_GROUP_unzermails' => 'Confirmation mails',
     'SHOP_MODULE_UnzerRefundMailRecipient' => 'Confirmation mail on refund',
     'SHOP_MODULE_UnzerRefundMailRecipient_0' => 'Do not send a mail',
@@ -123,5 +126,5 @@ $aLang = [
     'SHOP_MODULE_UnzerCancelMailRecipient_1' => 'To the customer',
     'SHOP_MODULE_UnzerCancelMailRecipient_2' => 'To the shop owner',
     'SHOP_MODULE_UnzerCancelMailRecipient_3' => 'To customer and shop owner',
-    'HELP_SHOP_MODULE_UnzerCancelMailRecipient' => 'Who is notified by email once an Unzer order was cancelled in the backend? An order cancellation does not trigger an automatic refund - this mail only confirms the cancellation. A refund is triggered separately in the order view and confirmed separately.',
+    'HELP_SHOP_MODULE_UnzerCancelMailRecipient' => 'Who is notified by email once an Unzer order was cancelled in the backend? If the cancellation refunded automatically (option "Refund automatically when an order is cancelled"), this mail states the refunded amount as well, so the customer gets one mail instead of two. Without the automated refund it confirms the cancellation only, and a refund issued in the order view later is confirmed separately.',
 ];

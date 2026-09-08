@@ -46,6 +46,7 @@ $aLang = [
     'OSCUNZER_CHARGED_AMOUNT' => 'amount collected',
     'OSCUNZER_CHARGED_CANCELLED' => 'refunded amount',
     'OSCUNZER_CANCEL_ERR_AMOUNT' => 'wrong amount',
+    'OSCUNZER_CANCEL_REFUND_FAILED' => 'The automated refund for this order failed. The cancellation was carried out; please issue the refund by hand in the order view. The details are in the log.',
     'OSCUNZER_CHARGE_CANCELREASON' => 'refund reason',
     'OSCUNZER_CHARGE_CANCELAMOUNT' => 'redemption amount',
     'OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT' => 'Refund from charged total amount',

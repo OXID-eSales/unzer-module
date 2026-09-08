@@ -180,6 +180,12 @@ $aModule = [
     ],
     'settings'    => [
         [
+            'group' => 'unzercancel',
+            'name' => 'UnzerAutomatedRefundOnCancel',
+            'type' => 'bool',
+            'value' => false
+        ],
+        [
             'group' => 'unzermails',
             'name' => 'UnzerRefundMailRecipient',
             'type' => 'select',
