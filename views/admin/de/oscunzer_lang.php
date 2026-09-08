@@ -45,6 +45,7 @@ $aLang = [
     'OSCUNZER_CHARGED_AMOUNT' => 'Eingezogener Betrag',
     'OSCUNZER_CHARGED_CANCELLED' => 'Erstatteter Betrag',
     'OSCUNZER_CANCEL_ERR_AMOUNT' => 'Ungültiger Betrag',
+    'OSCUNZER_CANCEL_REFUND_FAILED' => 'Die automatische Rückerstattung zu dieser Bestellung ist fehlgeschlagen. Das Storno wurde ausgeführt; bitte lösen Sie die Rückerstattung in der Bestellansicht von Hand aus. Details stehen im Log.',
     'OSCUNZER_CHARGE_CANCELREASON' => 'Rückzahlungsgrund',
     'OSCUNZER_CHARGE_CANCELAMOUNT' => 'Rückzahlungsbetrag',
     'OSCUNZER_CHARGE_CANCEL_FROM_PAYMENT' => 'Rückzahlung von eingezogenem Gesamtbetrag',

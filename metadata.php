@@ -54,7 +54,7 @@ $aModule = [
             </ul>',
     ],
     'thumbnail' => 'logo.svg',
-    'version' => '1.3.0-rc.2',
+    'version' => '1.3.0-rc.3',
     'author' => 'OXID eSales AG',
     'url' => 'https://www.oxid-esales.com',
     'email' => 'info@oxid-esales.com',
@@ -173,6 +173,12 @@ $aModule = [
         ],
     ],
     'settings' => [
+        [
+            'group' => 'unzercancel',
+            'name' => 'UnzerAutomatedRefundOnCancel',
+            'type' => 'bool',
+            'value' => false
+        ],
         [
             'group' => 'unzermails',
             'name' => 'UnzerRefundMailRecipient',

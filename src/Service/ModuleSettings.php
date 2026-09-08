@@ -460,6 +460,16 @@ class ModuleSettings
     }
 
     /**
+     * Whether cancelling an order in the backend refunds what the unzer payment still holds.
+     * Off by default: an update must not start moving money on its own, and a merchant who
+     * refunds separately (or has already refunded by hand) keeps the behaviour they know.
+     */
+    public function automatedRefundOnCancel(): bool
+    {
+        return $this->getSettingValue('UnzerAutomatedRefundOnCancel') === true;
+    }
+
+    /**
      * Recipients of the refund confirmation mail, see the MAIL_RECIPIENT_* modes.
      * Unknown values mean "no mail".
      */
