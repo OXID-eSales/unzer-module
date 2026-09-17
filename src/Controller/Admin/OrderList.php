@@ -241,16 +241,19 @@ class OrderList extends OrderList_parent
      */
     protected function refundOnCancel(Order $order): ?float
     {
-        /** @var ModuleSettings $moduleSettings */
-        $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
-        if (!$moduleSettings->automatedRefundOnCancel()) {
-            return null;
-        }
-
         $orderNr = $order->getFieldData('oxordernr');
         $orderNr = is_scalar($orderNr) ? (string)$orderNr : '';
 
+        // Reading the setting happens inside the try as well: a cancellation is a routine backend
+        // action and must not end in the maintenance screen because something went wrong while
+        // asking for a module setting.
         try {
+            /** @var ModuleSettings $moduleSettings */
+            $moduleSettings = $this->getServiceFromContainer(ModuleSettings::class);
+            if (!$moduleSettings->automatedRefundOnCancel()) {
+                return null;
+            }
+
             /** @var TransactionService $transactionService */
             $transactionService = $this->getServiceFromContainer(TransactionService::class);
             $unzerPaymentId = $transactionService->getPaymentIdByOrderId($order->getId(), true);

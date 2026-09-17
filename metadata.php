@@ -180,26 +180,6 @@ $aModule = [
     ],
     'settings'    => [
         [
-            'group' => 'unzercancel',
-            'name' => 'UnzerAutomatedRefundOnCancel',
-            'type' => 'bool',
-            'value' => false
-        ],
-        [
-            'group' => 'unzermails',
-            'name' => 'UnzerRefundMailRecipient',
-            'type' => 'select',
-            'value' => '0',
-            'constraints' => '0|1|2|3'
-        ],
-        [
-            'group' => 'unzermails',
-            'name' => 'UnzerCancelMailRecipient',
-            'type' => 'select',
-            'value' => '0',
-            'constraints' => '0|1|2|3'
-        ],
-        [
             'group'       => 'unzerenvironment',
             'name'        => 'UnzerSystemMode',
             'type'        => 'select',
@@ -310,8 +290,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-
-        // live Paylater Invoice B2C EUR
         [
             'group' => 'unzerinvoice',
             'name'  => 'production-UnzerPayLaterInvoiceB2CEURPrivateKey',
@@ -324,7 +302,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // live Paylater Invoice B2B EUR
         [
             'group' => 'unzerinvoice',
             'name'  => 'production-UnzerPayLaterInvoiceB2BEURPrivateKey',
@@ -337,7 +314,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // live Paylater Invoice B2C CHF
         [
             'group' => 'unzerinvoice',
             'name'  => 'production-UnzerPayLaterInvoiceB2CCHFPrivateKey',
@@ -350,7 +326,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // live Paylater Invoice B2B CHF
         [
             'group' => 'unzerinvoice',
             'name'  => 'production-UnzerPayLaterInvoiceB2BCHFPrivateKey',
@@ -363,7 +338,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // live Paylater Installment B2C EUR
         [
             'group' => 'unzerpaylater',
             'name'  => 'production-UnzerPayLaterInstallmentB2CEURPrivateKey',
@@ -376,7 +350,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // live Paylater Installment B2C CHF
         [
             'group' => 'unzerpaylater',
             'name'  => 'production-UnzerPayLaterInstallmentB2CCHFPrivateKey',
@@ -389,7 +362,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // sandbox Paylater Invoice B2C EUR
         [
             'group' => 'unzerinvoice',
             'name'  => 'sandbox-UnzerPayLaterInvoiceB2CEURPrivateKey',
@@ -402,7 +374,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // sandbox Paylater Invoice B2B EUR
         [
             'group' => 'unzerinvoice',
             'name'  => 'sandbox-UnzerPayLaterInvoiceB2BEURPrivateKey',
@@ -415,7 +386,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // sandbox Paylater Invoice B2C CHF
         [
             'group' => 'unzerinvoice',
             'name'  => 'sandbox-UnzerPayLaterInvoiceB2CCHFPrivateKey',
@@ -428,7 +398,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // sandbox Paylater Invoice B2B CHF
         [
             'group' => 'unzerinvoice',
             'name'  => 'sandbox-UnzerPayLaterInvoiceB2BCHFPrivateKey',
@@ -441,7 +410,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // sandbox Paylater Installment B2C EUR
         [
             'group' => 'unzerpaylater',
             'name'  => 'sandbox-UnzerPayLaterInstallmentB2CEURPrivateKey',
@@ -454,7 +422,6 @@ $aModule = [
             'type'  => 'str',
             'value' => ''
         ],
-        // sandbox Paylater Installment B2C CHF
         [
             'group' => 'unzerpaylater',
             'name'  => 'sandbox-UnzerPayLaterInstallmentB2CCHFPrivateKey',
@@ -479,7 +446,6 @@ $aModule = [
             'type'  => 'str',
             'value' => '5',
         ],
-        // this options are invisible because of missing group
         [
             'group' => '',
             'name'  => 'sandboxApplePayPaymentKeyId',
@@ -503,6 +469,26 @@ $aModule = [
             'name'  => 'productionApplePayPaymentCertificateId',
             'type'  => 'str',
             'value' => ''
+        ],
+        [
+            'group' => 'unzercancel',
+            'name' => 'UnzerAutomatedRefundOnCancel',
+            'type' => 'bool',
+            'value' => false
+        ],
+        [
+            'group' => 'unzermails',
+            'name' => 'UnzerRefundMailRecipient',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1|2|3'
+        ],
+        [
+            'group' => 'unzermails',
+            'name' => 'UnzerCancelMailRecipient',
+            'type' => 'select',
+            'value' => '0',
+            'constraints' => '0|1|2|3'
         ],
     ],
     'events'      => [

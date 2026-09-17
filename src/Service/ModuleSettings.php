@@ -906,7 +906,7 @@ class ModuleSettings
 
     private function getKeyType(string $key): string
     {
-        if (in_array($key, ['UnzerDebug', 'UnzerjQuery'])) {
+        if (in_array($key, ['UnzerDebug', 'UnzerjQuery', 'UnzerAutomatedRefundOnCancel'])) {
             return 'bool';
         }
 
