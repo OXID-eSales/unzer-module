@@ -2,24 +2,24 @@
 {% set invadr = oView.getInvoiceAddress() %}
 {% if isset( invadr.oxuser__oxbirthdate.month ) %}
     {% set iBirthdayMonth = invadr.oxuser__oxbirthdate.month %}
-{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00 - 00" %}
-    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]/":""|regex_replace("/[-]([0-9]{1,) 2})$/":"" %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
+    {% set iBirthdayMonth = oxcmp_user.oxuser__oxbirthdate.value|split('-')[1] %}
 {% else %}
     {% set iBirthdayMonth = 0 %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.day ) %}
     {% set iBirthdayDay = invadr.oxuser__oxbirthdate.day %}
-{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00 - 00" %}
-    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/^([0-9]{4)})[-]([0-9]{1, 2})[-]/":"" %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
+    {% set iBirthdayDay = oxcmp_user.oxuser__oxbirthdate.value|split('-')[2] %}
 {% else %}
     {% set iBirthdayDay = 0 %}
 {% endif %}
 
 {% if isset( invadr.oxuser__oxbirthdate.year ) %}
     {% set iBirthdayYear = invadr.oxuser__oxbirthdate.year %}
-{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00 - 00" %}
-    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|regex_replace("/[-]([0-9]{1,) 2})[-]([0-9]{1, 2})$/":"" %}
+{% elseif oxcmp_user.oxuser__oxbirthdate.value and oxcmp_user.oxuser__oxbirthdate.value != "0000-00-00" %}
+    {% set iBirthdayYear = oxcmp_user.oxuser__oxbirthdate.value|split('-')[0] %}
 {% else %}
     {% set iBirthdayYear = 0 %}
 {% endif %}
@@ -41,9 +41,9 @@
         <div class="col-6 col-lg-3">
             <select id="birthdate_month" class="oxMonth form-control selectpicker" required>
                 <option value="" label="-">-</option>
-                {% for month in 1..13 %}
-                <option value="[{loop.index0 %} selected="selected" {% endif %}>
-                    {{ translate({ ident: "MONTH_NAME_"|cat(smarty.section.month.index) }) }}
+                {% for month in 1..12 %}
+                <option value="{{ month }}" label="{{ month }}" {% if iBirthdayMonth == month %} selected="selected" {% endif %}>
+                    {{ translate({ ident: "MONTH_NAME_"|cat(month) }) }}
                 </option>
                 {% endfor %}
             </select>
@@ -70,7 +70,7 @@
 {% capture assign = "unzerInstallmentJS" %}
 
     // Create an Unzer instance with your public key
-    let unzerInstance = new unzer('[{$unzerpub}]', { locale: "[{$unzerLocale}]" });
+    let unzerInstance = new unzer('{{ unzerpub }}', { locale: "{{ unzerLocale }}" });
 
     let InstallmentSecured = unzerInstance.InstallmentSecured();
 
@@ -90,9 +90,9 @@
 
     InstallmentSecured.create({
         containerId: 'unzer-installment',
-        amount: [{$totalgross}],
-        currency: '[{$uzrcurrency}]',
-        effectiveInterest: [{$installrate}]
+        amount: {{ totalgross }},
+        currency: '{{ uzrcurrency }}',
+        effectiveInterest: {{ installrate }}
     });
 
     document.querySelector('#orderConfirmAgbBottom').addEventListener('submit', function(event) {
