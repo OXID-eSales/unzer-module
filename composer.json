@@ -34,7 +34,7 @@
     "oxid-esales/oxideshop-ce": "dev-b-6.3.x",
     "phpunit/php-code-coverage": "*"
   },
-  "conflicts": {
+  "conflict": {
     "oxid-esales/oxideshop-ce": "<6.8 | ^7.0"
   },
   "autoload": {

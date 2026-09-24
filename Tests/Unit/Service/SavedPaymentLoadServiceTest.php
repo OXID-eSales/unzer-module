@@ -7,7 +7,7 @@ use OxidSolutionCatalysts\Unzer\Service\SavedPaymentLoadService;
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentLoadFilterService;
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentLoadGroupService;
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentMethodValidator;
-use OxidSolutionCatalysts\Unzer\Tests\Unit\Service\SavedPayment\SQL\LoadQueries;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SQL\LoadQueries;
 use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Connection;
 
@@ -170,6 +170,7 @@ class SavedPaymentLoadServiceTest extends TestCase
     public function testGetSavedPaymentTransactionsByUserId()
     {
         $savedPaymentUserId = 'user123';
+        $oxUserId = 'oxuser456';
 
         $sql = LoadQueries::LOAD_TRANSACTIONS_BY_USER_ID_SQL;
 
@@ -179,12 +180,16 @@ class SavedPaymentLoadServiceTest extends TestCase
             ['OXID' => 'txn2']
         ]);
 
+        // the owner has to be part of the query - see the security entry in the CHANGELOG
         $this->connection->expects($this->once())
             ->method('executeQuery')
-            ->with($sql, ['savedPaymentUserId' => $savedPaymentUserId])
+            ->with($sql, ['savedPaymentUserId' => $savedPaymentUserId, 'oxuserid' => $oxUserId])
             ->willReturn($statement);
 
-        $result = $this->savedPaymentLoadService->getSavedPaymentTransactionsByUserId($savedPaymentUserId);
+        $result = $this->savedPaymentLoadService->getSavedPaymentTransactionsByUserId(
+            $savedPaymentUserId,
+            $oxUserId
+        );
 
         $this->assertEquals(['txn1', 'txn2'], $result);
     }

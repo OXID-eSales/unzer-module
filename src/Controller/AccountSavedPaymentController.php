@@ -58,8 +58,12 @@ class AccountSavedPaymentController extends AccountController
 
         $savedPaymentUserId = $this->getUnzerStringRequestParameter('savedPaymentUserId');
         $loadService = $this->getServiceFromContainer(SavedPaymentLoadService::class);
+        // The saved payment id comes straight from the request and is a PayPal address or an IBAN,
+        // so it identifies nobody: the lookup is restricted to the signed-in customer's own
+        // transactions, otherwise anyone could delete a stranger's saved payment methods.
         $transactionsIds = $loadService->getSavedPaymentTransactionsByUserId(
-            $savedPaymentUserId
+            $savedPaymentUserId,
+            (string)$user->getId()
         );
 
         if (count($transactionsIds) > 0) {

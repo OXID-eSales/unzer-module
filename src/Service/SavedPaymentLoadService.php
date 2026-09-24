@@ -7,7 +7,7 @@ use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentLoadFilterServi
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentLoadGroupService;
 use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SavedPaymentMethodValidator;
 use InvalidArgumentException;
-use OxidSolutionCatalysts\Unzer\Tests\Unit\Service\SavedPayment\SQL\LoadQueries;
+use OxidSolutionCatalysts\Unzer\Service\SavedPayment\SQL\LoadQueries;
 
 class SavedPaymentLoadService
 {
@@ -71,12 +71,22 @@ class SavedPaymentLoadService
         return $this->loadGroupService->groupByPaymentTypeId($ungroupedRows);
     }
 
-    public function getSavedPaymentTransactionsByUserId(string $savedPaymentUserId): array
+    /**
+     * Returns the ids of the saved payment transactions of one customer.
+     *
+     * $oxUserId is not optional on purpose: the saved payment id is a PayPal address or an IBAN,
+     * which is not a secret, so the owner has to be part of the query itself. Leaving the check to
+     * the caller once let any signed-in customer delete another customer's saved payment methods.
+     */
+    public function getSavedPaymentTransactionsByUserId(string $savedPaymentUserId, string $oxUserId): array
     {
         $sql = LoadQueries::LOAD_TRANSACTIONS_BY_USER_ID_SQL;
 
         /** @var \Doctrine\DBAL\Driver\Result $statement */
-        $statement = $this->connection->executeQuery($sql, ['savedPaymentUserId' => $savedPaymentUserId]);
+        $statement = $this->connection->executeQuery(
+            $sql,
+            ['savedPaymentUserId' => $savedPaymentUserId, 'oxuserid' => $oxUserId]
+        );
         $rowsFromDB = $statement->fetchAllAssociative();
 
         return array_map(function ($row) {
