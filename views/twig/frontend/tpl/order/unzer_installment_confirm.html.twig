@@ -7,9 +7,9 @@
 
     {% block checkout_installment_confirm_main %}
         {% if oViewConf.isFlowCompatibleTheme() %}
-            {% include '@unzer/unzer_installment_confirm_flow.html.twig' %}
+            {% include '@osc-unzer/frontend/tpl/order/unzer_installment_confirm_flow.html.twig' %}
         {% else %}
-            {% include '@unzer/unzer_installment_confirm_wave.html.twig' %}
+            {% include '@osc-unzer/frontend/tpl/order/unzer_installment_confirm_wave.html.twig' %}
         {% endif %}
     {% endblock %}
 {% endcapture %}
