@@ -239,7 +239,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      * @SuppressWarnings(PHPMD.StaticAccess)
      * @throws \OxidEsales\EshopCommunity\Core\Exception\FileException
      */
-    public function saveConfVars(): void
+    public function saveConfVars()
     {
         $moduleId = $this->getUnzerStringRequestEscapedParameter('oxid');
         if ($moduleId === Module::MODULE_ID) {
