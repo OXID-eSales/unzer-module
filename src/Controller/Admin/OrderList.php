@@ -101,7 +101,7 @@ class OrderList extends OrderList_parent
 
         parent::cancelOrder();
 
-        $refundedAmount = $this->refundOnCancel($order);
+        $refundedAmount = $this->unzerRefundOnCancel($order);
 
         $currency = $order->getFieldData('oxcurrency');
         $mailService = oxNew(RefundMailService::class);
@@ -129,7 +129,7 @@ class OrderList extends OrderList_parent
      * @param Order $order
      * @return float|null amount unzer confirmed as refunded, null when nothing was refunded
      */
-    protected function refundOnCancel(Order $order): ?float
+    protected function unzerRefundOnCancel(Order $order): ?float
     {
         $orderNr = $order->getFieldData('oxordernr');
         $orderNr = is_scalar($orderNr) ? (string)$orderNr : '';
