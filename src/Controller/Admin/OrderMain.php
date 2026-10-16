@@ -11,6 +11,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Application\Model\Payment as EshopPayment;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Service\Payment as PaymentService;
 use OxidEsales\Eshop\Application\Model\Order;
@@ -32,7 +33,7 @@ class OrderMain extends OrderMain_parent
         $oOrder = oxNew(Order::class);
         if ($oOrder->load($sOxid)) {
             /** @var Payment $oPayment */
-            $oPayment = oxNew(Payment::class);
+            $oPayment = oxNew(EshopPayment::class);
             /** @var string $paymentType */
             $paymentType = $oOrder->getFieldData('oxpaymenttype');
             if (

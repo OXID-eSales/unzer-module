@@ -12,6 +12,7 @@ namespace OxidSolutionCatalysts\Unzer\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\Payment as EshopPayment;
 use OxidSolutionCatalysts\Unzer\Model\Payment;
 use OxidSolutionCatalysts\Unzer\Model\TransactionList;
 use OxidSolutionCatalysts\Unzer\Core\RefundMailService;
@@ -434,7 +435,7 @@ class AdminOrderController extends AdminDetailsController
         /** @var string $oxPaymentType */
         $oxPaymentType = $order->getFieldData('oxpaymenttype');
         if ($order instanceof Order && strpos($oxPaymentType, "oscunzer") !== false) {
-            $this->oPayment = oxNew(Payment::class);
+            $this->oPayment = oxNew(EshopPayment::class);
             if ($this->oPayment->load($oxPaymentType)) {
                 $isUnzer = true;
             }
