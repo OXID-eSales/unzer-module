@@ -1,6 +1,6 @@
 [{assign var="payment" value=$oView->getPayment()}]
 
-[{if $payment->isUnzerPayment()}]
+[{if $payment && $payment->isUnzerPayment()}]
     [{if $oViewConf->isFlowCompatibleTheme()}]
         [{include file="modules/osc/unzer/unzer_shippingAndPayment_flow.tpl"}]
     [{else}]
