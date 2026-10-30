@@ -1,5 +1,5 @@
 [{assign var="payment" value=$oView->getPayment()}]
-[{if $payment->getId() === 'oscunzer_applepay'}]
+[{if $payment && $payment->getId() === 'oscunzer_applepay'}]
     [{include file="@osc-unzer/frontend/tpl/order/applepay_button.tpl"}]
 [{else}]
     [{$smarty.block.parent}]

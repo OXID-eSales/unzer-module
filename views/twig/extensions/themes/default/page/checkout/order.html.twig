@@ -1,7 +1,9 @@
 {% extends "page/checkout/order.html.twig" %}
 
 {% block checkout_order_errors %}
-        {% if payment.isUnzerPayment() %}
+        {# payment is set by the core inside another block only, which is out of scope here #}
+        {% set payment = oView.getPayment() %}
+        {% if payment and payment.isUnzerPayment() %}
             {{ parent() }}
             {% set sepaError = oView.isSepaMandateConfirmationError() %}
             {% if sepaError == 1 %}
@@ -16,9 +18,9 @@
 
 {% block checkout_order_btn_submit_bottom %}
     {% set payment = oView.getPayment() %}
-    {% if payment.getId() is same as('oscunzer_applepay') %}
+    {% if payment and payment.getId() is same as('oscunzer_applepay') %}
         {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
-    {% elseif payment.isUnzerPayment() %}
+    {% elseif payment and payment.isUnzerPayment() %}
         <button type="submit" class="btn btn-highlight btn-lg w-100"
                 onclick="executeUnzerPayment(event)" id="submitOrder">
             {{ translate({ ident: "SUBMIT_ORDER" }) }}
@@ -81,9 +83,9 @@
 
 {% block checkout_order_next_step_side %}
     {% set payment = oView.getPayment() %}
-    {% if payment.getId() is same as('oscunzer_applepay') %}
+    {% if payment and payment.getId() is same as('oscunzer_applepay') %}
         {% include "@osc-unzer/frontend/tpl/order/applepay_button.html.twig" %}
-    {% elseif payment.isUnzerPayment() %}
+    {% elseif payment and payment.isUnzerPayment() %}
         <button type="submit" class="btn btn-highlight btn-lg w-100"
                 onclick="executeUnzerPayment(event)" id="submitOrder">
             {{ translate({ ident: "SUBMIT_ORDER" }) }}
@@ -146,7 +148,7 @@
 
 {% block shippingAndPayment %}
     {% set payment = oView.getPayment() %}
-    {% if payment.isUnzerPayment() %}
+    {% if payment and payment.isUnzerPayment() %}
         {% include "@osc-unzer/frontend/tpl/order/unzer_shippingAndPayment.html.twig" %}
     {% else %}
         {{ parent() }}

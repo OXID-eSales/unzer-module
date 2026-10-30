@@ -13,7 +13,7 @@
 {% block unzer_css %}
     {{ style({ include: "https://static.unzer.com/v1/unzer.css" }) }}
     {% set payment = oView.getPayment() %}
-    {% if payment.getId() is same as('oscunzer_applepay') %}
+    {% if payment and payment.getId() is same as('oscunzer_applepay') %}
         {{ style({ include: oViewConf.getModuleUrl('osc-unzer', 'out/src/css/applepay_button.css') }) }}
     {% endif %}
 {% endblock %}

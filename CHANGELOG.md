@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.1-rc.1] - Unreleased
+
+### Fixed
+
+- Guard the order page templates against a missing payment: the order button block, `unzer_assets` and the `shippingAndPayment` block called `getId()` and `isUnzerPayment()` on `$oView->getPayment()` without checking that a payment was returned. The core normally redirects to the payment step before the order page renders without a valid payment, so this is hardening, found while fixing a server error of the same kind in the PayPal and Adyen modules (reproduced with Amazon Pay's express checkout as a guest, where Amazon Pay replaces the order template's `shippingAndPayment` block - the block in which the core assigns `$payment` - entirely). In the Twig order template the `checkout_order_errors` block also used `payment` without assigning it: Twig keeps a variable set inside a block local to that block, so the payment the core sets in another block never reached it and the SEPA mandate confirmation error was not shown; the block now fetches the payment itself. Files touched: `views/smarty/frontend/blocks/page/checkout/checkout_order_btn_submit_bottom.tpl`, `views/smarty/frontend/blocks/page/checkout/shippingAndPayment_flow.tpl`, `views/smarty/frontend/blocks/page/checkout/shippingAndPayment_wave.tpl`, `views/smarty/frontend/tpl/order/unzer_assets.tpl`, `views/twig/extensions/themes/default/page/checkout/order.html.twig`, `views/twig/frontend/tpl/order/unzer_assets.html.twig`.
+- The same change was made in the OXID 6 module `osc/unzer` (1.3.1-rc.1).
+
 ## [2.3.0] - 2026-10-16
 
 ### Added
