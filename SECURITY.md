@@ -5,16 +5,17 @@ This document describes known security considerations that have been reviewed an
 ## Webhook Dispatcher Without Signature Verification
 
 **File:** `src/Controller/DispatcherController.php`
-**Risk:** High (architectural)
+**Risk:** Low
 
-The Unzer webhook dispatcher does not verify webhook authenticity via cryptographic signatures. Unlike Stripe or PayPal, the Unzer API does not provide webhook signatures. The module currently accepts any POST request to the dispatcher endpoint.
+Unzer does not sign its webhook notifications, so the dispatcher cannot prove that a call really comes from Unzer. For this reason the module never trusts the content of a notification:
 
-**Mitigation:** The module fetches payment details from the Unzer API using the `retrieveUrl` from the webhook payload. This means the actual payment data comes from Unzer's API (authenticated via the module's private key), not from the webhook body itself. An attacker cannot forge a successful payment — they can only trigger the module to re-check a payment's status at Unzer.
+- The payment state is never read from the request body. The module takes only the resource id from `retrieveUrl` and fetches the resource from the Unzer API itself, authenticated with the merchant's private key and sent to the API host the SDK is configured for. A notification therefore cannot mark an order as paid or cancelled unless Unzer reports that state.
+- The private key is never sent to the host named in `retrieveUrl`.
+- Before the Unzer API is contacted, the call is rejected unless `retrieveUrl` uses `https` and an Unzer API host, the referenced transaction is already known to the shop, and the `context` parameter matches a registered webhook.
 
-**Recommendation for future improvement:**
-- Validate `retrieveUrl` against Unzer API domains (`https://api.unzer.com/`, `https://sbx-api.unzer.com/`)
-- Consider IP whitelisting for known Unzer webhook source IPs
-- Implement a shared secret or bearer token for webhook authentication
+A forged call can therefore only make the shop read the current state of an existing payment from Unzer and process it, as the genuine notification would. Each such call costs one outbound API request. Shops that want to limit this can rate-limit `cl=unzer_dispatcher` in the web server.
+
+**Planned improvement:** a random token per registered webhook URL, verified by the dispatcher.
 
 ## `|raw` on CMS Content
 
