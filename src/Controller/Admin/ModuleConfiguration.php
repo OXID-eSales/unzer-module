@@ -89,7 +89,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         return $result;
     }
 
-    public function registerWebhooks(): void
+    public function unzerRegisterWebhooks(): void
     {
         try {
             $this->unzerWebhooks->setPrivateKeys(
@@ -103,7 +103,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
         }
     }
 
-    public function unregisterWebhooks(): void
+    public function unzerUnregisterWebhooks(): void
     {
         try {
             $this->unzerWebhooks->setPrivateKeys(
@@ -270,7 +270,7 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             $this->savePaymentKey($systemMode);
 
             $this->moduleSettings->saveWebhookConfiguration([]);
-            $this->registerWebhooks();
+            $this->unzerRegisterWebhooks();
         }
         parent::saveConfVars();
     }
