@@ -29,6 +29,19 @@ class DispatcherController extends FrontendController
     use ServiceContainer;
     use Request;
 
+    /**
+     * Hosts accepted in the retrieveUrl of a webhook notification. This is a plausibility check only:
+     * the SDK takes nothing but the resource id from the retrieveUrl and always talks to the API host
+     * it is configured for, so the private key never goes to the host named in the notification.
+     * The Unzer sandbox sends sbx-api.heidelpay.com, the legacy name of its API (checked 2026-11-03);
+     * sbx-api.unzer.com is the name the SDK uses and is accepted in case Unzer switches over.
+     */
+    private const RETRIEVE_URL_HOSTS = [
+        'api.unzer.com',
+        'sbx-api.unzer.com',
+        'sbx-api.heidelpay.com',
+    ];
+
     private Transaction $transaction;
     private UnzerWebhooks $unzerWebhooks;
     private UnzerSDKLoader $unzerSDKLoader;
@@ -129,8 +142,8 @@ class DispatcherController extends FrontendController
 
     protected function isInvalidRequest(array $url, string $typeid): bool
     {
-        return $url['scheme'] !== "https" ||
-            ($url['host'] !== "api.unzer.com" && $url['host'] !== "sbx-api.heidelpay.com") ||
+        return ($url['scheme'] ?? '') !== 'https' ||
+            !in_array($url['host'] ?? '', self::RETRIEVE_URL_HOSTS, true) ||
             !$this->transaction->isValidTransactionTypeId($typeid);
     }
 

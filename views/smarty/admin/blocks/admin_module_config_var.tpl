@@ -12,10 +12,10 @@
             <dt>
                 <input type="submit" class="confinput" name="validatewebhooks"
                        value="[{oxmultilang ident="SHOP_MODULE_webhook_register"}]"
-                       onClick="Javascript:document.module_configuration.fnc.value='registerWebhooks'" [{$readonly}]>
+                       onClick="Javascript:document.module_configuration.fnc.value='unzerRegisterWebhooks'" [{$readonly}]>
                 <input type="submit" class="confinput" name="deletewebhooks"
                        value="[{oxmultilang ident="SHOP_MODULE_webhook_unregister"}]"
-                       onClick="Javascript:document.module_configuration.fnc.value='unregisterWebhooks'" [{$readonly}]>
+                       onClick="Javascript:document.module_configuration.fnc.value='unzerUnregisterWebhooks'" [{$readonly}]>
             </dt>
             <div class="spacer"></div>
         </dl>
